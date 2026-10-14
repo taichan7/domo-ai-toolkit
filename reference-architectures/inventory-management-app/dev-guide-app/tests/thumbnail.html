@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>開発ガイド thumbnail</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <style>
+    /* 300x300 の Pro Code サムネイル。開発ガイド（ハンズオン）を表す。本体 app.css と同じ
+       calm-blue（紺青）基調の落ち着いた面（白地・細罫線・ゴシック見出し〔Noto Sans JP〕・差し色 #2b569c）に
+       合わせる＝品位はセリフ書体でなくヘアライン＋余白で出す。罫線色は在庫アプリのトークン --line（#dce0e9）に揃える。
+       補助文字（#5f6b7a）は 300px サムネイル向けに本体の補助色より意図的に淡くしている。
+       make-thumbnail.mjs は 600 CSS px × device-scale-factor 2 ＝ 1200px で描画し、sips で 300px へ縮小する。 */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 600px; height: 600px; overflow: hidden; background: #f3f5fa; }
+    body {
+      font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", sans-serif;
+      color: #26303f;
+    }
+    .frame {
+      position: relative; width: 300px; height: 300px; padding: 20px 20px 16px;
+      background: #ffffff; border: 1px solid #dce0e9;
+      transform: scale(2); transform-origin: top left;
+      display: flex; flex-direction: column;
+    }
+    .top { display: flex; align-items: center; gap: 7px; }
+    .mark {
+      width: 22px; height: 22px; display: grid; place-items: center;
+      border: 1px solid #2b569c; border-radius: 5px; color: #2b569c;
+      font: 700 13px/1 "Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .top b { font-size: 9px; font-weight: 700; letter-spacing: .05em; color: #5f6b7a; }
+    .chip {
+      margin-left: auto; padding: 2px 7px; font-size: 7px; font-weight: 800; letter-spacing: .06em;
+      color: #2b569c; background: #fff; border: 1px solid #2b569c; border-radius: 20px;
+    }
+    h1 {
+      margin: 13px 0 0; font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 27px; font-weight: 700; letter-spacing: .02em; color: #2b569c; line-height: 1.2;
+    }
+    .sub { margin: 7px 0 0; font-size: 10.5px; color: #26303f; line-height: 1.6; }
+    .sub b { color: #2b569c; }
+    .rule { height: 1px; margin: 12px 0 11px; background: #dce0e9; }
+    .term {
+      padding: 9px 10px; background: #f7f9fc; border: 1px solid #dce0e9; border-radius: 6px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+    }
+    .term .cmt { display: block; font-size: 7.5px; color: #5f6b7a; }
+    .term .ln { display: block; margin-top: 3px; font-size: 9.5px; color: #26303f; }
+    .term .p { color: #2b569c; }
+    .term .ok { color: #2b569c; font-weight: 700; }
+    .flow { display: flex; align-items: center; gap: 5px; margin-top: auto; }
+    .tile {
+      flex: 1; padding: 7px 2px; text-align: center;
+      background: #f7f9fc; border: 1px solid #dce0e9; border-radius: 5px;
+      color: #26303f; font-size: 8px; font-weight: 700;
+    }
+    .tile.on { background: #fff; border: 1.5px solid #2b569c; color: #2b569c; }
+    .arr { color: #aab4c3; font-size: 10px; font-weight: 800; }
+    .foot {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 10px; color: #5f6b7a; font-size: 7px; letter-spacing: .08em;
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="top">
+      <span class="mark">在</span>
+      <b>Domo All-in-One ・ 開発ハンズオン</b>
+      <span class="chip">約 3 時間</span>
+    </div>
+    <h1>開発ガイド</h1>
+    <p class="sub">VS&nbsp;Code × コーディングエージェントで <b>Domo</b> を開発する<br>環境準備 → 全体像 → 実習（コピー → 編集 → 公開 → 確認）</p>
+    <div class="rule"></div>
+    <div class="term">
+      <span class="cmt"># 手元で確かめてから公開する</span>
+      <span class="ln"><span class="p">$</span> domo publish</span>
+      <span class="ln ok">✓ 検証 → 公開 → 反映確認</span>
+    </div>
+    <div class="flow">
+      <div class="tile on">調べる</div><span class="arr">›</span>
+      <div class="tile">直す</div><span class="arr">›</span>
+      <div class="tile">公開</div><span class="arr">›</span>
+      <div class="tile">確認</div>
+    </div>
+    <div class="foot"><span>在庫入出庫管理｜開発ガイド</span><span>v2.0.1</span>
+</div>
+  </div>
+</body>
+</html>

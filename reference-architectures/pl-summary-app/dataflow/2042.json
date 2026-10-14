@@ -1,0 +1,1196 @@
+{
+  "gui": {
+    "version": "1.0",
+    "canvases": {
+      "default": {
+        "canvasSettings": {
+          "coarserGrid": true,
+          "hideCoarserGridPopUp": false,
+          "backgroundVariant": "Lines"
+        },
+        "elements": [
+          {
+            "id": "LoadFromVault-2a654779-e073-4b77-9c10-a6cca0b24126",
+            "type": "Tile",
+            "x": 128,
+            "y": 128,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "3fdc212f-32f5-4e25-88fb-01335509fb82",
+            "type": "Tile",
+            "x": 256,
+            "y": 128,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "dab1e13b-54a4-4833-9c77-f247dc84fa62",
+            "type": "Tile",
+            "x": 512,
+            "y": 128,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "364a005d-742b-455c-a33f-3afbfb2fc32a",
+            "type": "Tile",
+            "x": 1280,
+            "y": 288,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "SQL-2aad9739-d14d-4039-a06d-9a959b14e530",
+            "type": "Tile",
+            "x": 512,
+            "y": 288,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "Metadata-d7194316-533a-4367-bbc6-fa114e880e23",
+            "type": "Tile",
+            "x": 384,
+            "y": 128,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "PythonEngineAction-71dc1c5e-6baf-48d5-b3a1-daf8be58f17b",
+            "type": "Tile",
+            "x": 640,
+            "y": 288,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "TextGeneration-fac0a778-db80-4e93-96e3-0f20b591bc4e",
+            "type": "Tile",
+            "x": 768,
+            "y": 288,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061",
+            "type": "Tile",
+            "x": 1152,
+            "y": 288,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "Metadata-fdcee276-52f4-4d27-a127-6ab367bd0be8",
+            "type": "Tile",
+            "x": 896,
+            "y": 288,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "TextGeneration-0fa8df6c-10d9-4d28-8d8d-93dbd625a395",
+            "type": "Tile",
+            "x": 1024,
+            "y": 288,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "SQL-c4bdc5d5-9e9c-5d81-a817-0816308570fc",
+            "type": "Tile",
+            "x": 512,
+            "y": 448,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "0e861cea-7c34-53a2-8f3f-d2f3653290be",
+            "type": "Tile",
+            "x": 704,
+            "y": 448,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "SQL-bfb09e1d-af6d-5506-add0-99d81e326683",
+            "type": "Tile",
+            "x": 512,
+            "y": 608,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "b351222a-8c12-5e6c-b687-849d36c538cd",
+            "type": "Tile",
+            "x": 704,
+            "y": 608,
+            "color": null,
+            "colorSource": null
+          }
+        ],
+        "disabledActions": []
+      }
+    },
+    "elements": [
+      {
+        "id": "LoadFromVault-2a654779-e073-4b77-9c10-a6cca0b24126",
+        "type": "Tile",
+        "x": 128,
+        "y": 128,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "3fdc212f-32f5-4e25-88fb-01335509fb82",
+        "type": "Tile",
+        "x": 256,
+        "y": 128,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "dab1e13b-54a4-4833-9c77-f247dc84fa62",
+        "type": "Tile",
+        "x": 512,
+        "y": 128,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "364a005d-742b-455c-a33f-3afbfb2fc32a",
+        "type": "Tile",
+        "x": 1280,
+        "y": 288,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "SQL-2aad9739-d14d-4039-a06d-9a959b14e530",
+        "type": "Tile",
+        "x": 512,
+        "y": 288,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "Metadata-d7194316-533a-4367-bbc6-fa114e880e23",
+        "type": "Tile",
+        "x": 384,
+        "y": 128,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "PythonEngineAction-71dc1c5e-6baf-48d5-b3a1-daf8be58f17b",
+        "type": "Tile",
+        "x": 640,
+        "y": 288,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "TextGeneration-fac0a778-db80-4e93-96e3-0f20b591bc4e",
+        "type": "Tile",
+        "x": 768,
+        "y": 288,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061",
+        "type": "Tile",
+        "x": 1152,
+        "y": 288,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "Metadata-fdcee276-52f4-4d27-a127-6ab367bd0be8",
+        "type": "Tile",
+        "x": 896,
+        "y": 288,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "TextGeneration-0fa8df6c-10d9-4d28-8d8d-93dbd625a395",
+        "type": "Tile",
+        "x": 1024,
+        "y": 288,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "SQL-c4bdc5d5-9e9c-5d81-a817-0816308570fc",
+        "type": "Tile",
+        "x": 512,
+        "y": 448,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "0e861cea-7c34-53a2-8f3f-d2f3653290be",
+        "type": "Tile",
+        "x": 704,
+        "y": 448,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "SQL-bfb09e1d-af6d-5506-add0-99d81e326683",
+        "type": "Tile",
+        "x": 512,
+        "y": 608,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "b351222a-8c12-5e6c-b687-849d36c538cd",
+        "type": "Tile",
+        "x": 704,
+        "y": 608,
+        "color": null,
+        "colorSource": null
+      }
+    ],
+    "useGraphUI": true,
+    "disabledActions": []
+  },
+  "name": "DF｜店舗別損益データフロー",
+  "runState": "ENABLED",
+  "actions": [
+    {
+      "type": "LoadFromVault",
+      "id": "LoadFromVault-2a654779-e073-4b77-9c10-a6cca0b24126",
+      "name": "IN｜P/L入力データ",
+      "settings": {
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "gui": {
+        "x": 128,
+        "y": 128,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "previewRowLimit": 10000,
+      "propagateAi": false,
+      "filterPolicy": "LEGACY",
+      "dataSourceId": "cdacbd54-23dd-4ec9-8e16-8b7c7aa69677",
+      "sourceType": "AUTO",
+      "executeFlowWhenUpdated": false,
+      "pseudoDataSource": false,
+      "truncateTextColumns": false,
+      "truncateRows": false,
+      "onlyLoadNewVersions": false,
+      "recentVersionCutoffMs": 0,
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "PythonEngineAction",
+      "id": "3fdc212f-32f5-4e25-88fb-01335509fb82",
+      "name": "PY｜損益データ生成",
+      "dependsOn": [
+        "LoadFromVault-2a654779-e073-4b77-9c10-a6cca0b24126"
+      ],
+      "settings": {
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "gui": {
+        "x": 256,
+        "y": 128,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "inputs": [
+        "LoadFromVault-2a654779-e073-4b77-9c10-a6cca0b24126"
+      ],
+      "removeByDefault": true,
+      "condaEnv": "domo-2",
+      "script": "from domomagic import *\nimport pandas as pd\nimport numpy as np\nimport random\nfrom datetime import datetime, date\nfrom dateutil.relativedelta import relativedelta\nimport uuid\n\n# Set random seed for reproducibility\nrandom.seed(42)\nnp.random.seed(42)\n\n# Current date for forecast determination - yesterday is the last actual date\nCURRENT_DATE = date.today() - relativedelta(days=1)\n\n# Define base 25 lifestyle brand store locations across Japan\nLOCATIONS = [\n    {\"id\": \"JPN001\", \"name\": \"シンプルスタイル 銀座\", \"prefecture\": \"東京都\", \"city\": \"中央区\", \"postal_code\": \"104-0061\", \"region\": \"関東\", \"area_code\": \"13104\"},\n    {\"id\": \"JPN002\", \"name\": \"シンプルスタイル 新宿\", \"prefecture\": \"東京都\", \"city\": \"新宿区\", \"postal_code\": \"160-0022\", \"region\": \"関東\", \"area_code\": \"13104\"},\n    {\"id\": \"JPN003\", \"name\": \"シンプルスタイル 渋谷\", \"prefecture\": \"東京都\", \"city\": \"渋谷区\", \"postal_code\": \"150-0002\", \"region\": \"関東\", \"area_code\": \"13104\"},\n    {\"id\": \"JPN004\", \"name\": \"シンプルスタイル 六本木\", \"prefecture\": \"東京都\", \"city\": \"港区\", \"postal_code\": \"106-0032\", \"region\": \"関東\", \"area_code\": \"13104\"},\n    {\"id\": \"JPN005\", \"name\": \"シンプルスタイル 表参道\", \"prefecture\": \"東京都\", \"city\": \"港区\", \"postal_code\": \"107-0062\", \"region\": \"関東\", \"area_code\": \"13104\"},\n    {\"id\": \"JPN006\", \"name\": \"シンプルスタイル 横浜\", \"prefecture\": \"神奈川県\", \"city\": \"横浜市\", \"postal_code\": \"220-0012\", \"region\": \"関東\", \"area_code\": \"14104\"},\n    {\"id\": \"JPN007\", \"name\": \"シンプルスタイル 大阪梅田\", \"prefecture\": \"大阪府\", \"city\": \"大阪市\", \"postal_code\": \"530-0001\", \"region\": \"関西\", \"area_code\": \"27128\"},\n    {\"id\": \"JPN008\", \"name\": \"シンプルスタイル 心斎橋\", \"prefecture\": \"大阪府\", \"city\": \"大阪市\", \"postal_code\": \"542-0081\", \"region\": \"関西\", \"area_code\": \"27128\"},\n    {\"id\": \"JPN009\", \"name\": \"シンプルスタイル 京都\", \"prefecture\": \"京都府\", \"city\": \"京都市\", \"postal_code\": \"604-8005\", \"region\": \"関西\", \"area_code\": \"26108\"},\n    {\"id\": \"JPN010\", \"name\": \"シンプルスタイル 神戸\", \"prefecture\": \"兵庫県\", \"city\": \"神戸市\", \"postal_code\": \"650-0034\", \"region\": \"関西\", \"area_code\": \"28110\"},\n    {\"id\": \"JPN011\", \"name\": \"シンプルスタイル 名古屋\", \"prefecture\": \"愛知県\", \"city\": \"名古屋市\", \"postal_code\": \"460-0008\", \"region\": \"中部\", \"area_code\": \"23106\"},\n    {\"id\": \"JPN012\", \"name\": \"シンプルスタイル 福岡\", \"prefecture\": \"福岡県\", \"city\": \"福岡市\", \"postal_code\": \"810-0001\", \"region\": \"九州\", \"area_code\": \"40133\"},\n    {\"id\": \"JPN013\", \"name\": \"シンプルスタイル 札幌\", \"prefecture\": \"北海道\", \"city\": \"札幌市\", \"postal_code\": \"060-0002\", \"region\": \"北海道\", \"area_code\": \"01101\"},\n    {\"id\": \"JPN014\", \"name\": \"シンプルスタイル 仙台\", \"prefecture\": \"宮城県\", \"city\": \"仙台市\", \"postal_code\": \"980-0021\", \"region\": \"東北\", \"area_code\": \"04101\"},\n    {\"id\": \"JPN015\", \"name\": \"シンプルスタイル 広島\", \"prefecture\": \"広島県\", \"city\": \"広島市\", \"postal_code\": \"730-0017\", \"region\": \"中国\", \"area_code\": \"34101\"},\n    {\"id\": \"JPN016\", \"name\": \"シンプルスタイル 千葉\", \"prefecture\": \"千葉県\", \"city\": \"千葉市\", \"postal_code\": \"260-0028\", \"region\": \"関東\", \"area_code\": \"12101\"},\n    {\"id\": \"JPN017\", \"name\": \"シンプルスタイル さいたま\", \"prefecture\": \"埼玉県\", \"city\": \"さいたま市\", \"postal_code\": \"330-0846\", \"region\": \"関東\", \"area_code\": \"11101\"},\n    {\"id\": \"JPN018\", \"name\": \"シンプルスタイル 静岡\", \"prefecture\": \"静岡県\", \"city\": \"静岡市\", \"postal_code\": \"420-0852\", \"region\": \"中部\", \"area_code\": \"22101\"},\n    {\"id\": \"JPN019\", \"name\": \"シンプルスタイル 金沢\", \"prefecture\": \"石川県\", \"city\": \"金沢市\", \"postal_code\": \"920-0962\", \"region\": \"中部\", \"area_code\": \"17201\"},\n    {\"id\": \"JPN020\", \"name\": \"シンプルスタイル 岡山\", \"prefecture\": \"岡山県\", \"city\": \"岡山市\", \"postal_code\": \"700-0826\", \"region\": \"中国\", \"area_code\": \"33101\"},\n    {\"id\": \"JPN021\", \"name\": \"シンプルスタイル 高松\", \"prefecture\": \"香川県\", \"city\": \"高松市\", \"postal_code\": \"760-0029\", \"region\": \"四国\", \"area_code\": \"37201\"},\n    {\"id\": \"JPN022\", \"name\": \"シンプルスタイル 熊本\", \"prefecture\": \"熊本県\", \"city\": \"熊本市\", \"postal_code\": \"860-0845\", \"region\": \"九州\", \"area_code\": \"43101\"},\n    {\"id\": \"JPN023\", \"name\": \"シンプルスタイル 那覇\", \"prefecture\": \"沖縄県\", \"city\": \"那覇市\", \"postal_code\": \"900-0013\", \"region\": \"沖縄\", \"area_code\": \"47201\"},\n    {\"id\": \"JPN024\", \"name\": \"シンプルスタイル 新潟\", \"prefecture\": \"新潟県\", \"city\": \"新潟市\", \"postal_code\": \"950-0916\", \"region\": \"中部\", \"area_code\": \"15101\"},\n    {\"id\": \"JPN025\", \"name\": \"シンプルスタイル 川崎\", \"prefecture\": \"神奈川県\", \"city\": \"川崎市\", \"postal_code\": \"210-0024\", \"region\": \"関東\", \"area_code\": \"14130\"}\n]\n\n# Expand to 100 stores using real regional district names (no serial-number\n# clones). Distribution is intentionally Kanto-heavy, mirroring real Japanese\n# lifestyle-brand chains.\nEXTRA_LOCATIONS = [\n    # --- 関東 (28) ---\n    {\"name\": \"シンプルスタイル 吉祥寺\", \"prefecture\": \"東京都\", \"city\": \"武蔵野市\", \"postal_code\": \"180-0004\", \"region\": \"関東\", \"area_code\": \"13203\"},\n    {\"name\": \"シンプルスタイル 自由が丘\", \"prefecture\": \"東京都\", \"city\": \"目黒区\", \"postal_code\": \"152-0035\", \"region\": \"関東\", \"area_code\": \"13110\"},\n    {\"name\": \"シンプルスタイル 二子玉川\", \"prefecture\": \"東京都\", \"city\": \"世田谷区\", \"postal_code\": \"158-0094\", \"region\": \"関東\", \"area_code\": \"13112\"},\n    {\"name\": \"シンプルスタイル 下北沢\", \"prefecture\": \"東京都\", \"city\": \"世田谷区\", \"postal_code\": \"155-0031\", \"region\": \"関東\", \"area_code\": \"13112\"},\n    {\"name\": \"シンプルスタイル 中野\", \"prefecture\": \"東京都\", \"city\": \"中野区\", \"postal_code\": \"164-0001\", \"region\": \"関東\", \"area_code\": \"13114\"},\n    {\"name\": \"シンプルスタイル 錦糸町\", \"prefecture\": \"東京都\", \"city\": \"墨田区\", \"postal_code\": \"130-0022\", \"region\": \"関東\", \"area_code\": \"13107\"},\n    {\"name\": \"シンプルスタイル 北千住\", \"prefecture\": \"東京都\", \"city\": \"足立区\", \"postal_code\": \"120-0034\", \"region\": \"関東\", \"area_code\": \"13121\"},\n    {\"name\": \"シンプルスタイル 蒲田\", \"prefecture\": \"東京都\", \"city\": \"大田区\", \"postal_code\": \"144-0051\", \"region\": \"関東\", \"area_code\": \"13111\"},\n    {\"name\": \"シンプルスタイル 立川\", \"prefecture\": \"東京都\", \"city\": \"立川市\", \"postal_code\": \"190-0012\", \"region\": \"関東\", \"area_code\": \"13202\"},\n    {\"name\": \"シンプルスタイル 町田\", \"prefecture\": \"東京都\", \"city\": \"町田市\", \"postal_code\": \"194-0013\", \"region\": \"関東\", \"area_code\": \"13209\"},\n    {\"name\": \"シンプルスタイル 大宮\", \"prefecture\": \"埼玉県\", \"city\": \"さいたま市\", \"postal_code\": \"330-0846\", \"region\": \"関東\", \"area_code\": \"11101\"},\n    {\"name\": \"シンプルスタイル 川口\", \"prefecture\": \"埼玉県\", \"city\": \"川口市\", \"postal_code\": \"332-0017\", \"region\": \"関東\", \"area_code\": \"11203\"},\n    {\"name\": \"シンプルスタイル 越谷\", \"prefecture\": \"埼玉県\", \"city\": \"越谷市\", \"postal_code\": \"343-0845\", \"region\": \"関東\", \"area_code\": \"11222\"},\n    {\"name\": \"シンプルスタイル 所沢\", \"prefecture\": \"埼玉県\", \"city\": \"所沢市\", \"postal_code\": \"359-1123\", \"region\": \"関東\", \"area_code\": \"11208\"},\n    {\"name\": \"シンプルスタイル 船橋\", \"prefecture\": \"千葉県\", \"city\": \"船橋市\", \"postal_code\": \"273-0005\", \"region\": \"関東\", \"area_code\": \"12204\"},\n    {\"name\": \"シンプルスタイル 柏\", \"prefecture\": \"千葉県\", \"city\": \"柏市\", \"postal_code\": \"277-0005\", \"region\": \"関東\", \"area_code\": \"12217\"},\n    {\"name\": \"シンプルスタイル 松戸\", \"prefecture\": \"千葉県\", \"city\": \"松戸市\", \"postal_code\": \"271-0092\", \"region\": \"関東\", \"area_code\": \"12207\"},\n    {\"name\": \"シンプルスタイル 海浜幕張\", \"prefecture\": \"千葉県\", \"city\": \"千葉市\", \"postal_code\": \"261-0021\", \"region\": \"関東\", \"area_code\": \"12101\"},\n    {\"name\": \"シンプルスタイル 藤沢\", \"prefecture\": \"神奈川県\", \"city\": \"藤沢市\", \"postal_code\": \"251-0055\", \"region\": \"関東\", \"area_code\": \"14205\"},\n    {\"name\": \"シンプルスタイル たまプラーザ\", \"prefecture\": \"神奈川県\", \"city\": \"横浜市\", \"postal_code\": \"225-0002\", \"region\": \"関東\", \"area_code\": \"14104\"},\n    {\"name\": \"シンプルスタイル 上大岡\", \"prefecture\": \"神奈川県\", \"city\": \"横浜市\", \"postal_code\": \"233-0002\", \"region\": \"関東\", \"area_code\": \"14104\"},\n    {\"name\": \"シンプルスタイル 本厚木\", \"prefecture\": \"神奈川県\", \"city\": \"厚木市\", \"postal_code\": \"243-0018\", \"region\": \"関東\", \"area_code\": \"14212\"},\n    {\"name\": \"シンプルスタイル 高崎\", \"prefecture\": \"群馬県\", \"city\": \"高崎市\", \"postal_code\": \"370-0849\", \"region\": \"関東\", \"area_code\": \"10202\"},\n    {\"name\": \"シンプルスタイル 前橋\", \"prefecture\": \"群馬県\", \"city\": \"前橋市\", \"postal_code\": \"371-0023\", \"region\": \"関東\", \"area_code\": \"10201\"},\n    {\"name\": \"シンプルスタイル 宇都宮\", \"prefecture\": \"栃木県\", \"city\": \"宇都宮市\", \"postal_code\": \"320-0811\", \"region\": \"関東\", \"area_code\": \"09201\"},\n    {\"name\": \"シンプルスタイル 水戸\", \"prefecture\": \"茨城県\", \"city\": \"水戸市\", \"postal_code\": \"310-0021\", \"region\": \"関東\", \"area_code\": \"08201\"},\n    {\"name\": \"シンプルスタイル つくば\", \"prefecture\": \"茨城県\", \"city\": \"つくば市\", \"postal_code\": \"305-0031\", \"region\": \"関東\", \"area_code\": \"08220\"},\n    {\"name\": \"シンプルスタイル 春日部\", \"prefecture\": \"埼玉県\", \"city\": \"春日部市\", \"postal_code\": \"344-0067\", \"region\": \"関東\", \"area_code\": \"11214\"},\n    # --- 関西 (15) ---\n    {\"name\": \"シンプルスタイル なんば\", \"prefecture\": \"大阪府\", \"city\": \"大阪市\", \"postal_code\": \"542-0076\", \"region\": \"関西\", \"area_code\": \"27128\"},\n    {\"name\": \"シンプルスタイル 天王寺\", \"prefecture\": \"大阪府\", \"city\": \"大阪市\", \"postal_code\": \"543-0055\", \"region\": \"関西\", \"area_code\": \"27128\"},\n    {\"name\": \"シンプルスタイル 京橋\", \"prefecture\": \"大阪府\", \"city\": \"大阪市\", \"postal_code\": \"534-0024\", \"region\": \"関西\", \"area_code\": \"27128\"},\n    {\"name\": \"シンプルスタイル 堺\", \"prefecture\": \"大阪府\", \"city\": \"堺市\", \"postal_code\": \"590-0028\", \"region\": \"関西\", \"area_code\": \"27141\"},\n    {\"name\": \"シンプルスタイル 江坂\", \"prefecture\": \"大阪府\", \"city\": \"吹田市\", \"postal_code\": \"564-0063\", \"region\": \"関西\", \"area_code\": \"27205\"},\n    {\"name\": \"シンプルスタイル 千里中央\", \"prefecture\": \"大阪府\", \"city\": \"豊中市\", \"postal_code\": \"560-0082\", \"region\": \"関西\", \"area_code\": \"27203\"},\n    {\"name\": \"シンプルスタイル 高槻\", \"prefecture\": \"大阪府\", \"city\": \"高槻市\", \"postal_code\": \"569-0071\", \"region\": \"関西\", \"area_code\": \"27207\"},\n    {\"name\": \"シンプルスタイル 枚方\", \"prefecture\": \"大阪府\", \"city\": \"枚方市\", \"postal_code\": \"573-0032\", \"region\": \"関西\", \"area_code\": \"27210\"},\n    {\"name\": \"シンプルスタイル 西宮\", \"prefecture\": \"兵庫県\", \"city\": \"西宮市\", \"postal_code\": \"663-8035\", \"region\": \"関西\", \"area_code\": \"28204\"},\n    {\"name\": \"シンプルスタイル 尼崎\", \"prefecture\": \"兵庫県\", \"city\": \"尼崎市\", \"postal_code\": \"661-0976\", \"region\": \"関西\", \"area_code\": \"28202\"},\n    {\"name\": \"シンプルスタイル 姫路\", \"prefecture\": \"兵庫県\", \"city\": \"姫路市\", \"postal_code\": \"670-0927\", \"region\": \"関西\", \"area_code\": \"28201\"},\n    {\"name\": \"シンプルスタイル 明石\", \"prefecture\": \"兵庫県\", \"city\": \"明石市\", \"postal_code\": \"673-0891\", \"region\": \"関西\", \"area_code\": \"28203\"},\n    {\"name\": \"シンプルスタイル 奈良\", \"prefecture\": \"奈良県\", \"city\": \"奈良市\", \"postal_code\": \"630-8215\", \"region\": \"関西\", \"area_code\": \"29201\"},\n    {\"name\": \"シンプルスタイル 和歌山\", \"prefecture\": \"和歌山県\", \"city\": \"和歌山市\", \"postal_code\": \"640-8331\", \"region\": \"関西\", \"area_code\": \"30201\"},\n    {\"name\": \"シンプルスタイル 大津\", \"prefecture\": \"滋賀県\", \"city\": \"大津市\", \"postal_code\": \"520-0051\", \"region\": \"関西\", \"area_code\": \"25201\"},\n    # --- 中部 (12) ---\n    {\"name\": \"シンプルスタイル 栄\", \"prefecture\": \"愛知県\", \"city\": \"名古屋市\", \"postal_code\": \"460-0008\", \"region\": \"中部\", \"area_code\": \"23106\"},\n    {\"name\": \"シンプルスタイル 名駅\", \"prefecture\": \"愛知県\", \"city\": \"名古屋市\", \"postal_code\": \"450-0002\", \"region\": \"中部\", \"area_code\": \"23104\"},\n    {\"name\": \"シンプルスタイル 藤が丘\", \"prefecture\": \"愛知県\", \"city\": \"名古屋市\", \"postal_code\": \"465-0032\", \"region\": \"中部\", \"area_code\": \"23113\"},\n    {\"name\": \"シンプルスタイル 岡崎\", \"prefecture\": \"愛知県\", \"city\": \"岡崎市\", \"postal_code\": \"444-0813\", \"region\": \"中部\", \"area_code\": \"23202\"},\n    {\"name\": \"シンプルスタイル 豊田\", \"prefecture\": \"愛知県\", \"city\": \"豊田市\", \"postal_code\": \"471-0025\", \"region\": \"中部\", \"area_code\": \"23211\"},\n    {\"name\": \"シンプルスタイル 一宮\", \"prefecture\": \"愛知県\", \"city\": \"一宮市\", \"postal_code\": \"491-0858\", \"region\": \"中部\", \"area_code\": \"23203\"},\n    {\"name\": \"シンプルスタイル 岐阜\", \"prefecture\": \"岐阜県\", \"city\": \"岐阜市\", \"postal_code\": \"500-8833\", \"region\": \"中部\", \"area_code\": \"21201\"},\n    {\"name\": \"シンプルスタイル 浜松\", \"prefecture\": \"静岡県\", \"city\": \"浜松市\", \"postal_code\": \"430-0927\", \"region\": \"中部\", \"area_code\": \"22131\"},\n    {\"name\": \"シンプルスタイル 沼津\", \"prefecture\": \"静岡県\", \"city\": \"沼津市\", \"postal_code\": \"410-0801\", \"region\": \"中部\", \"area_code\": \"22203\"},\n    {\"name\": \"シンプルスタイル 富山\", \"prefecture\": \"富山県\", \"city\": \"富山市\", \"postal_code\": \"930-0002\", \"region\": \"中部\", \"area_code\": \"16201\"},\n    {\"name\": \"シンプルスタイル 福井\", \"prefecture\": \"福井県\", \"city\": \"福井市\", \"postal_code\": \"910-0006\", \"region\": \"中部\", \"area_code\": \"18201\"},\n    {\"name\": \"シンプルスタイル 松本\", \"prefecture\": \"長野県\", \"city\": \"松本市\", \"postal_code\": \"390-0811\", \"region\": \"中部\", \"area_code\": \"20202\"},\n    # --- 九州 (9) ---\n    {\"name\": \"シンプルスタイル 天神\", \"prefecture\": \"福岡県\", \"city\": \"福岡市\", \"postal_code\": \"810-0001\", \"region\": \"九州\", \"area_code\": \"40133\"},\n    {\"name\": \"シンプルスタイル 博多\", \"prefecture\": \"福岡県\", \"city\": \"福岡市\", \"postal_code\": \"812-0011\", \"region\": \"九州\", \"area_code\": \"40132\"},\n    {\"name\": \"シンプルスタイル 小倉\", \"prefecture\": \"福岡県\", \"city\": \"北九州市\", \"postal_code\": \"802-0002\", \"region\": \"九州\", \"area_code\": \"40106\"},\n    {\"name\": \"シンプルスタイル 久留米\", \"prefecture\": \"福岡県\", \"city\": \"久留米市\", \"postal_code\": \"830-0032\", \"region\": \"九州\", \"area_code\": \"40203\"},\n    {\"name\": \"シンプルスタイル 大分\", \"prefecture\": \"大分県\", \"city\": \"大分市\", \"postal_code\": \"870-0021\", \"region\": \"九州\", \"area_code\": \"44201\"},\n    {\"name\": \"シンプルスタイル 宮崎\", \"prefecture\": \"宮崎県\", \"city\": \"宮崎市\", \"postal_code\": \"880-0805\", \"region\": \"九州\", \"area_code\": \"45201\"},\n    {\"name\": \"シンプルスタイル 鹿児島\", \"prefecture\": \"鹿児島県\", \"city\": \"鹿児島市\", \"postal_code\": \"892-0842\", \"region\": \"九州\", \"area_code\": \"46201\"},\n    {\"name\": \"シンプルスタイル 長崎\", \"prefecture\": \"長崎県\", \"city\": \"長崎市\", \"postal_code\": \"850-0841\", \"region\": \"九州\", \"area_code\": \"42201\"},\n    {\"name\": \"シンプルスタイル 佐賀\", \"prefecture\": \"佐賀県\", \"city\": \"佐賀市\", \"postal_code\": \"840-0801\", \"region\": \"九州\", \"area_code\": \"41201\"},\n    # --- 北海道 (4) ---\n    {\"name\": \"シンプルスタイル 旭川\", \"prefecture\": \"北海道\", \"city\": \"旭川市\", \"postal_code\": \"070-0030\", \"region\": \"北海道\", \"area_code\": \"01204\"},\n    {\"name\": \"シンプルスタイル 函館\", \"prefecture\": \"北海道\", \"city\": \"函館市\", \"postal_code\": \"040-0011\", \"region\": \"北海道\", \"area_code\": \"01202\"},\n    {\"name\": \"シンプルスタイル 帯広\", \"prefecture\": \"北海道\", \"city\": \"帯広市\", \"postal_code\": \"080-0012\", \"region\": \"北海道\", \"area_code\": \"01207\"},\n    {\"name\": \"シンプルスタイル 釧路\", \"prefecture\": \"北海道\", \"city\": \"釧路市\", \"postal_code\": \"085-0015\", \"region\": \"北海道\", \"area_code\": \"01206\"},\n    # --- 東北 (5) ---\n    {\"name\": \"シンプルスタイル 盛岡\", \"prefecture\": \"岩手県\", \"city\": \"盛岡市\", \"postal_code\": \"020-0022\", \"region\": \"東北\", \"area_code\": \"03201\"},\n    {\"name\": \"シンプルスタイル 秋田\", \"prefecture\": \"秋田県\", \"city\": \"秋田市\", \"postal_code\": \"010-0001\", \"region\": \"東北\", \"area_code\": \"05201\"},\n    {\"name\": \"シンプルスタイル 山形\", \"prefecture\": \"山形県\", \"city\": \"山形市\", \"postal_code\": \"990-0039\", \"region\": \"東北\", \"area_code\": \"06201\"},\n    {\"name\": \"シンプルスタイル 郡山\", \"prefecture\": \"福島県\", \"city\": \"郡山市\", \"postal_code\": \"963-8004\", \"region\": \"東北\", \"area_code\": \"07203\"},\n    {\"name\": \"シンプルスタイル 青森\", \"prefecture\": \"青森県\", \"city\": \"青森市\", \"postal_code\": \"030-0801\", \"region\": \"東北\", \"area_code\": \"02201\"},\n    # --- 中国 (2) ---\n    {\"name\": \"シンプルスタイル 倉敷\", \"prefecture\": \"岡山県\", \"city\": \"倉敷市\", \"postal_code\": \"710-0055\", \"region\": \"中国\", \"area_code\": \"33202\"},\n    {\"name\": \"シンプルスタイル 福山\", \"prefecture\": \"広島県\", \"city\": \"福山市\", \"postal_code\": \"720-0067\", \"region\": \"中国\", \"area_code\": \"34207\"},\n]\n\nLOCATIONS = (LOCATIONS + EXTRA_LOCATIONS)[:100]\n# Reassign clean sequential IDs while keeping each store's real landmark name.\nfor idx, location in enumerate(LOCATIONS, start=1):\n    location[\"id\"] = f\"JPN{idx:03d}\"\n\n# --- Performance archetypes ---------------------------------------------------\n# Give stores distinct business trajectories so the demo tells a clear\n# winners / losers / turnaround story instead of a flat cluster of stores.\n#   rev   : baseline revenue multiplier\n#   cost  : baseline non-COGS expense multiplier (COGS tracks revenue)\n#   trend : 24-month linear drift (+ grows over time, - decays over time)\nARCHETYPE_SPECS = {\n    \"star\":       {\"rev\": 1.30, \"cost\": 0.94, \"trend\":  0.26},  # 好調・伸長\n    \"stable\":     {\"rev\": 1.04, \"cost\": 1.00, \"trend\":  0.03},  # 安定\n    \"struggling\": {\"rev\": 0.80, \"cost\": 1.06, \"trend\": -0.05},  # 苦戦（高コスト低売上）\n    \"recovering\": {\"rev\": 0.90, \"cost\": 1.02, \"trend\":  0.30},  # 回復基調\n    \"declining\":  {\"rev\": 0.98, \"cost\": 1.05, \"trend\": -0.26},  # 下降トレンド\n}\nARCHETYPE_WEIGHTS = [(\"star\", 16), (\"stable\", 46), (\"struggling\", 16), (\"recovering\", 12), (\"declining\", 10)]\n\n_archetype_pool = []\nfor _name, _count in ARCHETYPE_WEIGHTS:\n    _archetype_pool.extend([_name] * _count)\n# Deterministic shuffle keeps the demo reproducible run-to-run.\nrandom.Random(2024).shuffle(_archetype_pool)\n\nSTORE_PROFILES = {}\nfor idx, location in enumerate(LOCATIONS):\n    archetype = _archetype_pool[idx]\n    spec = ARCHETYPE_SPECS[archetype]\n    rng = random.Random(1000 + idx)  # deterministic per-store idiosyncrasy\n    rev_idio = 1.0 + (rng.random() - 0.5) * 0.16   # +/-8%\n    cost_idio = 1.0 + (rng.random() - 0.5) * 0.10  # +/-5%\n    STORE_PROFILES[location[\"id\"]] = {\n        \"archetype\": archetype,\n        \"rev_mult\": spec[\"rev\"] * rev_idio,\n        \"cost_mult\": spec[\"cost\"] * cost_idio,\n        \"trend\": spec[\"trend\"],\n    }\n\n\ndef archetype_factor(location_id, month, year):\n    \"\"\"Return (revenue_multiplier, cost_multiplier) for a store in a given month,\n    blending its archetype baseline with a 24-month linear trend.\"\"\"\n    profile = STORE_PROFILES.get(location_id)\n    if not profile:\n        return 1.0, 1.0\n    month_index = (year - 2024) * 12 + (month - 1)  # 0..23 across 2024-01..2025-12\n    trend_factor = 1.0 + profile[\"trend\"] * ((month_index / 23.0) - 0.5)\n    return profile[\"rev_mult\"] * trend_factor, profile[\"cost_mult\"]\n\n\ndef seasonal_cost_factor(gl_account_id, month):\n    \"\"\"Personnel (5010/5020/5030) and marketing (5810/5820) costs flex with the\n    retail calendar - up in peak selling months, down in the quiet ones.\"\"\"\n    if gl_account_id in (\"5010\", \"5020\", \"5030\", \"5810\", \"5820\"):\n        seasonal = {3: 1.06, 5: 1.03, 7: 1.07, 12: 1.08, 2: 0.97, 8: 0.97}\n        return seasonal.get(month, 1.0)\n    return 1.0\n\n# Define Chart of Accounts for a Japanese lifestyle brand - Multi-level detail\nGL_ACCOUNTS = {\n    # Revenue Accounts\n    \"4000\": {\"name\": \"衣料品売上\", \"name_en\": \"Apparel Sales\", \"type\": \"Revenue\", \"subtype\": \"Apparel\", \"department\": \"衣料品事業部\", \"dept_code\": \"APPA\", \"parent\": None, \"level\": 1},\n    \"4010\": {\"name\": \"婦人服\", \"name_en\": \"Women's Wear\", \"type\": \"Revenue\", \"subtype\": \"Apparel\", \"department\": \"衣料品事業部\", \"dept_code\": \"APPA\", \"parent\": \"4000\", \"level\": 2},\n    \"4020\": {\"name\": \"紳士服\", \"name_en\": \"Men's Wear\", \"type\": \"Revenue\", \"subtype\": \"Apparel\", \"department\": \"衣料品事業部\", \"dept_code\": \"APPA\", \"parent\": \"4000\", \"level\": 2},\n    \"4030\": {\"name\": \"子供服・マタニティ\", \"name_en\": \"Kids & Maternity\", \"type\": \"Revenue\", \"subtype\": \"Apparel\", \"department\": \"衣料品事業部\", \"dept_code\": \"APPA\", \"parent\": \"4000\", \"level\": 2},\n    \"4040\": {\"name\": \"インナー・靴下\", \"name_en\": \"Innerwear & Socks\", \"type\": \"Revenue\", \"subtype\": \"Apparel\", \"department\": \"衣料品事業部\", \"dept_code\": \"APPA\", \"parent\": \"4000\", \"level\": 2},\n\n    \"4100\": {\"name\": \"生活雑貨売上\", \"name_en\": \"Household Goods Sales\", \"type\": \"Revenue\", \"subtype\": \"Household\", \"department\": \"生活雑貨事業部\", \"dept_code\": \"LIFE\", \"parent\": None, \"level\": 1},\n    \"4110\": {\"name\": \"家具\", \"name_en\": \"Furniture\", \"type\": \"Revenue\", \"subtype\": \"Household\", \"department\": \"生活雑貨事業部\", \"dept_code\": \"LIFE\", \"parent\": \"4100\", \"level\": 2},\n    \"4120\": {\"name\": \"寝具・ファブリック\", \"name_en\": \"Bedding & Fabrics\", \"type\": \"Revenue\", \"subtype\": \"Household\", \"department\": \"生活雑貨事業部\", \"dept_code\": \"LIFE\", \"parent\": \"4100\", \"level\": 2},\n    \"4130\": {\"name\": \"キッチン・テーブル用品\", \"name_en\": \"Kitchen & Tableware\", \"type\": \"Revenue\", \"subtype\": \"Household\", \"department\": \"生活雑貨事業部\", \"dept_code\": \"LIFE\", \"parent\": \"4100\", \"level\": 2},\n    \"4140\": {\"name\": \"文房具・オフィス用品\", \"name_en\": \"Stationery & Office\", \"type\": \"Revenue\", \"subtype\": \"Household\", \"department\": \"生活雑貨事業部\", \"dept_code\": \"LIFE\", \"parent\": \"4100\", \"level\": 2},\n    \"4150\": {\"name\": \"ヘルス＆ビューティー\", \"name_en\": \"Health & Beauty\", \"type\": \"Revenue\", \"subtype\": \"Household\", \"department\": \"生活雑貨事業部\", \"dept_code\": \"LIFE\", \"parent\": \"4100\", \"level\": 2},\n\n    \"4200\": {\"name\": \"食品売上\", \"name_en\": \"Food Sales\", \"type\": \"Revenue\", \"subtype\": \"Food\", \"department\": \"食品事業部\", \"dept_code\": \"FOOD\", \"parent\": None, \"level\": 1},\n    \"4210\": {\"name\": \"レトルト・冷凍食品\", \"name_en\": \"Packaged & Frozen Food\", \"type\": \"Revenue\", \"subtype\": \"Food\", \"department\": \"食品事業部\", \"dept_code\": \"FOOD\", \"parent\": \"4200\", \"level\": 2},\n    \"4220\": {\"name\": \"菓子・スナック\", \"name_en\": \"Sweets & Snacks\", \"type\": \"Revenue\", \"subtype\": \"Food\", \"department\": \"食品事業部\", \"dept_code\": \"FOOD\", \"parent\": \"4200\", \"level\": 2},\n    \"4230\": {\"name\": \"飲料・調味料\", \"name_en\": \"Beverages & Seasoning\", \"type\": \"Revenue\", \"subtype\": \"Food\", \"department\": \"食品事業部\", \"dept_code\": \"FOOD\", \"parent\": \"4200\", \"level\": 2},\n\n    \"4600\": {\"name\": \"その他事業収益\", \"name_en\": \"Other Business Revenue\", \"type\": \"Revenue\", \"subtype\": \"Other\", \"department\": \"新規事業部\", \"dept_code\": \"NEW\", \"parent\": None, \"level\": 1},\n    \"4610\": {\"name\": \"カフェ・レストラン\", \"name_en\": \"Cafe & Restaurant\", \"type\": \"Revenue\", \"subtype\": \"Other\", \"department\": \"新規事業部\", \"dept_code\": \"NEW\", \"parent\": \"4600\", \"level\": 2},\n    \"4620\": {\"name\": \"イベント・ワークショップ\", \"name_en\": \"Events & Workshops\", \"type\": \"Revenue\", \"subtype\": \"Other\", \"department\": \"新規事業部\", \"dept_code\": \"NEW\", \"parent\": \"4600\", \"level\": 2},\n\n    # Operating Expenses\n    \"5000\": {\"name\": \"人件費\", \"name_en\": \"Personnel Expenses\", \"type\": \"Expense\", \"subtype\": \"Labor\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": None, \"level\": 1},\n    \"5010\": {\"name\": \"正社員給与\", \"name_en\": \"Full-time Staff Salary\", \"type\": \"Expense\", \"subtype\": \"Labor\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": \"5000\", \"level\": 2},\n    \"5020\": {\"name\": \"契約・パートスタッフ給与\", \"name_en\": \"Contract & Part-time Staff\", \"type\": \"Expense\", \"subtype\": \"Labor\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": \"5000\", \"level\": 2},\n    \"5030\": {\"name\": \"賞与・引当金\", \"name_en\": \"Bonuses & Allowances\", \"type\": \"Expense\", \"subtype\": \"Labor\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": \"5000\", \"level\": 2},\n    \n    \"5300\": {\"name\": \"福利厚生・法定費用\", \"name_en\": \"Benefits & Payroll Taxes\", \"type\": \"Expense\", \"subtype\": \"Labor\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": None, \"level\": 1},\n    \"5310\": {\"name\": \"社会保険料\", \"name_en\": \"Social Insurance\", \"type\": \"Expense\", \"subtype\": \"Labor\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": \"5300\", \"level\": 2},\n    \"5320\": {\"name\": \"労働保険料\", \"name_en\": \"Labor Insurance\", \"type\": \"Expense\", \"subtype\": \"Labor\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": \"5300\", \"level\": 2},\n\n    \"5400\": {\"name\": \"賃借料\", \"name_en\": \"Rent\", \"type\": \"Expense\", \"subtype\": \"Facility\", \"department\": \"店舗開発部\", \"dept_code\": \"DEV\", \"parent\": None, \"level\": 1},\n    \"5410\": {\"name\": \"店舗賃料\", \"name_en\": \"Store Rent\", \"type\": \"Expense\", \"subtype\": \"Facility\", \"department\": \"店舗開発部\", \"dept_code\": \"DEV\", \"parent\": \"5400\", \"level\": 2},\n    \"5420\": {\"name\": \"本社・倉庫賃料\", \"name_en\": \"HQ & Warehouse Rent\", \"type\": \"Expense\", \"subtype\": \"Facility\", \"department\": \"店舗開発部\", \"dept_code\": \"DEV\", \"parent\": \"5400\", \"level\": 2},\n\n    \"5500\": {\"name\": \"水道光熱費\", \"name_en\": \"Utilities\", \"type\": \"Expense\", \"subtype\": \"Facility\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": None, \"level\": 1},\n    \"5510\": {\"name\": \"電気代\", \"name_en\": \"Electricity\", \"type\": \"Expense\", \"subtype\": \"Facility\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": \"5500\", \"level\": 2},\n    \"5530\": {\"name\": \"上下水道代\", \"name_en\": \"Water & Sewer\", \"type\": \"Expense\", \"subtype\": \"Facility\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": \"5500\", \"level\": 2},\n\n    \"5800\": {\"name\": \"広告宣伝費\", \"name_en\": \"Advertising\", \"type\": \"Expense\", \"subtype\": \"Sales & Marketing\", \"department\": \"マーケティング部\", \"dept_code\": \"MKT\", \"parent\": None, \"level\": 1},\n    \"5810\": {\"name\": \"販促・プロモーション費用\", \"name_en\": \"Sales Promotion\", \"type\": \"Expense\", \"subtype\": \"Sales & Marketing\", \"department\": \"マーケティング部\", \"dept_code\": \"MKT\", \"parent\": \"5800\", \"level\": 2},\n    \"5820\": {\"name\": \"Web・SNS広告費\", \"name_en\": \"Web & SNS Ads\", \"type\": \"Expense\", \"subtype\": \"Sales & Marketing\", \"department\": \"マーケティング部\", \"dept_code\": \"MKT\", \"parent\": \"5800\", \"level\": 2},\n    \n    \"5900\": {\"name\": \"商品原価\", \"name_en\": \"Cost of Goods Sold\", \"type\": \"Expense\", \"subtype\": \"COGS\", \"department\": \"商品部\", \"dept_code\": \"PROD\", \"parent\": None, \"level\": 1},\n    \"5910\": {\"name\": \"衣料品原価\", \"name_en\": \"Apparel COGS\", \"type\": \"Expense\", \"subtype\": \"COGS\", \"department\": \"衣料品事業部\", \"dept_code\": \"APPA\", \"parent\": \"5900\", \"level\": 2},\n    \"5920\": {\"name\": \"生活雑貨原価\", \"name_en\": \"Household Goods COGS\", \"type\": \"Expense\", \"subtype\": \"COGS\", \"department\": \"生活雑貨事業部\", \"dept_code\": \"LIFE\", \"parent\": \"5900\", \"level\": 2},\n    \"5930\": {\"name\": \"食品原価\", \"name_en\": \"Food COGS\", \"type\": \"Expense\", \"subtype\": \"COGS\", \"department\": \"食品事業部\", \"dept_code\": \"FOOD\", \"parent\": \"5900\", \"level\": 2},\n\n    \"6000\": {\"name\": \"業務委託費\", \"name_en\": \"Outsourcing Costs\", \"type\": \"Expense\", \"subtype\": \"Operating\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": None, \"level\": 1},\n    \"6010\": {\"name\": \"物流・配送委託費\", \"name_en\": \"Logistics & Delivery\", \"type\": \"Expense\", \"subtype\": \"Operating\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": \"6000\", \"level\": 2},\n    \"6020\": {\"name\": \"システム開発・保守委託費\", \"name_en\": \"System Development\", \"type\": \"Expense\", \"subtype\": \"Operating\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": \"6000\", \"level\": 2},\n\n    \"6100\": {\"name\": \"減価償却費\", \"name_en\": \"Depreciation\", \"type\": \"Expense\", \"subtype\": \"Administrative\", \"department\": \"経理部\", \"dept_code\": \"FIN\", \"parent\": None, \"level\": 1},\n    \"6110\": {\"name\": \"店舗設備償却\", \"name_en\": \"Store Asset Depreciation\", \"type\": \"Expense\", \"subtype\": \"Administrative\", \"department\": \"経理部\", \"dept_code\": \"FIN\", \"parent\": \"6100\", \"level\": 2},\n    \"6120\": {\"name\": \"IT資産・ソフトウェア償却\", \"name_en\": \"IT Asset & Software Depreciation\", \"type\": \"Expense\", \"subtype\": \"Administrative\", \"department\": \"経理部\", \"dept_code\": \"FIN\", \"parent\": \"6100\", \"level\": 2},\n    \n    \"6200\": {\"name\": \"その他経費\", \"name_en\": \"Other Expenses\", \"type\": \"Expense\", \"subtype\": \"Operating\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": None, \"level\": 1},\n    \"6210\": {\"name\": \"消耗品費\", \"name_en\": \"Supplies\", \"type\": \"Expense\", \"subtype\": \"Operating\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": \"6200\", \"level\": 2},\n    \"6220\": {\"name\": \"通信費\", \"name_en\": \"Communications\", \"type\": \"Expense\", \"subtype\": \"Operating\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": \"6200\", \"level\": 2},\n    \"6230\": {\"name\": \"決済手数料\", \"name_en\": \"Payment Processing Fees\", \"type\": \"Expense\", \"subtype\": \"Operating\", \"department\": \"管理部門\", \"dept_code\": \"ADM\", \"parent\": \"6200\", \"level\": 2}\n}\n\ndef generate_seasonal_factor(month):\n    \"\"\"Generate seasonal factors for Japanese retail business\"\"\"\n    # Japanese retail patterns: Spikes in March (new life), May (GW), July (bonus), Dec (bonus/Xmas). Dips in Feb, Aug.\n    seasonal_factors = {\n        1: 1.1,   # January - New Year sales\n        2: 0.8,   # February - slow month\n        3: 1.3,   # March - End of fiscal year, new life prep\n        4: 1.1,   # April - Start of new year\n        5: 1.2,   # May - Golden Week\n        6: 1.0,   # June\n        7: 1.25,  # July - Summer bonus season\n        8: 0.85,  # August - Obon holidays, travel focus\n        9: 1.0,   # September\n        10: 1.1,  # October\n        11: 1.15, # November - prep for winter\n        12: 1.4   # December - Bonus season, Christmas\n    }\n    return seasonal_factors.get(month, 1.0)\n\ndef generate_revenue_amount(gl_account_id, location_id, month, year, scenario):\n    \"\"\"Generate realistic revenue amounts based on account type and location\"\"\"\n    # Base amounts in JPY, adjusted for a lifestyle brand\n    base_amounts = {\n        # Level 1 Summary accounts\n        \"4000\": 0, \"4100\": 0, \"4200\": 0, \"4600\": 0,\n        \n        # Level 2 Detail - Apparel\n        \"4010\": 3500000, # Women's Wear\n        \"4020\": 2500000, # Men's Wear\n        \"4030\": 800000,  # Kids & Maternity\n        \"4040\": 1200000, # Innerwear & Socks\n\n        # Level 2 Detail - Household\n        \"4110\": 1500000, # Furniture\n        \"4120\": 1000000, # Bedding & Fabrics\n        \"4130\": 1800000, # Kitchen & Tableware\n        \"4140\": 2000000, # Stationery & Office\n        \"4150\": 1300000, # Health & Beauty\n\n        # Level 2 Detail - Food\n        \"4210\": 2200000, # Packaged & Frozen Food\n        \"4220\": 1600000, # Sweets & Snacks\n        \"4230\": 900000,  # Beverages & Seasoning\n\n        # Level 2 Detail - Other\n        \"4610\": 500000,  # Cafe & Restaurant\n        \"4620\": 200000,  # Events & Workshops\n    }\n    \n    base = base_amounts.get(gl_account_id, 0)\n    if base == 0:\n        return 0\n    \n    # Location factor (premium for major urban centers)\n    location_factors = {\n        \"JPN001\": 1.5, \"JPN002\": 1.4, \"JPN003\": 1.4, \"JPN004\": 1.5, \"JPN005\": 1.4, # Tokyo premium\n        \"JPN007\": 1.3, # Osaka Umeda\n    }\n    location_factor = location_factors.get(location_id, 1.0)\n    \n    # Seasonal adjustment\n    seasonal_factor = generate_seasonal_factor(month)\n    \n    # Category-specific seasonality\n    category_factors = {\n        \"4000\": 1.2, # Apparel is more seasonal\n        \"4200\": 0.9, # Food is less seasonal\n    }\n    parent_account = GL_ACCOUNTS.get(gl_account_id, {}).get(\"parent\")\n    seasonal_factor *= category_factors.get(parent_account, 1.0)\n\n    # Year-over-year growth\n    yoy_growth = 1.03 if year == 2025 else 1.0\n    \n    # Random variation\n    random_factor = np.random.normal(1.0, 0.1)\n    \n    # Forecast uncertainty\n    forecast_factor = 1.0\n    if scenario == \"Forecast\":\n        forecast_factor = np.random.normal(1.0, 0.05)\n    \n    # Store performance archetype (winners / losers / trend)\n    rev_mult, _ = archetype_factor(location_id, month, year)\n\n    amount = base * location_factor * seasonal_factor * yoy_growth * random_factor * forecast_factor * rev_mult\n    return round(amount, 0)\n\ndef generate_expense_amount(gl_account_id, location_id, month, year, scenario, revenue_total):\n    \"\"\"Generate realistic expense amounts in JPY\"\"\"\n    if gl_account_id.startswith(\"4\"):\n        return 0\n    \n    # Base amounts for expenses\n    base_amounts = {\n        \"5010\": 3000000, # Full-time Staff Salary\n        \"5020\": 2500000, # Contract & Part-time Staff\n        \"5030\": 800000,  # Bonuses & Allowances\n        \"5310\": 900000,  # Social Insurance\n        \"5320\": 300000,  # Labor Insurance\n        \"5410\": 2200000, # Store Rent\n        \"5420\": 800000,  # HQ & Warehouse Rent\n        \"5510\": 300000,  # Electricity\n        \"5530\": 80000,   # Water & Sewer\n        \"5810\": 600000,  # Sales Promotion\n        \"5820\": 400000,  # Web & SNS Ads\n        \"5910\": revenue_total * 0.15, # Apparel COGS (approx. 15% of total revenue)\n        \"5920\": revenue_total * 0.20, # Household COGS (approx. 20% of total revenue)\n        \"5930\": revenue_total * 0.10, # Food COGS (approx. 10% of total revenue)\n        \"6010\": 700000,  # Logistics & Delivery\n        \"6020\": 500000,  # System Development\n        \"6110\": 1200000, # Store Asset Depreciation\n        \"6120\": 800000,  # IT Asset & Software Depreciation\n        \"6210\": 150000,  # Supplies\n        \"6220\": 100000,  # Communications\n        \"6230\": 200000,  # Payment Processing Fees\n    }\n    \n    base = base_amounts.get(gl_account_id, 0)\n    if base == 0:\n        return 0\n    \n    # Location factor for expenses\n    location_factors = {\n        \"JPN001\": 1.6, \"JPN002\": 1.5, \"JPN003\": 1.5, \"JPN004\": 1.6, \"JPN005\": 1.5, # Tokyo premium\n    }\n    location_factor = location_factors.get(location_id, 1.0)\n    \n    # Inflation factor\n    inflation_factor = 1.02 if year == 2025 else 1.0\n    \n    # Random variation\n    random_factor = np.random.normal(1.0, 0.08)\n    \n    # Forecast uncertainty\n    forecast_factor = 1.0\n    if scenario == \"Forecast\":\n        forecast_factor = np.random.normal(1.0, 0.05)\n        \n    # Make COGS directly proportional to revenue total for realism.\n    # COGS already reflects the store archetype because revenue_total does.\n    if gl_account_id in [\"5910\", \"5920\", \"5930\"]:\n        amount = base * random_factor * forecast_factor\n    else:\n        _, cost_mult = archetype_factor(location_id, month, year)\n        seasonal_cost = seasonal_cost_factor(gl_account_id, month)\n        amount = base * location_factor * inflation_factor * random_factor * forecast_factor * cost_mult * seasonal_cost\n        \n    return round(amount, 0)\n\ndef generate_pl_data():\n    \"\"\"Generate the complete P&L dataset\"\"\"\n    records = []\n    \n    start_date = date(2024, 1, 1)\n    end_date = date(2025, 12, 31)\n    \n    current_date_iter = start_date\n    while current_date_iter <= end_date:\n        month = current_date_iter.month\n        year = current_date_iter.year\n        quarter = f\"Q{(month - 1) // 3 + 1}\"\n        fiscal_year = year\n        \n        scenario = \"Forecast\" if current_date_iter > CURRENT_DATE else \"Actual\"\n        \n        for location in LOCATIONS:\n            account_amounts = {}\n            location_revenue_total = 0\n            \n            # First pass: Generate Level 2 (detail) revenue to get a total\n            for gl_account_id, account_info in GL_ACCOUNTS.items():\n                if account_info[\"level\"] == 2 and account_info[\"type\"] == \"Revenue\":\n                    revenue_amount = generate_revenue_amount(gl_account_id, location[\"id\"], month, year, scenario)\n                    account_amounts[gl_account_id] = {'revenue': revenue_amount, 'expense': 0}\n                    location_revenue_total += revenue_amount\n\n            # Second pass: Generate all expenses using the calculated revenue total\n            for gl_account_id, account_info in GL_ACCOUNTS.items():\n                 if account_info[\"type\"] == \"Expense\":\n                    expense_amount = generate_expense_amount(gl_account_id, location[\"id\"], month, year, scenario, location_revenue_total)\n                    # For expenses, level 1 is sum of level 2\n                    if account_info[\"level\"] == 2:\n                        account_amounts[gl_account_id] = {'revenue': 0, 'expense': expense_amount}\n\n            # Third pass: Roll up all amounts to Level 1 and generate records\n            for gl_account_id, account_info in GL_ACCOUNTS.items():\n                revenue_amount = 0\n                expense_amount = 0\n                \n                if account_info[\"level\"] == 1:  # Summary accounts\n                    children = [acc_id for acc_id, acc_info in GL_ACCOUNTS.items() if acc_info.get(\"parent\") == gl_account_id]\n                    for child_id in children:\n                        if child_id in account_amounts:\n                            revenue_amount += account_amounts[child_id]['revenue']\n                            expense_amount += account_amounts[child_id]['expense']\n                else:  # Detail accounts\n                    if gl_account_id in account_amounts:\n                        revenue_amount = account_amounts[gl_account_id]['revenue']\n                        expense_amount = account_amounts[gl_account_id]['expense']\n                \n                net_amount = revenue_amount - expense_amount\n                profit = net_amount if net_amount > 0 else 0\n                loss = abs(net_amount) if net_amount < 0 else 0\n                \n                variance_to_budget = np.random.normal(0, abs(net_amount) * 0.05) if net_amount != 0 else 0\n                variance_percent = (variance_to_budget / net_amount * 100) if net_amount != 0 else 0\n                \n                record = {\n                    \"損益記録ID\": str(uuid.uuid4()),\n                    \"日付\": current_date_iter,\n                    \"期間\": current_date_iter.strftime(\"%Y-%m\"),\n                    \"月\": month,\n                    \"年\": year,\n                    \"四半期\": quarter,\n                    \"会計年度\": fiscal_year,\n                    \"店舗ID\": location[\"id\"],\n                    \"店舗名\": location[\"name\"],\n                    \"都道府県\": location[\"prefecture\"],\n                    \"市区町村\": location[\"city\"],\n                    \"郵便番号\": location[\"postal_code\"],\n                    \"地域\": location[\"region\"],\n                    \"地域コード\": location[\"area_code\"],\n                    \"勘定科目ID\": gl_account_id,\n                    \"勘定科目名\": account_info[\"name\"],\n                    \"勘定科目名英語\": account_info[\"name_en\"],\n                    \"勘定科目種類\": account_info[\"type\"],\n                    \"勘定科目サブタイプ\": account_info[\"subtype\"],\n                    \"部門\": account_info[\"department\"],\n                    \"部門コード\": account_info[\"dept_code\"],\n                    \"親勘定科目ID\": account_info.get(\"parent\"),\n                    \"勘定科目レベル\": account_info[\"level\"],\n                    \"シナリオ\": scenario,\n                    \"売上金額\": revenue_amount,\n                    \"費用金額\": expense_amount,\n                    \"利益\": profit,\n                    \"損失\": loss,\n                    \"純額\": net_amount,\n                    \"予算差異\": round(variance_to_budget, 0),\n                    \"差異率\": round(variance_percent, 2),\n                    \"サマリ区分\": account_info[\"level\"] == 1,\n                    \"備考\": f\"{scenario.lower()} scenario data for level {account_info['level']} account\",\n                    \"通貨\": \"JPY\"\n                }\n                \n                records.append(record)\n        \n        current_date_iter = current_date_iter.replace(day=1) + relativedelta(months=1)\n    \n    df = pd.DataFrame(records)\n    df['日付'] = pd.to_datetime(df['日付'])\n    return df\n\n# Generate the dataset\nprint(\"シンプルスタイル（ライフスタイルブランド）損益データセット生成中...\")\nprint(\"勘定科目カテゴリ:\")\nprint(\"  - 収益: 衣料品, 生活雑貨, 食品\")\nprint(\"  - 費用: 人件費, 賃借料, 商品原価, 広告宣伝費\")\nprint(f\"実績データ期間: {CURRENT_DATE}まで\")\nprint(f\"予測データ期間: {CURRENT_DATE + relativedelta(days=1)}から\")\ndf = generate_pl_data()\n\n# Display basic information\nprint(f\"\\nデータセット生成完了!\")\nprint(f\"総レコード数: {len(df):,}\")\nprint(f\"期間範囲: {df['期間'].min()} から {df['期間'].max()}\")\nprint(f\"店舗数: {df['店舗ID'].nunique()}\")\nprint(f\"勘定科目数: {df['勘定科目ID'].nunique()}\")\nprint(f\"レベル1（サマリ）勘定科目: {len(df[df['勘定科目レベル'] == 1]['勘定科目ID'].unique())}\")\nprint(f\"レベル2（詳細）勘定科目: {len(df[df['勘定科目レベル'] == 2]['勘定科目ID'].unique())}\")\n\nwrite_dataframe(df)",
+      "additions": [
+        {
+          "name": "損益記録ID",
+          "dataType": "STRING"
+        },
+        {
+          "name": "期間",
+          "dataType": "STRING"
+        },
+        {
+          "name": "月",
+          "dataType": "LONG"
+        },
+        {
+          "name": "年",
+          "dataType": "LONG"
+        },
+        {
+          "name": "四半期",
+          "dataType": "STRING"
+        },
+        {
+          "name": "会計年度",
+          "dataType": "LONG"
+        },
+        {
+          "name": "店舗ID",
+          "dataType": "STRING"
+        },
+        {
+          "name": "店舗名",
+          "dataType": "STRING"
+        },
+        {
+          "name": "都道府県",
+          "dataType": "STRING"
+        },
+        {
+          "name": "市区町村",
+          "dataType": "STRING"
+        },
+        {
+          "name": "郵便番号",
+          "dataType": "STRING"
+        },
+        {
+          "name": "地域",
+          "dataType": "STRING"
+        },
+        {
+          "name": "地域コード",
+          "dataType": "STRING"
+        },
+        {
+          "name": "勘定科目ID",
+          "dataType": "STRING"
+        },
+        {
+          "name": "勘定科目名",
+          "dataType": "STRING"
+        },
+        {
+          "name": "勘定科目名英語",
+          "dataType": "STRING"
+        },
+        {
+          "name": "勘定科目種類",
+          "dataType": "STRING"
+        },
+        {
+          "name": "勘定科目サブタイプ",
+          "dataType": "STRING"
+        },
+        {
+          "name": "部門",
+          "dataType": "STRING"
+        },
+        {
+          "name": "部門コード",
+          "dataType": "STRING"
+        },
+        {
+          "name": "親勘定科目ID",
+          "dataType": "STRING"
+        },
+        {
+          "name": "勘定科目レベル",
+          "dataType": "LONG"
+        },
+        {
+          "name": "シナリオ",
+          "dataType": "STRING"
+        },
+        {
+          "name": "売上金額",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "費用金額",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "利益",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "損失",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "純額",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "予算差異",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "差異率",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "サマリ区分",
+          "dataType": "BOOLEAN"
+        },
+        {
+          "name": "備考",
+          "dataType": "STRING"
+        },
+        {
+          "name": "通貨",
+          "dataType": "STRING"
+        },
+        {
+          "name": "日付",
+          "dataType": "STRING"
+        }
+      ],
+      "fillMissingWithNull": true,
+      "accountPermission": {
+        "mask": 16
+      },
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "Metadata",
+      "id": "Metadata-d7194316-533a-4367-bbc6-fa114e880e23",
+      "name": "日付型変更",
+      "dependsOn": [
+        "3fdc212f-32f5-4e25-88fb-01335509fb82"
+      ],
+      "settings": {
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "gui": {
+        "x": 384,
+        "y": 128,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "input": "3fdc212f-32f5-4e25-88fb-01335509fb82",
+      "fields": [
+        {
+          "name": "日付",
+          "rename": null,
+          "type": "DATE",
+          "dateFormat": null,
+          "settings": {},
+          "remove": false
+        }
+      ],
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "PublishToVault",
+      "id": "dab1e13b-54a4-4833-9c77-f247dc84fa62",
+      "name": "OUT｜P/L明細（店舗×勘定×月）",
+      "dependsOn": [
+        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+      ],
+      "settings": {
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "gui": {
+        "x": 512,
+        "y": 128,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "inputs": [
+        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+      ],
+      "dataSource": {
+        "guid": "a1ba80ca-147e-4ac8-8464-5867d665860e",
+        "type": "DataFlow",
+        "name": "OUT｜P/L明細（店舗×勘定×月）",
+        "description": "店舗別・勘定科目別の損益実績データ（月次粒度）。2024年1月の実績シナリオにおける売上金額、費用金額、利益、損失、純額を記録し、予算との差異分析が可能。勘定科目は階層構造（レベル1/2）を持ち、衣料品・生活雑貨・食品などの事業部別に管理。店舗の地域情報（都道府県、市区町村、地域）を含み、地域別・店舗別の収益性分析に活用される財務管理データ。",
+        "cloudId": "domo"
+      },
+      "versionChainType": "REPLACE",
+      "schemaSource": "DATAFLOW",
+      "partitioned": false,
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "SQL",
+      "id": "SQL-2aad9739-d14d-4039-a06d-9a959b14e530",
+      "name": "SQL｜要約集計（店舗×月）",
+      "dependsOn": [
+        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+      ],
+      "settings": {
+        "sqlDialect": "MAGIC",
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "notes": [],
+      "gui": {
+        "x": 512,
+        "y": 288,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "inputs": [
+        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+      ],
+      "statements": [
+        "--   `PY｜損益データ生成` → あなたの実テーブル名\nWITH base AS (\n  SELECT\n    b.*,\n    (b.年 * 100 + b.月) AS ym\n  FROM `日付型変更` b\n),\n\n-- サマリ区分が 1 でも TRUE でも通るようフラグ化\nbflags AS (\n  SELECT\n    *,\n    CASE\n      WHEN サマリ区分 IN (1, TRUE) THEN 1\n      ELSE 0\n    END AS is_summary\n  FROM base\n),\n\nlatest AS (\n  SELECT MAX(ym) AS 現在YM\n  FROM bflags\n  WHERE シナリオ = 'Actual'\n),\n\nparams AS (\n  SELECT\n    現在YM,\n    CASE\n      WHEN MOD(現在YM,100)=1\n        THEN (FLOOR(現在YM/100)-1)*100 + 12\n      ELSE 現在YM - 1\n    END AS 前月YM,\n    現在YM - 100 AS 一年前YM\n  FROM latest\n),\n\ncurrent_period AS (\n  SELECT\n    b.店舗ID, b.店舗名, b.都道府県, b.市区町村, b.地域,\n    MAX(CONCAT(b.年,'-',LPAD(b.月,2,'0'))) AS 期間,\n    'Actual' AS シナリオ,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.is_summary=1 THEN b.売上金額 ELSE 0 END) AS 総売上,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.is_summary=1 THEN b.費用金額 ELSE 0 END) AS 総費用,\n    SUM(CASE WHEN b.is_summary=1 THEN b.純額 ELSE 0 END) AS 純利益,\n    AVG(CASE WHEN b.is_summary=1 THEN b.差異率 END) AS 平均差異率\n  FROM bflags b\n  JOIN params p ON b.ym = p.現在YM\n  WHERE b.シナリオ='Actual'\n  GROUP BY b.店舗ID, b.店舗名, b.都道府県, b.市区町村, b.地域\n),\n\nprevious_month AS (\n  SELECT\n    b.店舗ID,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.is_summary=1 THEN b.売上金額 ELSE 0 END) AS 前月売上,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.is_summary=1 THEN b.費用金額 ELSE 0 END) AS 前月費用,\n    SUM(CASE WHEN b.is_summary=1 THEN b.純額 ELSE 0 END) AS 前月利益\n  FROM bflags b\n  JOIN params p ON b.ym = p.前月YM\n  WHERE b.シナリオ='Actual'\n  GROUP BY b.店舗ID\n),\n\nyear_ago AS (\n  SELECT\n    b.店舗ID,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.is_summary=1 THEN b.売上金額 ELSE 0 END) AS 前年同月売上,\n    SUM(CASE WHEN b.is_summary=1 THEN b.純額 ELSE 0 END) AS 前年同月利益\n  FROM bflags b\n  JOIN params p ON b.ym = p.一年前YM\n  WHERE b.シナリオ='Actual'\n  GROUP BY b.店舗ID\n),\n\n/* ---------- FIX-1: カテゴリは明細から集計（is_summary=0） ---------- */\ndepartment_summary AS (\n  SELECT\n    b.店舗ID,\n    -- 収益ブレークダウン（ライフスタイルブランド版）\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.部門='衣料品事業部'     AND b.is_summary=0 THEN b.売上金額 ELSE 0 END) AS 衣料品売上,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.部門='生活雑貨事業部'   AND b.is_summary=0 THEN b.売上金額 ELSE 0 END) AS 生活雑貨売上,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.部門='食品事業部'       AND b.is_summary=0 THEN b.売上金額 ELSE 0 END) AS 食品売上,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.部門='新規事業部'       AND b.is_summary=0 THEN b.売上金額 ELSE 0 END) AS その他売上,\n\n    -- 主要費用カテゴリ（明細で重複排除）\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.勘定科目サブタイプ='COGS'                    AND b.is_summary=0 THEN b.費用金額 ELSE 0 END) AS 商品原価,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.勘定科目サブタイプ='Labor'                   AND b.is_summary=0 THEN b.費用金額 ELSE 0 END) AS 総人件費,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.勘定科目サブタイプ IN ('Facility','Utilities') AND b.is_summary=0 THEN b.費用金額 ELSE 0 END) AS 施設費,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.勘定科目サブタイプ='Sales & Marketing'       AND b.is_summary=0 THEN b.費用金額 ELSE 0 END) AS マケ費用,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.勘定科目サブタイプ IN ('Administrative','Technology','Professional Services')\n                                                                                                   AND b.is_summary=0 THEN b.費用金額 ELSE 0 END) AS 管理費用\n  FROM bflags b\n  JOIN params p ON b.ym = p.現在YM\n  WHERE b.シナリオ='Actual'\n  GROUP BY b.店舗ID\n),\n\n/* ---------- FIX-2: 地域平均は「店舗合計の平均」で算出 ---------- */\nregion_store_totals AS (\n  SELECT\n    b.地域,\n    b.店舗ID,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.is_summary=1 THEN b.売上金額 ELSE 0 END) AS store_売上,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.is_summary=1 THEN b.費用金額 ELSE 0 END) AS store_費用,\n    SUM(CASE WHEN b.is_summary=1 THEN b.純額 ELSE 0 END) AS store_利益\n  FROM bflags b\n  JOIN params p ON b.ym = p.現在YM\n  WHERE b.シナリオ='Actual'\n  GROUP BY b.地域, b.店舗ID\n),\nregional_benchmarks AS (\n  SELECT\n    地域,\n    AVG(store_売上)  AS 地域平均売上,\n    AVG(store_費用)  AS 地域平均費用,\n    AVG(store_利益)  AS 地域平均利益\n  FROM region_store_totals\n  GROUP BY 地域\n),\n\nvariance_analysis AS (\n  SELECT\n    b.店舗ID,\n    COUNT(CASE WHEN ABS(b.差異率) > 10 AND b.is_summary=0 THEN 1 END) AS 高差異勘定数,\n    MAX(CASE WHEN b.差異率 > 0  AND b.is_summary=0 THEN b.差異率 END) AS 最大プラス差異,\n    MIN(CASE WHEN b.差異率 < 0  AND b.is_summary=0 THEN b.差異率 END) AS 最大マイナス差異,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.is_summary=1 THEN b.予算差異 ELSE 0 END) AS 売上予算差異,\n    SUM(CASE WHEN b.勘定科目サブタイプ='COGS' AND b.is_summary=1 THEN b.予算差異 ELSE 0 END) AS 原価予算差異\n  FROM bflags b\n  JOIN params p ON b.ym = p.現在YM\n  WHERE b.シナリオ='Actual'\n  GROUP BY b.店舗ID\n)\n\nSELECT\n  cp.店舗ID, cp.店舗名, cp.都道府県, cp.市区町村, cp.地域, cp.期間, cp.シナリオ,\n  cp.総売上, cp.総費用, cp.純利益,\n  ROUND((cp.純利益 / NULLIF(cp.総売上,0)) * 100, 1) AS 利益率,\n  cp.平均差異率,\n  pm.前月売上, pm.前月費用, pm.前月利益,\n  ROUND(((cp.総売上 - pm.前月売上) / NULLIF(pm.前月売上,0)) * 100, 1) AS 前月比売上変化率,\n  ROUND(((cp.純利益 - pm.前月利益) / NULLIF(ABS(pm.前月利益),0)) * 100, 1) AS 前月比利益変化率,\n  ya.前年同月売上, ya.前年同月利益,\n  ROUND(((cp.総売上 - ya.前年同月売上) / NULLIF(ya.前年同月売上,0)) * 100, 1) AS 前年同月比売上変化率,\n  ds.衣料品売上, ds.生活雑貨売上, ds.食品売上, ds.その他売上,\n  ds.商品原価, ds.総人件費, ds.施設費, ds.マケ費用, ds.管理費用,\n  ROUND((ds.衣料品売上   / NULLIF(cp.総売上,0)) * 100, 1) AS 衣料品売上比率,\n  ROUND((ds.生活雑貨売上 / NULLIF(cp.総売上,0)) * 100, 1) AS 生活雑貨売上比率,\n  ROUND((ds.管理費用     / NULLIF(cp.総売上,0)) * 100, 1) AS 管理費用比率,\n  ROUND((ds.総人件費     / NULLIF(cp.総売上,0)) * 100, 1) AS 人件費比率,\n  rb.地域平均売上, rb.地域平均費用, rb.地域平均利益,\n  ROUND(((cp.総売上 - rb.地域平均売上) / NULLIF(rb.地域平均売上,0)) * 100, 1) AS 地域比売上差異,\n  ROUND(((cp.純利益 - rb.地域平均利益) / NULLIF(ABS(rb.地域平均利益),0)) * 100, 1) AS 地域比利益差異,\n  va.高差異勘定数, va.最大プラス差異, va.最大マイナス差異,\n  va.売上予算差異, va.原価予算差異,\n  CASE\n    WHEN ROUND((cp.純利益 / NULLIF(cp.総売上,0)) * 100, 1) >= 8.0 THEN '好調'\n    WHEN ROUND((cp.純利益 / NULLIF(cp.総売上,0)) * 100, 1) >= 5.0 THEN '堅調'\n    WHEN ROUND((cp.純利益 / NULLIF(cp.総売上,0)) * 100, 1) >= 0.0 THEN '要注意'\n    WHEN ROUND(((cp.純利益 - pm.前月利益) / NULLIF(ABS(pm.前月利益),0)) * 100, 1) > 0 THEN '回復基調'\n    ELSE '不振'\n  END AS 状態ラベル,\n  CASE\n    WHEN cp.純利益 > 0 THEN '黒字'\n    WHEN cp.純利益 = 0 THEN '損益分岐点'\n    ELSE '赤字'\n  END AS 収益性ステータス,\n  CASE\n    WHEN ABS(cp.平均差異率) > 15 THEN '高差異'\n    WHEN ABS(cp.平均差異率) > 5  THEN '中差異'\n    ELSE '低差異'\n  END AS 予算達成度,\n  /* ---------- FIX-3: リスクレベルは '高' | '中' | '低' に正規化 ---------- */\n  CASE\n    WHEN (cp.純利益 / NULLIF(cp.総売上,0)) * 100 < 5  THEN '高'\n    WHEN (cp.純利益 / NULLIF(cp.総売上,0)) * 100 < 15 THEN '中'\n    ELSE '低'\n  END AS リスクレベル\nFROM current_period cp\nLEFT JOIN previous_month pm      ON cp.店舗ID = pm.店舗ID\nLEFT JOIN year_ago ya            ON cp.店舗ID = ya.店舗ID\nLEFT JOIN department_summary ds  ON cp.店舗ID = ds.店舗ID\nLEFT JOIN regional_benchmarks rb ON cp.地域  = rb.地域\nLEFT JOIN variance_analysis va   ON cp.店舗ID = va.店舗ID\nORDER BY cp.総売上 DESC;"
+      ],
+      "columnSettings": {},
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "PythonEngineAction",
+      "id": "PythonEngineAction-71dc1c5e-6baf-48d5-b3a1-daf8be58f17b",
+      "name": "PY｜AI入力用テキスト結合",
+      "dependsOn": [
+        "SQL-2aad9739-d14d-4039-a06d-9a959b14e530"
+      ],
+      "settings": {
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "gui": {
+        "x": 640,
+        "y": 288,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "inputs": [
+        "SQL-2aad9739-d14d-4039-a06d-9a959b14e530"
+      ],
+      "removeByDefault": true,
+      "condaEnv": "domo-2",
+      "script": "from domomagic import *\nimport pandas as pd\n\n# 1. 前のタイルからの入力データを読み込む\ndf = read_dataframe('SQL｜要約集計（店舗×月）')\n\n# 2. 各行の全列データを「列名: 値」のテキストに結合（店舗別AI入力）\ndef build_context_string(row):\n    parts = []\n    for col in df.columns:\n        val = row[col]\n        if pd.isna(val):\n            val = \"取得不可\"\n        parts.append(f\"{col}: {val}\")\n    return \"\\n\".join(parts)\n\ndf['ai_input_text'] = df.apply(build_context_string, axis=1)\n\n# 3. 全社（全店舗合算）サマリーを1本のテキストにまとめ、全行へブロードキャスト\ndef _num(col):\n    if col in df.columns:\n        return pd.to_numeric(df[col], errors='coerce').fillna(0)\n    return pd.Series([0] * len(df))\n\ntotal_sales  = _num('総売上').sum()\ntotal_cost   = _num('総費用').sum()\ntotal_profit = _num('純利益').sum()\nmargin = (total_profit / total_sales * 100) if total_sales else 0\nprofitable = int((_num('純利益') > 0).sum())\nn_stores = len(df)\nperiod   = str(df['期間'].iloc[0])   if '期間' in df.columns and len(df) else \"\"\nscenario = str(df['シナリオ'].iloc[0]) if 'シナリオ' in df.columns and len(df) else \"\"\n\ncogs     = _num('商品原価').sum()\nlabor    = _num('総人件費').sum()\nfacility = _num('施設費').sum()\nmkt      = _num('マケ費用').sum()\nadmin    = _num('管理費用').sum()\n\ncat_apparel = _num('衣料品売上').sum()\ncat_living  = _num('生活雑貨売上').sum()\ncat_food    = _num('食品売上').sum()\ncat_other   = _num('その他売上').sum()\n\nrank = df.copy()\nrank['_p'] = _num('純利益')\nhave_name = '店舗名' in df.columns\ntop    = rank.nlargest(3, '_p')[['店舗名', '_p']].values.tolist()  if have_name else []\nbottom = rank.nsmallest(3, '_p')[['店舗名', '_p']].values.tolist() if have_name else []\n\ndef _fmt(v):\n    return f\"{int(round(v)):,}\"\n\nlines = [\n    f\"対象期間: {period} / シナリオ: {scenario} / 店舗数: {n_stores}\",\n    f\"全社総売上: {_fmt(total_sales)}\",\n    f\"全社総費用: {_fmt(total_cost)}\",\n    f\"全社純利益: {_fmt(total_profit)}\",\n    f\"全社利益率: {margin:.1f}%\",\n    f\"黒字店舗数: {profitable} / {n_stores}\",\n    f\"費用内訳 商品原価: {_fmt(cogs)} / 総人件費: {_fmt(labor)} / 施設費: {_fmt(facility)} / マケ費用: {_fmt(mkt)} / 管理費用: {_fmt(admin)}\",\n    f\"カテゴリ別売上 衣料品: {_fmt(cat_apparel)} / 生活雑貨: {_fmt(cat_living)} / 食品: {_fmt(cat_food)} / その他: {_fmt(cat_other)}\",\n]\nif top:\n    lines.append(\"純利益上位: \" + \" / \".join(f\"{n}({_fmt(p)})\" for n, p in top))\nif bottom:\n    lines.append(\"純利益下位: \" + \" / \".join(f\"{n}({_fmt(p)})\" for n, p in bottom))\n\ndf['zensha_ai_input'] = \"\\n\".join(lines)\n\n# 4. 次のタイルへ出力\nwrite_dataframe(df)\n",
+      "additions": [
+        {
+          "name": "店舗ID",
+          "dataType": "STRING"
+        },
+        {
+          "name": "店舗名",
+          "dataType": "STRING"
+        },
+        {
+          "name": "都道府県",
+          "dataType": "STRING"
+        },
+        {
+          "name": "市区町村",
+          "dataType": "STRING"
+        },
+        {
+          "name": "地域",
+          "dataType": "STRING"
+        },
+        {
+          "name": "期間",
+          "dataType": "STRING"
+        },
+        {
+          "name": "シナリオ",
+          "dataType": "STRING"
+        },
+        {
+          "name": "総売上",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "総費用",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "純利益",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "利益率",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "平均差異率",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "前月売上",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "前月費用",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "前月利益",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "前月比売上変化率",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "前月比利益変化率",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "前年同月売上",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "前年同月利益",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "前年同月比売上変化率",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "衣料品売上",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "生活雑貨売上",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "食品売上",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "その他売上",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "商品原価",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "総人件費",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "施設費",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "マケ費用",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "管理費用",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "衣料品売上比率",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "生活雑貨売上比率",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "管理費用比率",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "人件費比率",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "地域平均売上",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "地域平均費用",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "地域平均利益",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "地域比売上差異",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "地域比利益差異",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "高差異勘定数",
+          "dataType": "LONG"
+        },
+        {
+          "name": "最大プラス差異",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "最大マイナス差異",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "売上予算差異",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "原価予算差異",
+          "dataType": "DOUBLE"
+        },
+        {
+          "name": "収益性ステータス",
+          "dataType": "STRING"
+        },
+        {
+          "name": "予算達成度",
+          "dataType": "STRING"
+        },
+        {
+          "name": "リスクレベル",
+          "dataType": "STRING"
+        },
+        {
+          "name": "ai_input_text",
+          "dataType": "STRING"
+        },
+        {
+          "name": "zensha_ai_input",
+          "dataType": "STRING"
+        }
+      ],
+      "fillMissingWithNull": true,
+      "accountPermission": {
+        "mask": 16
+      },
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "TextGeneration",
+      "id": "TextGeneration-fac0a778-db80-4e93-96e3-0f20b591bc4e",
+      "name": "店舗別AIサマリー生成",
+      "dependsOn": [
+        "PythonEngineAction-71dc1c5e-6baf-48d5-b3a1-daf8be58f17b"
+      ],
+      "settings": {
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "notes": [],
+      "gui": {
+        "x": 768,
+        "y": 288,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "input": "PythonEngineAction-71dc1c5e-6baf-48d5-b3a1-daf8be58f17b",
+      "modelId": "domo.domo_ai.domogpt-medium-v2.1:anthropic",
+      "temperature": 0.0,
+      "instructions": "あなたは小売業のシニア財務アナリスト兼経営コンサルタントです。\n入力された1ヶ月分の店舗P/L要約データ（売上・費用・利益率・前月比/前年同月比・費用内訳・地域比較・リスクレベル等）を多角的に分析し、店長と本部が一目で状況を把握できる簡潔な要約を作成してください。\n\n【分析の視点（内部で必ず検討し、結論のみ出力）】\n- 収益性: 利益率と純利益の水準、黒字/赤字、地域平均との差（地域比利益差異）\n- モメンタム: 前月比・前年同月比の売上/利益変化率で改善か悪化かを判断\n- コスト構造: 商品原価・総人件費・施設費・マケ費用・管理費用のうち売上比で過大な項目を特定（人件費比率・管理費用比率を活用）\n- リスク: リスクレベル・予算達成度・予算差異\n\n【絶対遵守の出力要件】\n1) 装飾のないプレーンテキストのみ（HTML・Markdown・記号の箇条書き・挨拶・前置き・解説は一切禁止）。\n2) 全体120〜180文字。3段落構成とし、各段落の間に改行（\\n）を1つだけ入れる。\n3) 1段落目【状況判断】: 状態ラベルは、入力データに含まれる「状態ラベル」列の値（好調／堅調／要注意／回復基調／不振 のいずれか1つ）を**一字一句そのまま**使用する。利益率から自分で再判定・変更・言い換えをしてはならない（このラベルはETL側で機械的に確定済みの単一の真実）。このラベルに利益率(%)を必ず添え、収益性とモメンタムの要点を簡潔に述べる。\n   （参考・判定規則: 好調=利益率≥8.0% / 堅調=5.0〜8.0% / 要注意=0.0〜5.0% / 回復基調=利益率<0%かつ前月比利益変化率>0 / 不振=利益率<0%かつ前月比利益変化率≤0。赤字店舗の回復基調／不振は前月比利益変化率の符号のみで決まり、赤字の深さや改善幅の大小では変わらない。）\n   ※「黒字/赤字」は状態ラベルに使わない（説明文で使うのは可）。\n4) 2段落目【主要因】: 利益を左右した最大の要因を「売上不足」「コスト構造過剰」「売上・コスト両面」のいずれか（共通規約§3）で結論づけ、売上側（例: 前年同月比◯%）とコスト側（例: ◯◯費が売上比◯%で過大）の具体数値を最低1つずつ挙げて説明する。\n5) 3段落目【次の一手】: 上記要因に直結する、次月に店長が実行すべき具体的アクションを1つだけ、可能なら数値目標を添えて提示する。\n\n【厳守事項】\n- 数値は入力データの値のみを使用し、創作しない。「取得不可」の指標には言及しない。\n- 「〜と思われる」等の曖昧表現は避け、データに基づき明確に述べる。",
+      "prompt": "【入力データ】\n{{ai_input_text}}",
+      "parameters": {
+        "ai_input_text": "ai_input_text"
+      },
+      "outputColumnName": "output",
+      "outputColumns": [
+        {
+          "description": "",
+          "title": "店舗別AIサマリー",
+          "enum": [],
+          "type": "string"
+        }
+      ],
+      "structuredOutput": true,
+      "path": "",
+      "modelOutputSchema": [],
+      "modelInputSchema": [],
+      "columnSettings": {},
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "Metadata",
+      "id": "Metadata-fdcee276-52f4-4d27-a127-6ab367bd0be8",
+      "name": "AIエラー列を除去(全社前)",
+      "dependsOn": [
+        "TextGeneration-fac0a778-db80-4e93-96e3-0f20b591bc4e"
+      ],
+      "settings": {
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "gui": {
+        "x": 896,
+        "y": 288,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "input": "TextGeneration-fac0a778-db80-4e93-96e3-0f20b591bc4e",
+      "fields": [
+        {
+          "name": "DOMO_AI_BATCH_ERROR",
+          "rename": null,
+          "type": null,
+          "dateFormat": null,
+          "settings": {},
+          "remove": true
+        }
+      ],
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "TextGeneration",
+      "id": "TextGeneration-0fa8df6c-10d9-4d28-8d8d-93dbd625a395",
+      "name": "全社AIサマリー生成",
+      "dependsOn": [
+        "Metadata-fdcee276-52f4-4d27-a127-6ab367bd0be8"
+      ],
+      "settings": {
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "notes": [],
+      "gui": {
+        "x": 1024,
+        "y": 288,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "input": "Metadata-fdcee276-52f4-4d27-a127-6ab367bd0be8",
+      "modelId": "domo.domo_ai.domogpt-medium-v2.1:anthropic",
+      "temperature": 0.0,
+      "instructions": "あなたは小売チェーン全体を統括する経営企画のシニアアナリストです。\n入力された全社（全店舗合算）の1ヶ月P/Lサマリー（全社売上・費用・純利益・利益率・黒字店舗数・費用内訳・カテゴリ別売上・純利益の上位/下位店舗）を分析し、経営層が全社の状況を一目で把握できる簡潔な要約を作成してください。\n\n【分析の視点（内部で必ず検討し、結論のみ出力）】\n- 全社収益性: 全社利益率と純利益の水準、黒字店舗の比率\n- コスト構造: 商品原価・総人件費・施設費・マケ費用・管理費用のうち売上比で過大な項目\n- 店舗間のばらつき: 純利益ワースト店舗（赤字・低収益）の格差と、それらが全社純利益に与える影響（要介入店舗は必ず純利益ワーストで選ぶ。予算差異ワーストは使わない）\n- カテゴリ: 衣料品・生活雑貨・食品・その他の売上構成\n\n【絶対遵守の出力要件】\n1) 装飾のないプレーンテキストのみ（HTML・Markdown・記号の箇条書き・挨拶・前置き・解説は一切禁止）。\n2) 全体120〜180文字。3段落構成とし、各段落の間に改行（\\n）を1つだけ入れる。\n3) 1段落目【全社状況】: 全社を全社利益率で以下の4値のいずれかに一意に判定し、全社利益率(%)と黒字店舗数(◯/◯店)を必ず添える（共通規約§2.1の閾値に厳密に従う）。\n   - 好調: 利益率 ≥ 8.0%\n   - 堅調: 5.0% ≤ 利益率 < 8.0%\n   - 要注意: 0.0% ≤ 利益率 < 5.0%\n   - 不振: 利益率 < 0.0%（全社赤字）\n   ※「黒字/赤字」は状態ラベルに使わない（説明文で使うのは可）。\n4) 2段落目【主要因】: 全社業績を左右した最大の要因を「売上不足」「コスト構造過剰」「売上・コスト両面」のいずれか（共通規約§3）で結論づけ、コスト側（例: ◯◯費が売上比◯%で過大）と店舗間格差（例: 純利益ワースト店舗が全社純利益を押し下げ）の具体数値を挙げて説明する。\n5) 3段落目【次の一手】: 経営層・統括マネージャーが次月に実行すべき全社施策を1つだけ、可能なら数値目標を添えて提示する。\n\n【厳守事項】\n- 数値は入力データの値のみを使用し、創作しない。「取得不可」の指標には言及しない。\n- 「〜と思われる」等の曖昧表現は避け、データに基づき明確に述べる。",
+      "prompt": "【入力データ】\n{{zensha_ai_input}}",
+      "parameters": {
+        "zensha_ai_input": "zensha_ai_input"
+      },
+      "outputColumnName": "output",
+      "outputColumns": [
+        {
+          "description": "",
+          "title": "全社AIサマリー",
+          "enum": [],
+          "type": "string"
+        }
+      ],
+      "structuredOutput": true,
+      "path": "",
+      "modelOutputSchema": [],
+      "modelInputSchema": [],
+      "columnSettings": {},
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "Metadata",
+      "id": "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061",
+      "name": "列を変更",
+      "dependsOn": [
+        "TextGeneration-0fa8df6c-10d9-4d28-8d8d-93dbd625a395"
+      ],
+      "settings": {
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "gui": {
+        "x": 896,
+        "y": 288,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "input": "TextGeneration-0fa8df6c-10d9-4d28-8d8d-93dbd625a395",
+      "fields": [
+        {
+          "name": "ai_input_text",
+          "rename": null,
+          "type": null,
+          "dateFormat": null,
+          "settings": {},
+          "remove": true
+        },
+        {
+          "name": "DOMO_AI_BATCH_ERROR",
+          "rename": null,
+          "type": null,
+          "dateFormat": null,
+          "settings": {},
+          "remove": true
+        },
+        {
+          "name": "zensha_ai_input",
+          "rename": null,
+          "type": null,
+          "dateFormat": null,
+          "settings": {},
+          "remove": true
+        }
+      ],
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "PublishToVault",
+      "id": "364a005d-742b-455c-a33f-3afbfb2fc32a",
+      "name": "OUT｜P/L要約（店舗×月）",
+      "dependsOn": [
+        "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061"
+      ],
+      "settings": {
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "gui": {
+        "x": 1024,
+        "y": 288,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "inputs": [
+        "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061"
+      ],
+      "dataSource": {
+        "guid": "e05581f1-d70a-474d-91f3-f5a2080c9d05",
+        "type": "DataFlow",
+        "name": "OUT｜P/L要約（店舗×月）",
+        "description": "小売チェーン「シンプルスタイル」の店舗別月次経営実績データ。2025年12月の実績値（Actual）を店舗単位で集計し、売上・費用・利益の財務指標、カテゴリ別売上構成、前月・前年同月比較、地域平均との差異分析、予算差異、収益性ステータス、リスクレベル評価、AIサマリーを含む。経営判断・店舗評価・改善施策立案に活用。",
+        "cloudId": "domo"
+      },
+      "versionChainType": "REPLACE",
+      "schemaSource": "DATAFLOW",
+      "partitioned": false,
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "SQL",
+      "id": "SQL-c4bdc5d5-9e9c-5d81-a817-0816308570fc",
+      "name": "SQL｜トレンド集計（店舗×月）",
+      "dependsOn": [
+        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+      ],
+      "inputs": [
+        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+      ],
+      "settings": {
+        "sqlDialect": "MAGIC",
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "notes": [],
+      "gui": {
+        "x": 512,
+        "y": 448,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "statements": [
+        "-- 店舗×月 の売上/純利益。レベル1（サマリ区分=1）のみで集計し二重計上を回避する。\n-- 旧 window.__TREND__（app.js 同梱スナップショット）の live 版。値は同一。\nWITH bflags AS (\n  SELECT *, CASE WHEN サマリ区分 IN (1, TRUE) THEN 1 ELSE 0 END AS is_summary\n  FROM `日付型変更`\n)\nSELECT\n  期間     AS period,\n  店舗ID   AS store_id,\n  店舗名   AS store,\n  地域     AS region,\n  ROUND(SUM(売上金額)) AS rev,\n  ROUND(SUM(純額))     AS profit\nFROM bflags\nWHERE is_summary = 1\nGROUP BY 期間, 店舗ID, 店舗名, 地域"
+      ],
+      "columnSettings": {},
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "PublishToVault",
+      "id": "0e861cea-7c34-53a2-8f3f-d2f3653290be",
+      "dependsOn": [
+        "SQL-c4bdc5d5-9e9c-5d81-a817-0816308570fc"
+      ],
+      "inputs": [
+        "SQL-c4bdc5d5-9e9c-5d81-a817-0816308570fc"
+      ],
+      "settings": {
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "dataSource": {
+        "guid": null,
+        "type": "DataFlow",
+        "name": "OUT｜P/Lトレンド（店舗×月）",
+        "description": "店舗×月の売上・純利益（レベル1集計）。Pro-Code の24ヶ月トレンド（店舗別/全社/月次ランキング）が live 参照する。",
+        "cloudId": "domo"
+      },
+      "versionChainType": "REPLACE",
+      "schemaSource": "DATAFLOW",
+      "partitioned": false,
+      "gui": {
+        "x": 704,
+        "y": 448,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "SQL",
+      "id": "SQL-bfb09e1d-af6d-5506-add0-99d81e326683",
+      "name": "SQL｜事業部別集計（部門×月）",
+      "dependsOn": [
+        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+      ],
+      "inputs": [
+        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+      ],
+      "settings": {
+        "sqlDialect": "MAGIC",
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "notes": [],
+      "gui": {
+        "x": 512,
+        "y": 608,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "statements": [
+        "-- 部門×月 の売上(Revenue・レベル1)/売上原価(Expense・レベル2)/予算差異。収益4事業部・FY2025。\n-- レベルを分けるのは二重計上回避（レベル1売上＝レベル2子科目の合計のため必ず一方に絞る）。\n-- 間接部門は売上0のため対象外。旧 window.__DEPT__ の live 版。\nWITH b AS (\n  SELECT * FROM `日付型変更`\n  WHERE シナリオ = 'Actual'\n    AND 部門 IN ('衣料品事業部','生活雑貨事業部','食品事業部','新規事業部')\n    AND 期間 >= '2025-01' AND 期間 <= '2025-12'\n)\nSELECT\n  期間       AS period,\n  部門コード AS code,\n  部門       AS name,\n  ROUND(SUM(CASE WHEN 勘定科目種類 = 'Revenue' AND 勘定科目レベル = 1 THEN 売上金額 ELSE 0 END)) AS rev,\n  ROUND(SUM(CASE WHEN 勘定科目種類 = 'Expense' AND 勘定科目レベル = 2 THEN 費用金額 ELSE 0 END)) AS cogs,\n  ROUND(SUM(CASE WHEN (勘定科目種類 = 'Revenue' AND 勘定科目レベル = 1)\n                   OR (勘定科目種類 = 'Expense' AND 勘定科目レベル = 2) THEN 予算差異 ELSE 0 END)) AS variance\nFROM b\nGROUP BY 期間, 部門コード, 部門"
+      ],
+      "columnSettings": {},
+      "tables": [
+        {}
+      ]
+    },
+    {
+      "type": "PublishToVault",
+      "id": "b351222a-8c12-5e6c-b687-849d36c538cd",
+      "dependsOn": [
+        "SQL-bfb09e1d-af6d-5506-add0-99d81e326683"
+      ],
+      "inputs": [
+        "SQL-bfb09e1d-af6d-5506-add0-99d81e326683"
+      ],
+      "settings": {
+        "preferredDatabaseEntityType": "TEMP_VIEW"
+      },
+      "dataSource": {
+        "guid": null,
+        "type": "DataFlow",
+        "name": "OUT｜P/L事業部別（部門×月）",
+        "description": "部門×月の売上（Revenue L1）・売上原価（Expense L2）・予算差異。収益4事業部・FY2025。Pro-Code の事業部別タブが live 参照する。",
+        "cloudId": "domo"
+      },
+      "versionChainType": "REPLACE",
+      "schemaSource": "DATAFLOW",
+      "partitioned": false,
+      "gui": {
+        "x": 704,
+        "y": 608,
+        "color": null,
+        "colorSource": null,
+        "sampleJson": null
+      },
+      "tables": [
+        {}
+      ]
+    }
+  ],
+  "engineProperties": {
+    "kettle.mode": "STRICT"
+  },
+  "inputs": [
+    {
+      "dataSourceId": "cdacbd54-23dd-4ec9-8e16-8b7c7aa69677",
+      "executeFlowWhenUpdated": false,
+      "dataSourceName": "IN｜P/L入力データ",
+      "onlyLoadNewVersions": false,
+      "recentVersionCutoffMs": 0
+    }
+  ],
+  "outputs": [
+    {
+      "onboardFlowId": null,
+      "dataSourceId": "a1ba80ca-147e-4ac8-8464-5867d665860e",
+      "dataSourceName": "OUT｜P/L明細（店舗×勘定×月）",
+      "versionChainType": "REPLACE"
+    },
+    {
+      "onboardFlowId": null,
+      "dataSourceId": "e05581f1-d70a-474d-91f3-f5a2080c9d05",
+      "dataSourceName": "OUT｜P/L要約（店舗×月）",
+      "versionChainType": "REPLACE"
+    },
+    {
+      "onboardFlowId": null,
+      "dataSourceId": null,
+      "dataSourceName": "OUT｜P/Lトレンド（店舗×月）",
+      "versionChainType": "REPLACE"
+    },
+    {
+      "onboardFlowId": null,
+      "dataSourceId": null,
+      "dataSourceName": "OUT｜P/L事業部別（部門×月）",
+      "versionChainType": "REPLACE"
+    }
+  ],
+  "useLegacyTriggerBehavior": false,
+  "passwordProtected": false,
+  "deleted": false,
+  "abandoned": false,
+  "neverAbandon": false,
+  "settings": {
+    "sqlDialect": "MAGIC"
+  },
+  "triggerSettings": {
+    "triggers": [
+      {
+        "title": "トリガーのタイトル1",
+        "triggerEvents": [
+          {
+            "id": "695c51f7-7ee4-41ec-a0d2-70741ba10cd9",
+            "schedule": {
+              "second": "0",
+              "minute": "0",
+              "hour": "23",
+              "dayOfMonth": "?",
+              "month": "*",
+              "dayOfWeek": "*",
+              "year": "*"
+            },
+            "type": "SCHEDULE"
+          }
+        ],
+        "triggerConditions": [],
+        "triggerId": 1
+      }
+    ],
+    "zoneId": "Asia/Tokyo",
+    "locale": "ja_JP"
+  },
+  "paused": false,
+  "enabled": true,
+  "databaseType": "MAGIC",
+  "editable": true,
+  "draft": false,
+  "triggeredByInput": false,
+  "numInputs": 1,
+  "numOutputs": 2,
+  "magic": true,
+  "restricted": false,
+  "subsetProcessing": false,
+  "container": false
+}

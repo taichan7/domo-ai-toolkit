@@ -1,0 +1,130 @@
+<html lang="ja"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>店舗別損益 AIインサイト</title>
+
+  <!-- 外部 CDN 非依存（inventory-management-app と同基準）。日本語書体は app.css の
+       font-family スタックで "Noto Sans JP"（ローカルにあれば）→ システム日本語フォントへ
+       フォールバックする。Google Fonts 等のランタイム読込は行わない（オフライン/社内NW/CDN障害でも壊れない）。 -->
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div id="header">
+    <div class="header-content container">
+      <div class="brand">
+        <img class="brand-logo" src="logo.png" alt="シンプルスタイル" width="46" height="46">
+        <div class="brand-text">
+          <div class="logo">店舗別損益 AIインサイト</div>
+          <div class="brand-sub">Store P/L AI Insights</div>
+        </div>
+      </div>
+      <div class="selector">
+        <label for="store-select" class="selector-label">店舗</label>
+        <div class="select-shell">
+          <select id="store-select" aria-label="店舗を選択"></select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content container">
+    <div id="message-container"></div>
+
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <p>データを読み込み中…</p>
+    </div>
+
+    <div id="dashboard" class="hidden">
+      <div class="view-head">
+        <div>
+          <div id="view-eyebrow" class="view-eyebrow"></div>
+          <h1 id="view-title" class="view-title"></h1>
+        </div>
+        <div id="badges" class="badges"></div>
+      </div>
+
+      <div class="view-tabs" role="tablist" aria-label="表示の切り替え">
+        <button type="button" class="view-tab active" role="tab" data-tab="overview"
+                id="tab-overview" aria-controls="panel-overview" aria-selected="true">概要</button>
+        <button type="button" class="view-tab" role="tab" data-tab="department"
+                id="tab-department" aria-controls="panel-department" aria-selected="false" tabindex="-1">事業部別</button>
+        <button type="button" class="view-tab" role="tab" data-tab="summary"
+                id="tab-summary" aria-controls="panel-summary" aria-selected="false" tabindex="-1">サマリー</button>
+      </div>
+
+      <section id="panel-overview" class="view-panel active" role="tabpanel" aria-labelledby="tab-overview">
+        <div id="kpis" class="kpi-grid"></div>
+
+        <div id="ai-quick" class="ai-quick hidden"></div>
+
+        <div class="charts-grid">
+          <section class="chart-card span-2">
+            <h2 class="chart-title" id="title-trend">売上・利益トレンド<span class="chart-note">直近24ヶ月</span></h2>
+            <div id="chart-trend" class="chart-body"></div>
+            <div id="legend-trend" class="legend"></div>
+          </section>
+
+          <section class="chart-card">
+            <h2 class="chart-title" id="title-donut">費用構成<span class="chart-note"></span></h2>
+            <div id="chart-donut" class="chart-body donut-body"></div>
+          </section>
+
+          <section class="chart-card span-3">
+            <h2 class="chart-title" id="rank-title">店舗別 純利益ランキング</h2>
+            <div id="chart-rank" class="chart-body"></div>
+            <div id="legend-rank" class="legend"></div>
+          </section>
+        </div>
+      </section>
+
+      <!-- 事業部別損益（全社ビューのみ。店舗選択時はタブごと非表示。間接部門は売上0のため自動除外＝収益4事業部のみ） -->
+      <section id="panel-department" class="view-panel" role="tabpanel" aria-labelledby="tab-department">
+        <div id="dept-section" class="dept-section hidden">
+          <div class="dept-head">
+            <h2 class="dept-heading">事業部別損益</h2>
+            <span class="dept-sub" id="dept-period-note"></span>
+          </div>
+          <div class="charts-grid">
+            <section class="chart-card span-2">
+              <h2 class="chart-title" id="title-dept-bar">事業部別 売上・粗利<span class="chart-note">積み上げ＝売上原価＋粗利益</span></h2>
+              <div id="chart-dept-bar" class="chart-body"></div>
+              <div id="legend-dept-bar" class="legend"></div>
+            </section>
+
+            <section class="chart-card">
+              <h2 class="chart-title" id="title-dept-donut">売上構成比<span class="chart-note"></span></h2>
+              <div id="chart-dept-donut" class="chart-body donut-body"></div>
+            </section>
+
+            <section class="chart-card span-3">
+              <h2 class="chart-title" id="title-dept-trend">事業部別 月次売上トレンド<span class="chart-note">2025年度・季節性（3月/7月/12月が繁忙）</span></h2>
+              <div id="chart-dept-trend" class="chart-body"></div>
+              <div id="legend-dept-trend" class="legend"></div>
+            </section>
+
+            <section class="chart-card span-3">
+              <h2 class="chart-title">予算達成状況<span class="chart-note">粗利ベース・実績 vs 予算</span></h2>
+              <div id="dept-budget-table"></div>
+              <p class="dept-foot">※ 粗利益＝売上−売上原価。人件費・賃料等の間接費は全社共通のため事業部には配賦していません。予算差異＝実績−予算。</p>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section id="panel-summary" class="view-panel" role="tabpanel" aria-labelledby="tab-summary">
+        <section class="insight-card">
+          <h2 class="chart-title">AI 経営インサイト<span class="chart-note" id="insight-note"></span></h2>
+          <div id="analysis-container"></div>
+        </section>
+      </section>
+    </div>
+  </div>
+
+  <!-- Bundled snapshot data (window.__TREND__ / window.__DEPT__) は app.js 冒頭に統合済み -->
+  <!-- Domo SDK -->
+  <script src="vendor/domo.js"></script>
+  <!-- App script (bundled snapshot data + logic) -->
+  <script src="app.js"></script>
+
+</body></html>

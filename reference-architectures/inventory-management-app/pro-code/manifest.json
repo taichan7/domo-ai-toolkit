@@ -1,0 +1,266 @@
+{
+  "name": "在庫入出庫管理",
+  "version": "2.4.104",
+  "size": {
+    "width": 1,
+    "height": 1
+  },
+  "ignore": [
+    "vendor/*.LICENSE",
+    "vendor/README.md"
+  ],
+  "datasetsMapping": [
+    {
+      "dataSetId": "6f407387-7980-44b4-b1fd-3e4b12ec3d34",
+      "alias": "inventoryDashboard",
+      "fields": []
+    }
+  ],
+  "collectionsMapping": [
+    {
+      "id": "b76a1233-038d-4f99-aa19-1705469b7f7e",
+      "name": "inventory_management_records",
+      "syncEnabled": true,
+      "schema": {
+        "columns": [
+          {
+            "name": "record_type",
+            "type": "STRING"
+          },
+          {
+            "name": "record_key",
+            "type": "STRING"
+          },
+          {
+            "name": "item_code",
+            "type": "STRING"
+          },
+          {
+            "name": "item_name",
+            "type": "STRING"
+          },
+          {
+            "name": "category",
+            "type": "STRING"
+          },
+          {
+            "name": "unit",
+            "type": "STRING"
+          },
+          {
+            "name": "location_code",
+            "type": "STRING"
+          },
+          {
+            "name": "location_name",
+            "type": "STRING"
+          },
+          {
+            "name": "zone",
+            "type": "STRING"
+          },
+          {
+            "name": "qr_value",
+            "type": "STRING"
+          },
+          {
+            "name": "active",
+            "type": "STRING"
+          },
+          {
+            "name": "rule_key",
+            "type": "STRING"
+          },
+          {
+            "name": "notification_enabled",
+            "type": "STRING"
+          },
+          {
+            "name": "transaction_id",
+            "type": "STRING"
+          },
+          {
+            "name": "request_id",
+            "type": "STRING"
+          },
+          {
+            "name": "transaction_type",
+            "type": "STRING"
+          },
+          {
+            "name": "balance_key",
+            "type": "STRING"
+          },
+          {
+            "name": "quantity",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "signed_quantity",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "balance_before",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "balance_after",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "minimum_quantity",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "shortage_quantity",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "is_shortage",
+            "type": "STRING"
+          },
+          {
+            "name": "reason",
+            "type": "STRING"
+          },
+          {
+            "name": "operator_user_id",
+            "type": "STRING"
+          },
+          {
+            "name": "operator_name",
+            "type": "STRING"
+          },
+          {
+            "name": "source",
+            "type": "STRING"
+          },
+          {
+            "name": "status",
+            "type": "STRING"
+          },
+          {
+            "name": "last_alerted_quantity",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "last_alerted_at",
+            "type": "DATETIME"
+          },
+          {
+            "name": "last_recovered_at",
+            "type": "DATETIME"
+          },
+          {
+            "name": "alert_id",
+            "type": "STRING"
+          },
+          {
+            "name": "event_type",
+            "type": "STRING"
+          },
+          {
+            "name": "current_quantity",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "notification_status",
+            "type": "STRING"
+          },
+          {
+            "name": "notification_subject",
+            "type": "STRING"
+          },
+          {
+            "name": "notification_body",
+            "type": "STRING"
+          },
+          {
+            "name": "error_message",
+            "type": "STRING"
+          },
+          {
+            "name": "workflow_instance_id",
+            "type": "STRING"
+          },
+          {
+            "name": "occurred_at",
+            "type": "DATETIME"
+          },
+          {
+            "name": "last_transaction_at",
+            "type": "DATETIME"
+          },
+          {
+            "name": "created_at",
+            "type": "DATETIME"
+          },
+          {
+            "name": "updated_at",
+            "type": "DATETIME"
+          },
+          {
+            "name": "archived",
+            "type": "STRING"
+          }
+        ]
+      }
+    }
+  ],
+  "packagesMapping": [
+    {
+      "name": "inventoryService",
+      "alias": "inventoryApi",
+      "packageId": "ba587df4-66a1-41e4-abe9-7af3e4a474d3",
+      "version": "1.0.38",
+      "functionName": "inventory_api",
+      "parameters": [
+        {
+          "name": "operation",
+          "displayName": "operation",
+          "type": "text",
+          "value": null,
+          "nullable": false,
+          "isList": false,
+          "children": [],
+          "entitySubType": null,
+          "alias": "operation"
+        },
+        {
+          "name": "request_json",
+          "displayName": "request_json",
+          "type": "text",
+          "value": "{}",
+          "nullable": true,
+          "isList": false,
+          "children": [],
+          "entitySubType": null,
+          "alias": "requestJson"
+        }
+      ],
+      "output": {
+        "name": "result",
+        "displayName": "result",
+        "type": "object",
+        "value": null,
+        "nullable": true,
+        "isList": false,
+        "children": [],
+        "entitySubType": null,
+        "alias": "result"
+      }
+    }
+  ],
+  "workflowsMapping": [
+    {
+      "startName": "不足通知を開始",
+      "alias": "lowStockNotification",
+      "modelId": "0c61146c-9e04-4a9b-bc5e-7c43384d06d6",
+      "parameters": [],
+      "version": "1.0.11"
+    }
+  ],
+  "proxyId": [],
+  "fileName": "manifest.json",
+  "id": "3c156897-8ddb-4761-9664-9073a9f2aa90"
+}

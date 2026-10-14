@@ -1,0 +1,204 @@
+{
+  "_note": "Schema-only mirror (column names + types). No row data, previews, owners, or instance-specific column IDs. Schema-only mirror (not published).",
+  "_source": "maintenance-instance:api/query/v1/datasources/schema/indexed",
+  "column_count": 49,
+  "columns": [
+    {
+      "name": "店舗ID",
+      "type": "STRING"
+    },
+    {
+      "name": "店舗名",
+      "type": "STRING"
+    },
+    {
+      "name": "都道府県",
+      "type": "STRING"
+    },
+    {
+      "name": "市区町村",
+      "type": "STRING"
+    },
+    {
+      "name": "地域",
+      "type": "STRING"
+    },
+    {
+      "name": "期間",
+      "type": "STRING"
+    },
+    {
+      "name": "シナリオ",
+      "type": "STRING"
+    },
+    {
+      "name": "総売上",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "総費用",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "純利益",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "利益率",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "平均差異率",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "前月売上",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "前月費用",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "前月利益",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "前月比売上変化率",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "前月比利益変化率",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "前年同月売上",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "前年同月利益",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "前年同月比売上変化率",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "衣料品売上",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "生活雑貨売上",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "食品売上",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "その他売上",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "商品原価",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "総人件費",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "施設費",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "マケ費用",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "管理費用",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "衣料品売上比率",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "生活雑貨売上比率",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "管理費用比率",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "人件費比率",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "地域平均売上",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "地域平均費用",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "地域平均利益",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "地域比売上差異",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "地域比利益差異",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "高差異勘定数",
+      "type": "LONG"
+    },
+    {
+      "name": "最大プラス差異",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "最大マイナス差異",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "売上予算差異",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "原価予算差異",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "収益性ステータス",
+      "type": "STRING"
+    },
+    {
+      "name": "予算達成度",
+      "type": "STRING"
+    },
+    {
+      "name": "リスクレベル",
+      "type": "STRING"
+    },
+    {
+      "name": "状態ラベル",
+      "type": "STRING"
+    },
+    {
+      "name": "店舗別AIサマリー",
+      "type": "STRING"
+    },
+    {
+      "name": "全社AIサマリー",
+      "type": "STRING"
+    }
+  ],
+  "dataset_name": "summary"
+}

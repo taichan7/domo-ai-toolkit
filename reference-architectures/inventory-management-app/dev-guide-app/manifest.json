@@ -1,0 +1,14 @@
+{
+  "name": "在庫入出庫管理｜開発ガイド",
+  "version": "2.0.1",
+  "size": {
+    "width": 1,
+    "height": 1
+  },
+  "fileName": "manifest.json",
+  "datasetsMapping": [],
+  "id": "aeb6e8d5-2548-4636-a7c2-7e1eeadd4ce1",
+  "ignore": [
+    "vendor/ryuu.js-4.6.0.LICENSE"
+  ]
+}

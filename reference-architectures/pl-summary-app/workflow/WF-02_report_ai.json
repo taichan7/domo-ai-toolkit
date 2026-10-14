@@ -1,0 +1,1277 @@
+{
+  "designElements": [
+    {
+      "id": "rootNode",
+      "position": {
+        "x": 360,
+        "y": 40
+      },
+      "data": {
+        "dimensions": {
+          "width": 200,
+          "height": 60
+        },
+        "title": "開始（AIレポート生成）",
+        "description": "",
+        "type": "Start",
+        "_designNode": "rootNode",
+        "isFormStart": true,
+        "input": [
+          {
+            "id": "input_CollectionId",
+            "paramName": "CollectionId",
+            "acceptsInput": false,
+            "useExternalValues": false,
+            "dataType": "text",
+            "mappedTo": "lZNswzDwqxbJuDs",
+            "value": null,
+            "fieldOptionsMappedTo": null,
+            "fieldOptionsValue": null,
+            "datasetMapping": null,
+            "required": true,
+            "children": [],
+            "displayName": "CollectionId",
+            "visible": true,
+            "formFieldId": "9e29f0af-ccfa-4503-bc81-dbfd55659126",
+            "formFieldType": null,
+            "flag": "input",
+            "customMappingType": "form_start",
+            "entitySubType": null,
+            "isList": false,
+            "configType": "forms"
+          },
+          {
+            "id": "input_AiPromptText",
+            "paramName": "AiPromptText",
+            "acceptsInput": false,
+            "useExternalValues": false,
+            "dataType": "text",
+            "mappedTo": "qCugVmcafngJTgJ",
+            "value": null,
+            "fieldOptionsMappedTo": null,
+            "fieldOptionsValue": null,
+            "datasetMapping": null,
+            "required": true,
+            "children": [],
+            "displayName": "AiPromptText",
+            "visible": true,
+            "formFieldId": "aa8b4e0c-9561-4e05-9ecc-79baf5dcaead",
+            "formFieldType": null,
+            "flag": "input",
+            "customMappingType": "form_start",
+            "entitySubType": null,
+            "isList": false,
+            "configType": "forms"
+          },
+          {
+            "id": "input_report_type",
+            "paramName": "report_type",
+            "acceptsInput": false,
+            "useExternalValues": false,
+            "dataType": "text",
+            "mappedTo": "var_report_type",
+            "value": null,
+            "fieldOptionsMappedTo": null,
+            "fieldOptionsValue": null,
+            "datasetMapping": null,
+            "required": true,
+            "children": [],
+            "displayName": "report_type",
+            "visible": true,
+            "formFieldId": "b5edb3e3-af2f-411c-bc6a-1bac4a97f149",
+            "formFieldType": null,
+            "flag": "input",
+            "customMappingType": "form_start",
+            "entitySubType": null,
+            "isList": false,
+            "configType": "forms"
+          }
+        ],
+        "output": [],
+        "formId": "900a3574-bed7-4f0d-ad00-f39ca43224f3",
+        "formTitle": "null",
+        "formDescription": "null"
+      },
+      "style": {
+        "zIndex": 4,
+        "outline": "none"
+      },
+      "index": 0,
+      "type": "rootNode"
+    },
+    {
+      "id": "child_settle_timer",
+      "position": {
+        "x": 360,
+        "y": 140
+      },
+      "data": {
+        "dimensions": {
+          "width": 200,
+          "height": 60
+        },
+        "title": "5秒待機｜AI負荷平準化",
+        "description": "",
+        "_designNode": "intermediateCatchEventNode",
+        "configType": "timer",
+        "input": [
+          {
+            "id": "49f6249e16a0476",
+            "paramName": "setting",
+            "dataType": "duration",
+            "mappedTo": null,
+            "value": "PT5S",
+            "required": true,
+            "isList": false,
+            "children": [],
+            "displayName": "設定",
+            "visible": true,
+            "flag": "input",
+            "customMappingType": null,
+            "configType": null,
+            "entitySubType": null,
+            "aiDescription": null
+          }
+        ],
+        "interrupting": true
+      },
+      "style": {
+        "zIndex": 4,
+        "outline": "none"
+      },
+      "index": 1,
+      "type": "intermediateCatchEventNode"
+    },
+    {
+      "id": "report_type_gateway",
+      "position": {
+        "x": 360,
+        "y": 240
+      },
+      "data": {
+        "dimensions": {
+          "width": 200,
+          "height": 60
+        },
+        "title": "レポート種別？",
+        "description": "",
+        "_designNode": "conditionalGatewayNode",
+        "inclusive": false
+      },
+      "style": {
+        "zIndex": 3,
+        "outline": "none"
+      },
+      "index": 2,
+      "type": "conditionalGatewayNode"
+    },
+    {
+      "id": "ai_company",
+      "position": {
+        "x": 580,
+        "y": 440
+      },
+      "data": {
+        "dimensions": {
+          "width": 200,
+          "height": 60
+        },
+        "title": "AIエージェント｜全社サマリー生成",
+        "description": "全社損益サマリーを生成しAppDBへ保存・通知",
+        "prompt": {
+          "id": "cc3277313e2444b",
+          "paramName": "prompt",
+          "dataType": "text",
+          "mappedTo": null,
+          "value": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "入力変数：",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "collection_id: ",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                },
+                {
+                  "type": "variable",
+                  "children": [
+                    {
+                      "text": "",
+                      "bold": false,
+                      "italic": false,
+                      "underlined": false,
+                      "sql": false
+                    }
+                  ],
+                  "dataType": "text",
+                  "id": "lZNswzDwqxbJuDs",
+                  "name": "CollectionId",
+                  "isList": false
+                },
+                {
+                  "text": "",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "これはAppDBコレクションID（文字列）です。保存は pl_report_api(operation=\"save\", request={collection_id, document}) で行う。",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "以下のデータに基づいて分析を行ってください。",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "<data>",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                },
+                {
+                  "type": "variable",
+                  "children": [
+                    {
+                      "text": "",
+                      "bold": false,
+                      "italic": false,
+                      "underlined": false,
+                      "sql": false
+                    }
+                  ],
+                  "dataType": "text",
+                  "id": "qCugVmcafngJTgJ",
+                  "name": "AiPromptText",
+                  "isList": false
+                },
+                {
+                  "text": "",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "</data>",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            }
+          ],
+          "required": true,
+          "isList": false,
+          "children": [],
+          "displayName": "Prompt",
+          "visible": true,
+          "flag": "input",
+          "customMappingType": null,
+          "configType": null,
+          "entitySubType": null,
+          "aiDescription": null
+        },
+        "result": {
+          "id": "84bd02945f98428",
+          "paramName": "result",
+          "dataType": "object",
+          "mappedTo": "var_company_result",
+          "value": null,
+          "required": true,
+          "isList": false,
+          "children": [],
+          "displayName": "Result",
+          "visible": true,
+          "flag": "output",
+          "customMappingType": null,
+          "configType": null,
+          "entitySubType": null,
+          "aiDescription": null
+        },
+        "agent": {
+          "instructions": "# 全社ライフスタイル小売 財務分析エージェント（経営層向け）\n\n## 1. 役割\nあなたは小売（アパレル／生活雑貨／食品）領域で15年以上の経験を持つ、経営管理部門のシニア財務アナリストです。入力データ（全店舗合算JSON）を一次情報として、全社の損益状況をマクロ視点で深く分析し、経営層・エリア統括マネージャーが即時実行できる、リソース最適化と全社横断の改善アクションを提案してください。\n\n## 2. 絶対要件（最優先）\n以下を1つでも満たさない場合は失格です。\n\n1. 最終出力は「単一のJSONオブジェクト（1件）」のみとする。\n2. 前後の説明、Markdownコードブロック、箇条書き、コメントを最終出力に含めない。\n3. JSONはフラット構造とし、`content` キーを禁止する。\n4. ツール `DomoSqlQueryTool` による店舗データ取得は最大1回までとする。\n5. AppDB保存およびメール送信は、分析完了後に必ず「保存 -> 送信」の順序で実行する。\n6. ツール失敗・0件・解釈不能時は即打ち切りし、以降ツール禁止で入力データのみで完了する（リトライ禁止）。\n7. 洞察は必ず「断定 + 根拠数値 + 仮説」を含める（高い/低いのみで終えない）。\n8. 支配要因は必ず「売上不足」「コスト構造過剰」「売上・コスト両面」のいずれかで結論づける（共通規約§3。不十分なら「暫定結論」）。\n9. 店舗名・勘定科目名の創作は禁止。ツールで取得した事実のみ記載可。\n10. 数値は入力データ（またはツール取得結果）の値のみを使用し、丸め・概算・創作をしない。金額は円単位を明示し、桁区切りで表示する。\n11. 経営示唆は「全社リソースの再配分」の観点を必ず1つ含める（好調店の勝ち筋を不振店へ横展開、または不振店へのリソース集中/撤退判断など、具体店舗名と数値を根拠に断定）。\n12. 状態ラベル（`state_label`）は共通規約§2.1 の4値「好調（利益率≥8%）／堅調（5〜8%）／要注意（0〜5%）／不振（<0%）」から全社利益率で決定する。「黒字」「赤字」を状態ラベルとして使わない（本文の補足説明で黒字/赤字の語を使うのは可）。\n\n## 3. 参照可能データセット（この2つのみ）\n1. `OUT｜P/L要約（店舗×月）`: 店舗および全社のサマリーデータ\n2. `OUT｜P/L明細（店舗×勘定×月）`: 勘定科目レベルの明細データ\n\n## 4. 入力JSONのキー解決（全社合算データ）\n入力JSONは「全店舗の合算・平均値」を想定。以下の優先順で値を確定し、見つからなければ `null`（表示時は `取得不可`）とする。\n\n- `period`: `period` -> `期間`\n- `scenario`: `scenario` -> `シナリオ`（基本は `Actual` 想定）\n- `total_sales`: `total_sales` -> `総売上`\n- `total_expenses`: `total_expenses` -> `総費用`\n- `net_profit`: `net_profit` -> `純利益`\n- `profit_margin`: `profit_margin` -> `利益率`\n- `personnel_ratio`: `personnel_ratio` -> `人件費比率`\n- `admin_ratio`: `administrative_expenses_ratio` -> `管理費用比率`\n- `trend`: `previous_month_sales_change_rate`, `previous_month_profit_change_rate`\n- `yoy`: `same_month_last_year_sales_change_rate`\n- `costs`: `cogs_expenses`, `total_personnel_expenses`, `facility_expenses`, `marketing_expenses`, `administrative_expenses`\n- `category`: `apparel_sales/ratio`, `household_sales/ratio`, `food_sales`, `other_sales`（全社合算値。欠損時は該当セルを `取得不可` とする）\n- `variance`: `sales_budget_difference`, `cogs_budget_difference`\n- `risk`: `risk_level` -> `リスクレベル`\n\n## 5. ツール利用ポリシー\n- 利用可能ツール: `DomoSqlQueryTool`（参照データセットの照会）, `pl_report_api`（レポート保存）, `Send Email`。\n- 入力データだけで完結できる場合は、`DomoSqlQueryTool` を使わない（`pl_report_api` の保存・`Send Email` は §8 で必須）。\n\n### 5.1 `DomoSqlQueryTool` 実行条件（最大1回）\n全社純利益を圧迫する「純利益ワースト店舗（赤字・低収益）」を具体名で示す価値がある場合のみ実行可（共通規約§4）。\n\n- 対象: `OUT｜P/L要約（店舗×月）`\n- 条件: 当該 `period` かつ `scenario='Actual'` かつ 集計用ダミー行（全社等）を除く\n- 抽出: **純利益を昇順（赤字・低収益が先頭）でワースト5店舗**（店舗名, 純利益, 利益率）\n- 予算差異ワーストは抽出しない。予算差異は§6 D で全社集計値としてのみ言及する（純利益ワーストと予算差異ワーストは別集合になり得るため、両者を混在させると短文サマリー＝`全社AIサマリー`列と矛盾する）。\n\n### 5.2 失敗時縮退\nエラー・空応答・0件の場合は即打ち切りし、以降ツール禁止で全社合算データのみから最終出力（AppDB保存・メール送信を含む）を完了する。純利益ワースト店舗テーブルは取得できた範囲のみ記載し、1件も取得できなければ「該当店舗の特定はスキップ」と明記する。\n\n## 6. 洞察要件（A〜E必須）\n欠損がある場合は「不明/暫定」を明記し、断定を避ける。欠損の捏造は禁止。\n\n- A) 全社収益ブリッジ: `gap_to_zero`（黒字化必要額）と `gap_to_five`（利益率5%必要額）を円で示し、優先課題（売上増か費用減か）を断定。\n- B) 支配要因: 売上トレンド + 費用内訳から、主因（需要減退 vs 構造的コスト増）を断定。\n- C) 投資 or ロス: 増加費用が意図的投資か、コストコントロール不全かを売上/利益トレンドで判定。\n- D) 予算差異の読み替え: 全社売上予算差異・原価予算差異（いずれも全社集計値）から主因を結論化する。ここでは店舗名を列挙しない（要介入店舗は§7の純利益ワーストで扱う）。ツール失敗時は費用内訳から優先課題を提示。\n- E) 経営アクション3つ: 短期（2週間）・中期（1〜2ヶ月）・仕組み化を提示し、各々に「目標KPI」「期待効果（円/%）」「運用設計（誰が何を見るか）」「期限」を必ず含める。少なくとも1つは全社リソース再配分（好調店の勝ち筋の横展開、または不振店への集中/撤退）を、具体店舗名・数値を根拠に含める。\n\n## 7. 表レイアウト方針（空欄列禁止）\nデモ品質を最優先し、純利益ワースト店舗テーブルの各列は必ず埋める（共通規約§4）。\n\n- テーブル列は「店舗名 / 純利益（円）／ 利益率（%）」の3列とする。\n- 純利益は円単位・桁区切り（赤字は先頭に ▲）。利益率は小数第1位。\n- 値が取得できない場合のみ `取得不可` とする。\n\n## 8. 出力フロー（AppDB保存 + メール送信 + 最終出力）\n分析完了後、以下の手順を必ず順番に実行してください。\n\n### 8.1 手順1：AppDB保存（必須）\n保存ツール `pl_report_api` は AppDB への保存と同一 `doc_key` の旧版削除（重複除去）を内包する。\n\n- ツール: `pl_report_api(operation=\"save\", request={collection_id, document})`\n- `collection_id`: 入力変数 `collection_id` の値（AppDB コレクションの UUID）を**そのまま**使う（コレクション名ではなく UUID）。\n- `document`: 作成した最終JSONオブジェクト（フラット構造・`content` キー禁止）\n- 戻り値 `{\"ok\": true, ...}` を確認してから §8.2 のメール送信へ進む。\n\n### 8.2 手順2：メール送信\n- ツール: `Send Email`\n- `to`: 経営層・エリア統括マネージャー（適切な宛先）\n- `subject`: `【AI財務分析】全社損益サマリー報告（{period} / リスク：{risk_level}）`\n- `body`: 分析結果の `analysis_html` の内容（HTMLメール形式）\n\n### 8.3 手順3：最終出力（厳守）\n- 上記ツールの実行完了後、**同一のJSONオブジェクト1件のみ**を出力して終了する。\n- Markdownコードブロック（```json ... ```）で囲まない。生のJSONテキストのみ。\n\n### 8.4 JSON構造（固定・全キー必須）\n```json\n{\n  \"doc_key\": \"ALL-{period}-{scenario}\",\n  \"store_id\": \"ALL\",\n  \"location_name\": \"全店舗サマリー\",\n  \"period\": \"{period}\",\n  \"risk_level\": \"{risk_level}\",\n  \"prefecture\": \"全国\",\n  \"city\": \"-\",\n  \"scenario\": \"{scenario}\",\n  \"region\": \"全社\",\n  \"generated_at\": \"ISO8601フォーマットの現在時刻\",\n  \"source_table\": \"OUT｜P/L要約（店舗×月）\",\n  \"total_sales\": 123456789,\n  \"profit_margin\": 8.5,\n  \"personnel_ratio\": 22.0,\n  \"analysis_html\": \"...\"\n}\n```\n\n### 8.5 `analysis_html` テンプレート（必須構造）\n```html\n<h1>全社損益サマリー AIインサイト</h1>\n<p><b>対象:</b> 全社（全店舗合算） | <b>期間:</b> {period} | <b>全社リスク傾向:</b> {risk_level}</p>\n\n<h2>全社サマリー</h2>\n<p>\n全社売上<b>{total_sales_fmt}</b>、純利益<b>{net_profit_fmt}</b>、利益率<b>{profit_margin_fmt}%</b>。状態は<b>{state_label}</b>。<br>\n支配要因は<b>{dominant_issue}</b>（根拠: {dominant_evidence}）。<br>\n黒字化に必要な改善額は<b>{gap_to_zero_fmt}</b>、利益率5%には<b>{gap_to_five_fmt}</b>。<br>\n前月比（売上{mom_sales_fmt}%、利益{mom_profit_fmt}%）、前年比（売上{yoy_sales_fmt}%）。\n</p>\n\n<h2>主要指標（全社合算）</h2>\n<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\">\n<tr><th>全社売上</th><th>総費用</th><th>純利益</th><th>利益率</th><th>人件費比率</th><th>管理費用比率</th></tr>\n<tr>\n<td>{total_sales_fmt}</td>\n<td>{total_expenses_fmt}</td>\n<td>{net_profit_fmt}</td>\n<td>{profit_margin_fmt}%</td>\n<td>{personnel_ratio_fmt}%</td>\n<td>{admin_ratio_fmt}%</td>\n</tr>\n</table>\n<p>{cost_structure_insight}</p>\n\n<h2>全社カテゴリ別内訳</h2>\n<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\">\n<tr><th>カテゴリ</th><th>全社売上</th><th>構成比</th><th>経営示唆</th></tr>\n<tr><td>衣料品</td><td>{apparel_sales_fmt}</td><td>{apparel_ratio_fmt}%</td><td>{apparel_insight}</td></tr>\n<tr><td>生活雑貨</td><td>{household_sales_fmt}</td><td>{household_ratio_fmt}%</td><td>{household_insight}</td></tr>\n<tr><td>食品</td><td>{food_sales_fmt}</td><td>{food_ratio_fmt}%</td><td>{food_insight}</td></tr>\n<tr><td>その他</td><td>{other_sales_fmt}</td><td>{other_ratio_fmt}%</td><td>{other_insight}</td></tr>\n</table>\n<p>{category_insight}</p>\n\n<h2>純利益ワースト店舗（赤字・要介入）</h2>\n<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\">\n<tr><th>店舗名（事実のみ）</th><th>純利益（円）</th><th>利益率（%）</th></tr>\n{worst_stores_rows}\n</table>\n<p>上記は全社純利益を最も押し下げている店舗（純利益昇順）。参考として全社売上予算差異<b>{sales_budget_diff_fmt}</b>・原価予算差異<b>{cogs_budget_diff_fmt}</b>（いずれも全社集計値）があり、主因は<b>{budget_gap_type}</b>（根拠: {budget_gap_evidence}）。</p>\n\n<h2>経営層・統括マネージャー向け 推奨アクション</h2>\n<ol>\n<li><b>{action1_title}（短期）:</b> {action1_detail}</li>\n<li><b>{action2_title}（中期）:</b> {action2_detail}</li>\n<li><b>{action3_title}（仕組み化）:</b> {action3_detail}</li>\n</ol>\n```\n",
+          "tools": [
+            {
+              "functionName": "pl_report_api",
+              "functionDescription": "店舗別損益AIレポートの保存（AppDB保存＋同一doc_keyの旧版削除）",
+              "inputs": [
+                {
+                  "id": "173cb094744045b",
+                  "paramName": "operation",
+                  "dataType": "text",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": true,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "operation",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": null
+                },
+                {
+                  "id": "a66f4ab3d34a40d",
+                  "paramName": "request",
+                  "dataType": "object",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": true,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "request",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": null
+                }
+              ],
+              "inputDescriptions": {
+                "173cb094744045b": "操作名。\"save\"（レポート保存＋同一doc_keyの旧版削除）を入れる。",
+                "a66f4ab3d34a40d": "JSONオブジェクト {collection_id: AppDBコレクションのUUID（入力変数 collection_id をそのまま）, document: 作成した最終レポートJSON（フラット・content キー禁止）}"
+              },
+              "id": "d5bc1ea63420412",
+              "name": "pl_report_api",
+              "description": "店舗別損益AIレポートの検証(validate)・保存(save)を operation で切り替える単一ツール",
+              "packageId": "43e0a52b-83df-4f52-a2bf-1a3634898215",
+              "packageVersion": "1.0.0",
+              "output": {
+                "id": "ff387b6ae6994a4",
+                "paramName": "result",
+                "dataType": "object",
+                "mappedTo": null,
+                "value": null,
+                "required": false,
+                "isList": false,
+                "children": [],
+                "displayName": "result",
+                "visible": true,
+                "flag": "output",
+                "customMappingType": null,
+                "configType": null,
+                "entitySubType": null,
+                "aiDescription": null
+              },
+              "type": "FUNCTION"
+            },
+            {
+              "functionName": "sendEmail",
+              "functionDescription": "Send a stylized email to an email address, list of People, or a list of Groups with the option to include attachments",
+              "inputs": [
+                {
+                  "id": "PIJohlHhVsUJIHg",
+                  "paramName": "recipientEmails",
+                  "dataType": "text",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "recipientEmails",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": null
+                },
+                {
+                  "id": "IZpsgGgcrPXvQDR",
+                  "paramName": "subject",
+                  "dataType": "text",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "subject",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": null
+                },
+                {
+                  "id": "lQsDtGPHsYWLnAj",
+                  "paramName": "body",
+                  "dataType": "text",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "body",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": null
+                },
+                {
+                  "id": "JAQbaXSMWxFPlCe",
+                  "paramName": "personRecipients",
+                  "dataType": "person",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": true,
+                  "children": [],
+                  "displayName": "personRecipients",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": null
+                },
+                {
+                  "id": "ulJkPZoNofUgzxo",
+                  "paramName": "groupRecipients",
+                  "dataType": "group",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": true,
+                  "children": [],
+                  "displayName": "groupRecipients",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": null
+                },
+                {
+                  "id": "aWtsvUdULohpCIa",
+                  "paramName": "attachments",
+                  "dataType": "number",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": true,
+                  "children": [],
+                  "displayName": "attachments",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": null
+                },
+                {
+                  "id": "RTLRYjxMORywFdh",
+                  "paramName": "attachment",
+                  "dataType": "number",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "attachment",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": null
+                },
+                {
+                  "id": "QjKyCTiBKxGlStt",
+                  "paramName": "includeReplyAll",
+                  "dataType": "boolean",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "includeReplyAll",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": null
+                }
+              ],
+              "inputDescriptions": {
+                "IZpsgGgcrPXvQDR": "",
+                "JAQbaXSMWxFPlCe": "",
+                "PIJohlHhVsUJIHg": "",
+                "QjKyCTiBKxGlStt": "",
+                "RTLRYjxMORywFdh": "",
+                "aWtsvUdULohpCIa": "",
+                "lQsDtGPHsYWLnAj": "",
+                "ulJkPZoNofUgzxo": ""
+              },
+              "id": "kjZmFLaQYJhtENg",
+              "name": "Send Email",
+              "description": "Send a stylized email to an email address, list of People, or a list of Groups with the option to include attachments",
+              "packageId": "03ba6971-98d0-4654-9bfd-aa897816df33",
+              "packageVersion": "2.1.18",
+              "output": {
+                "id": "atQElyCshRfhJSP",
+                "paramName": "isSent",
+                "dataType": "boolean",
+                "mappedTo": null,
+                "value": null,
+                "required": false,
+                "isList": false,
+                "children": [],
+                "displayName": "isSent",
+                "visible": true,
+                "flag": "output",
+                "customMappingType": null,
+                "configType": null,
+                "entitySubType": null,
+                "aiDescription": null
+              },
+              "type": "FUNCTION"
+            }
+          ],
+          "context": {
+            "datasets": [
+              {
+                "id": "e05581f1-d70a-474d-91f3-f5a2080c9d05"
+              },
+              {
+                "id": "a1ba80ca-147e-4ac8-8464-5867d665860e"
+              }
+            ],
+            "directories": [],
+            "files": [],
+            "isEmpty": false
+          },
+          "outputDescriptions": {
+            "84bd02945f98428": "AppDBへ保存した構造化レポート"
+          }
+        },
+        "_designNode": "AI_AGENT"
+      },
+      "style": {
+        "zIndex": 4,
+        "outline": "none"
+      },
+      "index": 3,
+      "type": "AI_AGENT"
+    },
+    {
+      "id": "ai_store",
+      "position": {
+        "x": 360,
+        "y": 440
+      },
+      "data": {
+        "dimensions": {
+          "width": 200,
+          "height": 60
+        },
+        "title": "AIエージェント｜店舗レポート生成",
+        "description": "単一店舗の損益レポートを生成しAppDBへ保存",
+        "prompt": {
+          "id": "c402ae136c07474",
+          "paramName": "prompt",
+          "dataType": "text",
+          "mappedTo": null,
+          "value": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "入力変数：",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "collection_id: ",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                },
+                {
+                  "type": "variable",
+                  "children": [
+                    {
+                      "text": "",
+                      "bold": false,
+                      "italic": false,
+                      "underlined": false,
+                      "sql": false
+                    }
+                  ],
+                  "dataType": "text",
+                  "id": "lZNswzDwqxbJuDs",
+                  "name": "CollectionId",
+                  "isList": false
+                },
+                {
+                  "text": "",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "これはAppDBコレクションID（文字列）です。保存は pl_report_api(operation=\"save\", request={collection_id, document}) で行う。",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "以下のデータに基づいて分析を行ってください。",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "<data>",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                },
+                {
+                  "type": "variable",
+                  "children": [
+                    {
+                      "text": "",
+                      "bold": false,
+                      "italic": false,
+                      "underlined": false,
+                      "sql": false
+                    }
+                  ],
+                  "dataType": "text",
+                  "id": "qCugVmcafngJTgJ",
+                  "name": "AiPromptText",
+                  "isList": false
+                },
+                {
+                  "text": "",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "</data>",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                }
+              ]
+            }
+          ],
+          "required": true,
+          "isList": false,
+          "children": [],
+          "displayName": "Prompt",
+          "visible": true,
+          "flag": "input",
+          "customMappingType": null,
+          "configType": null,
+          "entitySubType": null,
+          "aiDescription": null
+        },
+        "result": {
+          "id": "89e3a7e9fe0b4bd",
+          "paramName": "result",
+          "dataType": "object",
+          "mappedTo": "CvZsFxVZMOqYtMv",
+          "value": null,
+          "required": true,
+          "isList": false,
+          "children": [],
+          "displayName": "Result",
+          "visible": true,
+          "flag": "output",
+          "customMappingType": null,
+          "configType": null,
+          "entitySubType": null,
+          "aiDescription": null
+        },
+        "agent": {
+          "instructions": "# ライフスタイル小売 財務分析エージェント（店長向け）\n\n## 1. 役割\nあなたは小売（アパレル／生活雑貨／食品）領域で15年以上の経験を持つ財務アナリストです。入力データ（JSON）を一次情報として、店舗の損益状況を深く分析し、店長が即座に実行すべき具体的かつ戦略的な改善アクションを提案してください。\n\n## 2. 絶対要件（最優先）\n以下を1つでも満たさない場合は失格です。\n\n1. 最終出力は「単一のJSONオブジェクト（1件）」のみとする。\n2. 前後の説明、Markdownコードブロック、箇条書き、コメントを最終出力に含めない。\n3. JSONはフラット構造とし、`content` キーを禁止する。\n4. ツール `DomoSqlQueryTool` による明細取得は最大1回までとする。\n5. ツール失敗・0件・解釈不能時は即打ち切りし、以降ツール禁止で入力データのみで完了する（リトライ禁止）。\n6. 洞察は必ず「断定 + 根拠数値 + 仮説」を含める（高い/低いのみで終えない）。\n7. 支配要因は必ず「売上不足」「コスト構造過剰」「売上・コスト両面」のいずれかで結論づける（共通規約§3。不十分なら「暫定結論」）。\n8. 勘定科目名の創作は禁止。ツールで取得した事実のみ記載可。\n9. `store_id` / `location_name`（店舗名）は入力値を一字一句そのまま使用する（言い換え・省略・創作を禁止）。`location_name` は `analysis_html` の `<h1>` とサマリー文にも入力値のまま反映する。\n10. 数値は入力データ（またはツール取得結果）の値のみを使用し、丸め・概算・創作をしない。金額は円単位を明示し、桁区切りで表示する。\n11. 状態ラベル（`state_label`）は、入力データの `state_label`（日本語キーは「状態ラベル」）の値を**一字一句そのまま**使用する。利益率から自分で再判定・変更・言い換えをしてはならない（このラベルは ETL 側で機械的に確定済みの**単一の真実**であり、ETL 短文サマリー（`店舗別AIサマリー`列）と必ず一致させるため）。値は「好調／堅調／要注意／回復基調／不振」のいずれか1つ。`analysis_html` の `{state_label}` にもこの値をそのまま反映する。「黒字」「赤字」を状態ラベルとして使わない（本文の補足説明で使うのは可）。\n   （参考・判定規則: 好調=利益率≥8% / 堅調=5〜8% / 要注意=0〜5% / 回復基調=利益率<0% かつ `previous_month_profit_change_rate`>0 / 不振=利益率<0% かつ同≤0。赤字店舗は符号のみで決定し、赤字の深さや改善幅では変わらない。）\n\n## 3. 参照可能データセット（この2つのみ）\n1. `OUT｜P/L要約（店舗×月）`: 店舗レベルのサマリーデータ\n2. `OUT｜P/L明細（店舗×勘定×月）`: 勘定科目レベルの明細データ\n\n## 4. 入力JSONのキー解決（英語/日本語対応）\n以下の優先順で値を確定し、見つからなければ `null` とする。\n\n- `store_id`: `store_id` -> `店舗ID`\n- `state_label`: `state_label` -> `状態ラベル`（ETL で機械確定済みの状態ラベル。項目11のとおり再判定せずそのまま使う）\n- `store_name`: `store_name` -> `店舗名`\n- `prefecture`: `prefecture` -> `都道府県`\n- `city`: `city` -> `市区町村`\n- `region`: `region` -> `地域`\n- `period`: `period` -> `期間`\n- `scenario`: `scenario` -> `シナリオ`（基本は `Actual` 想定）\n- `total_sales`: `total_sales` -> `総売上`\n- `total_expenses`: `total_expenses` -> `総費用`\n- `net_profit`: `net_profit` -> `純利益`\n- `profit_margin`: `profit_margin` -> `利益率`\n- `personnel_ratio`: `personnel_ratio` -> `人件費比率`\n- `admin_ratio`: `administrative_expenses_ratio` -> `管理費用比率`\n- `trend`: `previous_month_sales/expenses/profit`, `previous_month_sales_change_rate`, `previous_month_profit_change_rate`\n- `yoy`: `same_month_last_year_sales/profit`, `same_month_last_year_sales_change_rate`\n- `category`: `apparel_sales/ratio`, `household_sales/ratio`, `food_sales`, `other_sales`\n- `costs`: `cogs_expenses`, `total_personnel_expenses`, `facility_expenses`, `marketing_expenses`, `administrative_expenses`\n- `region_avg`: `average_regional_sales/expenses/profit`, `regional_sales_difference`, `regional_profit_difference`\n- `variance`: `high_difference_account_number`, `maximum_positive_difference`, `maximum_negative_difference`, `sales_budget_difference`, `cogs_budget_difference`\n- `risk`: `risk_level` -> `リスクレベル`\n\n## 5. ツール利用ポリシー\n- 利用可能ツールは `DomoSqlQueryTool`（参照データセットの照会）, `pl_report_api`（レポート保存）のみ。\n- 入力データだけで完結できる場合は、`DomoSqlQueryTool` を使わない（`pl_report_api` の保存は §8.1 で必須）。\n\n### 5.1 `DomoSqlQueryTool` 実行条件（最大1回）\n「予算差異のワースト勘定（具体名）」特定が必要な場合のみ実行可。\n\n該当例:\n- 高差異勘定数 > 0\n- 最大マイナス差異が大きい\n- 費用過剰が疑われる\n\nクエリ要件:\n- 対象データセット: `OUT｜P/L明細（店舗×勘定×月）`\n- 抽出条件: 当該 `store_name` かつ当該 `period` かつ `scenario='Actual'` かつサマリ区分が `0`（または `FALSE`）\n- 取得項目: 勘定科目名, 予算差異, 差異率（欠損は `取得不可` など可視文字列に変換）\n- ソート/件数: 予算差異の昇順（マイナス大）で上位5件\n\n### 5.2 失敗時縮退\nエラー・空応答・0件の場合は即打ち切りし、以降ツール禁止で要約データのみから最終出力を完了する。\n\n## 6. 洞察要件（A〜E必須）\n欠損がある場合は「不明/暫定」を明記し、断定を避ける。欠損の捏造は禁止。\n\n- A) 収益ブリッジ: `gap_to_zero`（黒字化必要額）と `gap_to_five`（利益率5%必要額）を円で示し、「売上増」か「費用減」か主戦場を断定。\n- B) 支配要因: 地域比 + 総費用 + 費用内訳から「売上不足」「コスト構造過剰」「売上・コスト両面」のいずれかを断定（共通規約§3）。\n- C) 投資 or ロス: マケ/施設/人件費の目立つ増分が先行投資か管理不足（ロス）かを売上/利益トレンドで判定。\n- D) 予算差異の読み替え: 売上未達 vs 原価超過の主因を結論化。ツール成功時はワースト勘定を事実引用。失敗時は要約内訳から優先課題を提示。\n- E) アクション3つ: 短期（2週間）・中期（1〜2ヶ月）・仕組み化を提示し、各アクションに「目標KPI」「期待効果（円/%）」「週次運用（誰が何を見るか）」「期限」を必ず含める。\n\n## 7. 表レイアウト方針（空欄列禁止）\nデモ品質を最優先し、ワースト勘定科目テーブル3列目は必ず埋める。\n\n- 3列目は `影響度（売上比%）` を採用。\n- 算式: `影響度（%） = 予算差異 / total_sales * 100`\n- `total_sales` 欠損時は `取得不可` とする。\n- 差異率は任意。取得できた場合のみ「予算差異（円）」セル内に補足表示。\n\n## 8. 出力仕様（AppDB保存 + 最終出力）\n\n### 8.1 AppDB保存（必須）\n成功/エラー共通で、最終JSONオブジェクト作成後に必ず以下を1回実行する。保存ツール `pl_report_api` は\nAppDB への保存と同一 `doc_key` の旧版削除（重複除去）を内包するため、別途の重複除去は不要。\n\n- ツール: `pl_report_api(operation=\"save\", request={collection_id, document})`\n- `collection_id`: 入力変数 `collection_id` の値（AppDB コレクションの UUID）を**そのまま**使う（コレクション名ではなく UUID）。\n- `document`: 作成した最終JSONオブジェクト（フラット構造・`content` キー禁止）\n- 戻り値 `{\"ok\": true, ...}` を確認する。`{\"ok\": false, \"error\": ...}` の場合は保存失敗（リトライは1回まで）。\n\n### 8.2 最終出力（厳守）\n- AppDB保存完了後、**同一JSONオブジェクト1件のみ**を出力して終了する。\n- Markdownコードブロック（```json ... ```）で囲まない。生のJSONテキストのみ。\n\n### 8.3 JSON構造（固定・全キー必須）\n```json\n{\n  \"doc_key\": \"{store_id}-{period}-{scenario}\",\n  \"store_id\": \"{store_id}\",\n  \"location_name\": \"{store_name}\",\n  \"period\": \"{period}\",\n  \"risk_level\": \"{risk_level}\",\n  \"prefecture\": \"{prefecture}\",\n  \"city\": \"{city}\",\n  \"scenario\": \"{scenario}\",\n  \"region\": \"{region}\",\n  \"generated_at\": \"ISO8601フォーマットの現在時刻\",\n  \"source_table\": \"OUT｜P/L要約（店舗×月）\",\n  \"total_sales\": 1234567,\n  \"profit_margin\": 10.5,\n  \"personnel_ratio\": 25.0,\n  \"analysis_html\": \"...\"\n}\n```\n\n### 8.4 `analysis_html` テンプレート（必須構造）\n```html\n<h1>{store_name} 分析</h1>\n<p><b>店舗:</b> {store_name} | <b>期間:</b> {period} | <b>リスク:</b> {risk_level}</p>\n\n<h2>サマリー</h2>\n<p>\n売上<b>{total_sales_fmt}</b>、純利益<b>{net_profit_fmt}</b>、利益率<b>{profit_margin_fmt}%</b>。状態は<b>{state_label}</b>。\n支配要因は<b>{dominant_issue}</b>（根拠: {dominant_evidence}）。\n黒字化に必要な改善額は<b>{gap_to_zero_fmt}</b>、利益率5%には<b>{gap_to_five_fmt}</b>。\n前月比（売上{mom_sales_fmt}%、利益{mom_profit_fmt}%）、前年比（売上{yoy_sales_fmt}%）。\n地域比（売上{regional_sales_diff_fmt}%、利益{regional_profit_diff_fmt}%）より、{regional_insight}。\n</p>\n\n<h2>主要指標</h2>\n<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\">\n<tr><th>売上</th><th>総費用</th><th>純利益</th><th>利益率</th><th>人件費比率</th><th>管理費用比率</th></tr>\n<tr>\n<td>{total_sales_fmt}</td>\n<td>{total_expenses_fmt}</td>\n<td>{net_profit_fmt}</td>\n<td>{profit_margin_fmt}%</td>\n<td>{personnel_ratio_fmt}%</td>\n<td>{admin_ratio_fmt}%</td>\n</tr>\n</table>\n<p>{cost_structure_insight}</p>\n\n<h2>カテゴリ別内訳</h2>\n<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\">\n<tr><th>カテゴリ</th><th>売上</th><th>構成比</th><th>示唆</th></tr>\n<tr><td>衣料品</td><td>{apparel_sales_fmt}</td><td>{apparel_ratio_fmt}%</td><td>{apparel_insight}</td></tr>\n<tr><td>生活雑貨</td><td>{household_sales_fmt}</td><td>{household_ratio_fmt}%</td><td>{household_insight}</td></tr>\n<tr><td>食品</td><td>{food_sales_fmt}</td><td>{food_ratio_fmt}%</td><td>{food_insight}</td></tr>\n<tr><td>その他</td><td>{other_sales_fmt}</td><td>{other_ratio_fmt}%</td><td>{other_insight}</td></tr>\n</table>\n<p>{category_insight}</p>\n\n<h2>予算差異分析（優先度上位）</h2>\n<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\">\n<tr><th>勘定科目（事実のみ）</th><th>予算差異（円）</th><th>影響度（売上比%）</th></tr>\n{worst_accounts_rows}\n</table>\n<p>主因は<b>{budget_gap_type}</b>（根拠: {budget_gap_evidence}）。この差異は<b>{investment_or_loss}</b>（根拠: {investment_or_loss_evidence}）。</p>\n\n<h2>推奨アクション</h2>\n<ol>\n<li><b>{action1_title}（短期）:</b> {action1_detail}</li>\n<li><b>{action2_title}（中期）:</b> {action2_detail}</li>\n<li><b>{action3_title}（仕組み化）:</b> {action3_detail}</li>\n</ol>\n```\n",
+          "tools": [
+            {
+              "functionName": "pl_report_api",
+              "functionDescription": "店舗別損益AIレポートの保存（AppDB保存＋同一doc_keyの旧版削除）",
+              "inputs": [
+                {
+                  "id": "4a06e465ff694b3",
+                  "paramName": "operation",
+                  "dataType": "text",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": true,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "operation",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": null
+                },
+                {
+                  "id": "bd6bff0b39d14db",
+                  "paramName": "request",
+                  "dataType": "object",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": true,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "request",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": null
+                }
+              ],
+              "inputDescriptions": {
+                "4a06e465ff694b3": "操作名。\"save\"（レポート保存＋同一doc_keyの旧版削除）を入れる。",
+                "bd6bff0b39d14db": "JSONオブジェクト {collection_id: AppDBコレクションのUUID（入力変数 collection_id をそのまま）, document: 作成した最終レポートJSON（フラット・content キー禁止）}"
+              },
+              "id": "3ef0cbe12eaa46f",
+              "name": "pl_report_api",
+              "description": "店舗別損益AIレポートの検証(validate)・保存(save)を operation で切り替える単一ツール",
+              "packageId": "43e0a52b-83df-4f52-a2bf-1a3634898215",
+              "packageVersion": "1.0.0",
+              "output": {
+                "id": "1ebda2aaeb1447e",
+                "paramName": "result",
+                "dataType": "object",
+                "mappedTo": null,
+                "value": null,
+                "required": false,
+                "isList": false,
+                "children": [],
+                "displayName": "result",
+                "visible": true,
+                "flag": "output",
+                "customMappingType": null,
+                "configType": null,
+                "entitySubType": null,
+                "aiDescription": null
+              },
+              "type": "FUNCTION"
+            }
+          ],
+          "context": {
+            "datasets": [
+              {
+                "id": "e05581f1-d70a-474d-91f3-f5a2080c9d05"
+              },
+              {
+                "id": "a1ba80ca-147e-4ac8-8464-5867d665860e"
+              }
+            ],
+            "directories": [],
+            "files": [],
+            "isEmpty": false
+          },
+          "outputDescriptions": {
+            "89e3a7e9fe0b4bd": "AppDBへ保存した構造化レポート"
+          }
+        },
+        "_designNode": "AI_AGENT"
+      },
+      "style": {
+        "zIndex": 4,
+        "outline": "none"
+      },
+      "index": 4,
+      "type": "AI_AGENT"
+    },
+    {
+      "id": "endNode",
+      "position": {
+        "x": 360,
+        "y": 640
+      },
+      "data": {
+        "dimensions": {
+          "width": 200,
+          "height": 60
+        },
+        "title": "終了",
+        "description": "",
+        "_designNode": "endNode",
+        "terminating": false
+      },
+      "style": {
+        "zIndex": 4,
+        "outline": "none"
+      },
+      "index": 5,
+      "type": "endNode"
+    },
+    {
+      "id": "edge-rootNode-child_settle_timer",
+      "source": "rootNode",
+      "target": "child_settle_timer",
+      "data": {
+        "sourcePosition": "bottom",
+        "targetPosition": "top",
+        "path": [
+          [
+            460,
+            100
+          ],
+          [
+            460,
+            140
+          ]
+        ],
+        "title": ""
+      },
+      "style": {
+        "zIndex": 5
+      },
+      "index": 6,
+      "arrowHeadType": "arrow",
+      "type": "defaultEdge"
+    },
+    {
+      "id": "edge-child_settle_timer-report_type_gateway",
+      "source": "child_settle_timer",
+      "target": "report_type_gateway",
+      "data": {
+        "sourcePosition": "bottom",
+        "targetPosition": "top",
+        "path": [
+          [
+            460,
+            200
+          ],
+          [
+            460,
+            240
+          ]
+        ],
+        "title": ""
+      },
+      "style": {
+        "zIndex": 5
+      },
+      "index": 7,
+      "arrowHeadType": "arrow",
+      "type": "defaultEdge"
+    },
+    {
+      "id": "edge-report_type_gateway-ai_company",
+      "source": "report_type_gateway",
+      "target": "ai_company",
+      "data": {
+        "sourcePosition": "right",
+        "targetPosition": "top",
+        "path": [
+          [
+            560,
+            270
+          ],
+          [
+            680,
+            270
+          ],
+          [
+            680,
+            310
+          ],
+          [
+            680,
+            350
+          ],
+          [
+            680,
+            440
+          ]
+        ],
+        "entryPosition": "top",
+        "exitPosition": "bottom",
+        "description": "",
+        "title": "全社サマリー",
+        "type": "Advanced",
+        "nodeId": "60a2e9e79b2b424",
+        "position": {
+          "x": 580,
+          "y": 310
+        },
+        "dimensions": {
+          "width": 200,
+          "height": 40
+        },
+        "splitIndex": 3,
+        "_designNode": "condition",
+        "advancedRule": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "text": "= ",
+                "bold": false,
+                "italic": false,
+                "underlined": false,
+                "sql": false
+              },
+              {
+                "type": "variable",
+                "children": [
+                  {
+                    "text": "",
+                    "bold": false,
+                    "italic": false,
+                    "underlined": false,
+                    "sql": false
+                  }
+                ],
+                "dataType": "text",
+                "id": "var_report_type",
+                "name": "report_type",
+                "isList": false
+              },
+              {
+                "text": " = \"company\"",
+                "bold": false,
+                "italic": false,
+                "underlined": false,
+                "sql": false
+              }
+            ]
+          }
+        ]
+      },
+      "style": {},
+      "index": 8,
+      "arrowHeadType": "arrow",
+      "type": "conditionEdge"
+    },
+    {
+      "id": "edge-report_type_gateway-ai_store",
+      "source": "report_type_gateway",
+      "target": "ai_store",
+      "data": {
+        "sourcePosition": "top",
+        "targetPosition": "top",
+        "path": [
+          [
+            460,
+            240
+          ],
+          [
+            460,
+            350
+          ],
+          [
+            460,
+            350
+          ],
+          [
+            460,
+            440
+          ]
+        ],
+        "entryPosition": "top",
+        "exitPosition": "top",
+        "description": "",
+        "title": "店舗レポート",
+        "type": "Default",
+        "nodeId": "ac69423b3cf843b",
+        "position": {
+          "x": 360,
+          "y": 350
+        },
+        "dimensions": {
+          "width": 200,
+          "height": 40
+        },
+        "splitIndex": 2,
+        "_designNode": "condition"
+      },
+      "style": {},
+      "index": 9,
+      "arrowHeadType": "arrow",
+      "type": "conditionEdge"
+    },
+    {
+      "id": "edge-ai_company-endNode",
+      "source": "ai_company",
+      "target": "endNode",
+      "data": {
+        "sourcePosition": "bottom",
+        "targetPosition": "right",
+        "path": [
+          [
+            680,
+            500
+          ],
+          [
+            680,
+            670
+          ],
+          [
+            560,
+            670
+          ]
+        ],
+        "title": ""
+      },
+      "style": {
+        "zIndex": 5
+      },
+      "index": 10,
+      "arrowHeadType": "arrow",
+      "type": "defaultEdge"
+    },
+    {
+      "id": "edge-ai_store-endNode",
+      "source": "ai_store",
+      "target": "endNode",
+      "data": {
+        "sourcePosition": "bottom",
+        "targetPosition": "top",
+        "path": [
+          [
+            460,
+            500
+          ],
+          [
+            460,
+            640
+          ]
+        ],
+        "title": ""
+      },
+      "style": {
+        "zIndex": 5
+      },
+      "index": 11,
+      "arrowHeadType": "arrow",
+      "type": "defaultEdge"
+    }
+  ],
+  "dataList": [
+    {
+      "id": "lZNswzDwqxbJuDs",
+      "paramName": "CollectionId",
+      "dataType": "text",
+      "isList": false,
+      "children": [],
+      "showChildren": false,
+      "entitySubType": null,
+      "value": null,
+      "isOutput": false
+    },
+    {
+      "id": "qCugVmcafngJTgJ",
+      "paramName": "AiPromptText",
+      "dataType": "text",
+      "isList": false,
+      "children": [],
+      "showChildren": false,
+      "entitySubType": null,
+      "value": null,
+      "isOutput": false
+    },
+    {
+      "id": "var_report_type",
+      "paramName": "report_type",
+      "dataType": "text",
+      "isList": false,
+      "children": [],
+      "showChildren": false,
+      "entitySubType": null,
+      "value": null,
+      "isOutput": false
+    },
+    {
+      "id": "CvZsFxVZMOqYtMv",
+      "paramName": "StoreResult",
+      "dataType": "object",
+      "isList": false,
+      "children": [],
+      "showChildren": false,
+      "entitySubType": null,
+      "value": null,
+      "isOutput": false
+    },
+    {
+      "id": "var_company_result",
+      "paramName": "CompanyResult",
+      "dataType": "object",
+      "isList": false,
+      "children": [],
+      "showChildren": false,
+      "entitySubType": null,
+      "value": null,
+      "isOutput": false
+    }
+  ],
+  "version": 2,
+  "schema": {
+    "inputs": {
+      "input_CollectionId": {
+        "name": "CollectionId",
+        "type": "text",
+        "subType": null,
+        "isList": false,
+        "isNullable": false,
+        "id": "input_CollectionId",
+        "isChild": false,
+        "parent": null
+      },
+      "input_AiPromptText": {
+        "name": "AiPromptText",
+        "type": "text",
+        "subType": null,
+        "isList": false,
+        "isNullable": false,
+        "id": "input_AiPromptText",
+        "isChild": false,
+        "parent": null
+      },
+      "input_report_type": {
+        "name": "report_type",
+        "type": "text",
+        "subType": null,
+        "isList": false,
+        "isNullable": false,
+        "id": "input_report_type",
+        "isChild": false,
+        "parent": null
+      }
+    },
+    "outputs": {}
+  }
+}

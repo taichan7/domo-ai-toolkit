@@ -1,0 +1,11 @@
+{
+  "name": "Inventory Management | Analytics",
+  "dataflowId": "2246",
+  "inputDatasetId": "5402ecee-34f4-4caf-be2f-9ce09fa0dad8",
+  "outputDatasetId": "6f407387-7980-44b4-b1fd-3e4b12ec3d34",
+  "tileCount": 7,
+  "sectionCount": 3,
+  "documentedTileCount": 7,
+  "lastVerifiedExecutionId": "2063473",
+  "lastVerifiedState": "SUCCESS"
+}

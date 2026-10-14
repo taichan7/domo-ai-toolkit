@@ -1,0 +1,4109 @@
+{
+  "schemaVersion": 1,
+  "exportedAt": "2026-10-10T15:56:41+00:00",
+  "source": {
+    "instance": "maintenance-instance.domo.com",
+    "url": "https://maintenance-instance.domo.com/app-studio/1468477910/pages/1828849038",
+    "appId": "1468477910",
+    "viewId": "1828849038",
+    "cardId": "2109675257",
+    "contextId": "7a9386a2-d8fa-4dbc-99cb-0a9ab25f502b",
+    "designId": "3c156897-8ddb-4761-9664-9073a9f2aa90",
+    "cardVersionMode": "FOLLOW_LATEST",
+    "contextDesignVersion": null,
+    "effectiveDesignVersion": "2.4.104"
+  },
+  "dataApp": {
+    "dataAppId": 1468477910,
+    "title": "在庫入出庫管理",
+    "description": "Domo-native inventory operations and analytics hands-on application.",
+    "iconDataFileId": 14839,
+    "navIconDataFileId": null,
+    "landingViewId": 1828849038,
+    "enabled": true,
+    "isVirtualized": false,
+    "showNavigation": true,
+    "showDomoNavigation": true,
+    "showTitle": false,
+    "showLogo": false,
+    "navOrientation": "TOP",
+    "views": [
+      {
+        "viewId": 1828849038,
+        "title": "在庫入出庫管理",
+        "parentViewId": 0,
+        "viewOrder": 1,
+        "visible": true,
+        "customPermission": false,
+        "view": null,
+        "layout": null,
+        "children": []
+      },
+      {
+        "viewId": 41450484,
+        "title": "開発ガイド",
+        "parentViewId": 0,
+        "viewOrder": 2,
+        "visible": true,
+        "customPermission": false,
+        "view": null,
+        "layout": null,
+        "children": []
+      }
+    ],
+    "theme": {
+      "name": "Domo Neutral",
+      "chartColorPalette": {
+        "id": "Domo Default Palette",
+        "type": "DOMO"
+      },
+      "cards": [
+        {
+          "id": "ca1",
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "chartFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "timeFrameFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberLabelFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "accentColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "ca2",
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "chartFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c55",
+            "opacity": "20",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 2,
+          "borderColor": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "dropShadow": "NONE",
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "timeFrameFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberLabelFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "accentColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "ca3",
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "chartFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "timeFrameFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberLabelFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "accentColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "ca4",
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "chartFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c7",
+            "opacity": "50",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 2,
+          "borderColor": {
+            "value": "c7",
+            "type": "COLOR_REFERENCE"
+          },
+          "dropShadow": "NONE",
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "timeFrameFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberLabelFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "accentColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "ca5",
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "chartFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c21",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "timeFrameFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberLabelFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "accentColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "ca6",
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "chartFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c2",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "timeFrameFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberLabelFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "accentColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "ca7",
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "chartFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "RAISED",
+          "dropShadowColor": {
+            "value": "c5",
+            "type": "COLOR_REFERENCE"
+          },
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "timeFrameFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberLabelFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "accentColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "ca8",
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "chartFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c7",
+            "opacity": "50",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "RAISED",
+          "dropShadowColor": {
+            "value": "c5",
+            "type": "COLOR_REFERENCE"
+          },
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "timeFrameFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberLabelFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "accentColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          }
+        }
+      ],
+      "tables": [
+        {
+          "id": "t1",
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "chartFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "padding": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0
+          },
+          "timeFrameFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberLabelFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "tableBorderType": "ALL",
+          "tableBorderWeight": 1,
+          "tableBorderColor": {
+            "value": "c54",
+            "type": "COLOR_REFERENCE"
+          },
+          "rowHeight": "COMPACT",
+          "rowColor": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "alternatingRowColorEnabled": false,
+          "alternatingRowColor": {
+            "value": "c7",
+            "opacity": "50",
+            "type": "COLOR_REFERENCE"
+          },
+          "headerFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "headerFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "headerBackgroundColor": {
+            "value": "c61",
+            "type": "COLOR_REFERENCE"
+          },
+          "totalRowFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "totalRowFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "totalRowBackgroundColor": {
+            "value": "c6",
+            "type": "COLOR_REFERENCE"
+          },
+          "subtotalRowFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "subtotalRowFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "subtotalRowBackgroundColor": {
+            "value": "c7",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "t2",
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "chartFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "padding": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0
+          },
+          "timeFrameFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberLabelFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "tableBorderType": "NONE",
+          "tableBorderWeight": 0,
+          "rowHeight": "DEFAULT",
+          "rowColor": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "alternatingRowColorEnabled": true,
+          "alternatingRowColor": {
+            "value": "c12",
+            "type": "COLOR_REFERENCE"
+          },
+          "headerFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "headerFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "headerBackgroundColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          },
+          "totalRowFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "totalRowFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "totalRowBackgroundColor": {
+            "value": "c16",
+            "type": "COLOR_REFERENCE"
+          },
+          "subtotalRowFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "subtotalRowFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "subtotalRowBackgroundColor": {
+            "value": "c11",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "t3",
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "chartFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "padding": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0
+          },
+          "timeFrameFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "summaryNumberLabelFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "tableBorderType": "BELOW_HEADER",
+          "tableBorderWeight": 0,
+          "tableBorderColor": {
+            "value": "c43",
+            "type": "COLOR_REFERENCE"
+          },
+          "rowHeight": "COMFORTABLE",
+          "rowColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "alternatingRowColorEnabled": false,
+          "alternatingRowColor": {
+            "value": "c7",
+            "opacity": "50",
+            "type": "COLOR_REFERENCE"
+          },
+          "headerFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "headerFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "headerBackgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "totalRowFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "totalRowFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "totalRowBackgroundColor": {
+            "value": "c6",
+            "type": "COLOR_REFERENCE"
+          },
+          "subtotalRowFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "subtotalRowFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "subtotalRowBackgroundColor": {
+            "value": "c7",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          }
+        }
+      ],
+      "mappings": {
+        "button": "b1",
+        "singleValue": "ca5",
+        "chart": "ca1",
+        "table": "t1",
+        "control": "ca2",
+        "form": "fo1",
+        "image": "ca3",
+        "document": "ca3",
+        "brick": "ca3",
+        "notebook": "no1",
+        "header": "h1",
+        "tab": "ta1",
+        "section": "s1",
+        "component": "co1",
+        "pill": "p1"
+      },
+      "colors": [
+        {
+          "id": "c1",
+          "value": {
+            "value": "#12171A",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY",
+            "TINTED_GRAY"
+          ]
+        },
+        {
+          "id": "c2",
+          "value": {
+            "value": "#2D3337",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY",
+            "TINTED_GRAY"
+          ]
+        },
+        {
+          "id": "c3",
+          "value": {
+            "value": "#4C5256",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY",
+            "TINTED_GRAY"
+          ]
+        },
+        {
+          "id": "c4",
+          "value": {
+            "value": "#6C7377",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY",
+            "TINTED_GRAY"
+          ]
+        },
+        {
+          "id": "c5",
+          "value": {
+            "value": "#8F959A",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY",
+            "TINTED_GRAY"
+          ]
+        },
+        {
+          "id": "c6",
+          "value": {
+            "value": "#B3B9BE",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY",
+            "TINTED_GRAY"
+          ]
+        },
+        {
+          "id": "c7",
+          "value": {
+            "value": "#D8DFE4",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY",
+            "TINTED_GRAY"
+          ]
+        },
+        {
+          "id": "c8",
+          "value": {
+            "value": "#99CCEE",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY",
+            "ORDER_SOURCE"
+          ]
+        },
+        {
+          "id": "c9",
+          "value": {
+            "value": "#B1D8F2",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c10",
+          "value": {
+            "value": "#C0E0F5",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c11",
+          "value": {
+            "value": "#D0E7F7",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c12",
+          "value": {
+            "value": "#E0EFFA",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c13",
+          "value": {
+            "value": "#EFF7FC",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c14",
+          "value": {
+            "value": "#FFFFFF",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c15",
+          "value": {
+            "value": "#8DC1E3",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c16",
+          "value": {
+            "value": "#76ACCD",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c17",
+          "value": {
+            "value": "#5E97B7",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c18",
+          "value": {
+            "value": "#4782A0",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c19",
+          "value": {
+            "value": "#2F6D8A",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c20",
+          "value": {
+            "value": "#185774",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c21",
+          "value": {
+            "value": "#00425E",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "PRIMARY"
+          ]
+        },
+        {
+          "id": "c22",
+          "value": {
+            "value": "#FFB656",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "SECONDARY",
+            "ORDER_SOURCE"
+          ]
+        },
+        {
+          "id": "c23",
+          "value": {
+            "value": "#FFC778",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "SECONDARY"
+          ]
+        },
+        {
+          "id": "c24",
+          "value": {
+            "value": "#FFD28F",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "SECONDARY"
+          ]
+        },
+        {
+          "id": "c25",
+          "value": {
+            "value": "#FFDDA6",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "SECONDARY"
+          ]
+        },
+        {
+          "id": "c26",
+          "value": {
+            "value": "#FFE9BD",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "SECONDARY"
+          ]
+        },
+        {
+          "id": "c27",
+          "value": {
+            "value": "#FFF4D4",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "SECONDARY"
+          ]
+        },
+        {
+          "id": "c28",
+          "value": {
+            "value": "#FFFFEB",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "SECONDARY"
+          ]
+        },
+        {
+          "id": "c29",
+          "value": {
+            "value": "#419C55",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "TERTIARY",
+            "ORDER_SOURCE"
+          ]
+        },
+        {
+          "id": "c30",
+          "value": {
+            "value": "#64B376",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "TERTIARY"
+          ]
+        },
+        {
+          "id": "c31",
+          "value": {
+            "value": "#7CC28C",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "TERTIARY"
+          ]
+        },
+        {
+          "id": "c32",
+          "value": {
+            "value": "#93D1A3",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "TERTIARY"
+          ]
+        },
+        {
+          "id": "c33",
+          "value": {
+            "value": "#AAE1B9",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "TERTIARY"
+          ]
+        },
+        {
+          "id": "c34",
+          "value": {
+            "value": "#C2F0CF",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "TERTIARY"
+          ]
+        },
+        {
+          "id": "c35",
+          "value": {
+            "value": "#D9FFE5",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "TERTIARY"
+          ]
+        },
+        {
+          "id": "c36",
+          "value": {
+            "value": "#2F76B4",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "QUATERNARY",
+            "ORDER_SOURCE"
+          ]
+        },
+        {
+          "id": "c37",
+          "value": {
+            "value": "#5596C5",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "QUATERNARY"
+          ]
+        },
+        {
+          "id": "c38",
+          "value": {
+            "value": "#87C0DC",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "QUATERNARY"
+          ]
+        },
+        {
+          "id": "c39",
+          "value": {
+            "value": "#87C0DC",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "QUATERNARY"
+          ]
+        },
+        {
+          "id": "c40",
+          "value": {
+            "value": "#A0D5E8",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "QUATERNARY"
+          ]
+        },
+        {
+          "id": "c41",
+          "value": {
+            "value": "#B9EAF3",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "QUATERNARY"
+          ]
+        },
+        {
+          "id": "c42",
+          "value": {
+            "value": "#D2FFFF",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "QUATERNARY"
+          ]
+        },
+        {
+          "id": "c43",
+          "value": {
+            "value": "#000000",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c44",
+          "value": {
+            "value": "#141414",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c45",
+          "value": {
+            "value": "#272727",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c46",
+          "value": {
+            "value": "#3B3B3B",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c47",
+          "value": {
+            "value": "#4E4E4E",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c48",
+          "value": {
+            "value": "#626262",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c49",
+          "value": {
+            "value": "#767676",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c50",
+          "value": {
+            "value": "#898989",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c51",
+          "value": {
+            "value": "#9D9D9D",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c52",
+          "value": {
+            "value": "#B1B1B1",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c53",
+          "value": {
+            "value": "#C4C4C4",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c54",
+          "value": {
+            "value": "#D8D8D8",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c55",
+          "value": {
+            "value": "#EBEBEB",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c56",
+          "value": {
+            "value": "#FFFFFF",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c57",
+          "value": {
+            "value": "#FFFFFF",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        },
+        {
+          "id": "c58",
+          "value": {
+            "value": "#000000",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "FONT"
+          ]
+        },
+        {
+          "id": "c59",
+          "value": {
+            "value": "#FFFFFF",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "FONT"
+          ]
+        },
+        {
+          "id": "c60",
+          "value": {
+            "dark": {
+              "value": "c58",
+              "type": "COLOR_REFERENCE"
+            },
+            "light": {
+              "value": "c59",
+              "type": "COLOR_REFERENCE"
+            },
+            "type": "AUTOMATIC_COLOR"
+          },
+          "tags": [
+            "FONT"
+          ]
+        },
+        {
+          "id": "c61",
+          "value": {
+            "value": "#F6F6F6",
+            "type": "RGB_HEX"
+          },
+          "tags": [
+            "THEME",
+            "GRAYSCALE"
+          ]
+        }
+      ],
+      "fonts": [
+        {
+          "id": "f1",
+          "family": "Sans",
+          "style": "Regular",
+          "weight": 400,
+          "size": 32
+        },
+        {
+          "id": "f2",
+          "family": "Sans",
+          "style": "Regular",
+          "weight": 600,
+          "size": 24
+        },
+        {
+          "id": "f3",
+          "family": "Sans",
+          "style": "Regular",
+          "weight": 600,
+          "size": 20
+        },
+        {
+          "id": "f4",
+          "family": "Sans",
+          "style": "Regular",
+          "weight": 600,
+          "size": 16
+        },
+        {
+          "id": "f5",
+          "family": "Sans",
+          "style": "Regular",
+          "weight": 600,
+          "size": 14
+        },
+        {
+          "id": "f6",
+          "family": "Sans",
+          "style": "Regular",
+          "weight": 400,
+          "size": 14
+        },
+        {
+          "id": "f7",
+          "family": "Sans",
+          "style": "Regular",
+          "weight": 400,
+          "size": 12
+        },
+        {
+          "id": "f8",
+          "family": "Sans",
+          "style": "Regular",
+          "weight": 600,
+          "size": 14
+        },
+        {
+          "id": "f9",
+          "family": "Sans",
+          "style": "Regular",
+          "weight": 600,
+          "size": 12
+        }
+      ],
+      "buttons": [
+        {
+          "id": "b1",
+          "font": {
+            "value": "f8",
+            "type": "FONT_REFERENCE"
+          },
+          "fontColor": {
+            "value": "c43",
+            "opacity": "90",
+            "type": "COLOR_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 4,
+          "borderWidth": 0,
+          "contentAlignment": "CENTER",
+          "hoverColor": {
+            "value": "c9",
+            "type": "COLOR_REFERENCE"
+          },
+          "dropShadow": "NONE"
+        },
+        {
+          "id": "b2",
+          "font": {
+            "value": "f8",
+            "type": "FONT_REFERENCE"
+          },
+          "fontColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c8",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 4,
+          "borderWidth": 1,
+          "borderColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          },
+          "contentAlignment": "CENTER",
+          "hoverColor": {
+            "value": "c9",
+            "type": "COLOR_REFERENCE"
+          },
+          "dropShadow": "NONE"
+        },
+        {
+          "id": "b3",
+          "font": {
+            "value": "f8",
+            "type": "FONT_REFERENCE"
+          },
+          "fontColor": {
+            "value": "c43",
+            "opacity": "90",
+            "type": "COLOR_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 4,
+          "borderWidth": 0,
+          "contentAlignment": "CENTER",
+          "hoverColor": {
+            "value": "c8",
+            "opacity": "52",
+            "type": "COLOR_REFERENCE"
+          },
+          "dropShadow": "NONE"
+        },
+        {
+          "id": "b4",
+          "font": {
+            "value": "f8",
+            "type": "FONT_REFERENCE"
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 4,
+          "borderWidth": 0,
+          "contentAlignment": "CENTER",
+          "hoverColor": {
+            "value": "c1",
+            "type": "COLOR_REFERENCE"
+          },
+          "dropShadow": "NONE"
+        },
+        {
+          "id": "b5",
+          "font": {
+            "value": "f8",
+            "type": "FONT_REFERENCE"
+          },
+          "fontColor": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c43",
+            "opacity": "80",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 4,
+          "borderWidth": 0,
+          "contentAlignment": "CENTER",
+          "hoverColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          },
+          "dropShadow": "NONE"
+        }
+      ],
+      "navigation": [
+        {
+          "id": "n0",
+          "background": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "activeBackground": {
+            "value": "c10",
+            "type": "COLOR_REFERENCE"
+          },
+          "hoverBackground": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "showShadow": false,
+          "titleFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "linkFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFontStyle": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "linkFontStyle": {
+            "value": "f8",
+            "type": "FONT_REFERENCE"
+          },
+          "textHoverColor": {
+            "value": "c9",
+            "opacity": "50",
+            "type": "COLOR_REFERENCE"
+          },
+          "buttonStyle": "FILL",
+          "buttonFit": "HUG",
+          "buttonAlignment": "LEFT",
+          "showBorder": true,
+          "showDividers": true
+        }
+      ],
+      "pages": [
+        {
+          "id": "p0",
+          "background": {
+            "value": "c61",
+            "type": "COLOR_REFERENCE"
+          },
+          "isDynamic": true,
+          "density": {
+            "compact": 0,
+            "standard": 0
+          },
+          "height": "DYNAMIC",
+          "margin": {
+            "compact": {
+              "top": 0,
+              "bottom": 0,
+              "left": 0,
+              "right": 0
+            },
+            "standard": {
+              "top": 0,
+              "bottom": 0,
+              "left": 0,
+              "right": 0
+            }
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          }
+        }
+      ],
+      "headers": [
+        {
+          "id": "h1",
+          "font": {
+            "value": "f2",
+            "type": "FONT_REFERENCE"
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "h2",
+          "font": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          }
+        }
+      ],
+      "notebooks": [
+        {
+          "id": "no1",
+          "backgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "contentHeaderFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "contentTitleFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "contentSubtitleFont": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "contentTextFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "smartTextFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "no2",
+          "backgroundColor": {
+            "value": "c55",
+            "opacity": "20",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 2,
+          "borderColor": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "contentHeaderFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "contentTitleFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "contentSubtitleFont": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "contentTextFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "smartTextFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "no3",
+          "backgroundColor": {
+            "value": "c21",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "elementSpacing": {
+            "isCustom": false,
+            "header": {
+              "bottomMargin": 4
+            }
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFont": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "contentHeaderFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "contentTitleFont": {
+            "value": "f3",
+            "type": "FONT_REFERENCE"
+          },
+          "contentSubtitleFont": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "contentTextFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "smartTextFontColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          }
+        }
+      ],
+      "forms": [
+        {
+          "id": "fo1",
+          "backgroundColor": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "RAISED",
+          "dropShadowColor": {
+            "value": "c5",
+            "type": "COLOR_REFERENCE"
+          },
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "elementSpacing": {
+            "header": {
+              "bottomMargin": 8
+            }
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "formTitleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "formSectionNumberFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "formSectionHeaderFont": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "formSectionDescriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "formInputTextFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "formPrimaryButton": {
+            "value": "b1",
+            "type": "BUTTON_REFERENCE"
+          },
+          "formSecondaryButton": {
+            "value": "b5",
+            "type": "BUTTON_REFERENCE"
+          },
+          "formControlColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "fo2",
+          "backgroundColor": {
+            "value": "c7",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 2,
+          "borderColor": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "elementSpacing": {
+            "header": {
+              "bottomMargin": 8
+            }
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "formTitleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "formSectionNumberFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "formSectionHeaderFont": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "formSectionDescriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "formInputTextFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "formPrimaryButton": {
+            "value": "b2",
+            "type": "BUTTON_REFERENCE"
+          },
+          "formSecondaryButton": {
+            "value": "b5",
+            "type": "BUTTON_REFERENCE"
+          },
+          "formControlColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "fo3",
+          "backgroundColor": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "elementSpacing": {
+            "header": {
+              "bottomMargin": 8
+            }
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "formTitleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "formSectionNumberFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "formSectionHeaderFont": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "formSectionDescriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "formInputTextFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "formPrimaryButton": {
+            "value": "b1",
+            "type": "BUTTON_REFERENCE"
+          },
+          "formSecondaryButton": {
+            "value": "b5",
+            "type": "BUTTON_REFERENCE"
+          },
+          "formControlColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          }
+        }
+      ],
+      "tabs": [
+        {
+          "id": "ta1",
+          "background": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "tabBarBackground": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderColor": {
+            "value": "c43",
+            "opacity": "15",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderWeight": 1,
+          "borderRadius": 0,
+          "activeColor": {
+            "value": "c20",
+            "type": "COLOR_REFERENCE"
+          },
+          "hoverColor": {
+            "value": "c9",
+            "opacity": "50",
+            "type": "COLOR_REFERENCE"
+          },
+          "linkFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "linkFontStyle": {
+            "value": "f8",
+            "type": "FONT_REFERENCE"
+          },
+          "tabVariant": "UNDERLINE",
+          "tabFit": "FILL",
+          "contentAlignment": "CENTER"
+        },
+        {
+          "id": "ta2",
+          "background": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "tabBarBackground": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderColor": {
+            "value": "c43",
+            "opacity": "15",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderWeight": 1,
+          "borderRadius": 0,
+          "activeColor": {
+            "value": "c1",
+            "type": "COLOR_REFERENCE"
+          },
+          "hoverColor": {
+            "value": "c6",
+            "type": "COLOR_REFERENCE"
+          },
+          "linkFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "linkFontStyle": {
+            "value": "f8",
+            "type": "FONT_REFERENCE"
+          },
+          "tabVariant": "UNDERLINE",
+          "tabFit": "FILL",
+          "contentAlignment": "CENTER"
+        }
+      ],
+      "sections": [
+        {
+          "id": "s1",
+          "background": {
+            "value": "c14",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderColor": {
+            "value": "c43",
+            "opacity": "15",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderWeight": 1,
+          "borderRadius": 0,
+          "titleFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFontStyle": {
+            "value": "f8",
+            "type": "FONT_REFERENCE"
+          },
+          "density": {
+            "compact": 0,
+            "standard": 0
+          },
+          "margin": {
+            "compact": {
+              "top": 0,
+              "bottom": 0,
+              "left": 0,
+              "right": 0
+            },
+            "standard": {
+              "top": 0,
+              "bottom": 0,
+              "left": 0,
+              "right": 0
+            }
+          },
+          "isDynamic": true
+        },
+        {
+          "id": "s2",
+          "background": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderColor": {
+            "value": "c43",
+            "opacity": "15",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderWeight": 1,
+          "borderRadius": 0,
+          "titleFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "titleFontStyle": {
+            "value": "f8",
+            "type": "FONT_REFERENCE"
+          },
+          "density": {
+            "compact": 0,
+            "standard": 0
+          },
+          "margin": {
+            "compact": {
+              "top": 0,
+              "bottom": 0,
+              "left": 0,
+              "right": 0
+            },
+            "standard": {
+              "top": 0,
+              "bottom": 0,
+              "left": 0,
+              "right": 0
+            }
+          },
+          "isDynamic": true
+        }
+      ],
+      "components": [
+        {
+          "id": "co1",
+          "button": {
+            "value": "b1",
+            "type": "BUTTON_REFERENCE"
+          },
+          "secondaryButton": {
+            "value": "b3",
+            "type": "BUTTON_REFERENCE"
+          },
+          "itemBackgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "itemBorderRadius": 0,
+          "itemBorderWidth": 2,
+          "itemBorderColor": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "itemDropShadow": "NONE",
+          "backgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "spacing": {
+            "bottomMargin": 4
+          },
+          "gap": 4,
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "titleFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title1Font": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "title1FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title2Font": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "title2FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "labelDescriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "labelDescriptionFontColor": {
+            "value": "c60",
+            "opacity": "70",
+            "type": "COLOR_REFERENCE"
+          },
+          "contentFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "contentFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          },
+          "hover": {
+            "colorFill": {
+              "value": "c60",
+              "opacity": "05",
+              "type": "COLOR_REFERENCE"
+            },
+            "border": 2,
+            "borderColor": {
+              "value": "c7",
+              "type": "COLOR_REFERENCE"
+            },
+            "dropShadow": null,
+            "dropShadowColor": null
+          },
+          "active": {
+            "colorFill": {
+              "value": "c60",
+              "opacity": "10",
+              "type": "COLOR_REFERENCE"
+            },
+            "border": 2,
+            "borderColor": {
+              "value": "c8",
+              "type": "COLOR_REFERENCE"
+            },
+            "dropShadow": null,
+            "dropShadowColor": null
+          }
+        },
+        {
+          "id": "co2",
+          "button": {
+            "value": "b4",
+            "type": "BUTTON_REFERENCE"
+          },
+          "secondaryButton": {
+            "value": "b2",
+            "type": "BUTTON_REFERENCE"
+          },
+          "itemBackgroundColor": {
+            "value": "c2",
+            "type": "COLOR_REFERENCE"
+          },
+          "itemBorderRadius": 0,
+          "itemBorderWidth": 0,
+          "itemDropShadow": "NONE",
+          "backgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "spacing": {
+            "bottomMargin": 4
+          },
+          "gap": 4,
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "titleFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title1Font": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "title1FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title2Font": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "title2FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "labelDescriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "labelDescriptionFontColor": {
+            "value": "c60",
+            "opacity": "70",
+            "type": "COLOR_REFERENCE"
+          },
+          "contentFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "contentFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          },
+          "hover": {
+            "colorFill": {
+              "value": "c3",
+              "type": "COLOR_REFERENCE"
+            },
+            "border": 0,
+            "borderColor": null,
+            "dropShadow": null,
+            "dropShadowColor": {
+              "value": "c43",
+              "type": "COLOR_REFERENCE"
+            }
+          },
+          "active": {
+            "colorFill": {
+              "value": "c4",
+              "type": "COLOR_REFERENCE"
+            },
+            "border": 0,
+            "borderColor": null,
+            "dropShadow": null,
+            "dropShadowColor": {
+              "value": "c43",
+              "type": "COLOR_REFERENCE"
+            }
+          }
+        },
+        {
+          "id": "co3",
+          "button": {
+            "value": "b1",
+            "type": "BUTTON_REFERENCE"
+          },
+          "secondaryButton": {
+            "value": "b5",
+            "type": "BUTTON_REFERENCE"
+          },
+          "itemBackgroundColor": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "itemBorderRadius": 0,
+          "itemBorderWidth": 0,
+          "itemDropShadow": "FLOATING",
+          "itemDropShadowColor": {
+            "value": "c43",
+            "opacity": "40",
+            "type": "COLOR_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c55",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "spacing": {
+            "bottomMargin": 4
+          },
+          "gap": 4,
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "titleFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title1Font": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "title1FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title2Font": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "title2FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "labelDescriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "labelDescriptionFontColor": {
+            "value": "c60",
+            "opacity": "70",
+            "type": "COLOR_REFERENCE"
+          },
+          "contentFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "contentFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          },
+          "hover": {
+            "colorFill": {
+              "value": "c54",
+              "type": "COLOR_REFERENCE"
+            },
+            "border": 0,
+            "borderColor": null,
+            "dropShadow": "SOARING",
+            "dropShadowColor": {
+              "value": "c43",
+              "opacity": "40",
+              "type": "COLOR_REFERENCE"
+            }
+          },
+          "active": {
+            "colorFill": {
+              "value": "c53",
+              "type": "COLOR_REFERENCE"
+            },
+            "border": 0,
+            "borderColor": null,
+            "dropShadow": "SOARING",
+            "dropShadowColor": {
+              "value": "c43",
+              "opacity": "40",
+              "type": "COLOR_REFERENCE"
+            }
+          }
+        },
+        {
+          "id": "co4",
+          "button": {
+            "value": "b4",
+            "type": "BUTTON_REFERENCE"
+          },
+          "secondaryButton": {
+            "value": "b2",
+            "type": "BUTTON_REFERENCE"
+          },
+          "itemBackgroundColor": {
+            "value": "c2",
+            "type": "COLOR_REFERENCE"
+          },
+          "itemBorderRadius": 0,
+          "itemBorderWidth": 0,
+          "itemDropShadow": "NONE",
+          "backgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "spacing": {
+            "bottomMargin": 4
+          },
+          "gap": 4,
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "titleFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title1Font": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "title1FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title2Font": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "title2FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "labelDescriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "labelDescriptionFontColor": {
+            "value": "c60",
+            "opacity": "70",
+            "type": "COLOR_REFERENCE"
+          },
+          "contentFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "contentFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          },
+          "hover": {
+            "colorFill": null,
+            "border": 0,
+            "borderColor": null,
+            "dropShadow": "NONE",
+            "dropShadowColor": null
+          },
+          "active": {
+            "colorFill": null,
+            "border": 0,
+            "borderColor": null,
+            "dropShadow": "NONE",
+            "dropShadowColor": null
+          }
+        },
+        {
+          "id": "co5",
+          "button": {
+            "value": "b1",
+            "type": "BUTTON_REFERENCE"
+          },
+          "secondaryButton": {
+            "value": "b3",
+            "type": "BUTTON_REFERENCE"
+          },
+          "itemBackgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "itemBorderRadius": 0,
+          "itemBorderWidth": 2,
+          "itemBorderColor": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "itemDropShadow": "NONE",
+          "backgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "spacing": {
+            "bottomMargin": 12
+          },
+          "gap": 4,
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "titleFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title1Font": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "title1FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title2Font": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "title2FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "labelDescriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "labelDescriptionFontColor": {
+            "value": "c60",
+            "opacity": "70",
+            "type": "COLOR_REFERENCE"
+          },
+          "contentFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "contentFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          },
+          "hover": {
+            "colorFill": null,
+            "border": 2,
+            "borderColor": null,
+            "dropShadow": "NONE",
+            "dropShadowColor": null
+          },
+          "active": {
+            "colorFill": null,
+            "border": 2,
+            "borderColor": null,
+            "dropShadow": "NONE",
+            "dropShadowColor": null
+          }
+        },
+        {
+          "id": "co6",
+          "button": {
+            "value": "b1",
+            "type": "BUTTON_REFERENCE"
+          },
+          "secondaryButton": {
+            "value": "b5",
+            "type": "BUTTON_REFERENCE"
+          },
+          "itemBackgroundColor": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "itemBorderRadius": 0,
+          "itemBorderWidth": 0,
+          "itemDropShadow": "FLOATING",
+          "itemDropShadowColor": {
+            "value": "c43",
+            "opacity": "40",
+            "type": "COLOR_REFERENCE"
+          },
+          "backgroundColor": {
+            "value": "c55",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "spacing": {
+            "bottomMargin": 4
+          },
+          "gap": 4,
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "titleFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title1Font": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "title1FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title2Font": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "title2FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "labelDescriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "labelDescriptionFontColor": {
+            "value": "c60",
+            "opacity": "70",
+            "type": "COLOR_REFERENCE"
+          },
+          "contentFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "contentFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          },
+          "hover": {
+            "colorFill": {
+              "value": "c54",
+              "type": "COLOR_REFERENCE"
+            },
+            "border": 0,
+            "borderColor": null,
+            "dropShadow": "SOARING",
+            "dropShadowColor": {
+              "value": "c43",
+              "opacity": "40",
+              "type": "COLOR_REFERENCE"
+            }
+          },
+          "active": {
+            "colorFill": {
+              "value": "c53",
+              "type": "COLOR_REFERENCE"
+            },
+            "border": 0,
+            "borderColor": null,
+            "dropShadow": "SOARING",
+            "dropShadowColor": {
+              "value": "c43",
+              "opacity": "40",
+              "type": "COLOR_REFERENCE"
+            }
+          }
+        },
+        {
+          "id": "co7",
+          "button": {
+            "value": "b1",
+            "type": "BUTTON_REFERENCE"
+          },
+          "secondaryButton": {
+            "value": "b3",
+            "type": "BUTTON_REFERENCE"
+          },
+          "itemBackgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "itemBorderRadius": 0,
+          "itemBorderWidth": 2,
+          "itemBorderColor": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "itemDropShadow": "NONE",
+          "backgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "spacing": {
+            "bottomMargin": 4
+          },
+          "gap": 4,
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "titleFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title1Font": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "title1FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title2Font": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "title2FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "labelDescriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "labelDescriptionFontColor": {
+            "value": "c60",
+            "opacity": "70",
+            "type": "COLOR_REFERENCE"
+          },
+          "contentFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "contentFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          },
+          "hover": {
+            "colorFill": {
+              "value": "c60",
+              "opacity": "05",
+              "type": "COLOR_REFERENCE"
+            },
+            "border": 2,
+            "borderColor": {
+              "value": "c7",
+              "type": "COLOR_REFERENCE"
+            },
+            "dropShadow": null,
+            "dropShadowColor": null
+          },
+          "active": {
+            "colorFill": {
+              "value": "c60",
+              "opacity": "10",
+              "type": "COLOR_REFERENCE"
+            },
+            "border": 2,
+            "borderColor": {
+              "value": "c8",
+              "type": "COLOR_REFERENCE"
+            },
+            "dropShadow": null,
+            "dropShadowColor": null
+          }
+        },
+        {
+          "id": "co8",
+          "button": {
+            "value": "b1",
+            "type": "BUTTON_REFERENCE"
+          },
+          "secondaryButton": {
+            "value": "b3",
+            "type": "BUTTON_REFERENCE"
+          },
+          "itemBackgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "itemBorderRadius": 0,
+          "itemBorderWidth": 2,
+          "itemBorderColor": {
+            "value": "c55",
+            "type": "COLOR_REFERENCE"
+          },
+          "itemDropShadow": "NONE",
+          "backgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderRadius": 0,
+          "borderWidth": 0,
+          "dropShadow": "NONE",
+          "padding": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "spacing": {
+            "bottomMargin": 4
+          },
+          "gap": 4,
+          "titleFont": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "titleFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "descriptionFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "descriptionFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title1Font": {
+            "value": "f5",
+            "type": "FONT_REFERENCE"
+          },
+          "title1FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "title2Font": {
+            "value": "f4",
+            "type": "FONT_REFERENCE"
+          },
+          "title2FontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "labelDescriptionFont": {
+            "value": "f7",
+            "type": "FONT_REFERENCE"
+          },
+          "labelDescriptionFontColor": {
+            "value": "c60",
+            "opacity": "70",
+            "type": "COLOR_REFERENCE"
+          },
+          "contentFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "contentFontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          },
+          "urlFont": {
+            "value": "f6",
+            "type": "FONT_REFERENCE"
+          },
+          "urlFontColor": {
+            "value": "c19",
+            "type": "COLOR_REFERENCE"
+          },
+          "hover": {
+            "colorFill": {
+              "value": "c60",
+              "opacity": "05",
+              "type": "COLOR_REFERENCE"
+            },
+            "border": 2,
+            "borderColor": {
+              "value": "c7",
+              "type": "COLOR_REFERENCE"
+            },
+            "dropShadow": null,
+            "dropShadowColor": null
+          },
+          "active": {
+            "colorFill": {
+              "value": "c60",
+              "opacity": "10",
+              "type": "COLOR_REFERENCE"
+            },
+            "border": 2,
+            "borderColor": {
+              "value": "c8",
+              "type": "COLOR_REFERENCE"
+            },
+            "dropShadow": null,
+            "dropShadowColor": null
+          }
+        }
+      ],
+      "pills": [
+        {
+          "id": "p1",
+          "backgroundColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          },
+          "radius": 24,
+          "font": {
+            "value": "f9",
+            "type": "FONT_REFERENCE"
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "p2",
+          "backgroundColor": {
+            "value": "c14",
+            "opacity": "00",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderColor": {
+            "value": "c53",
+            "type": "COLOR_REFERENCE"
+          },
+          "radius": 24,
+          "font": {
+            "value": "f9",
+            "type": "FONT_REFERENCE"
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          }
+        },
+        {
+          "id": "p3",
+          "backgroundColor": {
+            "value": "c8",
+            "opacity": "50",
+            "type": "COLOR_REFERENCE"
+          },
+          "borderColor": {
+            "value": "c8",
+            "type": "COLOR_REFERENCE"
+          },
+          "radius": 24,
+          "font": {
+            "value": "f9",
+            "type": "FONT_REFERENCE"
+          },
+          "fontColor": {
+            "value": "c60",
+            "type": "COLOR_REFERENCE"
+          }
+        }
+      ],
+      "app": {
+        "backgroundColor": {
+          "value": "c14",
+          "type": "COLOR_REFERENCE"
+        },
+        "resizeMode": "AUTO"
+      }
+    },
+    "navigations": [
+      {
+        "dataAppId": 1468477910,
+        "entity": "HOME",
+        "entityId": "home",
+        "title": "Home",
+        "description": "All Domo apps",
+        "navOrder": 1,
+        "visible": true,
+        "interaction": null,
+        "icon": {
+          "value": "home",
+          "size": "DEFAULT"
+        },
+        "iconPosition": "LEFT",
+        "style": null
+      },
+      {
+        "dataAppId": 1468477910,
+        "entity": "VIEW",
+        "entityId": "1828849038",
+        "title": "在庫入出庫管理",
+        "description": null,
+        "navOrder": 2,
+        "visible": true,
+        "interaction": null,
+        "icon": {
+          "value": "pages",
+          "size": "DEFAULT"
+        },
+        "iconPosition": "LEFT",
+        "style": null
+      },
+      {
+        "dataAppId": 1468477910,
+        "entity": "VIEW",
+        "entityId": "41450484",
+        "title": "開発ガイド",
+        "description": null,
+        "navOrder": 3,
+        "visible": true,
+        "interaction": null,
+        "icon": {
+          "value": "pages",
+          "size": "DEFAULT"
+        },
+        "iconPosition": "LEFT",
+        "style": null
+      },
+      {
+        "dataAppId": 1468477910,
+        "entity": "AI_ASSISTANT",
+        "entityId": "ai_assistant",
+        "title": "Domo.AI",
+        "description": null,
+        "navOrder": 4,
+        "visible": true,
+        "interaction": null,
+        "icon": {
+          "value": "ai-chat",
+          "size": "DEFAULT"
+        },
+        "iconPosition": "LEFT",
+        "style": null
+      },
+      {
+        "dataAppId": 1468477910,
+        "entity": "CONTROLS",
+        "entityId": "controls",
+        "title": "Controls",
+        "description": "Filters, segments & variables",
+        "navOrder": 5,
+        "visible": true,
+        "interaction": null,
+        "icon": {
+          "value": "controls",
+          "size": "DEFAULT"
+        },
+        "iconPosition": "LEFT",
+        "style": null
+      },
+      {
+        "dataAppId": 1468477910,
+        "entity": "DISTRIBUTE",
+        "entityId": "distribute",
+        "title": "Distribute",
+        "description": "Distribution & access",
+        "navOrder": 6,
+        "visible": true,
+        "interaction": null,
+        "icon": {
+          "value": "arrow-box",
+          "size": "DEFAULT"
+        },
+        "iconPosition": "LEFT",
+        "style": null
+      },
+      {
+        "dataAppId": 1468477910,
+        "entity": "MORE",
+        "entityId": "more",
+        "title": "More",
+        "description": null,
+        "navOrder": 7,
+        "visible": true,
+        "interaction": null,
+        "icon": {
+          "value": "dots-vertical",
+          "size": "DEFAULT"
+        },
+        "iconPosition": "LEFT",
+        "style": null
+      }
+    ],
+    "persistSettings": {
+      "dataAppId": 1468477910,
+      "persistFiltersEnabled": false,
+      "persistInteractionsEnabled": false,
+      "persistDateEnabled": false,
+      "persistVariablesEnabled": false,
+      "persistedColumns": []
+    },
+    "agentId": null,
+    "conversationalAgentContext": {
+      "id": null,
+      "dataSourceIds": [],
+      "cardIds": [],
+      "pageIds": [],
+      "ignorableDataSourceIds": [],
+      "filters": [],
+      "dateRangeFilter": null,
+      "fileSets": [],
+      "dataApps": [],
+      "descriptions": {}
+    },
+    "type": "app",
+    "dataSourceId": null,
+    "dataSourceType": null,
+    "customPermission": false
+  },
+  "pages": [
+    {
+      "viewId": "1828849038",
+      "stack": {
+        "id": "1828849038",
+        "page": {
+          "pageId": 1828849038,
+          "type": "dataappview",
+          "title": "在庫入出庫管理",
+          "pageName": "App Page 1",
+          "mobileEnabled": true,
+          "sharedViewPage": true,
+          "virtualPage": false,
+          "customPermission": false
+        },
+        "type": "dav",
+        "title": "在庫入出庫管理",
+        "sizes": [
+          {
+            "id": "2109675257",
+            "size": ""
+          }
+        ],
+        "cards": [],
+        "collections": [],
+        "pageLayoutV4": {
+          "layoutId": 381523384,
+          "pageUrn": "1828849038",
+          "printFriendly": false,
+          "enabled": true,
+          "isDynamic": false,
+          "hasPageBreaks": false,
+          "content": [
+            {
+              "id": 115443,
+              "contentKey": 1,
+              "compactInteractionDefault": true,
+              "hideTitle": true,
+              "hideDescription": true,
+              "hideSummary": false,
+              "summaryNumberOnly": false,
+              "hideTimeframe": false,
+              "hideFooter": true,
+              "hideWrench": true,
+              "hideMargins": false,
+              "hasSummary": false,
+              "fitToFrame": false,
+              "hideBorder": false,
+              "acceptFilters": true,
+              "acceptDateFilter": true,
+              "acceptSegments": true,
+              "cardId": 2109675257,
+              "cardUrn": "2109675257",
+              "editInAppViewer": true,
+              "showMoreContent": false,
+              "chartStyles": false,
+              "type": "CARD"
+            }
+          ],
+          "standard": {
+            "aspectRatio": 1.67,
+            "width": 60,
+            "frameMargin": 4,
+            "framePadding": 8,
+            "type": "STANDARD",
+            "template": [
+              {
+                "contentKey": 1,
+                "x": 0,
+                "y": 0,
+                "width": 60,
+                "height": 82,
+                "type": "CARD",
+                "virtual": false,
+                "virtualAppendix": false,
+                "children": []
+              },
+              {
+                "contentKey": 2,
+                "x": 0,
+                "y": 82,
+                "width": 60,
+                "height": 0,
+                "type": "PAGE_BREAK",
+                "virtual": false,
+                "virtualAppendix": false,
+                "children": []
+              }
+            ]
+          },
+          "compact": {
+            "aspectRatio": 1.0,
+            "width": 12,
+            "frameMargin": 4,
+            "framePadding": 8,
+            "type": "COMPACT",
+            "template": [
+              {
+                "contentKey": 1,
+                "x": 0,
+                "y": 0,
+                "width": 12,
+                "height": 29,
+                "type": "CARD",
+                "virtual": false,
+                "virtualAppendix": false,
+                "children": []
+              },
+              {
+                "contentKey": 2,
+                "x": 0,
+                "y": 29,
+                "width": 12,
+                "height": 0,
+                "type": "PAGE_BREAK",
+                "virtual": false,
+                "virtualAppendix": false,
+                "children": []
+              }
+            ]
+          },
+          "background": null,
+          "style": null
+        },
+        "pageAnalyzerSettings": {
+          "pageId": 1828849038,
+          "interactionFilters": false,
+          "noAddingNewFilters": false,
+          "showFilterBar": true,
+          "showGlobalDateFilters": true,
+          "showSegments": true,
+          "showFilterIcons": true
+        }
+      },
+      "cards": [
+        {
+          "urn": "2109675257",
+          "id": 2109675257,
+          "type": "domoapp",
+          "badgeUpdated": 1786419787000,
+          "title": "在庫入出庫管理",
+          "active": true,
+          "allowTableDrill": true
+        }
+      ],
+      "layout": {
+        "layoutId": 381523384,
+        "pageUrn": "1828849038",
+        "printFriendly": false,
+        "enabled": true,
+        "isDynamic": false,
+        "hasPageBreaks": false,
+        "content": [
+          {
+            "id": 115443,
+            "contentKey": 1,
+            "compactInteractionDefault": true,
+            "hideTitle": true,
+            "hideDescription": true,
+            "hideSummary": false,
+            "summaryNumberOnly": false,
+            "hideTimeframe": false,
+            "hideFooter": true,
+            "hideWrench": true,
+            "hideMargins": false,
+            "hasSummary": false,
+            "fitToFrame": false,
+            "hideBorder": false,
+            "acceptFilters": true,
+            "acceptDateFilter": true,
+            "acceptSegments": true,
+            "cardId": 2109675257,
+            "cardUrn": "2109675257",
+            "editInAppViewer": true,
+            "showMoreContent": false,
+            "chartStyles": false,
+            "type": "CARD"
+          }
+        ],
+        "standard": {
+          "aspectRatio": 1.67,
+          "width": 60,
+          "frameMargin": 4,
+          "framePadding": 8,
+          "type": "STANDARD",
+          "template": [
+            {
+              "contentKey": 1,
+              "x": 0,
+              "y": 0,
+              "width": 60,
+              "height": 82,
+              "type": "CARD",
+              "virtual": false,
+              "virtualAppendix": false,
+              "children": []
+            },
+            {
+              "contentKey": 2,
+              "x": 0,
+              "y": 82,
+              "width": 60,
+              "height": 0,
+              "type": "PAGE_BREAK",
+              "virtual": false,
+              "virtualAppendix": false,
+              "children": []
+            }
+          ]
+        },
+        "compact": {
+          "aspectRatio": 1.0,
+          "width": 12,
+          "frameMargin": 4,
+          "framePadding": 8,
+          "type": "COMPACT",
+          "template": [
+            {
+              "contentKey": 1,
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 29,
+              "type": "CARD",
+              "virtual": false,
+              "virtualAppendix": false,
+              "children": []
+            },
+            {
+              "contentKey": 2,
+              "x": 0,
+              "y": 29,
+              "width": 12,
+              "height": 0,
+              "type": "PAGE_BREAK",
+              "virtual": false,
+              "virtualAppendix": false,
+              "children": []
+            }
+          ]
+        },
+        "background": null,
+        "style": null
+      },
+      "proCodeContext": {
+        "id": "7a9386a2-d8fa-4dbc-99cb-0a9ab25f502b",
+        "designId": "3c156897-8ddb-4761-9664-9073a9f2aa90",
+        "designVersion": null,
+        "mapping": [],
+        "collections": [
+          {
+            "name": "inventory_management_records",
+            "id": "b76a1233-038d-4f99-aa19-1705469b7f7e"
+          }
+        ],
+        "accountMapping": [],
+        "actionMapping": [],
+        "workflowMapping": [
+          {
+            "alias": "lowStockNotification",
+            "modelId": "0c61146c-9e04-4a9b-bc5e-7c43384d06d6",
+            "version": "1.0.11",
+            "startName": "不足通知を開始",
+            "triggerId": "b96b4359-ad65-4827-bf18-f5345c9e9e04",
+            "parameters": []
+          }
+        ],
+        "packageMapping": [],
+        "isDisabled": false
+      }
+    },
+    {
+      "viewId": "41450484",
+      "stack": {
+        "id": "41450484",
+        "page": {
+          "pageId": 41450484,
+          "type": "dataappview",
+          "title": "開発ガイド",
+          "pageName": "2ページ",
+          "mobileEnabled": true,
+          "sharedViewPage": true,
+          "virtualPage": false,
+          "customPermission": false
+        },
+        "type": "dav",
+        "title": "開発ガイド",
+        "sizes": [
+          {
+            "id": "417954969",
+            "size": ""
+          }
+        ],
+        "cards": [],
+        "collections": [],
+        "pageLayoutV4": {
+          "layoutId": 69282970,
+          "pageUrn": "41450484",
+          "printFriendly": false,
+          "enabled": true,
+          "isDynamic": false,
+          "hasPageBreaks": false,
+          "content": [
+            {
+              "id": 115444,
+              "contentKey": 1,
+              "compactInteractionDefault": true,
+              "hideTitle": true,
+              "hideDescription": true,
+              "hideSummary": false,
+              "summaryNumberOnly": false,
+              "hideTimeframe": false,
+              "hideFooter": true,
+              "hideWrench": true,
+              "hideMargins": false,
+              "hasSummary": false,
+              "fitToFrame": false,
+              "hideBorder": false,
+              "acceptFilters": true,
+              "acceptDateFilter": true,
+              "acceptSegments": true,
+              "cardId": 417954969,
+              "cardUrn": "417954969",
+              "editInAppViewer": true,
+              "showMoreContent": false,
+              "chartStyles": false,
+              "type": "CARD"
+            }
+          ],
+          "standard": {
+            "aspectRatio": 1.67,
+            "width": 60,
+            "frameMargin": 4,
+            "framePadding": 8,
+            "type": "STANDARD",
+            "template": [
+              {
+                "contentKey": 1,
+                "x": 0,
+                "y": 0,
+                "width": 60,
+                "height": 82,
+                "type": "CARD",
+                "virtual": false,
+                "virtualAppendix": false,
+                "children": []
+              },
+              {
+                "contentKey": 2,
+                "x": 0,
+                "y": 82,
+                "width": 60,
+                "height": 0,
+                "type": "PAGE_BREAK",
+                "virtual": false,
+                "virtualAppendix": false,
+                "children": []
+              }
+            ]
+          },
+          "compact": {
+            "aspectRatio": 1.0,
+            "width": 12,
+            "frameMargin": 4,
+            "framePadding": 8,
+            "type": "COMPACT",
+            "template": [
+              {
+                "contentKey": 1,
+                "x": 0,
+                "y": 0,
+                "width": 12,
+                "height": 29,
+                "type": "CARD",
+                "virtual": false,
+                "virtualAppendix": false,
+                "children": []
+              },
+              {
+                "contentKey": 2,
+                "x": 0,
+                "y": 29,
+                "width": 12,
+                "height": 0,
+                "type": "PAGE_BREAK",
+                "virtual": false,
+                "virtualAppendix": false,
+                "children": []
+              }
+            ]
+          },
+          "background": null,
+          "style": null
+        },
+        "pageAnalyzerSettings": {
+          "pageId": 41450484,
+          "interactionFilters": false,
+          "noAddingNewFilters": false,
+          "showFilterBar": true,
+          "showGlobalDateFilters": true,
+          "showSegments": true,
+          "showFilterIcons": true
+        }
+      },
+      "cards": [
+        {
+          "urn": "417954969",
+          "id": 417954969,
+          "type": "domoapp",
+          "badgeUpdated": 1786792293000,
+          "title": "在庫管理リファレンス ガイド",
+          "active": true,
+          "allowTableDrill": true
+        }
+      ],
+      "layout": {
+        "layoutId": 69282970,
+        "pageUrn": "41450484",
+        "printFriendly": false,
+        "enabled": true,
+        "isDynamic": false,
+        "hasPageBreaks": false,
+        "content": [
+          {
+            "id": 115444,
+            "contentKey": 1,
+            "compactInteractionDefault": true,
+            "hideTitle": true,
+            "hideDescription": true,
+            "hideSummary": false,
+            "summaryNumberOnly": false,
+            "hideTimeframe": false,
+            "hideFooter": true,
+            "hideWrench": true,
+            "hideMargins": false,
+            "hasSummary": false,
+            "fitToFrame": false,
+            "hideBorder": false,
+            "acceptFilters": true,
+            "acceptDateFilter": true,
+            "acceptSegments": true,
+            "cardId": 417954969,
+            "cardUrn": "417954969",
+            "editInAppViewer": true,
+            "showMoreContent": false,
+            "chartStyles": false,
+            "type": "CARD"
+          }
+        ],
+        "standard": {
+          "aspectRatio": 1.67,
+          "width": 60,
+          "frameMargin": 4,
+          "framePadding": 8,
+          "type": "STANDARD",
+          "template": [
+            {
+              "contentKey": 1,
+              "x": 0,
+              "y": 0,
+              "width": 60,
+              "height": 82,
+              "type": "CARD",
+              "virtual": false,
+              "virtualAppendix": false,
+              "children": []
+            },
+            {
+              "contentKey": 2,
+              "x": 0,
+              "y": 82,
+              "width": 60,
+              "height": 0,
+              "type": "PAGE_BREAK",
+              "virtual": false,
+              "virtualAppendix": false,
+              "children": []
+            }
+          ]
+        },
+        "compact": {
+          "aspectRatio": 1.0,
+          "width": 12,
+          "frameMargin": 4,
+          "framePadding": 8,
+          "type": "COMPACT",
+          "template": [
+            {
+              "contentKey": 1,
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 29,
+              "type": "CARD",
+              "virtual": false,
+              "virtualAppendix": false,
+              "children": []
+            },
+            {
+              "contentKey": 2,
+              "x": 0,
+              "y": 29,
+              "width": 12,
+              "height": 0,
+              "type": "PAGE_BREAK",
+              "virtual": false,
+              "virtualAppendix": false,
+              "children": []
+            }
+          ]
+        },
+        "background": null,
+        "style": null
+      },
+      "proCodeContext": {}
+    }
+  ],
+  "proCodeContext": {
+    "id": "7a9386a2-d8fa-4dbc-99cb-0a9ab25f502b",
+    "designId": "3c156897-8ddb-4761-9664-9073a9f2aa90",
+    "designVersion": null,
+    "mapping": [],
+    "collections": [
+      {
+        "name": "inventory_management_records",
+        "id": "b76a1233-038d-4f99-aa19-1705469b7f7e"
+      }
+    ],
+    "accountMapping": [],
+    "actionMapping": [],
+    "workflowMapping": [
+      {
+        "alias": "lowStockNotification",
+        "modelId": "0c61146c-9e04-4a9b-bc5e-7c43384d06d6",
+        "version": "1.0.11",
+        "startName": "不足通知を開始",
+        "triggerId": "b96b4359-ad65-4827-bf18-f5345c9e9e04",
+        "parameters": []
+      }
+    ],
+    "packageMapping": [],
+    "isDisabled": false
+  },
+  "proCodeContexts": [
+    {
+      "viewId": "1828849038",
+      "contextId": "7a9386a2-d8fa-4dbc-99cb-0a9ab25f502b",
+      "context": {
+        "id": "7a9386a2-d8fa-4dbc-99cb-0a9ab25f502b",
+        "designId": "3c156897-8ddb-4761-9664-9073a9f2aa90",
+        "designVersion": null,
+        "mapping": [],
+        "collections": [
+          {
+            "name": "inventory_management_records",
+            "id": "b76a1233-038d-4f99-aa19-1705469b7f7e"
+          }
+        ],
+        "accountMapping": [],
+        "actionMapping": [],
+        "workflowMapping": [
+          {
+            "alias": "lowStockNotification",
+            "modelId": "0c61146c-9e04-4a9b-bc5e-7c43384d06d6",
+            "version": "1.0.11",
+            "startName": "不足通知を開始",
+            "triggerId": "b96b4359-ad65-4827-bf18-f5345c9e9e04",
+            "parameters": []
+          }
+        ],
+        "packageMapping": [],
+        "isDisabled": false
+      }
+    }
+  ]
+}

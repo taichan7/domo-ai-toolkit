@@ -1,0 +1,991 @@
+/* 落ち着いた青系（calm subdued blue）を基調にした業務向けパレット。
+   navy-* は構造色（見出し・主要ボタン・ブランド）、teal-* は同系のアクセント青
+   （ナビ強調・アイコン・スキャン導線）。彩度を抑え、視認性のための明度差は維持する。
+   orange/red/green は状態（出庫・エラー・成功）を表す意味色として据え置く。 */
+:root {
+  --navy-950: #1d3c66;
+  --navy-900: #2b569c;
+  --navy-800: #4470b2;
+  --teal-700: #2f6bb0;
+  --teal-100: #cfe1f0;
+  --orange-600: #956126;
+  --orange-100: #f8f0e4;
+  --red-600: #994646;
+  --red-100: #f8eaea;
+  --green-700: #3d6c58;
+  --green-100: #eaf3ee;
+  --ink: #26303f;
+  --muted: #626e7d;
+  --line: #dce0e9;
+  --line-strong: #c6ccd9;
+  /* 行間・パネル内の淡い仕切り線。複数箇所に散っていた #e9edf5 を1本に集約し、
+     線のトーンを一括調整できるようにする（--line より一段淡い罫）。 */
+  --line-soft: #e9edf5;
+  --surface: #ffffff;
+  --surface-muted: #f7f9fc;
+  /* 選択・強調中の面色（選択行・アクティブな選択肢/カード）。近似した淡い青が
+     #eef2fb/#eef3fc/#eaf2fb と3値に散っていたのを1本へ集約し、強調トーンを
+     一括調整できるようにする（--line-soft と同じ「散った近似色を1トークンへ」方針）。 */
+  --surface-selected: #eef2fb;
+  --canvas: #f3f5fa;
+  --shadow: 0 1px 2px rgba(26, 38, 60, .06);
+  --shadow-raised: 0 8px 24px rgba(26, 38, 60, .09);
+  --radius: 8px;
+  --sidebar: 204px;
+  --header: 56px;
+  --app-viewport-height: 100vh;
+  /* PCでは画面幅いっぱいに広げず、中央に寄せた読みやすい列幅に収める。
+     ガターは (ビューポート幅 - 上限) の半分。上限未満では 0 になるためタブレット・スマホは無影響。 */
+  --app-max: 1200px;
+  --app-gutter: max(0px, calc((100vw - var(--app-max)) / 2));
+  color-scheme: light;
+  font-family: "Noto Sans JP", "Meiryo UI", Meiryo, "Hiragino Sans", "Zen Kaku Gothic New", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  overflow-x: clip;
+  background: var(--canvas);
+  /* Domo Mobile (iOS WKWebView) はカード内をタップすると WebKit の tap ハイライトと
+     長押しコールアウトが働き、青い外枠＋スクロール固定に見える。Web側で無効化できる
+     この2点を切って、ホストのカード選択に見える描画を抑える。PC・タッチ以外へは無害。 */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+body {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  color: var(--ink);
+  background: var(--canvas);
+  font-size: 13px;
+  line-height: 1.55;
+  letter-spacing: .012em;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; touch-action: manipulation; }
+dialog:not([open]) { display: none; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  /* キーボード操作の可視フォーカス。淡い半透明リング(旧 rgba …,.18)は背景に溶けて
+     見え難かったため、不透明のアクセント青で 2px の輪郭にし低視力・高輝度環境でも
+     追える強さにする（WCAG 2.4.7 の視認性を担保）。offset で枠と分離。 */
+  outline: 2px solid var(--teal-700);
+  outline-offset: 2px;
+}
+
+.icon-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.ui-icon, .nav-icon, .button-icon, .search-icon {
+  width: 1em;
+  height: 1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.skip-link {
+  position: fixed;
+  top: -60px;
+  left: 16px;
+  z-index: 1000;
+  padding: 10px 16px;
+  color: #fff;
+  background: var(--navy-950);
+  border-radius: 8px;
+}
+.skip-link:focus { top: 8px; }
+
+.app-shell { width: 100%; min-width: 0; min-height: 100vh; }
+
+.topbar {
+  position: fixed;
+  inset: 0 var(--app-gutter) auto var(--app-gutter);
+  z-index: 30;
+  height: var(--header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  color: var(--navy-950);
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, .98);
+  box-shadow: 0 1px 3px rgba(26, 38, 60, .04);
+}
+
+.brand, .topbar-actions, .brand > div, .user-chip, .sync-status { display: flex; align-items: center; }
+/* display:flex は作者スタイルとしてUA既定の [hidden]{display:none} を打ち消すため、
+   hidden 属性を尊重するには作者側で明示的に打ち消す必要がある。これがないと
+   「接続済みでバッジを隠す」経路が効かず初期文言「接続を確認中」が残り続ける。 */
+.user-chip[hidden], .sync-status[hidden] { display: none; }
+.brand { gap: 10px; }
+.brand > div { align-items: flex-start; flex-direction: column; line-height: 1.25; }
+.brand strong { color: var(--navy-950); font-size: 14px; letter-spacing: .025em; font-weight: 700; }
+/* 補足タグラインは11px大文字。旧 #79838f は白地で3.85:1とAA(4.5:1)に届かないため、
+   他の補足テキストと同じトークン --muted(5.18:1)へ統一して可読性と色調を揃える。 */
+.brand small { color: var(--muted); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+.brand-mark {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  background: var(--navy-950);
+}
+.brand-mark .ui-icon { width: 17px; height: 17px; }
+.topbar-actions { gap: 8px; }
+.sync-status { gap: 7px; color: var(--muted); font-size: 11px; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: #b8863b; }
+.sync-status.error .status-dot { background: var(--red-600); }
+.icon-button, .user-chip {
+  min-width: 36px;
+  min-height: 36px;
+  color: var(--navy-950);
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.icon-button { display: grid; place-items: center; border-radius: 7px; font-size: 17px; }
+.icon-button:hover { border-color: var(--line-strong); background: var(--surface-muted); }
+.user-chip { gap: 8px; padding: 3px 10px 3px 4px; border-radius: 19px; }
+.user-chip > span:first-child { display: grid; width: 28px; height: 28px; place-items: center; color: var(--navy-900); background: var(--teal-100); border-radius: 50%; font-weight: 700; }
+
+.sidebar {
+  position: fixed;
+  /* 全高レールをやめ、ナビとヒントの内容分だけの高さでカード化する。下に残る領域は
+     canvas（背景）が引き取るため「ここの空白が無駄」に見えない。中央寄せフレームに
+     合わせて左端はガター分だけ内側へ寄せる。 */
+  inset: calc(var(--header) + 16px) auto auto calc(var(--app-gutter) + 16px);
+  z-index: 20;
+  width: var(--sidebar);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+.sidebar nav { display: grid; gap: 4px; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  color: #55636f;
+  text-align: left;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+}
+.nav-item .nav-icon { width: 18px; height: 18px; color: #747f8f; }
+.nav-item em { font-style: normal; font-weight: 600; }
+.nav-item:hover { color: var(--navy-950); background: var(--surface-muted); }
+.nav-item.active { color: var(--navy-950); background: var(--teal-100); }
+.nav-item.active .nav-icon { color: var(--teal-700); }
+.sidebar-help { padding: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; background: var(--surface-muted); font-size: 11px; }
+.sidebar-help strong { display: block; margin-bottom: 6px; color: var(--ink); }
+.sidebar-help code { display: block; margin-top: 5px; color: var(--navy-800); font-size: 11px; }
+.sidebar-help-note { margin: 0 0 10px; font-size: 11px; line-height: 1.5; color: var(--muted); }
+.qr-samples { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.qr-sample { display: flex; align-items: center; gap: 10px; }
+.qr-sample-image { flex: 0 0 auto; display: inline-flex; padding: 4px; background: #ffffff; border: 1px solid var(--line); border-radius: 6px; }
+.qr-sample-image svg { display: block; width: 64px; height: 64px; }
+.qr-sample code { margin-top: 0; font-size: 11px; word-break: break-all; }
+
+main { min-width: 0; min-height: 100vh; padding: calc(var(--header) + 24px) calc(24px + var(--app-gutter)) 36px calc(var(--app-gutter) + var(--sidebar) + 40px); }
+.view { display: none; width: 100%; min-width: 0; max-width: 1480px; margin: 0 auto; }
+.view.active { display: block; animation: view-in .18s ease-out; }
+@keyframes view-in { from { opacity: 0; transform: translateY(3px); } }
+
+.page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 14px; }
+.page-heading h1 { margin: 2px 0 3px; color: var(--navy-950); font-size: clamp(22px, 2.5vw, 27px); letter-spacing: -.015em; line-height: 1.3; font-weight: 700; }
+.page-heading p { margin: 0; color: var(--muted); }
+.page-heading-actions { display: flex; align-items: center; gap: 8px; }
+.eyebrow, .step-label { color: var(--teal-700) !important; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+
+.segmented { display: flex; padding: 2px; border: 1px solid var(--line); border-radius: 7px; background: #e8ecf5; }
+.type-button { min-width: 74px; min-height: 36px; color: #5a6673; border: 0; border-radius: 5px; background: transparent; font-weight: 600; }
+.type-button:hover:not(.active) { color: var(--navy-950); background: rgba(255,255,255,.65); }
+.type-button.active { color: #fff; background: var(--navy-900); box-shadow: 0 1px 2px rgba(26, 38, 60, .12); }
+.type-button[data-type="OUT"].active { background: var(--orange-600); }
+
+.step-status { display: flex; align-items: baseline; justify-content: center; gap: 9px; max-width: 640px; margin: 0 auto 7px; color: var(--navy-950); }
+.step-status span { color: var(--teal-700); font-size: 11px; font-weight: 700; letter-spacing: .06em; }
+.step-status strong { font-size: 12px; }
+.stepper { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 640px; margin: 0 auto 14px; overflow: hidden; padding: 0; border: 1px solid var(--line); border-radius: 7px; background: #fff; list-style: none; }
+.stepper li { min-width: 0; border-right: 1px solid var(--line); }
+.stepper li:last-child { border-right: 0; }
+/* 未到達ステップのラベル。disabled でも opacity:1 で通常ラベルとして読ませる意図なので、
+   旧 #7f8a97(3.51:1)ではなくトークン --muted(4.5:1超)で判読性を確保する。 */
+.stepper button { display: flex; width: 100%; min-width: 0; min-height: 40px; align-items: center; justify-content: center; gap: 7px; padding: 5px 8px; color: var(--muted); border: 0; background: transparent; font-size: 11px; }
+.stepper button:disabled { cursor: default; opacity: 1; }
+.stepper span { display: grid; flex: none; width: 23px; height: 23px; place-items: center; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface-muted); font-size: 11px; font-weight: 700; }
+.stepper b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stepper li.active button { color: var(--navy-950); background: var(--teal-100); font-weight: 700; }
+.stepper li.active span { color: #fff; border-color: var(--teal-700); background: var(--teal-700); }
+.stepper li.done button { color: var(--navy-900); }
+.stepper li.done span { color: var(--navy-900); border-color: #bcc8df; background: var(--teal-100); }
+.stepper li.available button:hover { background: var(--surface-muted); }
+
+.operation-grid { display: grid; min-width: 0; grid-template-columns: minmax(0, 1.65fr) minmax(280px, .72fr); align-items: start; gap: 16px; }
+.panel { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+.workflow-panel { min-height: 0; padding: clamp(22px, 3vw, 28px); }
+.context-panel { position: sticky; top: calc(var(--header) + 20px); padding: 20px; }
+.form-step { display: none; }
+.form-step.active { display: block; }
+.panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 18px; }
+.panel-heading h2 { margin: 0; color: var(--navy-950); font-size: 17px; }
+.panel-heading p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+.form-step > label, .manual-entry label { display: block; margin: 0 0 6px; color: #414f63; font-size: 12px; font-weight: 600; }
+
+input, select, textarea {
+  width: 100%;
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: #fff;
+}
+input, select { min-height: 42px; padding: 0 12px; }
+textarea { padding: 12px 13px; resize: vertical; }
+/* プレースホルダは入力例のヒント。旧 #97a6b8(2.48:1)は判読しにくいため --muted へ上げ、
+   入力済みの値(--ink)より淡いまま可読性(5.18:1)を確保する。 */
+input::placeholder, textarea::placeholder { color: var(--muted); }
+input:focus, select:focus, textarea:focus { border-color: var(--navy-800); outline: 0; box-shadow: 0 0 0 3px rgba(47, 107, 176, .11); }
+.search-wrap { position: relative; margin-bottom: 13px; }
+.search-wrap .search-icon { position: absolute; top: 50%; left: 13px; width: 16px; height: 16px; color: #7b8794; transform: translateY(-50%); }
+.search-wrap input { padding-left: 38px; }
+
+.scan-button, .secondary-button, .primary-button {
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+/* teal-100 面上の文字色は teal-700 だとコントラスト約4.07:1で本文基準(4.5:1)に届かないため、
+   一段濃い navy-900(約5.38:1)を使う。teal-700 は枠線・影など非テキスト用途に据え置く。 */
+.scan-button { display: inline-flex; align-items: center; gap: 7px; color: var(--navy-900); border: 1px solid #bcc9e0; background: var(--teal-100); }
+.scan-button:hover { border-color: #7ba7d6; background: #c1d8ee; }
+.button-icon { flex: none; width: 16px; height: 16px; }
+.secondary-button { color: var(--navy-900); border: 1px solid var(--line-strong); background: #fff; }
+.secondary-button:hover { border-color: #b2bcd2; background: var(--surface-muted); }
+.primary-button { min-width: 144px; color: #fff; border: 1px solid var(--navy-900); background: var(--navy-900); box-shadow: 0 1px 2px rgba(26, 38, 60, .12); }
+.primary-button:hover { border-color: var(--navy-950); background: var(--navy-950); }
+.button-row { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; }
+.back-button { margin-top: 16px; }
+button[disabled] { cursor: not-allowed; opacity: .55; }
+
+.option-list { display: grid; gap: 6px; max-height: 310px; overflow: auto; }
+.option-button {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  min-height: 56px;
+  padding: 8px 11px;
+  color: var(--ink);
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+}
+.option-button:hover { border-color: #b3c0d6; background: var(--surface-muted); }
+.option-button[aria-current="true"] { border-color: #94a9ce; background: var(--surface-selected); }
+.option-icon { display: grid; width: 36px; height: 30px; place-items: center; color: var(--navy-900); border: 1px solid #cdd7e8; border-radius: 5px; background: var(--teal-100); font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+.option-button strong, .option-button small { display: block; }
+.option-button small { color: var(--muted); }
+/* 補足メタ表示。旧 #737f92 は白地でコントラスト比が 4.5:1 を僅かに下回るため、
+   一段濃い共通トークン --muted(#626e7d) に寄せて本文 AA を満たす。 */
+.option-meta { color: var(--muted); font-size: 12px; }
+.empty-state { padding: 24px 15px; color: var(--muted); text-align: center; border: 1px dashed var(--line-strong); border-radius: 7px; background: var(--surface-muted); }
+
+.quantity-control { display: grid; grid-template-columns: 52px minmax(120px, 190px) 52px; justify-content: center; align-items: end; gap: 10px; margin: 20px 0; }
+.quantity-control button { height: 50px; color: var(--teal-700); border: 1px solid #bcc9e0; border-radius: 6px; background: var(--teal-100); font-size: 22px; }
+.quantity-control label span { display: block; margin-bottom: 5px; color: var(--muted); text-align: center; font-size: 12px; font-weight: 700; }
+.quantity-control input { height: 50px; text-align: center; font-size: 21px; font-weight: 700; }
+.stock-preview { min-height: 50px; margin-top: 14px; padding: 10px 14px; color: #3f4d62; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-muted); }
+.stock-preview span, .stock-preview strong, .stock-preview small { display: block; }
+.stock-preview span { color: var(--muted); font-size: 11px; font-weight: 700; }
+.stock-preview strong { margin: 1px 0; color: var(--navy-950); font-size: 18px; }
+.stock-preview small { color: #53616f; font-size: 11px; }
+.stock-preview.warning { color: var(--orange-600); background: var(--orange-100); }
+.stock-preview.error { color: var(--red-600); background: var(--red-100); }
+
+.selection-card { width: 100%; margin-bottom: 9px; padding: 12px; color: inherit; text-align: left; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-muted); }
+.selection-card:not(:disabled):hover { border-color: #b3c0d6; background: var(--surface-selected); }
+.selection-card:disabled { cursor: default; opacity: .7; }
+.selection-card span, .inventory-card span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 11px; font-weight: 600; }
+.selection-card strong { display: block; color: var(--navy-950); font-size: 15px; }
+.selection-card small { color: var(--muted); }
+.inventory-card { margin: 14px 0 18px; padding: 15px 16px; color: var(--ink); border: 1px solid var(--line); border-radius: 7px; background: var(--surface-selected); }
+.inventory-card span, .inventory-card small { color: var(--muted); }
+.inventory-card strong { display: block; margin: 2px 0; color: var(--navy-950); font-size: 27px; font-weight: 700; }
+.context-panel h2, #recent-operations h3 { margin: 0 0 12px; color: var(--navy-950); font-size: 15px; }
+.recent-row { display: grid; width: 100%; grid-template-columns: auto minmax(0, 1fr) auto 16px; gap: 9px; align-items: center; padding: 10px 2px; color: inherit; text-align: left; border: 0; border-top: 1px solid var(--line-soft); background: transparent; }
+.recent-row:first-of-type { border-top: 0; }
+.recent-row:hover { background: var(--surface-muted); }
+.recent-badge { min-width: 38px; padding: 2px 6px; color: var(--green-700); text-align: center; border-radius: 4px; background: var(--green-100); font-size: 11px; font-weight: 700; }
+/* 出庫(OUT)の意味色はアプリ全体で単一の --orange-600 に統一する（凡例・状態・推移と同色）。
+   旧 #9a4a16 は同義なのに別トーンで、同じ状態が2色に見える不整合だった。 */
+.recent-badge.out { color: var(--orange-600); background: var(--orange-100); }
+.recent-row strong, .recent-row small { display: block; }
+.recent-row small, .recent-row time { color: var(--muted); font-size: 11px; }
+.empty-compact { padding: 12px 0; color: var(--muted); font-size: 12px; }
+
+.review-list { display: grid; grid-template-columns: 1fr 1fr; margin: 0; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.review-list div { padding: 14px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.review-list div:nth-child(even) { border-right: 0; }
+.review-list div:nth-last-child(-n+2) { border-bottom: 0; }
+.review-list dt { color: var(--muted); font-size: 11px; }
+.review-list dd { margin: 3px 0 0; color: var(--navy-950); font-weight: 600; }
+.notice-box { display: flex; align-items: flex-start; gap: 9px; margin-top: 18px; padding: 12px 13px; color: var(--green-700); border: 1px solid #cfe0d6; border-radius: 6px; background: var(--green-100); }
+.notice-box p { margin: 0; font-size: 12px; }
+
+.dashboard-actions { display: flex; align-items: center; gap: 10px; }
+.interaction-note { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; font-weight: 600; }
+.interaction-note .ui-icon { width: 15px; height: 15px; color: var(--teal-700); }
+.kpi-grid { display: grid; min-width: 0; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+.kpi-card { position: relative; overflow: hidden; padding: 13px 14px 11px; color: inherit; text-align: left; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); transition: border-color .15s ease, box-shadow .15s ease; }
+/* ホバーは枠色の変化だけの控えめな反応にする。浮き上がり（影の拡張・translateY）は
+   派手すぎて業務アプリの落ち着いたトーンから外れるため用いない。 */
+.kpi-card:hover, .kpi-card:focus-visible { border-color: var(--line-strong); box-shadow: var(--shadow); }
+.kpi-card span { color: var(--muted); font-size: 11px; font-weight: 600; }
+.kpi-card strong { display: block; margin: 5px 0 2px; color: var(--navy-950); font-size: 26px; line-height: 1.1; }
+.kpi-card small { color: var(--green-700); }
+.kpi-card.alert small, .kpi-card.alert strong { color: var(--red-600); }
+.kpi-footer { display: flex; align-items: center; justify-content: space-between; }
+.drill-icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.kpi-footer .drill-icon { color: #8b96a4; }
+/* 上部ツールバー: 左に横断検索、右にWorkflow起動ボタン。どちらもリファレンスとして重要な機能を、
+   目に付く上部へ独立配置する。狭幅では自然に折り返す。 */
+.dashboard-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 12px; }
+.dashboard-search-wrap { flex: 1 1 260px; min-width: 0; }
+.dashboard-toolbar .search-wrap { margin-bottom: 0; } /* 通常の検索欄は下マージンを持つが、ツールバー内では詰める。 */
+.toolbar-workflow { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.toolbar-workflow-hint { max-width: 230px; color: var(--muted); font-size: 11px; line-height: 1.4; text-align: right; }
+.toolbar-workflow .secondary-button { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 6px; white-space: nowrap; }
+/* ダッシュボードは「上段=品目別在庫・7日間の入出庫・在庫不足」「下段=ロケーション別・滞留」の
+   2行に分ける。各行は auto-fit で列数を自動調整する。カード高さは JS(equalizeDashboardRows)で
+   「その行で最も低いカード」に揃え、高いカードは中身(.dash-scroll)だけを内部縦スクロールにする。
+   見出し・凡例・ページャはスクロール枠の外に固定表示し（改ページボタンは常に見える）、低いカードを
+   基準にするので揃えても低いカード下に余白が残らない（高い方へ揃える stretch で生じた空白を解消）。
+   横に並びきらず折り返す狭い画面では JS が各カードを自然高のままにする（align-items:start が既定）。 */
+.dashboard-grid { display: grid; min-width: 0; gap: 10px; }
+.dashboard-row { display: grid; min-width: 0; align-items: start; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+/* 各カードを縦フレックスにし、見出し→(凡例)→スクロール枠→ページャの順で積む。overflow:hidden で
+   はみ出しを枠内へ閉じ、実スクロールは .dash-scroll だけが担う。既定の子は縮ませない（flex:0 0 auto）。
+   min-height は、不足0件などで空表示のカードが極端に低くなり行全体が潰れるのを防ぐ最小の床。 */
+.dashboard-row > .panel { display: flex; min-height: 200px; flex-direction: column; overflow: hidden; }
+.dashboard-row > .panel > * { flex: 0 0 auto; }
+/* パネル内で縦に伸びる中身だけをスクロール枠にする。min-height:0 が無いとフレックス子が縮まず
+   スクロールが効かない（既知の落とし穴）。ページャはこの枠の外にあるため常に見える。 */
+.dashboard-row > .panel > .dash-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+/* 内部スクロールバーは細く淡い色にして上品・地味に保つ。 */
+.dash-scroll { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+.dash-scroll::-webkit-scrollbar { width: 7px; }
+.dash-scroll::-webkit-scrollbar-thumb { border-radius: 4px; background: var(--line-strong); }
+.chart-panel, .shortage-panel, .dormant-panel, .ai-note-panel { min-height: 0; padding: 14px 15px; }
+.panel-action-hint { align-self: center; color: var(--teal-700); font-size: 11px; font-weight: 700; white-space: nowrap; }
+.panel-action-hint::after { margin-left: 4px; content: "›"; }
+.bar-chart { display: grid; gap: 5px; }
+.bar-row { display: grid; width: 100%; min-width: 0; grid-template-columns: minmax(92px, 120px) minmax(0, 1fr) 52px 14px; align-items: center; gap: 9px; min-height: 34px; padding: 4px 5px; color: inherit; text-align: left; border: 0; border-radius: 5px; background: transparent; }
+.bar-row:hover, .bar-row:focus-visible { background: var(--surface-muted); }
+.bar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #47586f; font-size: 11px; }
+/* 罫・トラックの淡色は一点物の #e6eaf3 をやめ、--line-soft に寄せて線トーンを一括調整可能にする。 */
+.bar-track { height: 9px; overflow: hidden; border-radius: 3px; background: var(--line-soft); }
+.bar-track span { display: block; height: 100%; border-radius: inherit; background: var(--navy-800); }
+.bar-row b { color: var(--navy-900); text-align: right; }
+.chart-legend { display: flex; justify-content: flex-end; gap: 12px; margin: -4px 0 2px; color: var(--muted); font-size: 11px; }
+.chart-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.chart-legend i { width: 8px; height: 8px; border-radius: 2px; background: var(--navy-800); }
+.chart-legend i.legend-out { background: var(--orange-600); }
+.trend-chart { display: flex; min-width: 0; align-items: flex-end; justify-content: space-around; gap: 5px; min-height: 166px; overflow: hidden; padding-top: 5px; border-bottom: 1px solid var(--line); }
+.trend-column { display: flex; min-width: 0; min-height: 160px; flex: 1; flex-direction: column; align-items: center; justify-content: flex-end; padding: 4px 2px 0; color: inherit; border: 0; border-radius: 5px 5px 0 0; background: transparent; }
+.trend-column:hover, .trend-column:focus-visible { background: var(--surface-muted); }
+.trend-bars { display: flex; align-items: flex-end; gap: 3px; height: 128px; }
+.trend-bars span { display: block; width: clamp(7px, 1.8vw, 15px); min-height: 2px; border-radius: 2px 2px 0 0; background: var(--navy-800); }
+.trend-bars span.out { background: var(--orange-600); }
+.trend-column small { margin-top: 7px; color: var(--muted); font-size: 11px; }
+.shortage-row, .dormant-row { display: grid; width: 100%; grid-template-columns: minmax(0, 1fr) auto 14px; align-items: center; gap: 10px; padding: 9px 4px; color: inherit; text-align: left; border: 0; border-top: 1px solid var(--line-soft); background: transparent; }
+.shortage-row:first-child, .dormant-row:first-child { border-top: 0; }
+.shortage-row:hover, .shortage-row:focus-visible, .dormant-row:hover, .dormant-row:focus-visible { background: var(--surface-muted); }
+.shortage-row strong, .shortage-row small, .dormant-row strong, .dormant-row small { display: block; }
+.shortage-row small, .dormant-row small { color: var(--muted); }
+.shortage-qty { color: var(--red-600); text-align: right; font-weight: 700; }
+.status-pill { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.status-pill.shortage, .status-pill.failed { color: var(--red-600); background: var(--red-100); }
+.status-pill.sent, .status-pill.recovery { color: var(--green-700); background: var(--green-100); }
+.status-pill.pending { color: var(--orange-600); background: var(--orange-100); }
+
+.filter-panel { display: grid; grid-template-columns: 2fr 1fr auto auto; align-items: end; gap: 10px; margin-bottom: 12px; padding: 12px; }
+.filter-panel label { color: var(--muted); font-size: 11px; font-weight: 700; }
+.filter-panel input, .filter-panel select { margin-top: 5px; }
+/* 履歴・マスタを1画面へ統合した統合タブ列。取引・通知・（管理者のみ）品目・ロケーション・基準在庫。 */
+.record-tabs { display: flex; gap: 2px; margin-bottom: -1px; padding-left: 8px; }
+.record-tab { min-width: 88px; padding: 9px 14px; color: var(--muted); border: 1px solid transparent; border-radius: 6px 6px 0 0; background: transparent; font-weight: 600; }
+.record-tab.active { position: relative; z-index: 2; color: var(--teal-700); border-color: var(--line); border-bottom-color: #fff; background: #fff; }
+/* filter-panel(grid)・master-detail(grid) は作者スタイルの display 指定が [hidden] を打ち消すため、
+   タブ切替で hidden にしても隠れない。属性セレクタで明示的に隠す（app.js の setRecordTab と対）。 */
+.filter-panel[hidden], .master-detail[hidden] { display: none; }
+.table-panel { overflow: hidden; border-radius: var(--radius); }
+.table-caption { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px; color: var(--muted); border-bottom: 1px solid var(--line); background: var(--surface-muted); font-size: 11px; }
+.table-caption span { display: inline-flex; align-items: center; gap: 6px; }
+.table-caption .ui-icon { width: 14px; height: 14px; color: var(--teal-700); }
+.table-caption strong { color: var(--navy-900); }
+.table-scroll { width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+th, td { padding: 11px 13px; text-align: left; border-bottom: 1px solid var(--line-soft); }
+th { position: sticky; top: 0; color: #5c6874; background: #f3f6fc; font-size: 11px; letter-spacing: .03em; }
+td { color: #354860; font-size: 12px; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--surface-muted); }
+.drilldown-row { cursor: pointer; }
+/* マウス選択時の面ハイライトのみ担う。キーボード操作の輪郭は淡い半透明リングで
+   潰さず、共通の :focus-visible（不透明アクセント青 2px）に委ねる（WCAG 2.4.7）。 */
+.drilldown-row:focus { background: var(--surface-selected); }
+.drill-cell { width: 34px; color: var(--teal-700); text-align: center; }
+
+.master-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+/* 種別タブで非表示にした入力群は、display:grid が [hidden] 属性の既定 display:none を
+   上書きしてしまい全種別が同時に見えてしまう。属性セレクタで明示的に隠す。 */
+.master-fields[hidden] { display: none; }
+.master-fields label { display: flex; flex-direction: column; gap: 5px; color: var(--muted); font-size: 11px; font-weight: 700; }
+/* 一覧は md-list パネル内に収めるため上マージンは持たせない（詳細ペインと左右で揃える）。 */
+/* 取引・通知の .table-scroll と同じく、この要素自身が表のスクロール枠になる（縦は .md-list の
+   ルールで、横は min-width:480px の表がはみ出す狭幅時のために overflow-x:auto を明示）。 */
+.master-list { margin: 0; overflow-x: auto; }
+.master-table { min-width: 480px; }
+.master-status { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.master-status.active { color: var(--navy-900); background: var(--teal-100); }
+.master-status.inactive { color: var(--muted); background: var(--surface-muted); }
+.master-row-inactive td { color: var(--muted); }
+/* 右ペインの編集フォーム。入力群・注記・操作ボタンを縦に積み、詳細ペインの余白に合わせる。 */
+#master-form { display: flex; flex-direction: column; gap: 16px; }
+#master-form .button-row { margin-top: 4px; justify-content: flex-end; }
+/* 削除は不可逆な破壊的操作なので左端に分離し、保存を右端に置く。 */
+#master-form .button-row #master-delete { margin-right: auto; }
+/* 有効/停止トグル。編集時のみ表示し、可逆な状態変更であることを控えめに示す。 */
+.master-active-toggle { display: flex; align-items: flex-start; gap: 9px; margin: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-muted); font-size: 12px; line-height: 1.5; color: var(--ink); cursor: pointer; }
+/* 作者側 display:flex は UA の [hidden]{display:none} を打ち消すため、hidden 属性で隠すには
+   セレクタと対で display:none を明示する必要がある。新規登録時に状態トグルが出続ける不具合を防ぐ。 */
+.master-active-toggle[hidden] { display: none; }
+/* チェックボックスの塗り色は操作アクセントの青緑（teal-700）で統一する。以前は別パレット由来の
+   未定義トークン（--primary/--text）を参照しており、accent-color が端末既定色へ落ちて配色から外れていた。 */
+.master-active-toggle input { margin: 1px 0 0; width: 15px; height: 15px; accent-color: var(--teal-700); flex: none; cursor: pointer; }
+.master-note { margin: 0; padding: 9px 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; background: var(--surface-muted); font-size: 11px; line-height: 1.55; }
+.secondary-button.danger { color: var(--red-600); border-color: #e9aaaa; }
+/* 一覧上部のキャプション右側。件数と新規登録ボタンをまとめる。 */
+.caption-actions { display: inline-flex; align-items: center; gap: 10px; }
+.caption-button { min-height: 28px; padding: 4px 12px; font-size: 11px; }
+
+.mobile-nav {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 35;
+  display: none;
+  align-items: center;
+  justify-content: space-around;
+  min-height: 66px;
+  padding: 5px max(5px, env(safe-area-inset-right)) max(5px, env(safe-area-inset-bottom)) max(5px, env(safe-area-inset-left));
+  border-top: 1px solid var(--line);
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 -4px 18px rgba(20, 42, 55, .08);
+}
+.mobile-nav .nav-item { display: flex; flex: 1; flex-direction: column; gap: 0; min-width: 62px; min-height: 52px; padding: 4px; font-size: 11px; }
+.mobile-nav .nav-item .nav-icon { width: 18px; height: 18px; }
+.mobile-nav .nav-item.active { background: transparent; box-shadow: none; }
+.modal { width: min(92vw, 560px); max-height: calc(var(--app-viewport-height) - 24px); padding: 0; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 20px 55px rgba(9, 27, 39, .28); }
+.modal::backdrop { background: rgba(9, 25, 37, .65); backdrop-filter: blur(2px); }
+.modal-card { max-height: inherit; overflow-y: auto; overscroll-behavior: contain; padding: 24px; }
+.modal-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 18px; }
+.scanner-modal .modal-heading { position: sticky; z-index: 3; top: 0; padding-bottom: 10px; background: #fff; }
+.modal-heading h2 { margin: 2px 0 0; color: var(--navy-950); }
+.close-button { width: 38px; height: 38px; color: #52616f; border: 1px solid var(--line); border-radius: 6px; background: #fff; font-size: 22px; }
+.camera-frame { position: relative; min-height: 290px; overflow: hidden; border-radius: 8px; background: var(--navy-950); }
+.camera-frame video { width: 100%; min-height: 290px; object-fit: cover; pointer-events: none; }
+.camera-frame > p { position: absolute; right: 12px; bottom: 9px; left: 12px; margin: 0; padding: 7px; color: #fff; text-align: center; border-radius: 7px; background: rgba(8, 23, 34, .75); font-size: 11px; }
+.scanner-guide { position: absolute; top: 50%; left: 50%; width: min(62%, 240px); aspect-ratio: 1; border: 2px solid rgba(255,255,255,.85); border-radius: 16px; transform: translate(-50%, -50%); box-shadow: 0 0 0 1000px rgba(4,16,25,.24); }
+.scanner-guide::before { position: absolute; top: 50%; right: 8px; left: 8px; height: 2px; content: ""; background: #7fb0e6; box-shadow: 0 0 9px #7fb0e6; animation: scan 1.8s infinite ease-in-out; }
+@keyframes scan { 0%, 100% { transform: translateY(-80px); } 50% { transform: translateY(80px); } }
+/* iPhoneのDomo Mobile（WKWebView）はホスト側のallowsInlineMediaPlaybackがfalseのため、
+   getUserMediaのライブ映像を必ず全画面化する。これはWeb側の属性では抑止できないので、
+   その端末では端末カメラで1枚撮影して戻る導線（capture）へ切り替える。camera-frame内の
+   中央CTAとして提示し、撮影後は既存の画像デコード経路で解析する。 */
+.camera-capture-cta { position: absolute; top: 50%; left: 50%; z-index: 1; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 12px 22px; color: #fff; border: 1px solid rgba(255, 255, 255, .55); border-radius: 999px; background: rgba(43, 86, 156, .94); font-size: 13px; font-weight: 600; transform: translate(-50%, -50%); box-shadow: 0 6px 18px rgba(8, 23, 34, .35); }
+.camera-capture-cta:hover { background: var(--navy-900); }
+.camera-capture-cta:focus-visible { outline: 3px solid rgba(255, 255, 255, .85); outline-offset: 2px; }
+.scanner-modal.capture-mode .scanner-guide { display: none; }
+.scanner-modal.capture-mode #scanner-video { visibility: hidden; }
+.scanner-modal.capture-mode .camera-frame { min-height: 200px; }
+.scanner-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: center; gap: 8px 12px; margin-top: 12px; padding: 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-muted); }
+.scanner-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.scanner-actions [hidden] { display: none; }
+.scanner-actions span { grid-column: 1 / -1; color: var(--muted); font-size: 11px; line-height: 1.45; }
+.manual-entry { margin-top: 17px; }
+.manual-entry > div { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.manual-entry button { min-width: 76px; color: #fff; border: 0; border-radius: 6px; background: var(--navy-900); font-weight: 600; }
+
+/* 明細はモーダル（スライダー）を廃止し、履歴ビュー内の左=一覧・右=明細のマスター詳細に統合する。 */
+.master-detail { display: grid; min-width: 0; grid-template-columns: minmax(0, 1.4fr) minmax(300px, .9fr); align-items: start; gap: 12px; }
+.md-list { display: flex; min-width: 0; min-height: 280px; max-height: calc(var(--app-viewport-height) - 88px); flex-direction: column; overflow: hidden; }
+/* 左の一覧ペインを右の明細ペインと同じ高さ枠に収め、2ペインの丈を揃える（縦の間延びと
+   左右の不均衡を解消する）。見出し(caption)と下部ページャは固定し、中央の一覧だけが内部
+   スクロールする。表ヘッダは既存の position:sticky で追従するため、行を送っても列名が残る。 */
+.md-list .table-caption { flex: 0 0 auto; }
+.md-list .table-scroll, .md-list .master-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.md-list .pager { flex: 0 0 auto; }
+/* ページ送り: 一覧の下に「前へ / レンジ表示 / 次へ」を静かに置く。display:flex は UA の
+   [hidden]{display:none} を打ち消すため、非表示用の対を必ず併記する（既知の落とし穴）。 */
+.pager { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 10px 12px; border-top: 1px solid var(--line); background: var(--surface-muted); }
+.pager[hidden] { display: none; }
+.pager-btn { min-height: 30px; padding: 5px 14px; color: var(--navy-900); border: 1px solid var(--line-strong); border-radius: 6px; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; }
+.pager-btn:hover:not(:disabled) { border-color: #b2bcd2; background: #fff; }
+.pager-btn:disabled { color: var(--muted); border-color: var(--line); background: var(--surface-muted); cursor: default; opacity: .6; }
+.pager-status { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* パネル内フッターに置く軽量ページャー。表全体を囲む .pager と違い、パネルの縦伸びを
+   抑えるため余白と装飾を最小化し（枠線は淡く・背景は透過）、ボタンも一回り小さくする。 */
+.pager-compact { gap: 8px; margin-top: 10px; padding: 8px 2px 0; border-top: 1px solid var(--line-soft); background: transparent; }
+.pager-compact .pager-btn { min-height: 28px; padding: 4px 11px; font-size: 11px; }
+.md-detail { display: flex; min-height: 280px; max-height: calc(var(--app-viewport-height) - 88px); flex-direction: column; min-width: 0; padding: 0; overflow: hidden; }
+.detail-pane-heading { flex: 0 0 auto; padding: 16px 18px 13px; border-bottom: 1px solid var(--line); background: var(--surface-muted); }
+.detail-pane-heading h2 { margin: 3px 0 2px; color: var(--navy-950); font-size: 18px; line-height: 1.35; }
+.detail-pane-heading h2:focus-visible { outline: none; }
+.detail-pane-heading p { margin: 0; color: var(--muted); font-size: 11px; }
+.detail-content { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px 18px 20px; }
+.detail-placeholder { display: grid; height: 100%; min-height: 180px; place-items: center; padding: 24px; color: var(--muted); text-align: center; font-size: 12px; line-height: 1.6; }
+/* ダッシュボード・入出庫のドリルダウンを、右から滑り込むスライドイン・ドロワーで表示する。 */
+/* 以前の「本文先頭へ割り込む上部カード＋×」は画面が飛ぶUXが不評だったため、面として静かに */
+/* 重ねる形へ改めた。履歴ビューの2ペイン（#detail-pane）とは別系統で、一覧を持たないビューで使う。 */
+.drawer-backdrop { position: fixed; inset: 0; z-index: 60; background: rgba(9, 25, 37, .42); opacity: 0; transition: opacity .22s ease; }
+.drawer-backdrop[hidden] { display: none; }
+.drawer-backdrop.is-open { opacity: 1; }
+.context-detail.drawer {
+  position: fixed; top: 0; right: 0; z-index: 61;
+  display: flex; flex-direction: column;
+  width: min(460px, 100vw); max-width: 100vw; height: var(--app-viewport-height, 100%);
+  margin: 0; padding: 0; overflow: hidden;
+  background: var(--surface, #fff);
+  border-left: 1px solid var(--line);
+  box-shadow: -18px 0 48px rgba(9, 27, 39, .20);
+  transform: translateX(100%);
+  transition: transform .24s cubic-bezier(.4, 0, .2, 1);
+  will-change: transform;
+}
+.context-detail.drawer[hidden] { display: none; }
+.context-detail.drawer.is-open { transform: translateX(0); }
+.context-detail-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.context-detail-heading-text { min-width: 0; }
+.context-detail .detail-content { flex: 1 1 auto; max-height: none; }
+/* ドロワー表示中は背面の本文スクロールを固定し、面への集中を保つ。 */
+body.drawer-open main { overflow: hidden; }
+/* 「履歴で詳しく見る」はユーザー操作の任意導線。条件があるときだけ出し、遷移は強制しない。 */
+.context-detail-more { flex: 0 0 auto; margin: 0 18px 16px; }
+.context-detail-more[hidden] { display: none; }
+/* 動きを抑える設定の端末ではスライドを無効化し、そのまま面を提示する。 */
+@media (prefers-reduced-motion: reduce) {
+  .context-detail.drawer, .drawer-backdrop { transition: none; }
+}
+/*
+  スクロール・支援技術のためだけにプログラム的にフォーカスする非操作要素（ビュー枠・本文コンテナ・
+  インライン詳細見出し）には、青い選択枠を出さない。tabindex=-1 でタブ順には入らず、キーボード操作の
+  起点は各ボタン側で既に可視化されるため、全幅の枠はデザイン上のノイズになる（枠残り＝詰めの甘さ）。
+*/
+.view:focus-visible, #main-content:focus-visible, #context-detail-title:focus-visible { outline: none; }
+/* マスター側で選択中の行を強調表示する（カレント表示）。 */
+.drilldown-row.is-selected { background: var(--surface-selected); }
+.drilldown-row.is-selected td { color: var(--navy-950); font-weight: 600; }
+/* 明細の数値ブロック。複数の独立指標（件数・数量計など）を、1枚のカードを内側の細罫線で
+   仕切って静かに並べる。以前の「枠付きの箱を3つ並べる」表現は重く事務的だったため改めた。 */
+.detail-stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+.detail-stat-grid > div { padding: 12px 14px; border-left: 1px solid var(--line); }
+.detail-stat-grid > div:first-child { border-left: 0; }
+.detail-stat-grid span { display: block; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; }
+.detail-stat-grid strong { display: block; margin-top: 4px; color: var(--navy-950); font-size: 18px; font-weight: 600; }
+
+/* 取引明細の主役。登録前→登録後の在庫の流れと増減量を、KPI箱ではなく静かな1本の帯で示す。
+   種別バッジ・矢印・増減量だけに絞り、枠や色数を抑えて品のある見え方にする。 */
+.balance-flow { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-muted); }
+.balance-flow-badge { flex: none; padding: 3px 11px; color: var(--green-700); border-radius: 999px; background: var(--green-100); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+.balance-flow-badge.out { color: var(--orange-600); background: var(--orange-100); }
+.balance-flow-track { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.balance-flow-node { display: flex; min-width: 0; flex-direction: column; gap: 1px; }
+.balance-flow-node small { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; }
+.balance-flow-node strong { color: var(--navy-950); font-size: 22px; font-weight: 600; line-height: 1.1; }
+.balance-flow-node.is-after strong { color: var(--teal-700); }
+.balance-flow-arrow { width: 15px; height: 15px; margin-top: 8px; flex: none; align-self: center; fill: none; stroke: var(--line-strong); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.balance-flow-delta { margin-left: auto; flex: none; color: var(--green-700); font-size: 15px; font-weight: 700; }
+.balance-flow-delta.out { color: var(--orange-600); }
+
+.detail-section { margin-top: 20px; }
+/* セクション見出しは声高な太字ではなく、静かなラベルにする。 */
+.detail-section h3 { margin: 0 0 9px; color: var(--navy-950); font-size: 12px; font-weight: 700; letter-spacing: .02em; line-height: 1.25; }
+.detail-table-wrap { max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+.detail-table { min-width: 440px; white-space: nowrap; }
+.detail-table th, .detail-table td { padding: 9px 11px; }
+.detail-table th { position: static; color: var(--muted); background: var(--surface-muted); font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.detail-table td { color: var(--ink); }
+
+/* 定義リストは「グレーのラベル列＋総罫線」の帳票的な見た目をやめ、細い横罫線と静かなラベルだけにする。 */
+.detail-definition { margin: 0; }
+.detail-definition div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 9px 2px; border-top: 1px solid var(--line); }
+.detail-definition div:first-child { border-top: 0; padding-top: 2px; }
+.detail-definition dt { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .02em; }
+.detail-definition dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; white-space: pre-wrap; }
+
+/* AI在庫コメント: 生成AIタイルの要約を、主張しすぎない淡い青系のカードで静かに見せる。
+   不足の品目だけ左罫と淡いオレンジで軽く強調し、要対応であることに気づけるようにする。 */
+.ai-note-tag { padding: 3px 10px; color: var(--teal-700); border: 1px solid var(--teal-100); border-radius: 999px; background: var(--surface-muted); font-size: 11px; font-weight: 700; letter-spacing: .02em; white-space: nowrap; }
+.ai-note-cards { display: flex; flex-direction: column; gap: 9px; margin: 0; padding: 0; list-style: none; }
+/* ダッシュボードの「AI在庫コメント」は全幅の横断バンドとして見せる。カードは auto-fit で横に並べ、
+   狭幅では段数が自動的に減って最終的に1列へ畳む。明細ドリルダウン内（.detail-* 配下）の同カードは
+   縦積みのまま残したいので、バンド固有の #ai-note-list 配下だけに横並びを適用する。 */
+#ai-note-list .ai-note-cards { display: grid; align-items: start; gap: 9px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+/* バンドは次の分析グリッドとの間に軽い余白を持たせる（.panel 自体は既定マージンを持たないため）。 */
+.ai-note-panel { margin-bottom: 10px; }
+.ai-note { padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-muted); }
+.ai-note.is-shortage { background: var(--orange-100); }
+.ai-note-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 5px; }
+.ai-note-head strong { color: var(--navy-950); font-size: 13px; }
+.ai-note-head small { color: var(--muted); font-size: 11px; }
+/* 見出し右の品目コードチップ。等幅数字で並びを揃え、名称と静かに区別する。 */
+.ai-note-code { color: var(--muted); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+.ai-note-badge { padding: 1px 6px; color: #fff; border-radius: 4px; background: var(--teal-700); font-size: 11px; font-weight: 700; letter-spacing: .06em; }
+.ai-note.is-shortage .ai-note-badge { background: var(--orange-600); }
+/* 所在行「ロケーション名（コード）」＋他拠点チップ。どの記録の要約か一目で分かるようにする。 */
+.ai-note-loc { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 8px; margin: 0 0 6px; color: var(--navy-900); font-size: 11px; font-weight: 600; }
+.ai-note-extra { padding: 1px 7px; color: var(--teal-700); border: 1px solid var(--teal-100); border-radius: 999px; background: var(--surface); font-size: 11px; font-weight: 700; }
+.ai-note.is-shortage .ai-note-extra { color: var(--orange-600); border-color: var(--orange-100); }
+.ai-note-body { margin: 0; color: var(--ink); font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; white-space: pre-wrap; }
+.ai-note-more { margin: 9px 0 0; color: var(--muted); font-size: 11px; text-align: right; }
+
+/* 参照値（各種ID）は主役情報の下に控えめな等幅で。破線区切りで「補足」であることを示す。 */
+.detail-meta { display: grid; gap: 6px; margin: 14px 0 0; padding-top: 11px; border-top: 1px dashed var(--line); }
+.detail-meta div { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 12px; align-items: baseline; }
+.detail-meta dt { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.detail-meta dd { margin: 0; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; overflow-wrap: anywhere; }
+.chart-tooltip { position: fixed; z-index: 120; width: max-content; max-width: min(280px, calc(100vw - 16px)); padding: 10px 12px; pointer-events: none; color: #fff; border: 1px solid rgba(255,255,255,.12); border-radius: 6px; background: rgba(20, 40, 50, .96); box-shadow: 0 8px 24px rgba(9, 27, 39, .22); }
+.chart-tooltip[hidden] { display: none; }
+.chart-tooltip strong, .chart-tooltip span, .chart-tooltip small { display: block; }
+.chart-tooltip strong { font-size: 12px; }
+.chart-tooltip span { margin-top: 2px; color: #e3e9f3; font-size: 11px; }
+.chart-tooltip small { margin-top: 5px; color: #a9c3e6; font-size: 11px; }
+
+.toast-region { position: fixed; right: 20px; bottom: 20px; z-index: 100; display: grid; gap: 9px; width: min(390px, calc(100vw - 40px)); }
+.toast { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; padding: 12px 14px; color: #fff; border-radius: 7px; background: var(--navy-950); box-shadow: var(--shadow-raised); animation: toast-in .22s ease-out; }
+.toast.success { background: #276b4e; }
+.toast.error { background: #9c3030; }
+/* 閉じるボタンは装飾グリフ1字でも 24×24 の最小ターゲットを確保する（WCAG 2.5.8）。 */
+.toast button { display: grid; place-items: center; min-width: 24px; min-height: 24px; color: inherit; border: 0; background: transparent; cursor: pointer; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+.loading-overlay { position: fixed; inset: 0; z-index: 90; display: grid; place-content: center; justify-items: center; color: #fff; background: rgba(9, 25, 37, .65); }
+.loading-overlay[hidden] { display: none; }
+.spinner { width: 42px; height: 42px; border: 4px solid rgba(255,255,255,.25); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.boot-message { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 auto 16px; padding: 13px 15px; color: var(--red-600); border: 1px solid #e3bcbc; border-radius: 8px; background: var(--red-100); }
+.boot-message[hidden] { display: none; }
+.boot-message strong { display: block; margin-bottom: 2px; }
+.boot-message p { margin: 0; color: var(--red-600); font-size: 11px; }
+.boot-message button { flex: 0 0 auto; }
+
+/* Domo Mobile（WKWebView）ではApp Studioが Pro Code iframe を固定高のカード内に収める。
+   その iframe 高にシェル全体を合わせ、縦スクロールの担い手を `main` 1つに絞る。
+   ヘッダー・ナビゲーションはスクロール領域の外に置き、入出庫フォームに重ならないようにする。 */
+html[data-domo-platform="mobile"],
+html[data-domo-platform="mobile"] body {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+html[data-domo-platform="mobile"] body { padding-bottom: 0; }
+html[data-domo-platform="mobile"] .app-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+html[data-domo-platform="mobile"] .brand small,
+html[data-domo-platform="mobile"] .sync-status,
+html[data-domo-platform="mobile"] #user-name { display: none; }
+html[data-domo-platform="mobile"] .user-chip { padding-right: 5px; }
+html[data-domo-platform="mobile"] .sidebar { display: none; }
+html[data-domo-platform="mobile"] .topbar { position: static; inset: auto; flex: 0 0 var(--header); }
+html[data-domo-platform="mobile"] main {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+  touch-action: pan-y pinch-zoom;
+  scroll-padding-top: 14px;
+  padding-top: 14px;
+  padding-right: max(18px, env(safe-area-inset-right));
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+  padding-left: max(18px, env(safe-area-inset-left));
+}
+html[data-domo-platform="mobile"] .toast-region { bottom: 10px; }
+
+/* ハンディ端末を想定したスマホアプリの操作系。品のある小綺麗さは保ちつつ、
+   タイル状の大きめタッチ領域と大きめの文字にして、現場での片手操作をしやすくする。
+   機能はコアの入出庫に絞り込む（マスタ編集はJS側で非表示）。 */
+html[data-domo-platform="mobile"] main { font-size: 15px; }
+html[data-domo-platform="mobile"] .page-heading h1 { font-size: clamp(24px, 6vw, 30px); }
+html[data-domo-platform="mobile"] .page-heading p { font-size: 14px; }
+
+/* 上部タブをタイル状の大きなボタンにする（管理を隠すと3枚が均等に並ぶ）。 */
+html[data-domo-platform="mobile"] .mobile-nav {
+  position: static;
+  inset: auto;
+  display: flex;
+  flex: 0 0 auto;
+  min-height: 68px;
+  gap: 8px;
+  padding: 8px max(8px, env(safe-area-inset-right)) 8px max(8px, env(safe-area-inset-left));
+  border-top: 0;
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 3px 12px rgba(20, 42, 55, .07);
+}
+html[data-domo-platform="mobile"] .mobile-nav .nav-item {
+  flex: 1 1 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-height: 60px;
+  padding: 8px 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-muted);
+  font-size: 13px;
+}
+html[data-domo-platform="mobile"] .mobile-nav .nav-item .nav-icon { width: 24px; height: 24px; }
+html[data-domo-platform="mobile"] .mobile-nav .nav-item em { font-weight: 700; }
+html[data-domo-platform="mobile"] .mobile-nav .nav-item.active {
+  color: var(--navy-950);
+  background: var(--teal-100);
+}
+
+/* 主要ボタンとスキャンボタンを大きく、文字も大きく（角丸のタイル感）。 */
+html[data-domo-platform="mobile"] .scan-button,
+html[data-domo-platform="mobile"] .secondary-button,
+html[data-domo-platform="mobile"] .primary-button {
+  min-height: 54px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+html[data-domo-platform="mobile"] .primary-button { min-width: 100%; }
+html[data-domo-platform="mobile"] .button-row { gap: 10px; }
+html[data-domo-platform="mobile"] .button-row > button { flex: 1 1 0; min-width: 0; }
+
+/* 処理種別（入庫/出庫）も大きなタイルにする。 */
+html[data-domo-platform="mobile"] .type-button { min-height: 50px; min-width: 96px; border-radius: 10px; font-size: 16px; }
+
+/* 数量コントロールを大きく、片手で押しやすく。 */
+html[data-domo-platform="mobile"] .quantity-control { grid-template-columns: 64px minmax(120px, 1fr) 64px; gap: 12px; margin: 22px 0; }
+html[data-domo-platform="mobile"] .quantity-control button { height: 64px; font-size: 28px; }
+html[data-domo-platform="mobile"] .quantity-control input { height: 64px; font-size: 26px; }
+
+/* 候補一覧・選択カードを大きなタップ領域にする。 */
+html[data-domo-platform="mobile"] .option-button { min-height: 60px; padding: 12px 14px; font-size: 15px; }
+html[data-domo-platform="mobile"] .selection-card { min-height: 74px; }
+html[data-domo-platform="mobile"] .selection-card strong { font-size: 17px; }
+
+/* 見出し・現在庫の文字も少し大きく。 */
+html[data-domo-platform="mobile"] .panel-heading h2 { font-size: 19px; }
+html[data-domo-platform="mobile"] .step-status strong { font-size: 14px; }
+
+@media (min-width: 981px) {
+  :root { --header: 52px; --sidebar: 184px; }
+  body { font-size: 12.5px; }
+  .topbar { padding: 0 16px; }
+  .brand { gap: 9px; }
+  .brand-mark { width: 28px; height: 28px; }
+  .sidebar { padding: 12px 10px; }
+  .sidebar nav { gap: 2px; }
+  .nav-item { min-height: 38px; padding: 6px 9px; }
+  .sidebar-help { padding: 10px; }
+  main { padding: calc(var(--header) + 16px) calc(18px + var(--app-gutter)) 18px calc(var(--app-gutter) + var(--sidebar) + 36px); }
+  .view { max-width: 1680px; }
+  .page-heading { gap: 16px; margin-bottom: 10px; }
+  .page-heading h1 { margin-top: 0; font-size: 23px; }
+  .page-heading p:not(.eyebrow) { font-size: 11.5px; }
+  .type-button { min-width: 68px; min-height: 34px; }
+  .stepper { max-width: 580px; margin-bottom: 10px; }
+  .stepper button { min-height: 38px; }
+  .operation-grid { grid-template-columns: minmax(0, 1.8fr) minmax(300px, .62fr); gap: 12px; }
+  .workflow-panel { padding: 14px 18px 16px; }
+  .context-panel { top: calc(var(--header) + 14px); padding: 14px; }
+  .panel-heading { margin-bottom: 12px; padding-bottom: 9px; border-bottom: 1px solid var(--line-soft); }
+  .panel-heading h2 { font-size: 15px; }
+  .panel-heading p { font-size: 11px; }
+  input, select { min-height: 38px; }
+  .search-wrap { margin-bottom: 9px; }
+  .scan-button, .secondary-button, .primary-button { min-height: 36px; padding: 6px 12px; }
+  .option-list { gap: 5px; max-height: 224px; }
+  .option-button { grid-template-columns: 34px minmax(0, 1fr) auto; min-height: 48px; padding: 6px 9px; }
+  .option-icon { width: 32px; height: 28px; }
+  .option-meta { font-size: 11px; }
+  .button-row { margin-top: 14px; }
+  .back-button { margin-top: 14px; }
+  .quantity-control { margin: 13px 0; }
+  .stock-preview { margin-top: 10px; padding: 9px 12px; }
+  .selection-card { margin-bottom: 7px; padding: 9px 10px; }
+  .selection-card strong { font-size: 14px; }
+  .inventory-card { margin: 10px 0 12px; padding: 11px 13px; }
+  .inventory-card strong { font-size: 23px; }
+  .context-panel h2, #recent-operations h3 { margin-bottom: 9px; font-size: 14px; }
+  .recent-row { gap: 7px; padding: 7px 0; }
+  .review-list div { padding: 10px 12px; }
+  .notice-box { margin-top: 12px; padding: 9px 11px; }
+  .kpi-grid { gap: 10px; margin-bottom: 12px; }
+  .kpi-card { padding: 11px 13px 10px; }
+  .kpi-card strong { margin: 3px 0 1px; font-size: 22px; }
+  .dashboard-grid, .dashboard-row { gap: 10px; }
+  .chart-panel, .shortage-panel, .dormant-panel, .ai-note-panel { padding: 13px 14px; }
+  /* 品目別・場所別の横棒は行間を詰めても可読性が落ちないため、広い画面では
+     バー間隔を狭めてパネルの縦伸びを抑える（基準5pxに寄せた密度）。 */
+  .bar-chart { gap: 6px; }
+  .trend-chart { min-height: 160px; padding-top: 4px; }
+  .trend-column { min-height: 154px; }
+  .trend-bars { height: 122px; }
+  .shortage-row, .dormant-row { padding: 9px 0; }
+  .filter-panel { gap: 9px; margin-bottom: 10px; padding: 10px 12px; }
+  .record-tabs { margin-bottom: -1px; }
+  .record-tab { padding: 7px 12px; }
+  th, td { padding: 9px 11px; }
+}
+
+@media (min-width: 1200px) {
+  .option-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 980px) {
+  :root { --sidebar: 74px; }
+  .sidebar { padding: 18px 9px; }
+  .sidebar .nav-item { justify-content: center; padding: 8px; }
+  .sidebar .nav-item em, .sidebar-help { display: none; }
+  .operation-grid { grid-template-columns: minmax(0, 1fr) 280px; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .master-detail { grid-template-columns: 1fr; }
+  /* 1カラムに畳んだら左右ペインとも高さ枠を外し、内部スクロールを止めてページ全体の
+     縦スクロールに委ねる（スマホでの入れ子スクロールを避ける）。横は広い表のため auto を維持。 */
+  .md-detail { min-height: auto; max-height: none; }
+  .md-list { min-height: 0; max-height: none; }
+}
+
+@media (max-width: 767px) {
+  :root { --header: 56px; }
+  html, body { width: 100%; height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; }
+  body { padding: 0; }
+  .app-shell { display: flex; width: 100%; height: 100vh; height: 100dvh; min-height: 0; flex-direction: column; overflow: hidden; }
+  .topbar { position: static; inset: auto; flex: 0 0 var(--header); padding: 0 max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left)); }
+  .brand small, .sync-status, #user-name { display: none; }
+  .topbar-actions { gap: 7px; }
+  .user-chip { padding-right: 5px; }
+  .sidebar { display: none; }
+  main { flex: 1 1 auto; min-height: 0; height: auto; overflow-x: hidden; overflow-y: auto; overscroll-behavior-y: auto; touch-action: pan-y pinch-zoom; padding: 14px max(14px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); }
+  .page-heading { align-items: flex-start; flex-direction: column; gap: 14px; margin-bottom: 13px; }
+  .page-heading h1 { font-size: 24px; }
+  .page-heading-actions { width: 100%; flex-wrap: wrap; }
+  .page-heading-actions .segmented { flex: 1; }
+  .segmented { width: 100%; }
+  .type-button { flex: 1; }
+  .step-status { justify-content: flex-start; margin-bottom: 6px; }
+  .step-status span { font-size: 11px; }
+  .step-status strong { font-size: 13px; }
+  .stepper { margin-bottom: 12px; }
+  .stepper button { min-height: 44px; gap: 4px; padding: 4px; }
+  .stepper span { width: 21px; height: 21px; }
+  .stepper b { font-size: 0; }
+  .stepper b::after { content: attr(data-short); font-size: 11px; }
+  .operation-grid { grid-template-columns: 1fr; }
+  .workflow-panel { min-height: 0; padding: 20px 16px; }
+  .context-panel { position: static; order: -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 10px; }
+  .context-panel > h2, #recent-operations { display: none; }
+  .context-panel .selection-card { min-width: 0; min-height: 64px; margin: 0; padding: 8px 10px; }
+  .context-panel .selection-card strong, .context-panel .selection-card small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .inventory-card { grid-column: 1 / -1; margin: 0; padding: 10px 14px; }
+  .inventory-card strong { font-size: 25px; }
+  .panel-heading { align-items: flex-start; }
+  .scan-button { min-height: 44px; }
+  .option-button { min-height: 60px; }
+  /* スマホ縦向きでは候補リストの高さ上限を外し、自然な高さで積む。main が唯一のスクロール
+     担当のため、候補が多くてもページスクロールで全件へ届く（310px上限で末尾が切れ下に余白が
+     残る＝到達しづらい問題を解消）。横向きの低い画面は後段の landscape 規則が上限を再設定する。 */
+  .option-list { max-height: none; overflow: visible; }
+  .button-row > button { flex: 1; min-height: 50px; }
+  .review-list { grid-template-columns: 1fr; }
+  .review-list div { border-right: 0; }
+  .review-list div:nth-last-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .review-list div:last-child { border-bottom: 0; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .kpi-card { padding: 15px; }
+  .kpi-card strong { font-size: 24px; }
+  .dashboard-grid { gap: 13px; }
+  .chart-panel, .shortage-panel, .dormant-panel, .ai-note-panel { min-height: auto; padding: 17px; }
+  .bar-row { grid-template-columns: minmax(70px, 90px) minmax(0, 1fr) minmax(44px, auto) 14px; gap: 8px; }
+  .bar-label { font-size: 11px; }
+  .trend-bars span { width: clamp(7px, 3vw, 13px); }
+  .filter-panel { grid-template-columns: 1fr; }
+  .filter-panel > button { min-height: 44px; }
+  .master-fields { grid-template-columns: 1fr; }
+  .mobile-nav { position: static; inset: auto; display: flex; flex: 0 0 auto; }
+  .icon-button, .close-button, .record-tab { min-width: 44px; min-height: 44px; }
+  .modal { width: calc(100vw - 16px); max-height: calc(var(--app-viewport-height) - 16px); }
+  .modal-card { padding: 18px; }
+  .detail-pane-heading { padding: 14px 16px 11px; }
+  .detail-content { padding: 14px 16px 20px; }
+  .detail-definition div { grid-template-columns: 84px minmax(0, 1fr); gap: 10px; }
+  .detail-meta div { grid-template-columns: 76px minmax(0, 1fr); gap: 10px; }
+  .camera-frame, .camera-frame video { min-height: clamp(160px, 32vh, 240px); }
+  .scanner-actions { grid-template-columns: 1fr; }
+  .scanner-actions button { min-height: 48px; }
+  .toast-region { right: 10px; bottom: calc(78px + env(safe-area-inset-bottom)); width: calc(100vw - 20px); }
+}
+
+@media (max-width: 900px) and (max-height: 520px) {
+  body { padding-bottom: 0; }
+  /* 横向き（低い高さ）でも main をスクロール担当にするため、縦フレックス列に揃える。
+     display:flex/flex-direction:column が無いと固定高＋overflow:hidden で本文下部が切れて到達不能になる。 */
+  .app-shell { display: flex; flex-direction: column; height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; }
+  .topbar { position: static; inset: auto; }
+  .mobile-nav { position: static; inset: auto; min-height: 52px; padding-top: 4px; padding-bottom: 4px; border-top: 0; border-bottom: 1px solid var(--line); box-shadow: 0 3px 12px rgba(20, 42, 55, .07); }
+  .mobile-nav .nav-item { flex-direction: row; justify-content: center; gap: 6px; min-height: 44px; }
+  main { min-height: 0; overflow-y: auto; padding-top: 12px; }
+  .page-heading { margin-bottom: 12px; }
+  .page-heading p:not(.eyebrow) { display: none; }
+  .workflow-panel { padding-top: 16px; padding-bottom: 16px; }
+  .option-list { max-height: 180px; }
+  .camera-frame, .camera-frame video { min-height: 180px; }
+  .scanner-actions { grid-template-columns: auto minmax(0, 1fr); }
+  .scanner-actions button { min-height: 44px; }
+  /* 横向きスマホは画面が低いので、傾向グラフの高さを詰めて主要操作が
+     スクロールなしで収まるようにする（縦向き・PCより一段低い値）。 */
+  .trend-chart { min-height: 130px; }
+  /* 横向き（低い高さ）では傾向グラフを詰める。基底 .trend-column の min-height:160px を明示的に 0 へ
+     戻さないと height:124px が min-height に負けて効かず、想定より高いまま本文下部が切れる。 */
+  .trend-column { min-height: 0; height: 124px; }
+  .trend-bars { height: 96px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}

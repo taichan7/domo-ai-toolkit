@@ -1,0 +1,144 @@
+{
+  "_note": "Schema-only mirror (column names + types). No row data, previews, owners, or instance-specific column IDs. Schema-only mirror (not published).",
+  "_source": "maintenance-instance:api/query/v1/datasources/schema/indexed",
+  "column_count": 34,
+  "columns": [
+    {
+      "name": "損益記録ID",
+      "type": "STRING"
+    },
+    {
+      "name": "期間",
+      "type": "STRING"
+    },
+    {
+      "name": "月",
+      "type": "LONG"
+    },
+    {
+      "name": "年",
+      "type": "LONG"
+    },
+    {
+      "name": "四半期",
+      "type": "STRING"
+    },
+    {
+      "name": "会計年度",
+      "type": "LONG"
+    },
+    {
+      "name": "店舗ID",
+      "type": "STRING"
+    },
+    {
+      "name": "店舗名",
+      "type": "STRING"
+    },
+    {
+      "name": "都道府県",
+      "type": "STRING"
+    },
+    {
+      "name": "市区町村",
+      "type": "STRING"
+    },
+    {
+      "name": "郵便番号",
+      "type": "STRING"
+    },
+    {
+      "name": "地域",
+      "type": "STRING"
+    },
+    {
+      "name": "地域コード",
+      "type": "STRING"
+    },
+    {
+      "name": "勘定科目ID",
+      "type": "STRING"
+    },
+    {
+      "name": "勘定科目名",
+      "type": "STRING"
+    },
+    {
+      "name": "勘定科目名英語",
+      "type": "STRING"
+    },
+    {
+      "name": "勘定科目種類",
+      "type": "STRING"
+    },
+    {
+      "name": "勘定科目サブタイプ",
+      "type": "STRING"
+    },
+    {
+      "name": "部門",
+      "type": "STRING"
+    },
+    {
+      "name": "部門コード",
+      "type": "STRING"
+    },
+    {
+      "name": "親勘定科目ID",
+      "type": "STRING"
+    },
+    {
+      "name": "勘定科目レベル",
+      "type": "LONG"
+    },
+    {
+      "name": "シナリオ",
+      "type": "STRING"
+    },
+    {
+      "name": "売上金額",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "費用金額",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "利益",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "損失",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "純額",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "予算差異",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "差異率",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "サマリ区分",
+      "type": "LONG"
+    },
+    {
+      "name": "備考",
+      "type": "STRING"
+    },
+    {
+      "name": "通貨",
+      "type": "STRING"
+    },
+    {
+      "name": "日付",
+      "type": "DATE"
+    }
+  ],
+  "dataset_name": "detail"
+}

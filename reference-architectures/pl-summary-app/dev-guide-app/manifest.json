@@ -1,0 +1,14 @@
+{
+  "name": "店舗別損益｜開発ガイド",
+  "version": "0.1.0",
+  "size": {
+    "width": 1,
+    "height": 1
+  },
+  "fileName": "manifest.json",
+  "datasetsMapping": [],
+  "ignore": [
+    "vendor/ryuu.js-4.6.0.LICENSE"
+  ],
+  "id": "8b61c346-997f-40fb-89fd-7121b79c2e9e"
+}

@@ -1,0 +1,23 @@
+# Domo session artifacts — never commit
+.sid
+.domo/
+*.token
+access_token.txt
+sid.txt
+
+# Env / secrets
+.env
+*.env
+!*.env.example
+config/secrets.env
+
+# OS / editor
+.DS_Store
+__pycache__/
+*.pyc
+node_modules/
+.pytest_cache/
+
+# Generated Domo bundles / exports
+*.zip
+dataflow.json

@@ -1,0 +1,261 @@
+/* ============================================================
+   DESIGN SYSTEM — keep these variables at the top.
+   Your AI agent should reuse them; never hardcode colors below.
+   ============================================================ */
+
+:root {
+  --bg-dark:       #0f1419;
+  --canyon-red:    #C4533A;   /* alerts, errors, destructive */
+  --sandstone:     #D4A76A;   /* highlights, secondary */
+  --sage-green:    #7C9473;   /* positive, success, primary */
+  --alpine-blue:   #5B8DB8;   /* info, links */
+  --snow-white:    #F5F0E8;   /* primary text */
+  --text-muted:    rgba(245, 240, 232, 0.55);
+  --glass-bg:      rgba(15, 20, 25, 0.85);
+  --glass-border:  rgba(255, 255, 255, 0.08);
+  --gap:           16px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-dark);
+  color: var(--snow-white);
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   PAGE GRID — single source of layout truth
+   ============================================================ */
+
+#app {
+  display: grid;
+  grid-template-rows: 64px 80px 1fr;
+  grid-template-columns: 1fr;
+  width: 100vw;
+  height: 100vh;
+  gap: var(--gap);
+  padding: var(--gap);
+}
+
+/* ============================================================
+   BRAND HEADER
+   ============================================================ */
+
+.brand-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.brand-name {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.brand-tagline {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.app-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--sandstone);
+  text-align: right;
+}
+
+/* ============================================================
+   STATS BAR
+   ============================================================ */
+
+.stats-bar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 0 24px;
+}
+
+.stat-number {
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ============================================================
+   CONTENT GRID
+   ============================================================ */
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: var(--gap);
+  min-height: 0;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  padding: 24px;
+  overflow: hidden;
+}
+
+.card-header {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.card-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-content.scrollable {
+  overflow-y: auto;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+thead th {
+  text-align: left;
+  padding: 12px 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--glass-border);
+  position: sticky;
+  top: 0;
+  background: var(--glass-bg);
+}
+
+tbody td {
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn.primary {
+  background: var(--sage-green);
+  color: var(--bg-dark);
+}
+
+.btn.primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn.secondary {
+  background: transparent;
+  color: var(--snow-white);
+  border: 1px solid var(--glass-border);
+}
+
+.btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.action-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+.action-hint code {
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--sandstone);
+}
+
+/* ============================================================
+   EMPTY / LOADING STATES
+   ============================================================ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 24px;
+}
+
+.empty-state strong {
+  color: var(--snow-white);
+  font-size: 16px;
+  margin-bottom: 8px;
+}

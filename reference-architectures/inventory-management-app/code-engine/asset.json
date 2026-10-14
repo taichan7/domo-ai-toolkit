@@ -1,0 +1,13 @@
+{
+  "name": "Inventory Management | Transaction Service",
+  "packageId": "ba587df4-66a1-41e4-abe9-7af3e4a474d3",
+  "version": "1.0.38",
+  "privateHelperCount": 6,
+  "privateHelpers": ["_is_true", "_resolve_recipient_email", "_records", "_register", "_notify_now", "_admin"],
+  "publicFunctions": [
+    {
+      "name": "inventory_api",
+      "inputs": ["operation", "request_json"]
+    }
+  ]
+}

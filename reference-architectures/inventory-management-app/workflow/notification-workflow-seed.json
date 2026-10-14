@@ -1,0 +1,776 @@
+{
+  "designElements": [
+    {
+      "id": "rootNode",
+      "position": {
+        "x": 40,
+        "y": 140
+      },
+      "data": {
+        "dimensions": {
+          "width": 200,
+          "height": 60
+        },
+        "title": "不足通知を開始",
+        "description": "確定済み在庫イベントを受け取る",
+        "type": "Start",
+        "_designNode": "rootNode",
+        "isFormStart": true,
+        "input": [
+          {
+            "id": "input_event_type",
+            "paramName": "event_type",
+            "acceptsInput": false,
+            "useExternalValues": false,
+            "dataType": "text",
+            "mappedTo": "var_event_type",
+            "value": null,
+            "fieldOptionsMappedTo": null,
+            "fieldOptionsValue": null,
+            "datasetMapping": null,
+            "required": true,
+            "children": [],
+            "displayName": "event_type",
+            "visible": true,
+            "formFieldId": "0e502b54-a0b7-430e-8b0a-95b5b32c3dee",
+            "formFieldType": null,
+            "flag": "input",
+            "customMappingType": "form_start",
+            "entitySubType": null,
+            "isList": false,
+            "configType": "forms"
+          },
+          {
+            "id": "input_recipient_email",
+            "paramName": "recipient_email",
+            "acceptsInput": false,
+            "useExternalValues": false,
+            "dataType": "text",
+            "mappedTo": "var_recipient_email",
+            "value": null,
+            "fieldOptionsMappedTo": null,
+            "fieldOptionsValue": null,
+            "datasetMapping": null,
+            "required": true,
+            "children": [],
+            "displayName": "recipient_email",
+            "visible": true,
+            "formFieldId": "83ba0d05-5291-40ed-bfb8-8306c943e844",
+            "formFieldType": null,
+            "flag": "input",
+            "customMappingType": "form_start",
+            "entitySubType": null,
+            "isList": false,
+            "configType": "forms"
+          },
+          {
+            "id": "input_occurred_at",
+            "paramName": "occurred_at",
+            "acceptsInput": false,
+            "useExternalValues": false,
+            "dataType": "text",
+            "mappedTo": "var_occurred_at",
+            "value": null,
+            "fieldOptionsMappedTo": null,
+            "fieldOptionsValue": null,
+            "datasetMapping": null,
+            "required": true,
+            "children": [],
+            "displayName": "occurred_at",
+            "visible": true,
+            "formFieldId": "04e1f5a8-221a-4fe8-a2d1-9ef9a07555df",
+            "formFieldType": null,
+            "flag": "input",
+            "customMappingType": "form_start",
+            "entitySubType": null,
+            "isList": false,
+            "configType": "forms"
+          },
+          {
+            "id": "input_headline",
+            "paramName": "headline",
+            "acceptsInput": false,
+            "useExternalValues": false,
+            "dataType": "text",
+            "mappedTo": "var_headline",
+            "value": null,
+            "fieldOptionsMappedTo": null,
+            "fieldOptionsValue": null,
+            "datasetMapping": null,
+            "required": true,
+            "children": [],
+            "displayName": "headline",
+            "visible": true,
+            "formFieldId": "e24c089a-5043-4715-8096-bb4e354cea14",
+            "formFieldType": null,
+            "flag": "input",
+            "customMappingType": "form_start",
+            "entitySubType": null,
+            "isList": false,
+            "configType": "forms"
+          },
+          {
+            "id": "input_shortage_lines",
+            "paramName": "shortage_lines",
+            "acceptsInput": false,
+            "useExternalValues": false,
+            "dataType": "text",
+            "mappedTo": "var_shortage_lines",
+            "value": null,
+            "fieldOptionsMappedTo": null,
+            "fieldOptionsValue": null,
+            "datasetMapping": null,
+            "required": true,
+            "children": [],
+            "displayName": "shortage_lines",
+            "visible": true,
+            "formFieldId": "5cbc5ba2-6de6-4049-b6bf-83e052739acf",
+            "formFieldType": null,
+            "flag": "input",
+            "customMappingType": "form_start",
+            "entitySubType": null,
+            "isList": false,
+            "configType": "forms"
+          }
+        ],
+        "output": [],
+        "formId": "d4d1a9c0-1a30-40a5-9871-05f126b2fb3b",
+        "formTitle": "null",
+        "formDescription": "null"
+      },
+      "style": {
+        "zIndex": 4,
+        "outline": "none"
+      },
+      "index": 0,
+      "type": "rootNode"
+    },
+    {
+      "id": "ai_format_notification",
+      "position": {
+        "x": 320,
+        "y": 140
+      },
+      "data": {
+        "dimensions": {
+          "width": 200,
+          "height": 60
+        },
+        "title": "AI Agent｜通知文作成・メール送信",
+        "description": "既存の在庫分析DataSetを参照し、通知文を指定先へ1回だけ送信",
+        "prompt": {
+          "id": "ai_prompt",
+          "paramName": "prompt",
+          "dataType": "text",
+          "mappedTo": null,
+          "value": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "event_type: ",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                },
+                {
+                  "type": "variable",
+                  "children": [
+                    {
+                      "text": "",
+                      "bold": false,
+                      "italic": false,
+                      "underlined": false,
+                      "sql": false
+                    }
+                  ],
+                  "dataType": "text",
+                  "id": "var_event_type",
+                  "name": "event_type",
+                  "isList": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "headline: ",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                },
+                {
+                  "type": "variable",
+                  "children": [
+                    {
+                      "text": "",
+                      "bold": false,
+                      "italic": false,
+                      "underlined": false,
+                      "sql": false
+                    }
+                  ],
+                  "dataType": "text",
+                  "id": "var_headline",
+                  "name": "headline",
+                  "isList": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "shortage_lines: ",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                },
+                {
+                  "type": "variable",
+                  "children": [
+                    {
+                      "text": "",
+                      "bold": false,
+                      "italic": false,
+                      "underlined": false,
+                      "sql": false
+                    }
+                  ],
+                  "dataType": "text",
+                  "id": "var_shortage_lines",
+                  "name": "shortage_lines",
+                  "isList": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "recipient_email: ",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                },
+                {
+                  "type": "variable",
+                  "children": [
+                    {
+                      "text": "",
+                      "bold": false,
+                      "italic": false,
+                      "underlined": false,
+                      "sql": false
+                    }
+                  ],
+                  "dataType": "text",
+                  "id": "var_recipient_email",
+                  "name": "recipient_email",
+                  "isList": false
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "occurred_at: ",
+                  "bold": false,
+                  "italic": false,
+                  "underlined": false,
+                  "sql": false
+                },
+                {
+                  "type": "variable",
+                  "children": [
+                    {
+                      "text": "",
+                      "bold": false,
+                      "italic": false,
+                      "underlined": false,
+                      "sql": false
+                    }
+                  ],
+                  "dataType": "text",
+                  "id": "var_occurred_at",
+                  "name": "occurred_at",
+                  "isList": false
+                }
+              ]
+            }
+          ],
+          "required": true,
+          "isList": false,
+          "children": [],
+          "displayName": "プロンプト",
+          "visible": true,
+          "flag": "input",
+          "customMappingType": null,
+          "configType": null,
+          "entitySubType": null,
+          "aiDescription": null
+        },
+        "result": {
+          "id": "ai_result_output",
+          "paramName": "result",
+          "dataType": "object",
+          "mappedTo": "var_ai_result",
+          "value": null,
+          "required": true,
+          "isList": false,
+          "children": [
+            {
+              "id": "ai_result_output.subject",
+              "paramName": "subject",
+              "dataType": "text",
+              "mappedTo": "var_ai_result.subject.value",
+              "value": null,
+              "required": true,
+              "isList": false,
+              "children": [],
+              "displayName": "subject",
+              "visible": true,
+              "flag": "output",
+              "customMappingType": null,
+              "configType": null,
+              "entitySubType": null,
+              "aiDescription": null
+            },
+            {
+              "id": "ai_result_output.body",
+              "paramName": "body",
+              "dataType": "text",
+              "mappedTo": "var_ai_result.body.value",
+              "value": null,
+              "required": true,
+              "isList": false,
+              "children": [],
+              "displayName": "body",
+              "visible": true,
+              "flag": "output",
+              "customMappingType": null,
+              "configType": null,
+              "entitySubType": null,
+              "aiDescription": null
+            }
+          ],
+          "displayName": "結果",
+          "visible": true,
+          "flag": "output",
+          "customMappingType": null,
+          "configType": null,
+          "entitySubType": null,
+          "aiDescription": null
+        },
+        "agent": {
+          "instructions": "",
+          "tools": [
+            {
+              "functionName": "sendEmail",
+              "functionDescription": "Send a stylized email",
+              "inputs": [
+                {
+                  "id": "email_attachment",
+                  "paramName": "attachment",
+                  "dataType": "number",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "attachment",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": "Do not use this optional input."
+                },
+                {
+                  "id": "email_attachments",
+                  "paramName": "attachments",
+                  "dataType": "number",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": true,
+                  "children": [],
+                  "displayName": "attachments",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": "Do not use this optional input."
+                },
+                {
+                  "id": "email_body",
+                  "paramName": "body",
+                  "dataType": "text",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "body",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": "A factual Japanese body no longer than 300 characters."
+                },
+                {
+                  "id": "email_groups",
+                  "paramName": "groupRecipients",
+                  "dataType": "group",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": true,
+                  "children": [],
+                  "displayName": "groupRecipients",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": "Do not use this optional input."
+                },
+                {
+                  "id": "email_reply",
+                  "paramName": "includeReplyAll",
+                  "dataType": "boolean",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "includeReplyAll",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": "Do not use this optional input."
+                },
+                {
+                  "id": "email_people",
+                  "paramName": "personRecipients",
+                  "dataType": "person",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": true,
+                  "children": [],
+                  "displayName": "personRecipients",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": "Do not use this optional input."
+                },
+                {
+                  "id": "email_recipient",
+                  "paramName": "recipientEmails",
+                  "dataType": "text",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "recipientEmails",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": "Use the recipient_email workflow input exactly as supplied."
+                },
+                {
+                  "id": "email_subject",
+                  "paramName": "subject",
+                  "dataType": "text",
+                  "mappedTo": null,
+                  "value": null,
+                  "required": false,
+                  "isList": false,
+                  "children": [],
+                  "displayName": "subject",
+                  "visible": true,
+                  "flag": "input",
+                  "customMappingType": null,
+                  "configType": null,
+                  "entitySubType": null,
+                  "aiDescription": "A factual Japanese subject no longer than 40 characters."
+                }
+              ],
+              "inputDescriptions": {
+                "email_body": "A factual Japanese body no longer than 300 characters.",
+                "email_reply": "Do not use this optional input.",
+                "email_groups": "Do not use this optional input.",
+                "email_people": "Do not use this optional input.",
+                "email_subject": "A factual Japanese subject no longer than 40 characters.",
+                "email_recipient": "Use the recipient_email workflow input exactly as supplied.",
+                "email_attachment": "Do not use this optional input.",
+                "email_attachments": "Do not use this optional input."
+              },
+              "id": "agent_tool_send_email",
+              "name": "Send Email",
+              "description": "Send a stylized email",
+              "packageId": "03ba6971-98d0-4654-9bfd-aa897816df33",
+              "packageVersion": "2.1.12",
+              "output": {
+                "id": "email_sent",
+                "paramName": "isSent",
+                "dataType": "boolean",
+                "mappedTo": null,
+                "value": null,
+                "required": false,
+                "isList": false,
+                "children": [],
+                "displayName": "isSent",
+                "visible": true,
+                "flag": "output",
+                "customMappingType": null,
+                "configType": null,
+                "entitySubType": null,
+                "aiDescription": null
+              },
+              "type": "FUNCTION"
+            }
+          ],
+          "context": {
+            "datasets": [],
+            "directories": [],
+            "files": [],
+            "isEmpty": true
+          },
+          "outputDescriptions": {
+            "ai_result_output": "確定済み在庫イベントの通知文。",
+            "ai_result_output.body": "確定値だけを使用した日本語メール本文。300文字以内。",
+            "ai_result_output.subject": "日本語メール件名。40文字以内。"
+          }
+        },
+        "_designNode": "AI_AGENT"
+      },
+      "style": {
+        "zIndex": 4,
+        "outline": "none"
+      },
+      "index": 1,
+      "type": "AI_AGENT"
+    },
+    {
+      "id": "endNode",
+      "position": {
+        "x": 600,
+        "y": 140
+      },
+      "data": {
+        "dimensions": {
+          "width": 200,
+          "height": 60
+        },
+        "title": "終了",
+        "description": "",
+        "_designNode": "endNode",
+        "terminating": false
+      },
+      "style": {
+        "zIndex": 4,
+        "outline": "none"
+      },
+      "index": 2,
+      "type": "endNode"
+    },
+    {
+      "id": "edge-rootNode-ai_format_notification",
+      "source": "rootNode",
+      "target": "ai_format_notification",
+      "data": {
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "path": [],
+        "title": ""
+      },
+      "style": {
+        "zIndex": 5
+      },
+      "index": 3,
+      "arrowHeadType": "arrow",
+      "type": "defaultEdge"
+    },
+    {
+      "id": "edge-ai_format_notification-endNode",
+      "source": "ai_format_notification",
+      "target": "endNode",
+      "data": {
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "path": [],
+        "title": ""
+      },
+      "style": {
+        "zIndex": 5
+      },
+      "index": 4,
+      "arrowHeadType": "arrow",
+      "type": "defaultEdge"
+    }
+  ],
+  "dataList": [
+    {
+      "id": "var_event_type",
+      "paramName": "event_type",
+      "dataType": "text",
+      "isList": false,
+      "children": [],
+      "showChildren": false,
+      "entitySubType": null,
+      "value": null,
+      "isOutput": false
+    },
+    {
+      "id": "var_recipient_email",
+      "paramName": "recipient_email",
+      "dataType": "text",
+      "isList": false,
+      "children": [],
+      "showChildren": false,
+      "entitySubType": null,
+      "value": null,
+      "isOutput": false
+    },
+    {
+      "id": "var_occurred_at",
+      "paramName": "occurred_at",
+      "dataType": "text",
+      "isList": false,
+      "children": [],
+      "showChildren": false,
+      "entitySubType": null,
+      "value": null,
+      "isOutput": false
+    },
+    {
+      "id": "var_ai_result",
+      "paramName": "ai_result",
+      "dataType": "object",
+      "isList": false,
+      "children": [
+        {
+          "id": "var_ai_result.subject.value",
+          "paramName": "subject",
+          "dataType": "text",
+          "isList": false,
+          "children": [],
+          "showChildren": false,
+          "entitySubType": null,
+          "value": null,
+          "isOutput": false
+        },
+        {
+          "id": "var_ai_result.body.value",
+          "paramName": "body",
+          "dataType": "text",
+          "isList": false,
+          "children": [],
+          "showChildren": false,
+          "entitySubType": null,
+          "value": null,
+          "isOutput": false
+        }
+      ],
+      "showChildren": false,
+      "entitySubType": null,
+      "value": null,
+      "isOutput": false
+    },
+    {
+      "id": "var_headline",
+      "paramName": "headline",
+      "dataType": "text",
+      "isList": false,
+      "children": [],
+      "showChildren": false,
+      "entitySubType": null,
+      "value": null,
+      "isOutput": false
+    },
+    {
+      "id": "var_shortage_lines",
+      "paramName": "shortage_lines",
+      "dataType": "text",
+      "isList": false,
+      "children": [],
+      "showChildren": false,
+      "entitySubType": null,
+      "value": null,
+      "isOutput": false
+    }
+  ],
+  "version": 2,
+  "schema": {
+    "inputs": {
+      "input_event_type": {
+        "name": "event_type",
+        "type": "text",
+        "subType": null,
+        "isList": false,
+        "isNullable": false,
+        "id": "input_event_type",
+        "isChild": false,
+        "parent": null
+      },
+      "input_recipient_email": {
+        "name": "recipient_email",
+        "type": "text",
+        "subType": null,
+        "isList": false,
+        "isNullable": false,
+        "id": "input_recipient_email",
+        "isChild": false,
+        "parent": null
+      },
+      "input_occurred_at": {
+        "name": "occurred_at",
+        "type": "text",
+        "subType": null,
+        "isList": false,
+        "isNullable": false,
+        "id": "input_occurred_at",
+        "isChild": false,
+        "parent": null
+      },
+      "input_headline": {
+        "name": "headline",
+        "type": "text",
+        "subType": null,
+        "isList": false,
+        "isNullable": false,
+        "id": "input_headline",
+        "isChild": false,
+        "parent": null
+      },
+      "input_shortage_lines": {
+        "name": "shortage_lines",
+        "type": "text",
+        "subType": null,
+        "isList": false,
+        "isNullable": false,
+        "id": "input_shortage_lines",
+        "isChild": false,
+        "parent": null
+      }
+    },
+    "outputs": {}
+  }
+}

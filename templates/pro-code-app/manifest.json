@@ -1,0 +1,20 @@
+{
+  "name": "Pro Code Starter",
+  "description": "A minimal Pro Code app skeleton with the design system pre-wired. Replace this with your own app.",
+  "version": "0.1.0",
+  "size": {
+    "width": 12,
+    "height": 8
+  },
+  "fullpage": true,
+  "datasetsMapping": [
+    {
+      "dataSetId": "REPLACE_WITH_DATASET_UUID",
+      "alias": "mainDs",
+      "fields": []
+    }
+  ],
+  "collectionsMapping": [],
+  "workflowsMapping": [],
+  "packagesMapping": []
+}

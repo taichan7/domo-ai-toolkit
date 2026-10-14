@@ -1,0 +1,7 @@
+# 配布フォルダのローカル生成物・秘密（コミットしない）
+.DS_Store
+config/secrets.env
+domo-assets.json
+sandbox-*/
+__pycache__/
+*.pyc

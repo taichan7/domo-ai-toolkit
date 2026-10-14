@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>在庫入出庫管理</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <svg class="icon-sprite" aria-hidden="true">
+    <symbol id="icon-brand" viewBox="0 0 24 24"><path d="M4 7.5 12 3l8 4.5-8 4.5-8-4.5Z"/><path d="m4 12 8 4.5 8-4.5M4 16.5 12 21l8-4.5"/></symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.34 5.66"/><path d="M20 4v7h-7"/></symbol>
+    <symbol id="icon-transfer" viewBox="0 0 24 24"><path d="M4 7h14M15 4l3 3-3 3M20 17H6M9 14l-3 3 3 3"/></symbol>
+    <symbol id="icon-dashboard" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="7" rx="1"/><rect x="14" y="4" width="6" height="4" rx="1"/><rect x="4" y="15" width="6" height="5" rx="1"/><rect x="14" y="12" width="6" height="8" rx="1"/></symbol>
+    <symbol id="icon-history" viewBox="0 0 24 24"><path d="M4.5 9A8 8 0 1 1 4 14"/><path d="M4 4v5h5M12 7v5l3 2"/></symbol>
+    <symbol id="icon-qr" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v6h-2zM14 18h2v2h-2z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 5 5"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+  </svg>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><svg class="ui-icon"><use href="#icon-brand"></use></svg></span>
+        <div><strong>在庫入出庫管理</strong><small>Inventory operations</small></div>
+      </div>
+      <div class="topbar-actions">
+        <span id="sync-status" class="sync-status" role="status" hidden><span class="status-dot"></span>接続を確認中</span>
+        <button id="refresh-button" class="icon-button" type="button" aria-label="データを更新" title="更新"><svg class="ui-icon" aria-hidden="true"><use href="#icon-refresh"></use></svg></button>
+        <div class="user-chip"><span id="user-initial">利</span><span id="user-name">利用者</span></div>
+      </div>
+    </header>
+
+    <aside class="sidebar" aria-label="メインナビゲーション">
+      <nav>
+        <button class="nav-item active" data-view="operations" type="button" aria-current="page"><svg class="nav-icon" aria-hidden="true"><use href="#icon-transfer"></use></svg><em>入出庫</em></button>
+        <button class="nav-item" data-view="dashboard" type="button"><svg class="nav-icon" aria-hidden="true"><use href="#icon-dashboard"></use></svg><em>ダッシュボード</em></button>
+        <button class="nav-item" data-view="history" type="button"><svg class="nav-icon" aria-hidden="true"><use href="#icon-history"></use></svg><em>履歴・管理</em></button>
+      </nav>
+      <div class="sidebar-help">
+        <strong>QR形式（テスト用）</strong>
+        <p class="sidebar-help-note">カメラでスキャンして動作を試せます。</p>
+        <ul class="qr-samples">
+          <li class="qr-sample" data-qr="LOC:LOC-01"></li>
+          <li class="qr-sample" data-qr="ITEM:ITEM-001"></li>
+        </ul>
+      </div>
+    </aside>
+
+    <nav class="mobile-nav" aria-label="モバイルナビゲーション">
+      <button class="nav-item active" data-view="operations" type="button" aria-current="page"><svg class="nav-icon" aria-hidden="true"><use href="#icon-transfer"></use></svg><em>入出庫</em></button>
+      <button class="nav-item" data-view="dashboard" type="button"><svg class="nav-icon" aria-hidden="true"><use href="#icon-dashboard"></use></svg><em>分析</em></button>
+      <button class="nav-item" data-view="history" type="button"><svg class="nav-icon" aria-hidden="true"><use href="#icon-history"></use></svg><em>履歴</em></button>
+    </nav>
+
+    <main id="main-content" tabindex="-1">
+      <div id="boot-message" class="boot-message" role="alert" hidden>
+        <div><strong id="boot-message-title">アプリを起動できません</strong><p id="boot-message-detail">Domoとの接続を確認し、再読み込みしてください。</p></div>
+        <button id="boot-retry" class="secondary-button" type="button">再読み込み</button>
+      </div>
+      <section id="view-operations" class="view active" tabindex="-1" aria-labelledby="operations-title">
+        <div class="page-heading">
+          <div><p class="eyebrow">オペレーション</p><h1 id="operations-title">入出庫を登録</h1><p>ロケーションと品目を選び、数量を確定します。</p></div>
+          <div class="page-heading-actions">
+            <div class="segmented" role="group" aria-label="処理種別">
+              <button type="button" class="type-button active" data-type="IN" aria-pressed="true">入庫</button>
+              <button type="button" class="type-button" data-type="OUT" aria-pressed="false">出庫</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-status" aria-live="polite"><span id="step-count">ステップ 1 / 4</span><strong id="step-action">ロケーションを選択</strong></div>
+        <ol class="stepper" aria-label="登録手順">
+          <li class="active" data-step="1"><button type="button" data-step-nav="1" aria-controls="step-panel-1" aria-current="step" disabled><span>1</span><b data-short="場所">ロケーション</b></button></li>
+          <li data-step="2"><button type="button" data-step-nav="2" aria-controls="step-panel-2" disabled><span>2</span><b data-short="品目">品目</b></button></li>
+          <li data-step="3"><button type="button" data-step-nav="3" aria-controls="step-panel-3" disabled><span>3</span><b data-short="数量">数量</b></button></li>
+          <li data-step="4"><button type="button" data-step-nav="4" aria-controls="step-panel-4" disabled><span>4</span><b data-short="確認">確認</b></button></li>
+        </ol>
+
+        <div class="operation-grid">
+          <div class="panel workflow-panel">
+            <section id="step-panel-1" class="form-step active" data-step-panel="1">
+              <div class="panel-heading"><div><span class="step-label">STEP 1</span><h2 id="step-title-1" tabindex="-1">ロケーション</h2></div><button class="scan-button" data-scan="location" type="button" disabled aria-busy="true"><svg class="button-icon" aria-hidden="true"><use href="#icon-qr"></use></svg>QRを読む</button></div>
+              <label for="location-search">ロケーション名またはコード</label>
+              <div class="search-wrap"><svg class="search-icon" aria-hidden="true"><use href="#icon-search"></use></svg><input id="location-search" autocomplete="off" placeholder="例: LOC-01 / 東京倉庫"></div>
+              <div id="location-options" class="option-list" role="group" aria-label="ロケーション候補"></div>
+            </section>
+
+            <section id="step-panel-2" class="form-step" data-step-panel="2">
+              <div class="panel-heading"><div><span class="step-label">STEP 2</span><h2 id="step-title-2" tabindex="-1">品目</h2></div><button class="scan-button" data-scan="item" type="button" disabled aria-busy="true"><svg class="button-icon" aria-hidden="true"><use href="#icon-qr"></use></svg>QRを読む</button></div>
+              <label for="item-search">品目名またはコード</label>
+              <div class="search-wrap"><svg class="search-icon" aria-hidden="true"><use href="#icon-search"></use></svg><input id="item-search" autocomplete="off" placeholder="例: ITEM-001 / 安全手袋"></div>
+              <div id="item-options" class="option-list" role="group" aria-label="品目候補"></div>
+              <button class="secondary-button back-button" data-back="1" type="button">戻る</button>
+            </section>
+
+            <section id="step-panel-3" class="form-step" data-step-panel="3">
+              <div class="panel-heading"><div><span class="step-label">STEP 3</span><h2 id="step-title-3" tabindex="-1">数量と理由</h2></div></div>
+              <div class="quantity-control">
+                <button id="quantity-minus" type="button" aria-label="数量を1減らす">−</button>
+                <label for="quantity"><span>数量</span><input id="quantity" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" value="1"></label>
+                <button id="quantity-plus" type="button" aria-label="数量を1増やす">＋</button>
+              </div>
+              <label for="reason">理由・メモ</label>
+              <textarea id="reason" maxlength="200" rows="3" placeholder="例: 定期補充、製造ラインへの払出"></textarea>
+              <div id="stock-preview" class="stock-preview" aria-live="polite"></div>
+              <div class="button-row"><button class="secondary-button back-button" data-back="2" type="button">戻る</button><button id="review-button" class="primary-button" type="button">内容を確認</button></div>
+            </section>
+
+            <section id="step-panel-4" class="form-step" data-step-panel="4">
+              <div class="panel-heading"><div><span class="step-label">STEP 4</span><h2 id="step-title-4" tabindex="-1">登録内容の確認</h2></div></div>
+              <dl id="review-list" class="review-list"></dl>
+              <div class="notice-box"><svg class="button-icon" aria-hidden="true"><use href="#icon-check"></use></svg><p>内容に問題がなければ「登録を確定」を押してください。登録直前に最新の在庫を確認します。</p></div>
+              <div class="button-row"><button class="secondary-button back-button" data-back="3" type="button">修正する</button><button id="submit-button" class="primary-button" type="button">登録を確定</button></div>
+            </section>
+          </div>
+
+          <aside class="panel context-panel" aria-label="選択内容">
+            <h2>現在の選択</h2>
+            <button id="selected-location-card" class="selection-card" type="button" aria-label="ロケーション選択へ戻る"><span>ロケーション</span><strong id="selected-location">未選択</strong><small id="selected-location-code">QRまたは一覧から選択</small></button>
+            <button id="selected-item-card" class="selection-card" type="button" aria-label="品目選択へ戻る" disabled><span>品目</span><strong id="selected-item">未選択</strong><small id="selected-item-code">QRまたは一覧から選択</small></button>
+            <div class="inventory-card"><span>現在庫</span><strong id="current-stock">—</strong><small id="minimum-stock">基準在庫: —</small></div>
+            <div id="recent-operations"><h3>直近の登録</h3><div class="empty-compact">データを読み込み中</div></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="view-dashboard" class="view" tabindex="-1" aria-labelledby="dashboard-title">
+        <div class="page-heading"><div><p class="eyebrow">アナリティクス</p><h1 id="dashboard-title">在庫ダッシュボード</h1><p>集計から品目・場所・日付を選び、現在庫と取引明細を確認できます。</p></div><div class="dashboard-actions"><span class="interaction-note"><svg class="ui-icon" aria-hidden="true"><use href="#icon-info"></use></svg>カーソルで内訳・クリックで明細</span></div></div>
+        <div class="dashboard-toolbar">
+          <div class="search-wrap dashboard-search-wrap"><svg class="search-icon" aria-hidden="true"><use href="#icon-search"></use></svg><input id="dashboard-search" type="search" autocomplete="off" aria-label="品目・場所・不足・滞留を検索" placeholder="品目・場所・不足・滞留を検索"></div>
+          <div class="toolbar-workflow"><span class="toolbar-workflow-hint">不足品目の担当者へメール通知するWorkflowを実行</span><button id="run-notification" class="secondary-button" type="button" title="不足品目の担当者へメール通知するWorkflowをその場で実行します。"><svg class="button-icon" aria-hidden="true"><use href="#icon-bell"></use></svg>AI在庫通知を実行</button></div>
+        </div>
+        <div id="kpi-grid" class="kpi-grid"></div>
+        <article class="panel ai-note-panel"><div class="panel-heading"><div><h2>AI在庫コメント</h2><p>生成AIが品目ごとに要約</p></div><span class="ai-note-tag">AI生成</span></div><div id="ai-note-list"></div></article>
+        <div class="dashboard-grid">
+          <div class="dashboard-row row-primary">
+            <article class="panel chart-panel item-stock-panel"><div class="panel-heading"><div><h2>品目別在庫</h2><p>現在の数量構成</p></div><span class="panel-action-hint">品目明細</span></div><div id="item-chart" class="bar-chart dash-scroll"></div><nav id="item-pager" class="pager pager-compact" aria-label="品目別在庫のページ送り" hidden></nav></article>
+            <article class="panel chart-panel trend-panel"><div class="panel-heading"><div><h2>7日間の入出庫</h2><p>日別の入庫・出庫数量</p></div><span class="panel-action-hint">日別明細</span></div><div class="chart-legend" aria-label="グラフ凡例"><span><i class="legend-in"></i>入庫</span><span><i class="legend-out"></i>出庫</span></div><div class="dash-scroll"><div id="trend-chart" class="trend-chart"></div></div></article>
+            <article class="panel shortage-panel"><div class="panel-heading"><div><h2>在庫不足</h2><p>補充確認が必要な品目</p></div><span class="panel-action-hint">不足明細</span></div><div id="shortage-list" class="dash-scroll"></div><nav id="shortage-pager" class="pager pager-compact" aria-label="在庫不足のページ送り" hidden></nav></article>
+          </div>
+          <div class="dashboard-row row-secondary">
+            <article class="panel chart-panel location-stock-panel"><div class="panel-heading"><div><h2>ロケーション別在庫</h2><p>現在の数量構成</p></div><span class="panel-action-hint">場所明細</span></div><div id="location-chart" class="bar-chart dash-scroll"></div><nav id="location-pager" class="pager pager-compact" aria-label="ロケーション別在庫のページ送り" hidden></nav></article>
+            <article class="panel dormant-panel"><div class="panel-heading"><div><h2>滞留在庫</h2><p>最終取引から30日超</p></div><span class="panel-action-hint">滞留明細</span></div><div id="dormant-list" class="dash-scroll"></div><nav id="dormant-pager" class="pager pager-compact" aria-label="滞留在庫のページ送り" hidden></nav></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-history" class="view" tabindex="-1" aria-labelledby="history-title">
+        <div class="page-heading"><div><p class="eyebrow">記録・管理</p><h1 id="history-title">履歴・マスタ管理</h1><p>取引と通知の履歴を確認できます。管理者は品目・ロケーション・基準在庫の編集もこの画面で行います。</p></div></div>
+        <div class="record-tabs" role="tablist" aria-label="表示の切り替え">
+          <button id="record-tab-transactions" class="record-tab active" data-record="transactions" type="button" role="tab" aria-selected="true">取引</button>
+          <button id="record-tab-alerts" class="record-tab" data-record="alerts" type="button" role="tab" aria-selected="false" tabindex="-1">通知</button>
+          <button id="record-tab-item" class="record-tab admin-only" data-record="item" type="button" role="tab" aria-selected="false" tabindex="-1" hidden>品目</button>
+          <button id="record-tab-location" class="record-tab admin-only" data-record="location" type="button" role="tab" aria-selected="false" tabindex="-1" hidden>ロケーション</button>
+          <button id="record-tab-rule" class="record-tab admin-only" data-record="rule" type="button" role="tab" aria-selected="false" tabindex="-1" hidden>基準在庫</button>
+        </div>
+        <div class="panel filter-panel" id="history-filter">
+          <label for="history-search">検索<input id="history-search" type="search" placeholder="品目、場所、担当者、日付"></label>
+          <label for="history-type">種別<select id="history-type"><option value="">すべて</option><option value="IN">入庫</option><option value="OUT">出庫</option></select></label>
+          <button id="history-refresh" class="secondary-button" type="button">更新</button>
+          <button id="history-clear" class="secondary-button" type="button">条件をクリア</button>
+        </div>
+        <div class="master-detail" id="record-panel-history" role="tabpanel" aria-labelledby="record-tab-transactions">
+          <div class="panel table-panel md-list">
+            <div class="table-caption"><span><svg class="ui-icon" aria-hidden="true"><use href="#icon-info"></use></svg>行を選択すると右側に明細を表示します</span><strong id="history-result-count" aria-live="polite">0件</strong></div>
+            <div class="table-scroll"><table><thead id="history-head"></thead><tbody id="history-body"></tbody></table></div>
+            <nav id="history-pager" class="pager" aria-label="取引履歴のページ送り" hidden></nav>
+          </div>
+          <aside class="panel md-detail" id="detail-pane" aria-labelledby="detail-title">
+            <header class="detail-pane-heading"><span id="detail-eyebrow" class="step-label">DETAIL</span><h2 id="detail-title" tabindex="-1">明細</h2><p id="detail-subtitle">一覧から選択</p></header>
+            <div id="detail-content" class="detail-content"></div>
+          </aside>
+        </div>
+        <div class="master-detail admin-only" id="record-panel-master" role="tabpanel" aria-labelledby="record-tab-item" hidden>
+          <div class="panel table-panel md-list">
+            <div class="table-caption"><span><svg class="ui-icon" aria-hidden="true"><use href="#icon-info"></use></svg>行を選択すると右側で編集できます</span><span class="caption-actions"><strong id="master-result-count" aria-live="polite">0件</strong><button id="master-new" class="secondary-button caption-button" type="button">＋ 新規登録</button></span></div>
+            <div id="master-list" class="master-list"></div>
+            <nav id="master-pager" class="pager" aria-label="マスタのページ送り" hidden></nav>
+          </div>
+          <aside class="panel md-detail" id="master-editor" aria-labelledby="master-editor-title">
+            <header class="detail-pane-heading"><span class="step-label">マスタ編集</span><h2 id="master-editor-title" tabindex="-1">新規登録</h2><p id="master-editor-subtitle">新しい項目を入力して保存します。</p></header>
+            <div class="detail-content">
+              <form id="master-form" autocomplete="off" novalidate>
+                <div class="master-fields" data-master-fields="item">
+                  <label>品目コード<input id="master-item-code" type="text" maxlength="40" placeholder="ITEM-010"></label>
+                  <label>品目名<input id="master-item-name" type="text" maxlength="120" placeholder="安全手袋"></label>
+                  <label>カテゴリー<input id="master-item-category" type="text" maxlength="80" placeholder="安全用品"></label>
+                  <label>単位<input id="master-item-unit" type="text" maxlength="40" placeholder="双"></label>
+                </div>
+                <div class="master-fields" data-master-fields="location" hidden>
+                  <label>ロケーションコード<input id="master-location-code" type="text" maxlength="40" placeholder="LOC-04"></label>
+                  <label>ロケーション名<input id="master-location-name" type="text" maxlength="120" placeholder="第2倉庫"></label>
+                  <label>ゾーン<input id="master-location-zone" type="text" maxlength="80" placeholder="A"></label>
+                </div>
+                <div class="master-fields" data-master-fields="rule" hidden>
+                  <label>ロケーション<select id="master-rule-location"></select></label>
+                  <label>品目<select id="master-rule-item"></select></label>
+                  <label>基準在庫数<input id="master-rule-minimum" type="number" min="0" step="1" inputmode="numeric" placeholder="10"></label>
+                </div>
+                <label class="master-active-toggle" id="master-active-row" hidden><input id="master-active" type="checkbox"><span>入出庫で選択できる状態にする（オフにすると一時停止・元に戻せます）</span></label>
+                <p class="master-note" id="master-note">「削除」はこの項目をAppDBから完全に削除します（取り消せません）。基準在庫や現在庫などの関連データも一緒に削除されますが、入出庫・通知の履歴は監査証跡として残ります。一時的に止めたいだけなら上の切り替えで停止できます。</p>
+                <div class="button-row">
+                  <button id="master-delete" class="secondary-button danger" type="button" hidden>削除</button>
+                  <button id="master-submit" class="primary-button" type="submit">登録・更新</button>
+                </div>
+              </form>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <!--
+    ダッシュボード・入出庫のドリルダウン明細を表示するスライドイン・ドロワー。
+    以前は本文先頭へ割り込む「上部カード＋×で閉じる」形式だったが、画面が飛ぶUXが不評だったため、
+    右から静かに滑り込む面（ドロワー）へ改めた。背景の薄いオーバーレイ・Esc・×・背景クリックで閉じる。
+    body 直下（.app-shell の外）に置き、transform を持つ祖先の影響を受けず position:fixed を安定させる。
+    履歴ビューは従来どおり一覧＋詳細の2ペイン（#detail-pane）を使い、このドロワーは経由しない。
+  -->
+  <div id="context-detail-backdrop" class="drawer-backdrop" hidden></div>
+  <aside id="context-detail" class="context-detail drawer" role="dialog" aria-modal="true" aria-labelledby="context-detail-title" hidden>
+    <header class="detail-pane-heading context-detail-heading">
+      <div class="context-detail-heading-text">
+        <span id="context-detail-eyebrow" class="step-label">DETAIL</span>
+        <h2 id="context-detail-title" tabindex="-1">明細</h2>
+        <p id="context-detail-subtitle"></p>
+      </div>
+      <button id="context-detail-close" class="close-button" type="button" aria-label="明細を閉じる">×</button>
+    </header>
+    <div id="context-detail-content" class="detail-content"></div>
+    <button id="context-detail-more" class="secondary-button context-detail-more" type="button" hidden>履歴で詳しく見る</button>
+  </aside>
+
+  <dialog id="scanner-dialog" class="modal scanner-modal" aria-labelledby="scanner-title">
+    <form method="dialog" class="modal-card">
+      <div class="modal-heading"><div><span class="step-label">QR SCANNER</span><h2 id="scanner-title">QRコードを読み取る</h2></div><button class="close-button" value="cancel" aria-label="閉じる">×</button></div>
+      <div class="camera-frame"><video id="scanner-video" autoplay playsinline webkit-playsinline muted disablepictureinpicture></video><div class="scanner-guide"><span></span></div><button id="qr-capture-button" class="camera-capture-cta" type="button" hidden><svg class="button-icon" aria-hidden="true"><use href="#icon-qr"></use></svg>カメラで撮影</button><button id="qr-live-restart" class="camera-capture-cta" type="button" hidden><svg class="button-icon" aria-hidden="true"><use href="#icon-qr"></use></svg>ライブ映像を再開</button><p id="camera-message" role="status" aria-live="polite">カメラを起動しています</p></div>
+      <div class="scanner-actions">
+        <button id="qr-image-button" class="secondary-button" type="button"><svg class="button-icon" aria-hidden="true"><use href="#icon-qr"></use></svg>写真から選ぶ</button>
+        <span id="scanner-hint">アプリ画面のまま、上のライブ映像でそのまま読み取ります。読み取れない場合だけ「写真から選ぶ」または下のコード入力に切り替えてください。画像は端末内だけで解析します。</span>
+        <input id="qr-image-input" type="file" accept="image/*" hidden>
+        <input id="qr-capture-input" type="file" accept="image/*" capture="environment" hidden>
+        <canvas id="qr-canvas" hidden></canvas>
+      </div>
+      <div class="manual-entry"><label for="manual-qr">読み取れない場合はコードを入力</label><div><input id="manual-qr" autocomplete="off" placeholder="LOC:LOC-01"><button id="manual-qr-submit" type="button">適用</button></div></div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog" class="modal confirm-modal" aria-labelledby="confirm-title">
+    <form method="dialog" class="modal-card"><div class="modal-heading"><h2 id="confirm-title">実行の確認</h2><button class="close-button" value="cancel" aria-label="閉じる">×</button></div><p id="confirm-message"></p><div class="button-row"><button value="cancel" class="secondary-button">キャンセル</button><button id="confirm-action" value="default" class="primary-button">実行する</button></div></form>
+  </dialog>
+
+  <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
+
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
+  <div id="loading-overlay" class="loading-overlay" role="status" hidden><div class="spinner"></div><p>処理しています</p></div>
+
+  <script src="boot-diagnostics.js"></script>
+  <script src="vendor/domo.js"></script>
+  <script src="vendor/jsQR.js"></script>
+  <script src="config.js"></script>
+  <script src="domo-access.js"></script>
+  <script src="qr-generator.js"></script>
+  <script src="qr-scanner.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

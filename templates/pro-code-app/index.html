@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pro Code Starter</title>
+  <script src="https://unpkg.com/ryuu.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+
+    <header class="brand-header">
+      <div class="brand-identity">
+        <h1 class="brand-name" id="brandName">Your Company</h1>
+        <span class="brand-tagline" id="brandTagline">Pro Code Starter App</span>
+      </div>
+      <div class="app-title">
+        <h2 class="app-name">Dataset Explorer</h2>
+      </div>
+    </header>
+
+    <section class="stats-bar" id="statsBar">
+      <div class="stat">
+        <div class="stat-number" id="rowCount">—</div>
+        <div class="stat-label">Rows</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" id="columnCount">—</div>
+        <div class="stat-label">Columns</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" id="userName">—</div>
+        <div class="stat-label">Signed In As</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" id="instanceName">—</div>
+        <div class="stat-label">Instance</div>
+      </div>
+    </section>
+
+    <main class="content-grid">
+
+      <section class="card" id="tableCard">
+        <div class="card-header">Dataset Preview</div>
+        <div class="card-content scrollable">
+          <table id="dataTable">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <aside class="card" id="actionsCard">
+        <div class="card-header">Actions</div>
+        <div class="card-content">
+          <button class="btn primary" id="refreshBtn">Refresh Data</button>
+          <button class="btn secondary" id="runSqlBtn">Run Custom SQL</button>
+          <div class="action-hint">
+            Replace this skeleton's manifest <code>dataSetId</code> with your own dataset UUID,
+            then have your AI agent build the workflow you actually need on top of it.
+          </div>
+        </div>
+      </aside>
+
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

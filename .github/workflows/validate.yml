@@ -1,0 +1,58 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Secret scan
+        run: bash scripts/check-secrets.sh
+
+      - name: Markdown link check
+        run: python3 scripts/check-links.py
+
+      - name: JSON syntax
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            python3 -m json.tool "$f" >/dev/null || { echo "JSON FAIL: $f"; fail=1; }
+          done < <(find . -name '*.json' -not -path './.git/*' -not -path '*/node_modules/*')
+          exit $fail
+
+      - name: JavaScript syntax
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            node --check "$f" || { echo "JS FAIL: $f"; fail=1; }
+          done < <(find . -name '*.js' -not -path './.git/*' -not -path '*/node_modules/*' -not -path '*/vendor/*')
+          exit $fail
+
+      - name: Python tests (offline)
+        run: |
+          pip install pytest
+          python -m pytest reference-architectures/pl-summary-app/tests -q
+          python -m pytest reference-architectures/inventory-management-app/tests -q
+
+      - name: Node tests (offline)
+        run: |
+          node templates/pro-code-app/tests/test_frontend_guards.js
+          node reference-architectures/inventory-management-app/dev-guide-app/tests/check.mjs
+          node reference-architectures/pl-summary-app/dev-guide-app/tests/check.mjs
+          node reference-architectures/inventory-management-app/tests/test_frontend_guards.js
+          node reference-architectures/inventory-management-app/tests/test_frontend_shell.js
+          node reference-architectures/inventory-management-app/tests/test_frontend_transforms.js
+          node reference-architectures/pl-summary-app/tests/test_drill_helpers.js

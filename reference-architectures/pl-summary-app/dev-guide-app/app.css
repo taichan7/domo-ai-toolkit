@@ -1,0 +1,722 @@
+/*
+ * 店舗別損益｜開発ガイド — テーマ（連続する1枚の技術文書 / ハンズオン教材）
+ *
+ * デザイン方針:
+ *   店舗損益AI分析デモの開発者向けハンズオン教材。装飾は最小限に抑え、
+ *   学術論文の紙面のように「地味・小綺麗・品のある」佇まいを目指す。濃い赤の塗り・太い帯・
+ *   進捗バー・ドットレールは使わず、細い罫線（ヘアライン）・太字ゴシックの見出し
+ *   （Noto Sans JP で全体を統一・先行アプリと同じ方式）・Booktabs 風の表・余白のリズムで構造を見せる。
+ *   節番号(§N)・図番号(図N)・表番号(表N)・要旨・目次を備え、
+ *   本文は要点だけを短く添え、意味は図・表・ポンチ絵で伝える。
+ *
+ *   番号は CSS カウンタが唯一の情報源（HTML には数字を書かない・JS でも振らない）。
+ *   図の増減・節の並べ替えで手直しが要らず、二重採番の事故も防ぐ。
+ *
+ * 配色・書体は Store PL AI Insights 本体（pro-code/app.css）へ寄せている:
+ *   基調＝臙脂（enji）#7F1D2D、アクセント＝暖色（赤茶）、書体＝Noto Sans JP / Yu Gothic。
+ *   濃淡は単一トークン --brand-primary から color-mix() で機械導出するので、
+ *   基調色を変えるときはこの1行＋暖色バイアスだけ差し替えれば全体の色が揃う。
+ */
+
+:root {
+  /* ★配色の基点はこの1色。Store PL AI Insights 本体（pro-code/app.css の --accent）と
+     一致させた臙脂（enji）系の深い赤。 */
+  --brand-primary: #7F1D2D;
+
+  /* --brand-primary から機械的に導出する濃淡（暖色バイアスで赤系に寄せる・手で数値を置かない）。 */
+  --brand-ink: color-mix(in srgb, var(--brand-primary) 82%, #180406);
+  --brand-strong: color-mix(in srgb, var(--brand-primary) 90%, #1a0005);
+  --brand-soft: color-mix(in srgb, var(--brand-primary) 8%, #fff);
+  --brand-softer: color-mix(in srgb, var(--brand-primary) 4%, #fff);
+  --brand-line: color-mix(in srgb, var(--brand-primary) 15%, #fff);
+  --brand-accent: color-mix(in srgb, var(--brand-primary) 55%, #b4532f);
+
+  /* 中立色（本文・面・境界）＝暖色寄りのニュートラル（Store PL AI Insights 本体のトーンに一致）。
+     補助文字（キャプション・タイルの説明・FAQ の対処など）も読めるよう、--ink-soft は十分に暗く取る。 */
+  --ink: #241f22;
+  --ink-soft: #514a45;
+  --canvas: #f4f3f0;
+  --surface: #ffffff;
+  --surface-muted: #faf7f4;
+  --line: #e4ded6;
+
+  /* 文字サイズの階梯。Store PL AI Insights 本体に合わせ可読性重視で底上げ（本文15〜16px・ラベル13〜14px・
+     極小ラベル12.8px）。年配利用者・プロジェクタ投影でも読める下限を確保する。 */
+  --fs-2xs: .80rem;
+  --fs-xs: .875rem;
+  --fs-sm: .9375rem;
+  --fs-base: 1.0rem;
+  --fs-h3: 1.26rem;
+
+  --radius: 10px;
+  --radius-sm: 7px;
+  --shadow: 0 1px 3px rgba(36, 31, 34, 0.05);
+  --shadow-sm: 0 1px 2px rgba(36, 31, 34, 0.04);
+  --gap: clamp(12px, 1.7vw, 20px);
+  --maxw: 1080px;
+  /* スティッキー上部バーの高さぶん。#doc／§N へのスクロール着地がバーに隠れないよう
+     scroll-margin-top で使う単一情報源（.doc と .sec の両方が参照する）。 */
+  --topbar-h: 64px;
+  /* 書体は 先行アプリと同じ Noto Sans JP（Google Fonts・index.html で読み込む）。
+     読み込めない環境は OS の標準ゴシックへ自然にフォールバックする。見出しも同じ書体（太字）。 */
+  --font: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
+          "Yu Gothic", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --serif: var(--font);
+  --font-mono: "SFMono-Regular", Consolas, "Courier New", monospace;
+  --code-surface: #f1efec;   /* インライン code の地 */
+  --cmd-surface: #f8f7f4;    /* コマンドブロックの地 */
+}
+
+* { box-sizing: border-box; }
+
+/* スキップリンク（キーボード利用者向け・通常は不可視、フォーカスで見える） */
+.skip-link {
+  position: absolute; left: 12px; top: -48px; z-index: 200;
+  padding: 8px 14px; background: var(--surface); color: var(--brand-primary);
+  border: 1.5px solid var(--brand-primary); border-radius: var(--radius-sm);
+  font-size: var(--fs-sm); font-weight: 700; text-decoration: none;
+}
+.skip-link:focus { top: 12px; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--canvas);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+}
+
+/* ── 線アイコン（絵）の共通スタイル ─────────────────────────
+ * symbol 側は path のみ持ち、色・線幅はここで一括指定して継承させる。
+ * currentColor 継承なので、置いた文脈の文字色に自然になじむ。 */
+.svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.ic {
+  width: 22px; height: 22px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+}
+.ic--lg { width: 28px; height: 28px; }
+
+/* ── 上部バー（スティッキー）＝ブランドと「現在の節」だけ（論文のランニングヘッダ） ─────── */
+.topbar {
+  position: sticky; top: 0; z-index: 60;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(8px);
+  backdrop-filter: saturate(1.4) blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.topbar__in {
+  max-width: var(--maxw); margin: 0 auto;
+  padding: 8px clamp(14px, 3vw, 26px);
+  display: flex; align-items: center; gap: 12px;
+}
+.brand { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 0 0 auto; }
+.brand__logo {
+  width: 28px; height: 28px; border-radius: 8px; flex: 0 0 auto;
+  display: grid; place-items: center;
+  background: var(--brand-primary); color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.brand__logo .ic { width: 17px; height: 17px; stroke-width: 1.7; }
+.brand__text {
+  font-weight: 700; font-size: clamp(0.9rem, 1.5vw, 1.02rem);
+  letter-spacing: 0.01em; color: var(--brand-ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* ランニングヘッダ（現在地の §N 見出し）。JS が activeObs で本文を書き込む。空なら何も出さない。 */
+.topbar__section {
+  margin-left: auto; min-width: 0;
+  font-size: var(--fs-xs); color: var(--ink-soft); font-weight: 700;
+  padding-left: 12px; border-left: 1px solid var(--line);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums; text-align: right;
+}
+.topbar__section:empty { border-left: none; }
+@media (max-width: 620px) { .brand__text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+
+/* ══════════════════════════════════════════════════════════════════
+ * 本体＝1枚の「紙面(ドキュメントシート)」。中の節は罫線で仕切って切れ目なく続ける。
+ * カウンタの起点をここに置く（節・図・表を通し番号で振る単一情報源）。
+ * ══════════════════════════════════════════════════════════════════ */
+.doc {
+  scroll-margin-top: var(--topbar-h);   /* スキップリンク（#doc）が topbar に隠れないように */
+  max-width: var(--maxw);
+  margin: clamp(14px, 2.2vw, 26px) auto clamp(24px, 3.4vw, 42px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: clamp(20px, 2.6vw, 34px) clamp(16px, 2.6vw, 38px) clamp(26px, 3.4vw, 44px);
+  counter-reset: sec fig tbl;
+}
+
+/* 節どうしの縦リズム＝直下の子に一定の上マージン（先頭は付けない）。詰めて連続感を出す。 */
+.sec > *:not(:first-child) { margin-top: clamp(16px, 2vw, 24px); }
+/* ↑ :not() で .fig{ margin:0 } や .try{ margin:0 } より優先させる（figure/try の上余白が 0 になる事故の修正）。 */
+
+/* ── 標題・要旨・目次（フロントマター） ───────────────────────── */
+.masthead {
+  padding-bottom: clamp(15px, 2vw, 22px);
+  border-bottom: 1px solid var(--line);
+}
+.masthead__eyebrow {
+  display: flex; align-items: center; gap: 8px; margin: 0 0 8px;
+  font-size: var(--fs-2xs); font-weight: 700; letter-spacing: 0.1em; color: var(--brand-accent);
+}
+.masthead__eyebrow .ic { width: 16px; height: 16px; }
+.masthead__title {
+  margin: 0; font-family: var(--serif); font-size: clamp(1.5rem, 3.3vw, 2.15rem); line-height: 1.3;
+  color: var(--brand-ink); font-weight: 700; letter-spacing: 0.01em;
+}
+.masthead__lead {
+  margin: 9px 0 0; font-size: clamp(1.0rem, 1.5vw, 1.12rem); color: var(--ink);
+  max-width: 66ch; line-height: 1.85;
+}
+.masthead__lead b { color: var(--brand-strong); }
+/* 全体像の図の直前に置くリード（図との間隔を詰める） */
+.masthead__lead--figtop { margin: 0 0 10px; }
+
+/* 書誌行（コロフォン）＝論文のフロントマター。文書種別・版・対象を dt/dd で示す。 */
+.colophon {
+  display: flex; flex-wrap: wrap; gap: 5px 20px; margin: 11px 0 0;
+  font-size: var(--fs-xs); color: var(--ink-soft);
+}
+.colophon > div { display: inline-flex; gap: 7px; }
+.colophon dt { margin: 0; font-weight: 800; color: var(--brand-accent); }
+.colophon dd { margin: 0; }
+
+/* 要旨（Abstract）＝論文の書き出しを模した囲み。 */
+.abstract {
+  margin-top: clamp(12px, 1.8vw, 16px);
+  padding: 11px 15px;
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.abstract__tag {
+  display: inline-block; margin-bottom: 3px;
+  font-size: var(--fs-2xs); font-weight: 800; letter-spacing: 0.12em; color: var(--brand-accent);
+}
+.abstract p { margin: 0; font-size: var(--fs-sm); line-height: 1.78; color: var(--ink); }
+.abstract b { color: var(--brand-strong); font-weight: 700; }
+
+/* 目次＋読み方を横並び（広幅）／縦積み（狭幅）。 */
+.frontgrid {
+  margin-top: clamp(13px, 1.8vw, 18px);
+  display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--gap); align-items: start;
+}
+
+.toc__cap, .readme__cap {
+  margin: 0 0 7px; font-size: var(--fs-2xs); font-weight: 800; letter-spacing: 0.1em; color: var(--brand-accent);
+  display: flex; align-items: center; gap: 7px;
+}
+.toc__cap .ic, .readme__cap .ic { width: 15px; height: 15px; }
+.toc__list { list-style: none; margin: 0; padding: 0; counter-reset: toc; }
+.toc__list li { counter-increment: toc; }
+.toc__list li + li { border-top: 1px solid var(--line); }
+.toc__list a {
+  display: grid; grid-template-columns: 1.6em 1fr; align-items: baseline;
+  column-gap: 10px; row-gap: 1px;
+  padding: 8px 11px; border-radius: var(--radius-sm);
+  text-decoration: none; color: inherit; cursor: pointer;
+  transition: background 0.12s ease;
+}
+.toc__list a:hover { background: var(--brand-soft); }
+/* 番号は左列で2行ぶち抜き。見出し・説明は右の広い列に縦積み（説明が1文字折返しになる事故を防ぐ）。
+ * 数字は CSS カウンタ（toc）で出す＝HTML には数字を書かない。 */
+.toc__n { grid-column: 1; grid-row: 1 / 3; font-weight: 800; color: var(--brand-primary); font-variant-numeric: tabular-nums; }
+.toc__n::before { content: counter(toc); }
+.toc__t { grid-column: 2; grid-row: 1; font-weight: 700; color: var(--brand-ink); font-size: var(--fs-sm); }
+.toc__d { grid-column: 2; grid-row: 2; font-size: var(--fs-2xs); color: var(--ink-soft); }
+
+.readme {
+  padding: 12px 15px; background: var(--brand-softer);
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+}
+.readme__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+/* アイコンは絶対配置、本文（<b>含む）は通常インラインで流す。
+ * flex の直下に text と <b> を混ぜると別々のアイテム化して1文字折返しになるため、その事故を避ける。 */
+.readme__list li { position: relative; padding-left: 25px; font-size: var(--fs-sm); line-height: 1.55; color: var(--ink); }
+.readme__list .ic { position: absolute; left: 0; top: 2px; width: 16px; height: 16px; color: var(--brand-accent); }
+.readme__list b { color: var(--brand-strong); }
+
+/* ── 節（§）＝紙面内の見出しブロック。罫線で仕切って連続させる。 ───────── */
+.sec {
+  border-top: 1px solid var(--line);
+  padding: clamp(22px, 2.8vw, 32px) 0 clamp(2px, 0.6vw, 6px);
+  scroll-margin-top: var(--topbar-h);
+  counter-increment: sec;   /* §N */
+  counter-reset: sub;       /* 小節番号を節ごとに 1 から振り直す */
+}
+/* JS がある時だけ「スクロールで現れる」演出を有効化（無ければ常に表示）。 */
+.reveal .sec { opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.reveal .sec.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal .sec { opacity: 1; transform: none; transition: none; }
+  .toast, .copy-btn { transition: none; }
+}
+
+.sec__head { display: flex; align-items: center; gap: 12px; }
+.sec__no {
+  width: 32px; height: 32px; flex: 0 0 auto;
+  display: grid; place-items: center; border-radius: 6px;
+  background: transparent; color: var(--brand-primary);
+  border: 1px solid var(--brand-line);
+  font-family: var(--serif);
+  font-size: 1.1rem; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.sec__no::before { content: counter(sec); }   /* 数字は CSS カウンタが唯一の情報源 */
+.sec__title {
+  margin: 0; font-family: var(--serif); font-size: clamp(1.3rem, 2.1vw, 1.6rem); line-height: 1.4;
+  color: var(--brand-ink); font-weight: 700; letter-spacing: 0.01em;
+}
+.sec__lead { margin: 0; font-size: clamp(1.0rem, 1.4vw, 1.1rem); color: var(--ink); max-width: 72ch; line-height: 1.8; }
+
+/* 節内の小見出し（§N.M）。左に細い紺のバー＋自動採番。 */
+.sub {
+  counter-increment: sub;
+  margin: 16px 0 0; font-family: var(--serif); font-size: var(--fs-h3); font-weight: 700; color: var(--brand-ink);
+  line-height: 1.45;
+}
+.sub::before {
+  content: counter(sec) "." counter(sub) "\2002";
+  color: var(--brand-accent); font-variant-numeric: tabular-nums;
+}
+
+/* 注記（左アクセントの帯）。アイコン絶対配置＋本文通常フローで narrow でも崩れない。 */
+.sec__note {
+  position: relative;
+  font-size: var(--fs-sm); line-height: 1.72; color: var(--ink-soft);
+  padding: 12px 16px 12px 42px;
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.sec__note .ic { position: absolute; left: 14px; top: 10px; width: 17px; height: 17px; color: var(--brand-accent); }
+.sec__note code { font-size: 0.86em; }
+.sec__note--strong { background: var(--brand-soft); border-color: var(--brand-line); color: var(--brand-ink); font-weight: 700; }
+.sec__note--strong .ic { color: var(--brand-primary); }
+
+/* ── 図版（figure）と図番号／表番号キャプション ───────────────────────
+ * 図（fig）と表（fig--table）で別々のカウンタを回し、「図N.」「表N.」を figcaption 先頭へ自動前置する。
+ * 本文・HTML は番号を持たない（単一情報源＝出現順）。 */
+.fig { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.fig figcaption {
+  font-size: var(--fs-xs); color: var(--ink-soft); line-height: 1.7;
+}
+.fig figcaption::before { font-family: var(--serif); }
+.fig figcaption b { color: var(--brand-strong); }
+figure.fig:not(.fig--table) > figcaption::before {
+  counter-increment: fig; content: "図" counter(fig) ". ";
+  font-weight: 700; color: var(--brand-strong);
+}
+figure.fig--table > figcaption::before {
+  counter-increment: tbl; content: "表" counter(tbl) ". ";
+  font-weight: 700; color: var(--brand-strong);
+}
+
+/* ── 2カラム（図版を横に並べて縦を詰める） ───────────────────── */
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); align-items: start; }
+.cols--wideleft { grid-template-columns: 1.25fr 0.9fr; }
+/* グリッド/フレックスの子は既定 min-width:auto。中の長いコマンド行や表の最小幅で列が縮まず、
+ * 文書全体を横に押し広げてしまう。min-width:0 で縮小を許し、はみ出しは内側のスクロール枠で吸収させる。 */
+.cols > *, .frontgrid > * { min-width: 0; }
+.fig, .cmd, .tablewrap { min-width: 0; max-width: 100%; }
+
+/* ── 定義リスト（用語・契約を仕様書らしく term→定義で並べる） ───────── */
+dl.defs {
+  display: grid; grid-template-columns: auto 1fr; column-gap: 16px; row-gap: 10px;
+  margin: 0; font-size: var(--fs-sm);
+  padding: 15px 18px; background: var(--surface-muted);
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+}
+dl.defs dt { font-weight: 800; color: var(--brand-strong); white-space: nowrap; }
+dl.defs dd { margin: 0; color: var(--ink-soft); line-height: 1.5; }
+dl.defs dd b { color: var(--brand-strong); }
+dl.defs code { font-size: 0.86em; }
+
+/* ── 手順（前提→操作→確認）＝自動採番の番号バッジ付きリスト ───────── */
+ol.proc { list-style: none; counter-reset: step; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+ol.proc > li {
+  counter-increment: step; position: relative; padding-left: 30px;
+  font-size: var(--fs-sm); line-height: 1.7; color: var(--ink);
+}
+ol.proc > li::before {
+  content: counter(step); position: absolute; left: 0; top: 0;
+  width: 20px; height: 20px; border-radius: 6px;
+  background: var(--brand-soft); color: var(--brand-primary);
+  font-weight: 800; font-size: 0.72rem; font-variant-numeric: tabular-nums;
+  display: grid; place-items: center;
+}
+ol.proc b { color: var(--brand-strong); }
+ol.proc .ph {
+  display: inline-block; margin-right: 6px; padding: 0 7px;
+  font-size: var(--fs-2xs); font-weight: 800; letter-spacing: 0.04em;
+  color: #fff; background: var(--brand-accent); border-radius: 999px; vertical-align: 1px;
+}
+
+/* ── フッター ──────────────────────────────────────────── */
+.sitefoot {
+  max-width: var(--maxw); margin: 0 auto;
+  padding: 0 clamp(14px, 3vw, 26px) clamp(24px, 4vw, 44px);
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  color: var(--ink-soft); font-size: var(--fs-xs);
+}
+.sitefoot .ic { width: 16px; height: 16px; color: var(--brand-accent); }
+
+/* ══════════════════════════════════════════════════════════════════
+ * 図中心のコンテンツ・プリミティブ。ブランドの赤は差し色としてのみ使い、面は白・生成りで統一する。
+ * ══════════════════════════════════════════════════════════════════ */
+
+/* ── ステップカード（アイコン主役） ─────────────────────────── */
+.steps {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap);
+}
+.step {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 7px;
+  padding: clamp(13px, 1.7vw, 18px);
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.step__icon {
+  width: 40px; height: 40px; display: grid; place-items: center;
+  border-radius: 11px; background: var(--brand-soft); color: var(--brand-primary);
+  margin-bottom: 2px;
+}
+.step__num { font-size: var(--fs-2xs); font-weight: 700; letter-spacing: 0.06em; color: var(--brand-accent); }
+.step h4 { margin: 0; font-size: var(--fs-base); color: var(--brand-ink); }
+.step p { margin: 0; font-size: var(--fs-sm); color: var(--ink-soft); line-height: 1.65; }
+
+/* ── コールアウト（小見出し＋一言） ─────────────────────────── */
+.callouts { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+.callouts--2 { grid-template-columns: repeat(2, 1fr); }
+.callouts--4 { grid-template-columns: repeat(4, 1fr); }
+.callout {
+  display: flex; flex-direction: column; gap: 7px;
+  padding: 14px 17px; background: var(--surface-muted);
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+}
+.callout--accent { background: var(--brand-soft); border-color: var(--brand-line); }
+.callout h4 { margin: 0; font-size: var(--fs-sm); color: var(--brand-ink); }
+.callout__icon {
+  width: 34px; height: 34px; flex: 0 0 auto; display: grid; place-items: center;
+  border-radius: 9px; background: var(--brand-soft); color: var(--brand-primary);
+}
+.callout__icon .ic { width: 20px; height: 20px; }
+.callout p { margin: 0; font-size: var(--fs-xs); color: var(--ink-soft); line-height: 1.7; }
+
+code {
+  font-family: var(--font-mono);
+  background: var(--code-surface);
+  color: var(--brand-ink);
+  letter-spacing: 0;
+  padding: 1px 6px; border-radius: 4px; font-size: 0.88em;
+}
+
+/* ── フロー図（各タイルにアイコン） ───────────────────────── */
+.flow {
+  display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; justify-content: flex-start;
+  padding: clamp(12px, 1.6vw, 18px);
+  background: var(--surface-muted); border: 1px solid var(--line); border-radius: var(--radius-sm);
+}
+.flow__arrow { display: grid; place-items: center; color: var(--brand-accent); }
+.flow__arrow .ic { width: 24px; height: 24px; stroke-width: 2; }
+/* 段数の多いフロー（§6 開発ループ・§7 実習の流れ）は紙面幅（〜930px）では横に収まらず、
+ * 折返して矢印が宙に浮く。常に縦1列＋下向き矢印で積む（狭幅時の挙動を全幅へ広げる）。 */
+.flow--long { flex-direction: column; align-items: stretch; }
+.flow--long .flow__arrow { transform: rotate(90deg); }
+.tile {
+  display: flex; align-items: center; gap: 9px;
+  border-radius: 10px; padding: 10px 14px; font-size: var(--fs-sm);
+  border: 1px solid var(--brand-line); background: var(--surface); min-width: 140px;
+}
+.tile .ic { width: 20px; height: 20px; color: var(--brand-accent); flex: 0 0 auto; }
+.tile--input { border-left: 2px solid var(--brand-accent); }
+.tile--step {
+  flex-direction: column; align-items: flex-start; gap: 3px;
+  background: var(--surface-muted); border-color: var(--line); min-width: 150px;
+}
+.tile--step .tile__head { display: flex; align-items: center; gap: 7px; }
+.tile--step .tile__head .ic { color: var(--brand-primary); }
+.tile--step b { color: var(--brand-strong); font-size: 0.9rem; }
+.tile--step span { color: var(--ink-soft); font-size: var(--fs-2xs); }
+.tile--step em { color: var(--brand-accent); font-style: normal; font-weight: 700; font-size: var(--fs-2xs); }
+.tile--output { background: var(--brand-softer); color: var(--brand-ink); border: 1.5px solid var(--brand-primary); font-weight: 700; }
+.tile--output .ic { color: var(--brand-primary); }
+/* ── 境界図（Domo の外＝開発／中＝実行 の役割分担） ───────────── */
+.boundary {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 0;
+  border: 1px solid var(--brand-line); border-radius: var(--radius); overflow: hidden;
+  background: var(--surface-muted);
+}
+.boundary__side { display: flex; flex-direction: column; gap: 10px; padding: clamp(15px, 2vw, 20px); min-width: 0; }
+.boundary__side--in { background: var(--surface); }
+.boundary__cap {
+  display: flex; align-items: center; gap: 8px;
+  font-size: var(--fs-sm); font-weight: 800; color: var(--brand-ink);
+}
+.boundary__cap .ic { width: 18px; height: 18px; color: var(--brand-primary); flex: 0 0 auto; }
+.boundary__chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.boundary__chips i {
+  font-style: normal; font-size: var(--fs-2xs); font-weight: 700;
+  padding: 3px 9px; border-radius: 999px;
+  background: var(--surface); color: var(--brand-ink); border: 1px solid var(--brand-line);
+}
+.boundary__role { font-size: var(--fs-xs); color: var(--brand-accent); font-weight: 700; }
+.boundary__bridge {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  padding: 0 clamp(8px, 1.4vw, 16px); background: var(--brand-soft); color: var(--brand-primary);
+  border-left: 1px solid var(--brand-line); border-right: 1px solid var(--brand-line);
+  font-size: var(--fs-2xs); font-weight: 800; text-align: center; white-space: nowrap;
+}
+.boundary__bridge .ic { width: 22px; height: 22px; color: var(--brand-primary); }
+@media (max-width: 720px) {
+  .boundary { grid-template-columns: 1fr; }
+  .boundary__bridge { flex-direction: row; padding: 8px; }
+  .boundary__bridge .ic { transform: rotate(90deg); }
+}
+
+/* ── 図解用のミニ表／責務表 ───────────────────────────────── */
+.tablewrap { display: flex; justify-content: flex-start; overflow-x: auto; }
+.tablewrap .demotable { width: 100%; }
+.demotable {
+  border-collapse: collapse; background: transparent;
+  border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink);
+  font-size: var(--fs-sm); font-variant-numeric: tabular-nums;
+}
+.demotable--sm { font-size: var(--fs-xs); }
+.demotable th, .demotable td { border: none; border-bottom: 1px solid var(--line); padding: 8px 12px; text-align: left; white-space: nowrap; color: var(--ink); }
+.demotable thead th { background: transparent; color: var(--brand-ink); font-weight: 700; border-bottom: 1px solid var(--ink); }
+.demotable tbody tr:last-child td { border-bottom: none; }
+.demotable td.n, .demotable th.n { text-align: right; }
+.demotable td.role, .demotable th.role { color: var(--brand-strong); font-weight: 700; white-space: nowrap; }
+.demotable--wrap td.role, .demotable--wrap th.role { white-space: normal; }
+.demotable td.memo { color: var(--ink-soft); white-space: normal; }
+/* --wrap: すべてのセル（中央の素 td も）を折り返して表を枠内に収める。
+   既定の nowrap（L498）が中央列を 1 行強制し、表幅が枠を超えて末尾列が見切れる問題への対処。 */
+.demotable--wrap th, .demotable--wrap td { white-space: normal; overflow-wrap: anywhere; }
+
+/* ── ターミナル風コマンド ─────────────────────────────────── */
+.cmd { display: flex; flex-direction: column; gap: 0; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--line); }
+.cmd__bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 7px 13px; background: var(--surface-muted); border-bottom: 1px solid var(--line);
+}
+.cmd__bar span { display: flex; align-items: center; gap: 8px; font-size: var(--fs-sm); font-weight: 700; color: var(--brand-ink); }
+.cmd__bar span .ic { width: 16px; height: 16px; color: var(--brand-accent); }
+.cmd__body {
+  margin: 0; padding: 11px 14px; background: var(--cmd-surface); color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm); line-height: 1.6; white-space: pre; overflow-x: auto;
+}
+.cmd__body .c { color: var(--ink-soft); }
+/* 印刷(PDF)では横スクロールが効かず幅広行が右端で切れてテキストが欠落する。
+   PDF では折り返して全文を残す（画面・shoot.mjs PNG は white-space:pre のまま不干渉）。 */
+@media print { .cmd__body { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; } }
+
+/* ── Try & Error の輪 ─────────────────────────────────────── */
+/* 開発ループの「戻り」注記（破線ピルで囲わず、フロー図の下に中央の一行で添える＝はみ出さない）。 */
+.loop-note {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  margin: 2px 0 0; font-size: var(--fs-sm); font-weight: 700; color: var(--brand-primary);
+}
+.loop-note .ic { width: 17px; height: 17px; color: var(--brand-primary); flex: 0 0 auto; }
+
+/* ── コピーボタン ─────────────────────────────────────────── */
+.copy-btn {
+  font-family: inherit; font-size: var(--fs-xs); font-weight: 700;
+  padding: 5px 13px; border-radius: 999px;
+  border: 1px solid var(--brand-line); background: var(--surface); color: var(--brand-primary);
+  cursor: pointer; white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.copy-btn:hover { background: var(--brand-soft); border-color: var(--brand-primary); }
+.copy-btn:focus-visible, .toc__list a:focus-visible, .sec__lead a:focus-visible,
+dl.defs dd a:focus-visible, ol.proc a:focus-visible {
+  outline: 2px solid var(--brand-primary); outline-offset: 2px;
+  background: var(--brand-soft); border-radius: var(--radius-sm);
+}
+.copy-btn.is-copied { background: var(--brand-primary); color: #fff; border-color: var(--brand-strong); }
+
+/* ── トースト ─────────────────────────────────────────────── */
+.toast {
+  position: fixed; left: 50%; bottom: 24px;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--brand-ink); color: #fff;
+  padding: 10px 22px; border-radius: 999px; font-size: 0.9rem; font-weight: 700;
+  box-shadow: var(--shadow); opacity: 0; pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease; z-index: 90;
+}
+.toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── 狭幅（タブレット縦・スマホ） ─────────────────────────── */
+@media (max-width: 900px) {
+  .frontgrid { grid-template-columns: 1fr; }
+  .cols, .cols--wideleft { grid-template-columns: 1fr; }
+  .steps, .callouts, .callouts--2 { grid-template-columns: 1fr; }
+  .callouts--4 { grid-template-columns: repeat(2, 1fr); }
+  .flow { flex-direction: column; align-items: stretch; }
+  .flow__arrow { transform: rotate(90deg); }
+  .arch__layer { flex-wrap: wrap; gap: 10px; }
+  .arch__role { margin-left: auto; }
+}
+@media (max-width: 620px) {
+  .sec__no { width: 27px; height: 27px; font-size: 0.94rem; }
+  .doc { border-radius: 0; border-left: none; border-right: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+ * アーキテクチャ（三層スタック）
+ * ══════════════════════════════════════════════════════════════════ */
+.arch {
+  display: flex; flex-direction: column; gap: 10px;
+  /* 「ひとつの Domo で完結」ラベルは箱の中（先頭・中央）に置く＝上辺を跨がないので見出しと衝突しない。 */
+  padding: clamp(14px, 1.8vw, 18px) clamp(15px, 2.2vw, 24px) clamp(11px, 1.4vw, 14px);
+  background: var(--surface-muted); border: 1px solid var(--brand-line); border-radius: var(--radius);
+}
+.arch__frame {
+  align-self: center; margin-bottom: 3px;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 4px 14px; font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.04em;
+  color: var(--ink-soft); background: transparent; border: 1px solid var(--brand-line); border-radius: 999px;
+  white-space: nowrap;
+}
+.arch__frame .ic { width: 15px; height: 15px; color: var(--brand-accent); }
+.arch__layer {
+  display: flex; align-items: center; gap: clamp(11px, 1.8vw, 18px);
+  padding: clamp(8px, 1.2vw, 11px) clamp(14px, 1.8vw, 20px);
+  border-radius: var(--radius-sm); border: 1px solid var(--brand-line); background: var(--surface);
+}
+.arch__layer--ai { background: var(--brand-softer); border: 1.5px solid var(--brand-primary); }
+.arch__layer--app { background: var(--brand-soft); }
+.arch__layer--data { background: var(--surface); }
+.arch__icon {
+  width: 42px; height: 42px; flex: 0 0 auto; display: grid; place-items: center;
+  border-radius: 12px; background: var(--brand-soft); color: var(--brand-primary);
+}
+.arch__body { display: flex; flex-direction: column; gap: 6px; flex: 1 1 auto; min-width: 0; }
+.arch__label { font-family: var(--serif); font-size: clamp(0.98rem, 1.7vw, 1.14rem); font-weight: 700; color: var(--brand-ink); }
+.arch__layer--ai .arch__label { color: var(--brand-ink); }
+.arch__chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.arch__chips i {
+  font-style: normal; font-size: var(--fs-2xs); font-weight: 700;
+  padding: 3px 10px; border-radius: 999px;
+  background: var(--surface); color: var(--brand-ink); border: 1px solid var(--brand-line);
+}
+.arch__role { flex: 0 0 auto; font-size: var(--fs-sm); font-weight: 700; color: var(--brand-accent); white-space: nowrap; }
+.arch__layer--ai .arch__role { color: var(--brand-primary); }
+.arch__flow { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: var(--fs-2xs); font-weight: 700; color: var(--ink-soft); }
+.arch__flow .ic { width: 18px; height: 18px; color: var(--brand-accent); transform: rotate(90deg); }
+
+/* ── 2経路の並置 ─────────────────────────────────────────── */
+.vs { display: flex; align-items: stretch; gap: clamp(10px, 1.8vw, 16px); flex-wrap: wrap; }
+.vs__panel {
+  flex: 1 1 240px; display: flex; flex-direction: column; gap: 12px;
+  padding: clamp(15px, 1.8vw, 20px); border-radius: var(--radius-sm);
+  border: 1px solid var(--line); background: var(--surface-muted);
+}
+.vs__panel--accent { background: var(--brand-soft); border-color: var(--brand-line); }
+.vs__head { display: flex; align-items: center; gap: 10px; font-size: 0.98rem; font-weight: 800; color: var(--brand-ink); }
+.vs__head .ic { color: var(--brand-primary); flex: 0 0 auto; }
+.vs__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.vs__list li { display: flex; align-items: flex-start; gap: 9px; font-size: var(--fs-sm); color: var(--ink); line-height: 1.45; }
+.vs__list .ic { width: 17px; height: 17px; flex: 0 0 auto; color: var(--brand-accent); margin-top: 2px; }
+
+/* ══════════════════════════════════════════════════════════════════
+ * 開発ガイド向けの追加プリミティブ（本日の流れ・ハンズオン強調・凡例バッジ）
+ * ══════════════════════════════════════════════════════════════════ */
+
+/* masthead 内の図（本日の流れ）の上余白。 */
+.masthead > .fig { margin-top: clamp(13px, 1.8vw, 18px); }
+.masthead > .try { margin-top: clamp(14px, 1.9vw, 20px); }
+
+/* ── 「やってみよう」ブロック：参加者が実際に手を動かす箇所を強調する ───────── */
+.try {
+  position: relative; display: flex; flex-direction: column; gap: 9px;
+  padding: 14px 17px; margin: 0;
+  background: var(--brand-softer); border: 1.5px solid var(--brand-primary);
+  border-left: 4px solid var(--brand-primary); border-radius: var(--radius-sm);
+}
+.try__tag {
+  display: inline-flex; align-items: center; gap: 7px; align-self: flex-start;
+  padding: 2px 10px; font-size: var(--fs-2xs); font-weight: 800; letter-spacing: 0.06em;
+  color: var(--brand-primary); background: var(--surface); border: 1px solid var(--brand-primary); border-radius: 999px;
+}
+.try__tag .ic { width: 14px; height: 14px; color: var(--brand-primary); }
+.try h4 { margin: 0; font-size: var(--fs-base); color: var(--brand-ink); }
+.try p { margin: 0; font-size: var(--fs-sm); color: var(--ink); line-height: 1.55; }
+.try ol, .try ul { margin: 2px 0 0; padding-left: 1.35em; font-size: var(--fs-sm); color: var(--ink); line-height: 1.78; }
+.try li + li { margin-top: 5px; }
+.try li b { color: var(--brand-strong); }
+.try code { font-size: 0.86em; }
+
+/* ── 凡例バッジ（開発サーフェスの色分け：CLI / REST / UI など） ───────────── */
+.keys { display: flex; flex-wrap: wrap; gap: 8px; }
+.key {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 4px 11px; border-radius: 999px; font-size: var(--fs-2xs); font-weight: 700;
+  border: 1px solid var(--brand-line); background: var(--surface); color: var(--ink);
+}
+.key .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+.key .dot--cli { background: var(--brand-primary); }
+.key .dot--rest { background: var(--brand-accent); }
+.key .dot--ui { background: var(--ink-soft); }
+/* ── 承認/検証ゲート・バッジ（開発ループ図で人間が握る関門。塗りではなく破線の赤枠で示す） ───────── */
+.tile--gate { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; background: var(--surface); color: var(--brand-ink); border: 1.5px dashed var(--brand-primary); font-weight: 700; }
+.tile--gate .ic { color: var(--brand-primary); }
+.tile--gate b { color: var(--brand-primary); }
+.tile--gate span { color: var(--ink-soft); font-size: var(--fs-2xs); }
+
+/* 本文リンク（lead・定義リスト内）はブランド色の下線に＝既定の生青リンクを避ける。TOC（.toc__list a）には触れない。 */
+.sec__lead a, dl.defs dd a { color: var(--brand-primary); text-decoration: underline; text-underline-offset: 2px; }
+.sec__lead a:hover, dl.defs dd a:hover { color: var(--brand-strong); }
+
+/* ── 開発サーフェスのアイコンカード（文字の壁を避け、絵＋短文＋手段バッジで一覧する） ─────── */
+.surfaces { display: grid; grid-template-columns: repeat(auto-fill, minmax(236px, 1fr)); gap: var(--gap); }
+.surface {
+  display: flex; flex-direction: column; gap: 9px;
+  padding: 14px 16px; background: var(--surface-muted);
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+}
+.surface__head { display: flex; align-items: center; gap: 9px; }
+.surface__icon {
+  width: 34px; height: 34px; flex: 0 0 auto; display: grid; place-items: center;
+  border-radius: 9px; background: var(--brand-soft); color: var(--brand-primary);
+}
+.surface__icon .ic { width: 20px; height: 20px; }
+.surface__name { font-size: var(--fs-base); font-weight: 800; color: var(--brand-ink); line-height: 1.25; }
+.surface__badge {
+  margin-left: auto; flex: 0 0 auto; font-size: var(--fs-2xs); font-weight: 800; letter-spacing: 0.04em;
+  padding: 1px 9px; border-radius: 999px; background: var(--surface); white-space: nowrap;
+  border: 1px solid currentColor;
+}
+.surface__badge.b-cli { color: var(--brand-primary); }
+.surface__badge.b-api { color: var(--brand-accent); }
+.surface__badge.b-ui  { color: var(--ink-soft); }
+.surface p { margin: 0; font-size: var(--fs-sm); color: var(--ink-soft); line-height: 1.6; }
+.surface p b, .surface p code { color: var(--brand-strong); }
+
+@media (max-width: 620px) {
+  .surfaces { grid-template-columns: 1fr; }
+  .callouts--4 { grid-template-columns: 1fr; }
+  dl.defs { grid-template-columns: 1fr; }
+  dl.defs dt { white-space: normal; }
+}
+
+/* スクリーンリーダー専用（視覚的には出さないが読み上げには残す） */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* 補助の小さめ注記（出典・補足）。--ink-soft の淡色で本文と差をつける。 */
+.muted, small.muted { color: var(--ink-soft); }

@@ -1,0 +1,451 @@
+/* ============ MUJI-inspired minimal theme ============ */
+:root{
+  --bg: #F5F4F2;
+  --surface: #FFFFFF;
+  --ink: #2E2E2A;
+  --ink-muted: #5A5A56;
+  --border: #E6E2DC;
+  --accent: #7F1D2D;          /* enji */
+  --accent-weak: #9B2C3A;
+  --profit: #5F7A64;          /* muted sage for profit line/positive */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 8px 24px rgba(0,0,0,.05);
+  --radius: 12px;
+}
+
+*{ box-sizing: border-box; }
+html, body{ height: 100%; }
+
+body{
+  margin: 0;
+  font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
+               "Yu Gothic", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--bg), #F7F6F4 40%, var(--bg) 100%);
+  letter-spacing: .02em;
+}
+
+.container{ max-width: 1120px; margin: 0 auto; }
+.hidden{ display: none !important; }
+
+/* ---------- Header ---------- */
+#header{
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 10;
+  box-shadow: var(--shadow-sm);
+}
+.header-content{
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; padding: 14px 24px;
+}
+.brand{ display: flex; flex-direction: row; align-items: center; gap: 12px; }
+.brand-logo{ width: 46px; height: 46px; border-radius: 10px; display: block; box-shadow: var(--shadow-sm); }
+.brand-text{ display: flex; flex-direction: column; gap: 2px; }
+.logo{ font-weight: 700; font-size: 17px; letter-spacing: .04em; color: var(--ink); }
+.brand-sub{ font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-muted); }
+
+.selector{ display: flex; align-items: center; gap: 10px; }
+.selector-label{ font-size: 13px; color: var(--ink-muted); }
+.select-shell{ position: relative; }
+.select-shell::after{
+  content: "▾"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--accent); pointer-events: none; font-size: 12px;
+}
+#store-select{
+  -webkit-appearance: none; appearance: none;
+  min-width: 240px; max-width: 320px;
+  padding: 9px 34px 9px 14px;
+  font-family: inherit; font-size: 14px; color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: var(--shadow-sm); cursor: pointer;
+}
+#store-select:focus{ outline: none; border-color: var(--accent-weak); box-shadow: 0 0 0 3px rgba(127,29,45,.12); }
+
+/* ---------- Main ---------- */
+.main-content{ padding: 28px 24px 48px; }
+
+#message-container{
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border); border-left: 4px solid var(--accent);
+  border-radius: var(--radius); padding: 14px 16px; margin-bottom: 18px;
+  color: var(--ink-muted); box-shadow: var(--shadow-sm);
+}
+
+/* Loading */
+.loading{ display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 56px 0; }
+.spinner{
+  width: 42px; height: 42px;
+  border: 2px solid var(--border); border-top: 2px solid var(--accent);
+  border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 12px;
+}
+.spinner.sm{ width: 26px; height: 26px; margin-bottom: 10px; }
+@keyframes spin{ to{ transform: rotate(360deg); } }
+.loading p{ color: var(--ink-muted); }
+
+/* ---------- View head ---------- */
+.view-head{
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 16px; margin-bottom: 18px; flex-wrap: wrap;
+}
+.view-eyebrow{ font-size: 12px; letter-spacing: .14em; color: var(--ink-muted); text-transform: uppercase; }
+.view-title{ margin: 4px 0 0; font-size: 26px; font-weight: 700; color: var(--ink); letter-spacing: .02em; }
+.badges{ display: flex; gap: 8px; flex-wrap: wrap; }
+.badge{
+  font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 999px;
+  border: 1px solid var(--border); background: #fff; color: var(--ink-muted);
+}
+.badge.pos{ color: var(--profit); border-color: rgba(95,122,100,.35); background: rgba(95,122,100,.08); }
+.badge.neg{ color: var(--accent); border-color: rgba(127,29,45,.3); background: rgba(127,29,45,.06); }
+.badge.mid{ color: #8A6D3B; border-color: rgba(138,109,59,.3); background: rgba(138,109,59,.07); }
+
+/* ---------- KPI grid ---------- */
+.kpi-grid{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+.kpi{
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px 18px; box-shadow: var(--shadow-sm);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.kpi:hover{ transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.kpi-label{ font-size: 12px; color: var(--ink-muted); letter-spacing: .04em; }
+.kpi-value{ margin-top: 6px; font-size: 24px; font-weight: 700; color: var(--ink); letter-spacing: .01em; }
+.kpi-value.pos{ color: var(--profit); }
+.kpi-value.neg{ color: var(--accent); }
+
+/* ---------- Quick AI summary ---------- */
+.ai-quick{
+  display: flex; gap: 14px; align-items: flex-start;
+  background: linear-gradient(135deg, #FBF3F4, #F9F1F2);
+  border: 1px solid rgba(127,29,45,.18); border-radius: var(--radius);
+  padding: 16px 18px; margin-bottom: 20px; box-shadow: var(--shadow-sm);
+}
+.ai-quick-mark{
+  flex: 0 0 auto; width: 34px; height: 34px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent); color: #fff; font-weight: 700; font-size: 13px; letter-spacing: .05em;
+}
+.ai-quick-body{ font-size: 14px; line-height: 1.85; color: var(--ink); }
+.ai-quick-body p{ margin: 0 0 6px; }
+.ai-quick-body p:last-child{ margin-bottom: 0; }
+
+/* ---------- Charts grid ---------- */
+.charts-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+.chart-card{
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px 20px; box-shadow: var(--shadow-sm); min-width: 0;
+  position: relative; transition: box-shadow .18s ease;
+}
+.chart-card:hover{ box-shadow: var(--shadow-md); z-index: 3; }
+.chart-card.span-2{ grid-column: span 2; }
+.chart-card.span-3{ grid-column: span 3; }
+.chart-title{
+  margin: 0 0 12px; font-size: 15px; font-weight: 700; color: var(--ink);
+  display: flex; align-items: baseline; gap: 10px;
+}
+.chart-note{ font-size: 12px; font-weight: 500; color: var(--ink-muted); letter-spacing: .02em; }
+.chart-body{ width: 100%; }
+.chart-body .svg{ width: 100%; height: auto; display: block; }
+.donut-body{ display: block; }
+.chart-empty{ padding: 40px 0; text-align: center; color: var(--ink-muted); font-size: 13px; }
+
+/* Legend */
+.legend{ display: flex; gap: 18px; justify-content: center; margin-top: 6px; }
+.legend .lg{ display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-muted); }
+.legend .sw{ width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.legend .sw-rev{ background: var(--accent); }
+.legend .sw-profit{ background: var(--profit); }
+
+/* ---------- SVG chart primitives ---------- */
+.svg .grid{ stroke: var(--border); stroke-width: 1; }
+.svg .zero{ stroke: #C9C3BA; stroke-width: 1; stroke-dasharray: 3 3; }
+.svg .axis-y{ fill: var(--ink-muted); font-size: 12px; text-anchor: end; }
+.svg .axis-x{ fill: var(--ink-muted); font-size: 12px; text-anchor: middle; }
+.svg .line-rev{ fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.svg .line-profit{ fill: none; stroke: var(--profit); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.svg .dot-rev{ fill: var(--accent); }
+.svg .dot-profit{ fill: var(--profit); }
+
+/* Donut */
+.svg .donut-slice{ stroke: #fff; stroke-width: 1.5; }
+.svg .donut-center-label{ text-anchor: middle; fill: var(--ink-muted); font-size: 12px; }
+.svg .donut-center-value{ text-anchor: middle; fill: var(--ink); font-size: 20px; font-weight: 700; }
+.svg .donut-legend{ fill: var(--ink-muted); font-size: 12px; }
+
+/* Ranking */
+.svg .rank-row{ fill: transparent; }
+.svg .rank-row.sel{ fill: rgba(127,29,45,.06); }
+.svg .rank-name{ fill: var(--ink); font-size: 13px; }
+.svg .rank-name.sel{ font-weight: 700; fill: var(--accent); }
+.svg .rank-num{ fill: var(--ink-muted); font-size: 12px; }
+.svg .rank-val{ text-anchor: end; font-size: 13px; font-weight: 600; }
+.svg .rank-val.pos{ fill: var(--profit); }
+.svg .rank-val.neg{ fill: var(--accent); }
+
+/* ---------- Chart hover interactions ---------- */
+.svg .donut-slice{ cursor: pointer; transition: opacity .15s ease; }
+.svg .donut-slice:hover{ opacity: .82; }
+.svg .rank-hit{ fill: transparent; cursor: pointer; transition: fill .12s ease; }
+.svg .rank-hit:hover{ fill: rgba(127,29,45,.06); }
+.svg .trend-hit{ fill: transparent; cursor: crosshair; }
+.svg .trend-guide{ stroke: var(--accent); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; pointer-events: none; transition: opacity .12s ease; }
+.svg .trend-focus{ opacity: 0; pointer-events: none; stroke: #fff; stroke-width: 2; transition: opacity .12s ease; }
+.svg .focus-rev{ fill: var(--accent); }
+.svg .focus-profit{ fill: var(--profit); }
+
+/* ---------- Chart tooltip ---------- */
+.chart-tip{
+  position: absolute; left: 0; top: 0; z-index: 20; pointer-events: none;
+  min-width: 92px; max-width: 240px; padding: 9px 11px;
+  background: rgba(38,38,34,.96); color: #fff; border-radius: 9px;
+  box-shadow: 0 8px 22px rgba(0,0,0,.22);
+  font-size: 12px; line-height: 1.5; letter-spacing: .02em;
+  transform: translate(-50%, calc(-100% - 14px));
+  opacity: 0; transition: opacity .12s ease; white-space: nowrap;
+}
+.chart-tip.show{ opacity: 1; }
+.chart-tip .tip-head{ font-weight: 700; margin-bottom: 5px; font-size: 12.5px; }
+.chart-tip .tip-row{ display: flex; align-items: center; gap: 7px; margin-top: 2px; }
+.chart-tip .tip-sw{ width: 9px; height: 9px; border-radius: 2px; flex: 0 0 auto; }
+.chart-tip .tip-val{ margin-left: auto; padding-left: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- Department P/L section (事業部別損益 — 全社ビューのみ) ---------- */
+.dept-section{ margin: 8px 0 22px; }
+.dept-head{ display: flex; align-items: baseline; gap: 12px; margin: 0 0 12px; }
+.dept-heading{
+  margin: 0; font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: .04em;
+  padding-left: 12px; border-left: 4px solid var(--accent);
+}
+.dept-sub{ font-size: 12px; color: var(--ink-muted); letter-spacing: .04em; }
+.dept-foot{ margin: 12px 2px 0; font-size: 11.5px; line-height: 1.7; color: var(--ink-muted); letter-spacing: .01em; }
+
+/* Department stacked bar */
+.svg .bar-cogs{ fill: #C97B84; }
+.svg .bar-gross{ fill: var(--profit); }
+.svg .bar-hit{ fill: transparent; cursor: pointer; }
+.svg .bar-total{ fill: var(--ink); font-size: 12.5px; font-weight: 700; text-anchor: middle; }
+.svg .bar-inpct{ fill: #fff; font-size: 11.5px; font-weight: 600; text-anchor: middle; }
+.svg .bar-xlabel{ fill: var(--ink); font-size: 13px; text-anchor: middle; }
+.legend .sw-cogs{ background: #C97B84; }
+.legend .sw-gross{ background: var(--profit); }
+.legend .sw-dot{ width: 10px; height: 10px; border-radius: 2px; }
+
+/* Department multi-line trend */
+.svg .dline{ fill: none; stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+.svg .dfocus{ opacity: 0; pointer-events: none; stroke: #fff; stroke-width: 1.5; transition: opacity .12s ease; }
+
+/* Budget-variance table */
+#dept-budget-table{ overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.dept-table{
+  width: 100%; border-collapse: separate; border-spacing: 0; margin: 2px 0 0;
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface);
+  font-size: 13px;
+}
+.dept-table th, .dept-table td{ padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: right; }
+.dept-table thead th{
+  background: linear-gradient(135deg, #FAF9F7, #F2F1EF); color: var(--ink);
+  font-weight: 700; font-size: 12px; letter-spacing: .04em; border-bottom: 2px solid var(--accent-weak);
+}
+.dept-table th:first-child, .dept-table td:first-child{ text-align: left; }
+.dept-table td:first-child, .dept-table tbody th{ font-weight: 600; color: var(--ink); }
+.dept-table .dept-swatch{ display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: baseline; }
+.dept-table tbody tr:nth-child(odd){ background: #FCFBFA; }
+.dept-table tbody tr.total{ background: #F5F2ED; font-weight: 700; }
+.dept-table tbody tr.total td, .dept-table tbody tr.total th{ border-bottom: none; border-top: 2px solid var(--accent-weak); color: var(--ink); }
+.dept-table td.num{ font-variant-numeric: tabular-nums; }
+.dept-table td.pos{ color: var(--profit); font-weight: 600; }
+.dept-table td.neg{ color: var(--accent); font-weight: 600; }
+
+/* ---------- Insight card (wraps injected analysis HTML) ---------- */
+.insight-card{
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px 24px 26px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+}
+.insight-card::before{
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-weak), var(--accent));
+}
+.ai-pending{ padding: 30px 0; text-align: center; color: var(--ink-muted); }
+.ai-pending p{ margin: 6px 0; font-size: 14px; line-height: 1.8; }
+
+/* ---------- Analysis (injected HTML) ---------- */
+#analysis-container{ opacity: 1; }
+#analysis-container.ready{ animation: fadeUp .35s ease-out both; }
+@keyframes fadeUp{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* ---------- View tabs (概要 / 事業部別 / サマリー) ---------- */
+.view-tabs{
+  display: inline-flex; gap: 4px; margin: 0 0 20px; padding: 4px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; box-shadow: var(--shadow-sm);
+}
+.view-tab{
+  -webkit-appearance: none; appearance: none; font-family: inherit;
+  font-size: 14px; font-weight: 600; letter-spacing: .06em;
+  color: var(--ink-muted); background: transparent; border: none;
+  padding: 9px 24px; border-radius: 9px; cursor: pointer;
+  transition: color .18s, background .18s, box-shadow .18s;
+}
+.view-tab:hover{ color: var(--accent); }
+.view-tab.active{ color: #fff; background: var(--accent); box-shadow: var(--shadow-sm); }
+.view-tab:focus-visible{ outline: none; box-shadow: 0 0 0 3px rgba(127,29,45,.2); }
+
+.view-panel{ display: none; }
+.view-panel.active{ display: block; animation: fadeUp .3s ease-out both; }
+
+/* レポート先頭の h1 は stripReportTitle() が除去するため通常は非表示（残存時のフォールバック） */
+#analysis-container h1{
+  margin: 4px 0 20px; font-weight: 700; font-size: 24px; color: var(--ink);
+  letter-spacing: .02em; padding: 0 0 10px; border-bottom: 1px solid var(--border);
+}
+/* セクション見出しは事業部別の .dept-heading と同じ「細いアクセントバー」表現に統一 */
+#analysis-container h2{
+  margin: 32px 0 14px; font-weight: 700; font-size: 16px; color: var(--ink);
+  letter-spacing: .04em; padding: 2px 0 2px 12px;
+  background: none; border-left: 4px solid var(--accent); border-radius: 0; box-shadow: none;
+}
+#analysis-container h2::before{ content: none; }
+#analysis-container h3{
+  margin: 22px 0 10px; font-weight: 700; font-size: 14.5px; color: var(--ink);
+  padding: 2px 0 2px 10px; border-left: 3px solid var(--accent-weak);
+  background: none; border-radius: 0;
+}
+#analysis-container p{ color: var(--ink-muted); line-height: 1.95; font-size: 15px; margin: 12px 0 16px; }
+#analysis-container > p{ max-width: 920px; } /* 長文の可読性（表・リストは全幅のまま） */
+
+/* メタ行（店舗/期間/リスク等）: 淡い帯にして、本文と視覚的に分離（markReportMeta が付与） */
+#analysis-container > p.report-meta{
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px;
+  max-width: none; margin: 0 0 8px; padding: 9px 14px;
+  background: #FAF9F7; border: 1px solid var(--border); border-radius: 10px;
+  font-size: 13px; line-height: 1.7;
+}
+
+/* 番号付き対策リスト: 丸番号＋淡いカード（概要タブのリストカードより軽いトーン） */
+#analysis-container ol{ counter-reset: report-item; list-style: none; margin: 14px 0 22px; padding-left: 0; }
+#analysis-container > ol > li{
+  position: relative; margin: 10px 0; padding: 13px 18px 13px 46px;
+  background: #FCFBFA; border: 1px solid var(--border); border-radius: 10px;
+  counter-increment: report-item;
+}
+#analysis-container > ol > li::before{
+  content: counter(report-item); position: absolute; left: 14px; top: 14px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(127,29,45,.08); color: var(--accent);
+  font-size: 11px; font-weight: 700; line-height: 20px; text-align: center;
+}
+#analysis-container li{ color: var(--ink-muted); line-height: 1.85; font-size: 14.5px; margin: 8px 0; position: relative; }
+
+#analysis-container ul{ padding-left: 0; margin: 16px 0 24px; }
+#analysis-container > ul > li{
+  margin: 8px 0; padding: 12px 16px 12px 40px; background: #FCFBFA;
+  border: 1px solid var(--border); border-radius: 10px; box-shadow: none; list-style: none;
+}
+#analysis-container > ul > li::before{ content: "●"; color: var(--accent); font-size: 11px; position: absolute; left: 18px; top: 16px; }
+#analysis-container > ul > li:has(> strong:first-child)::before,
+#analysis-container > ul > li:has(> b:first-child)::before{ content: none; }
+#analysis-container > ul > li:has(> strong:first-child),
+#analysis-container > ul > li:has(> b:first-child){ padding-left: 16px; }
+#analysis-container li li{
+  margin: 4px 0 !important; padding: 4px 0 4px 22px !important; background: transparent !important;
+  border: none !important; box-shadow: none !important; list-style: none !important; font-size: 14px !important;
+}
+#analysis-container li li::before{ content: "・"; color: var(--accent-weak); position: absolute; left: 8px; top: 6px; font-size: 12px; }
+
+/* 強調は「色＋太字」のみ。箱・背景をやめて段落を静かにする（1文に多数の強調が入るため） */
+#analysis-container strong, #analysis-container b{
+  color: var(--accent); font-weight: 700; background: none; border: none; padding: 0;
+}
+#analysis-container em{ font-style: normal; font-weight: 600; color: var(--accent); background: none; border: none; padding: 0; }
+
+/* 表は事業部別の .dept-table と同じトーン（角丸・淡ヘッダ・ゼブラ・数値は等幅数字） */
+#analysis-container table{
+  width: 100%; border-collapse: separate; border-spacing: 0; margin: 16px 0 22px; overflow: hidden;
+  border: 1px solid var(--border); border-radius: 10px; box-shadow: none; background: var(--surface);
+  font-size: 13px;
+}
+/* AI 出力は <table border="1"> のため、UA がセルへ格子線（1px inset）を当てる。
+   事業部別テーブルと同じ「横罫線のみ」に揃えるため、セルの四辺を明示的にリセットする。 */
+#analysis-container th, #analysis-container td{
+  padding: 10px 14px; text-align: left;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+}
+#analysis-container th{
+  background: linear-gradient(135deg, #FAF9F7, #F2F1EF); color: var(--ink);
+  font-weight: 700; font-size: 12px; letter-spacing: .04em; border-bottom: 2px solid var(--accent-weak);
+}
+#analysis-container td{ font-variant-numeric: tabular-nums; }
+#analysis-container tr:nth-child(even) td{ background: #FCFBFA; }
+#analysis-container tr:last-child td{ border-bottom: none; }
+#analysis-container td:first-child{ font-weight: 600; color: var(--ink); }
+
+#analysis-container blockquote{
+  margin: 18px 0; padding: 12px 18px; background: #FAF9F7;
+  border: 1px solid var(--border); border-left: 4px solid var(--accent);
+  color: var(--ink-muted); border-radius: 0 10px 10px 0; box-shadow: none; font-style: normal;
+}
+
+/* ---------- Drill-down (カード内でドリルダウン / ドリルパス) ---------- */
+.drill-bar{
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin: 0 0 10px; min-height: 24px;
+}
+.drill-bar.idle{ margin-bottom: 6px; }
+.drill-hint{ font-size: 11.5px; color: var(--ink-muted); letter-spacing: .02em; }
+.drill-hint::before{ content: "▸ "; color: var(--accent); }
+.drill-btn{
+  -webkit-appearance: none; appearance: none; font-family: inherit;
+  font-size: 11.5px; font-weight: 600; color: var(--ink-muted);
+  background: #fff; border: 1px solid var(--border); border-radius: 999px;
+  padding: 3px 10px; cursor: pointer; transition: color .15s, border-color .15s;
+}
+.drill-btn:hover{ color: var(--accent); border-color: rgba(127,29,45,.35); }
+.drill-btn:focus-visible{ outline: none; box-shadow: 0 0 0 3px rgba(127,29,45,.18); }
+.drill-path{ display: inline-flex; align-items: center; gap: 3px; flex-wrap: wrap; min-width: 0; }
+.drill-crumb{
+  -webkit-appearance: none; appearance: none; font-family: inherit;
+  font-size: 11.5px; font-weight: 600; color: var(--accent);
+  background: rgba(127,29,45,.06); border: 1px solid rgba(127,29,45,.18);
+  border-radius: 999px; padding: 3px 10px; cursor: pointer; max-width: 220px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.drill-crumb:hover{ background: rgba(127,29,45,.12); }
+.drill-crumb:focus-visible{ outline: none; box-shadow: 0 0 0 3px rgba(127,29,45,.18); }
+.drill-crumb.current{ color: #fff; background: var(--accent); border-color: var(--accent); cursor: default; }
+.drill-sep{ color: var(--ink-muted); font-size: 11px; }
+.drill-foot{ margin: 10px 2px 0; font-size: 11.5px; line-height: 1.7; color: var(--ink-muted); letter-spacing: .01em; }
+
+/* Drillable chart elements: keyboard focus ring + generic hit band */
+.svg [data-drill]{ cursor: pointer; }
+.svg [data-drill]:focus{ outline: none; }
+.svg [data-drill]:focus-visible{ stroke: var(--accent); stroke-width: 2; }
+.svg .drill-hit{ fill: transparent; }
+.svg .drill-hit:hover{ fill: rgba(127,29,45,.05); }
+
+/* Drill result tables (final data view) */
+.table-scroll{ overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.dept-table tbody tr.hl{ background: rgba(127,29,45,.08); }
+.dept-table tbody tr.hl th, .dept-table tbody tr.hl td{ font-weight: 700; }
+.dept-table .delta{ font-size: 11px; font-weight: 600; white-space: nowrap; }
+.dept-table .delta.pos{ color: var(--profit); }
+.dept-table .delta.neg{ color: var(--accent); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px){
+  .charts-grid{ grid-template-columns: 1fr; }
+  .chart-card.span-2, .chart-card.span-3{ grid-column: span 1; }
+  .kpi-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px){
+  .main-content{ padding: 20px 16px 36px; }
+  .header-content{ padding: 14px 18px; flex-wrap: wrap; }
+  #store-select{ min-width: 180px; }
+  .view-title{ font-size: 22px; }
+  .insight-card{ padding: 18px 16px 22px; }
+  #analysis-container h1{ font-size: 24px; }
+  #analysis-container h2{ font-size: 18px; padding: 10px 14px; }
+  .view-tabs{ display: flex; width: 100%; }
+  .view-tab{ flex: 1; text-align: center; padding: 10px 12px; }
+}
