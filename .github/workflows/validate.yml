@@ -52,7 +52,5 @@ jobs:
           node templates/pro-code-app/tests/test_frontend_guards.js
           node reference-architectures/inventory-management-app/dev-guide-app/tests/check.mjs
           node reference-architectures/pl-summary-app/dev-guide-app/tests/check.mjs
-          node reference-architectures/inventory-management-app/tests/test_frontend_guards.js
-          node reference-architectures/inventory-management-app/tests/test_frontend_shell.js
-          node reference-architectures/inventory-management-app/tests/test_frontend_transforms.js
+          node --test reference-architectures/inventory-management-app/tests/test_*.js
           node reference-architectures/pl-summary-app/tests/test_drill_helpers.js

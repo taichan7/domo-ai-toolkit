@@ -5,6 +5,25 @@ kept in sync with the authors' working toolkit; versions follow
 [Semantic Versioning](https://semver.org/) loosely (MINOR = new
 skills/apps/docs, PATCH = fixes and content refreshes).
 
+## [1.0.1] - 2026-10-15
+
+### Reference architectures
+- Inventory app v2.4.105: consistent confirmation popups before inventory
+  registration, AI email notification, and master creation/update/deletion.
+  The existing understated blue UI is preserved; navigation, search, refresh
+  and QR input remain immediate.
+- Show the exact target and proposed values before approval. Default focus
+  is on Cancel; Escape, the close button and backdrop dismiss without writes.
+  Trap Tab/Shift+Tab, restore focus/scroll, and prevent duplicate or stale
+  approvals. Destructive actions retain irreversible/cascade warnings.
+- Add offline confirmation regression tests and a zero-network Chrome
+  interaction/layout harness at desktop, tablet and phone widths.
+  Update the walkthrough, mobile checks and test documentation.
+
+### Repo infrastructure
+- Run the complete inventory Node test suite in CI, including the new
+  confirmation regression tests.
+
 ## [1.0.0] - 2026-10-15
 
 Initial public release.

@@ -248,7 +248,7 @@ test('リファレンス実装として、取引に依らずWorkflowを起動で
   // 手動ボタンのハンドラが配線され、起動結果（CE が返す workflow_started/workflow_error）を表示する。
   assert.match(app, /async function runShortageNotification/);
   assert.match(app, /callFunction\('start_shortage_notification'/);
-  assert.match(app, /elements\['run-notification'\]\.addEventListener\('click', runShortageNotification\)/);
+  assert.match(app, /elements\['run-notification'\]\.addEventListener\('click', confirmShortageNotification\)/);
   // 自動経路（登録の副作用）も CE が返す結果だけを見る（フロントに Workflow 起動ヘルパーは持たない）。
   assert.match(app, /result\.notification\?\.workflow_ready/);
   assert.doesNotMatch(app, /launchNotificationWorkflow|recordNotificationFailure/);
@@ -648,9 +648,8 @@ test('アクセシビリティ: 可視フォーカス・補足メタのコント
 test('ミニマリズム: 未使用のフラグ・キャッシュ参照を復活させない', () => {
   // ライブスキャンが全端末既定。未使用の preferNativeCapture フラグは撤去済みで、再導入しない。
   assert.doesNotMatch(qr, /preferNativeCapture/);
-  // 確認ダイアログは <form method="dialog"> の returnValue で完結し、confirm-action ボタンは
-  // JS から参照しない（要素キャッシュにも積まない）。
-  assert.doesNotMatch(app, /'confirm-action'/);
+  // 確定判定は <form method="dialog"> の returnValue で完結。click リスナは都度追加しない。
+  assert.doesNotMatch(app, /confirm-action'\]\.addEventListener/);
   // master-editor / master-note は静的な見出し・注記で、要素キャッシュへ積む必要がない。
   assert.doesNotMatch(app, /'master-editor'(?!-)/);
   assert.doesNotMatch(app, /'master-note'/);
@@ -746,10 +745,10 @@ test('物理削除の確認は close 単一実行点で、確定時だけ1回実
   assert.match(app, /function handleConfirmClose/);
   assert.match(app, /returnValue === 'default'/);
   // 保留操作は state.pendingConfirm に1つだけ載せ、実行後は必ず null に戻して二重実行を防ぐ。
-  assert.match(app, /state\.pendingConfirm = \(\) => runMasterDelete\(tab, code\)/);
+  assert.match(app, /onConfirm: \(\) => runMasterDelete\(tab, code\)/);
   assert.match(app, /state\.pendingConfirm = null/);
   // 直前の確定結果が残って ESC 誤発火しないよう、表示前に returnValue を初期化する。
-  assert.match(app, /confirm-dialog'\]\.returnValue = ''/);
+  assert.match(app, /dialog\.returnValue = ''/);
 });
 
 test('選択状態は role=button 行では aria-current で表し、ビュー枠はプログラム的フォーカスを受けられる', () => {

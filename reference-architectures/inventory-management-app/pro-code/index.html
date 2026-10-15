@@ -253,8 +253,13 @@
     </form>
   </dialog>
 
-  <dialog id="confirm-dialog" class="modal confirm-modal" aria-labelledby="confirm-title">
-    <form method="dialog" class="modal-card"><div class="modal-heading"><h2 id="confirm-title">実行の確認</h2><button class="close-button" value="cancel" aria-label="閉じる">×</button></div><p id="confirm-message"></p><div class="button-row"><button value="cancel" class="secondary-button">キャンセル</button><button id="confirm-action" value="default" class="primary-button">実行する</button></div></form>
+  <dialog id="confirm-dialog" class="modal confirm-modal" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <form method="dialog" class="modal-card">
+      <div class="modal-heading"><div><span class="step-label">実行前の確認</span><h2 id="confirm-title">実行の確認</h2></div><button class="close-button" type="submit" value="cancel" aria-label="確認を閉じる">×</button></div>
+      <dl id="confirm-details" class="confirm-details"></dl>
+      <p id="confirm-message" class="confirm-note"></p>
+      <div class="confirm-actions"><button id="confirm-cancel" type="submit" value="cancel" class="secondary-button" autofocus>キャンセル</button><button id="confirm-action" type="submit" value="default" class="primary-button">実行する</button></div>
+    </form>
   </dialog>
 
   <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>

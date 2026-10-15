@@ -46,7 +46,7 @@
     masterTab: 'item',
     masterEditKey: null,
     masterEditLabel: null,
-    // 確認ダイアログで確定時に一度だけ実行する保留操作（物理削除など）。close リスナが消費する。
+    // 実行対象とフォーカス返却先を保持し、close リスナが一度だけ消費する。
     pendingConfirm: null
   };
 
@@ -124,7 +124,7 @@
       'selected-location', 'selected-location-code', 'selected-item', 'selected-item-code', 'current-stock', 'minimum-stock',
       'quantity', 'reason', 'stock-preview', 'review-list', 'submit-button', 'recent-operations', 'kpi-grid', 'item-chart', 'location-chart',
       'trend-chart', 'shortage-list', 'dormant-list', 'ai-note-list', 'dashboard-search', 'history-search', 'history-type', 'history-head', 'history-body',
-      'history-result-count', 'history-pager', 'master-pager', 'item-pager', 'location-pager', 'shortage-pager', 'dormant-pager', 'loading-overlay', 'toast-region', 'confirm-dialog', 'confirm-title', 'confirm-message',
+      'history-result-count', 'history-pager', 'master-pager', 'item-pager', 'location-pager', 'shortage-pager', 'dormant-pager', 'loading-overlay', 'toast-region', 'confirm-dialog', 'confirm-title', 'confirm-message', 'confirm-details', 'confirm-action', 'confirm-cancel',
       'detail-pane', 'detail-eyebrow', 'detail-title', 'detail-subtitle', 'detail-content', 'chart-tooltip',
       'context-detail', 'context-detail-backdrop', 'context-detail-eyebrow', 'context-detail-title', 'context-detail-subtitle', 'context-detail-content', 'context-detail-more', 'context-detail-close',
       'step-count', 'step-action', 'selected-location-card', 'selected-item-card', 'run-notification',
@@ -202,19 +202,27 @@
     byId('quantity-minus').addEventListener('click', () => changeQuantity(-1));
     byId('quantity-plus').addEventListener('click', () => changeQuantity(1));
     byId('review-button').addEventListener('click', reviewTransaction);
-    elements['submit-button'].addEventListener('click', submitTransaction);
+    elements['submit-button'].addEventListener('click', confirmTransaction);
     byId('refresh-button').addEventListener('click', () => refreshAll());
     byId('history-refresh').addEventListener('click', () => refreshAll());
     byId('history-clear').addEventListener('click', clearHistoryFilters);
-    if (elements['run-notification']) elements['run-notification'].addEventListener('click', runShortageNotification);
+    if (elements['run-notification']) elements['run-notification'].addEventListener('click', confirmShortageNotification);
     if (elements['master-form']) elements['master-form'].addEventListener('submit', submitMaster);
     // 新規登録は右ペインを空の入力状態へ戻す入口。一覧行のクリック／キー操作は委譲で受け、
     // 選択行を右ペインの編集フォームへ読み込む（履歴のドリルダウンと同じ操作感に揃える）。
     if (elements['master-new']) elements['master-new'].addEventListener('click', newMaster);
     if (elements['master-delete']) elements['master-delete'].addEventListener('click', () => confirmMasterDelete(state.masterTab, state.masterEditKey, state.masterEditLabel));
-    // 確認ダイアログは close を単一の実行点にする。確定(value="default")時だけ保留中の操作を1回実行し、
-    // キャンセル/ESC/×では何もしない。クリックハンドラを都度登録しないため蓄積による誤削除が起きない。
-    if (elements['confirm-dialog']) elements['confirm-dialog'].addEventListener('close', handleConfirmClose);
+    if (elements['confirm-dialog']) {
+      elements['confirm-dialog'].addEventListener('close', handleConfirmClose);
+      elements['confirm-dialog'].addEventListener('keydown', handleConfirmKeydown);
+      elements['confirm-dialog'].addEventListener('cancel', (event) => { event.preventDefault(); cancelConfirmation(); });
+      elements['confirm-dialog'].addEventListener('click', (event) => {
+        if (event.target !== elements['confirm-dialog']) return;
+        const rect = elements['confirm-dialog'].getBoundingClientRect();
+        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) cancelConfirmation();
+      });
+    }
+    global.addEventListener('pagehide', cancelConfirmation);
     if (elements['master-list']) {
       elements['master-list'].addEventListener('click', handleMasterRowActivate);
       elements['master-list'].addEventListener('keydown', handleMasterRowKey);
@@ -285,6 +293,7 @@
   }
 
   async function refreshAll(options) {
+    cancelConfirmation();
     const quiet = options && options.quiet;
     if (!quiet) setLoading(true, 'データを更新しています');
     state.bootReady = false;
@@ -394,6 +403,7 @@
   }
 
   function switchView(view) {
+    cancelConfirmation();
     state.view = view;
     // メニュー切替時はインライン詳細を閉じ、前ビューのドリルダウン明細が残らないようにする。
     hideContextDetail();
@@ -439,6 +449,7 @@
   }
 
   function setStep(step, focusTitle = true) {
+    cancelConfirmation();
     state.step = Math.min(4, Math.max(1, step));
     renderStepNavigation();
     document.querySelectorAll('.form-step').forEach((node) => node.classList.toggle('active', Number(node.dataset.stepPanel) === state.step));
@@ -654,7 +665,51 @@
     return '';
   }
 
-  async function submitTransaction() {
+  function transactionRequest() {
+    return {
+      request_id: state.requestId,
+      transaction_type: state.transactionType,
+      location_code: state.location?.location_code,
+      item_code: state.item?.item_code,
+      quantity: state.quantity,
+      reason: state.reason,
+      source: isMobile() ? 'DOMO_MOBILE' : 'DOMO_WEB',
+      operator_email: state.user.email || '',
+      operator_display_name: state.user.name || ''
+    };
+  }
+
+  function confirmTransaction() {
+    const validation = validateDraft();
+    if (validation) { toast(validation, 'error'); setStep(3); return; }
+    if (!state.requestId) state.requestId = createRequestId();
+    const payload = transactionRequest();
+    const operation = state.transactionType === 'OUT' ? '出庫' : '入庫';
+    const unit = state.item.unit || '';
+    showActionConfirmation({
+      title: `${operation}を登録しますか？`,
+      message: '確定後は履歴に記録されます。登録直前にサーバーで最新の在庫を確認し、基準在庫の状態が変わった場合はAI通知も開始します。',
+      details: [
+        ['ロケーション', `${state.location.location_name}（${payload.location_code}）`],
+        ['品目', `${state.item.item_name}（${payload.item_code}）`],
+        ['数量', `${operation} ${number.format(payload.quantity)} ${unit}`],
+        ['見込み在庫', `${number.format(Number(currentBalance()?.quantity || 0))} → ${number.format(projectedQuantity())} ${unit}`],
+        ['理由・メモ', payload.reason || '—']
+      ],
+      actionLabel: 'はい、登録する',
+      trigger: elements['submit-button'],
+      onConfirm: () => {
+        if (JSON.stringify(payload) !== JSON.stringify(transactionRequest())) {
+          toast('登録内容が変わりました。もう一度内容を確認してください。', 'error');
+          return;
+        }
+        submitTransaction(payload);
+      }
+    });
+  }
+
+  async function submitTransaction(payload) {
+    if (!elements['loading-overlay'].hidden) return;
     const validation = validateDraft();
     if (validation) {
       toast(validation, 'error');
@@ -664,19 +719,6 @@
     elements['submit-button'].disabled = true;
     setLoading(true, '在庫を登録しています');
     try {
-      const payload = {
-        request_id: state.requestId || createRequestId(),
-        transaction_type: state.transactionType,
-        location_code: state.location.location_code,
-        item_code: state.item.item_code,
-        quantity: state.quantity,
-        reason: state.reason,
-        source: isMobile() ? 'DOMO_MOBILE' : 'DOMO_WEB',
-        operator_email: state.user.email || '',
-        // 氏名を返さないインスタンスでも AppDB に担当者名を残すため、People API で解決済みの
-        // 表示名を送る。CE は実行コンテキストが氏名を持たないときだけ採用する（operator_user_id は不変）。
-        operator_display_name: state.user.name || ''
-      };
       const result = await dataApi.callFunction('register_transaction', {request_json: JSON.stringify(payload)});
       if (!result || !result.ok) throw new Error(result?.error?.message || '登録処理に失敗しました。');
       const transaction = result.transaction || {};
@@ -728,12 +770,25 @@
    * 実行コンテキストがメールを返さないインスタンスでも宛先を確定できるよう
    * operator_email を同じく同送する。
    */
-  async function runShortageNotification() {
+  function confirmShortageNotification() {
+    const recipient = {operator_email: state.user.email || '', operator_display_name: state.user.name || ''};
+    showActionConfirmation({
+      title: 'AI在庫通知を実行しますか？',
+      message: '実行時点の在庫不足をCode Engineで確認し、AIが通知文を作成してメールを送信します。不足がない場合は通知しません。',
+      details: [['通知先', recipient.operator_email || '実行時にDomoユーザーのメールアドレスを確認します']],
+      actionLabel: 'はい、通知を実行する',
+      trigger: elements['run-notification'],
+      onConfirm: () => runShortageNotification(recipient)
+    });
+  }
+
+  async function runShortageNotification(recipient) {
+    if (!elements['loading-overlay'].hidden) return;
     const button = elements['run-notification'];
     if (button) button.disabled = true;
     setLoading(true, 'AI在庫通知を実行しています');
     try {
-      const result = await dataApi.callFunction('start_shortage_notification', {request_json: JSON.stringify({operator_email: state.user.email || '', operator_display_name: state.user.name || ''})});
+      const result = await dataApi.callFunction('start_shortage_notification', {request_json: JSON.stringify(recipient)});
       if (!result || !result.ok) throw new Error(result?.error?.message || 'AI在庫通知を開始できませんでした。');
       const notification = result.notification || {};
       if (!notification.workflow_ready) {
@@ -773,6 +828,7 @@
   }
 
   function invalidateReview() {
+    cancelConfirmation();
     state.requestId = null;
   }
 
@@ -1123,6 +1179,7 @@
   // 統合タブのクリック入口。取引・通知は履歴パネル、品目・ロケーション・基準在庫はマスタパネルへ
   // 切り替える。マスタ系は管理者かつPCのみ許可し、権限がなければ取引履歴へフォールバックする。
   function setRecordTab(tab) {
+    cancelConfirmation();
     const isMaster = MASTER_TABS[tab] === true;
     if (isMaster && (!state.user.isAdmin || isMobileHostActive())) {
       setRecordTab('transactions'); // 'transactions' はマスタ系でないため再帰しない
@@ -1684,6 +1741,7 @@
 
   /** ドロワー表示中の Esc で閉じる。QRスキャナ等の <dialog> は各自 Esc を処理するため干渉しない。 */
   function handleDrawerKeydown(event) {
+    if (elements['confirm-dialog']?.open) return;
     if (event.key !== 'Escape') return;
     if (elements['context-detail'] && !elements['context-detail'].hidden) hideContextDetail();
   }
@@ -1840,6 +1898,7 @@
   // 右ペインを「新規登録」の空状態へ戻す。入力値・見出し・操作ボタンをすべて初期化し、
   // 編集途中のキー選択も解除する（callMaster 成功後や種別タブ切替から呼ばれる）。
   function resetMasterForm() {
+    cancelConfirmation();
     state.masterEditKey = null;
     state.masterEditLabel = null;
     ['master-item-code', 'master-item-name', 'master-item-category', 'master-item-unit', 'master-location-code', 'master-location-name', 'master-location-zone', 'master-rule-minimum'].forEach((id) => { if (elements[id]) elements[id].value = ''; });
@@ -1971,6 +2030,7 @@
     if (event) event.preventDefault();
     if (!state.user.isAdmin) return;
     const tab = state.masterTab;
+    let action, fields, successMessage, details;
     // 編集時のみ状態トグルの値を UPSERT に含める（可逆な有効/停止の切替＝更新Dの実演）。
     // 新規時はトグル非表示のため active を送らず、CE 既定の有効(true)で登録する。
     const activeField = (state.masterEditKey && elements['master-active']) ? {active: elements['master-active'].checked} : {};
@@ -1978,12 +2038,18 @@
       const code = (elements['master-item-code'].value || '').trim();
       const name = (elements['master-item-name'].value || '').trim();
       if (!code || !name) { toast('品目コードと品目名を入力してください。', 'error'); return; }
-      callMaster('UPSERT_ITEM', Object.assign({item_code: code, item_name: name, category: (elements['master-item-category'].value || '').trim(), unit: (elements['master-item-unit'].value || '').trim()}, activeField), `品目「${name}」を保存しました。`);
+      action = 'UPSERT_ITEM';
+      fields = Object.assign({item_code: code, item_name: name, category: (elements['master-item-category'].value || '').trim(), unit: (elements['master-item-unit'].value || '').trim()}, activeField);
+      successMessage = `品目「${name}」を保存しました。`;
+      details = [['品目', `${name}（${code}）`], ['カテゴリー', fields.category || '—'], ['単位', fields.unit || '—']];
     } else if (tab === 'location') {
       const code = (elements['master-location-code'].value || '').trim();
       const name = (elements['master-location-name'].value || '').trim();
       if (!code || !name) { toast('ロケーションコードとロケーション名を入力してください。', 'error'); return; }
-      callMaster('UPSERT_LOCATION', Object.assign({location_code: code, location_name: name, zone: (elements['master-location-zone'].value || '').trim()}, activeField), `ロケーション「${name}」を保存しました。`);
+      action = 'UPSERT_LOCATION';
+      fields = Object.assign({location_code: code, location_name: name, zone: (elements['master-location-zone'].value || '').trim()}, activeField);
+      successMessage = `ロケーション「${name}」を保存しました。`;
+      details = [['ロケーション', `${name}（${code}）`], ['ゾーン', fields.zone || '—']];
     } else {
       const locationCode = elements['master-rule-location'].value;
       const itemCode = elements['master-rule-item'].value;
@@ -1991,14 +2057,37 @@
       if (!locationCode || !itemCode) { toast('ロケーションと品目を選択してください。', 'error'); return; }
       const minimum = Number(minimumRaw);
       if (minimumRaw === '' || !Number.isFinite(minimum) || minimum < 0) { toast('基準在庫は0以上の数値で入力してください。', 'error'); return; }
-      callMaster('UPSERT_RULE', Object.assign({location_code: locationCode, item_code: itemCode, minimum_quantity: minimum}, activeField), '基準在庫を保存しました。');
+      action = 'UPSERT_RULE';
+      fields = Object.assign({location_code: locationCode, item_code: itemCode, minimum_quantity: minimum}, activeField);
+      successMessage = '基準在庫を保存しました。';
+      const locationName = state.data.locations.find((row) => row.location_code === locationCode)?.location_name || locationCode;
+      const itemName = state.data.items.find((row) => row.item_code === itemCode)?.item_name || itemCode;
+      details = [['ロケーション', `${locationName}（${locationCode}）`], ['品目', `${itemName}（${itemCode}）`], ['基準在庫', number.format(minimum)]];
     }
+    const editing = Boolean(state.masterEditKey);
+    const editKey = state.masterEditKey;
+    details.push(['状態', fields.active === false ? '一時停止（元に戻せます）' : '有効']);
+    showActionConfirmation({
+      title: `${MASTER_LABELS[tab]}を${editing ? '更新' : '登録'}しますか？`,
+      message: '以下の内容を保存します。有効・一時停止の変更は、入出庫の選択肢と基準在庫の判定に反映されます。',
+      details,
+      actionLabel: 'はい、保存する',
+      trigger: event?.submitter || elements['master-submit'],
+      onConfirm: () => {
+        if (!state.user.isAdmin || state.masterTab !== tab || state.masterEditKey !== editKey) {
+          toast('権限または編集対象が変わりました。もう一度確認してください。', 'error');
+          return;
+        }
+        callMaster(action, fields, successMessage);
+      }
+    });
   }
 
   // 一覧行の選択で右ペインへ読み込む。値を流し込んだあと、状態(有効/停止)を状態トグルへ反映し、
   // 操作ボタンを applyMasterEditorMode で編集モードに整える（更新・削除・可逆な停止切替を提示）。
   function editMaster(tab, code) {
     if (!state.user.isAdmin) return;
+    cancelConfirmation();
     let active = true;
     let label = code;
     if (tab === 'item') {
@@ -2087,22 +2176,69 @@
   function confirmMasterDelete(tab, code, label) {
     if (!state.user.isAdmin) return;
     const typeLabel = tab === 'item' ? '品目' : tab === 'location' ? 'ロケーション' : '基準在庫';
-    elements['confirm-title'].textContent = `${typeLabel}を完全に削除しますか？`;
-    elements['confirm-message'].textContent = `「${label || code}」をAppDBから完全に削除します。この操作は取り消せません。関連する基準在庫や現在庫も一緒に削除されますが、入出庫・通知の履歴は監査証跡として残ります。一時的に止めたいだけなら、削除せず「有効の切り替え」で停止できます。`;
-    // 確定時に実行する操作を1つだけ保留する。実行は close リスナ(handleConfirmClose)へ一元化し、
-    // ここでは都度 addEventListener しない。前回のキャンセル対象を巻き込む蓄積事故を構造的に排除する。
-    state.pendingConfirm = () => runMasterDelete(tab, code);
-    // 直前の確定結果(returnValue="default")が残って ESC 誤発火するのを防ぐため明示的に初期化する。
-    elements['confirm-dialog'].returnValue = '';
-    elements['confirm-dialog'].showModal();
+    showActionConfirmation({
+      title: `${typeLabel}を完全に削除しますか？`,
+      message: 'この項目をAppDBから完全に削除します。この操作は取り消せません。関連する基準在庫や現在庫も一緒に削除されますが、入出庫・通知の履歴は監査証跡として残ります。一時的に止めたいだけなら、削除せず「有効の切り替え」で停止できます。',
+      details: [['削除対象', `${label || code}（${code}）`]],
+      actionLabel: 'はい、完全に削除する',
+      danger: true,
+      trigger: elements['master-delete'],
+      onConfirm: () => runMasterDelete(tab, code)
+    });
+  }
+
+  function showActionConfirmation({title, message, details, actionLabel, danger = false, trigger, onConfirm}) {
+    if (state.pendingConfirm) { elements['confirm-cancel']?.focus({preventScroll: true}); return; }
+    if (!elements['loading-overlay'].hidden) return;
+    const dialog = elements['confirm-dialog'];
+    if (!dialog || typeof dialog.showModal !== 'function' ||
+        !['confirm-title', 'confirm-message', 'confirm-details', 'confirm-action', 'confirm-cancel'].every((id) => elements[id])) {
+      toast('確認画面を表示できません。画面を再読み込みしてください。', 'error');
+      return;
+    }
+    elements['confirm-title'].textContent = title;
+    elements['confirm-message'].textContent = message;
+    elements['confirm-details'].innerHTML = details.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join('');
+    elements['confirm-action'].textContent = actionLabel;
+    elements['confirm-action'].classList.toggle('danger', danger);
+    state.pendingConfirm = {action: onConfirm, trigger: trigger || document.activeElement, previousOverflow: document.body.style.overflow};
+    dialog.returnValue = '';
+    try {
+      dialog.showModal();
+      document.body.style.overflow = 'hidden';
+      elements['confirm-cancel'].focus({preventScroll: true});
+    } catch (error) {
+      cancelConfirmation();
+      toast(errorMessage(error, '確認画面を表示できません。画面を再読み込みしてください。'), 'error');
+    }
+  }
+
+  function cancelConfirmation() {
+    if (state.pendingConfirm) state.pendingConfirm.action = null;
+    if (elements['confirm-dialog']?.open) elements['confirm-dialog'].close('cancel');
+    handleConfirmClose();
+  }
+
+  function handleConfirmKeydown(event) {
+    if (event.key !== 'Tab') return;
+    const buttons = Array.from(elements['confirm-dialog'].querySelectorAll('button:not([disabled])'));
+    const first = buttons[0], last = buttons[buttons.length - 1];
+    if ((!event.shiftKey && document.activeElement === last) || (event.shiftKey && document.activeElement === first)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus({preventScroll: true});
+    }
   }
 
   // 確認ダイアログの単一実行点。確定ボタン(value="default")で閉じたときだけ保留中の操作を1回実行する。
   // キャンセル/×(value="cancel")・ESC(returnValue="")では保留を捨てるだけで何もしない。
   function handleConfirmClose() {
-    const action = state.pendingConfirm;
+    if (elements['confirm-dialog']?.open) return;
+    const pending = state.pendingConfirm;
     state.pendingConfirm = null;
-    if (action && elements['confirm-dialog'].returnValue === 'default') action();
+    if (!pending) return;
+    document.body.style.overflow = pending.previousOverflow;
+    if (pending.trigger?.isConnected) pending.trigger.focus({preventScroll: true});
+    if (pending.action && elements['confirm-dialog'].returnValue === 'default') pending.action();
   }
 
   // AppDBからの物理削除(D)を実行する。CE側でマスタ本体＋依存ルール＋派生状態を連鎖削除し、
@@ -2118,6 +2254,7 @@
 
   async function callMaster(action, fields, successMessage) {
     if (!state.user.isAdmin) return;
+    if (!elements['loading-overlay'].hidden) return;
     setLoading(true, 'マスタを更新しています');
     try {
       const request = Object.assign({action, request_id: createRequestId(), source: 'ADMIN_UI'}, fields);

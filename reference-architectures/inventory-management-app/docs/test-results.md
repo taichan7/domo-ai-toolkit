@@ -23,6 +23,9 @@ python3 -m unittest discover -s tests
   実行時に解決）・業務UIコントラクト（ステップナビ、マスタCRUDパネル、
   グラフ／履歴ドリル、メニュー内完結、レスポンシブ、WAI-ARIA Tabs、可読性フロア 11px、
   CSSカスタムプロパティ定義漏れ検出）・QR検出とiOSフォールバックを検証する。
+- `test_frontend_confirmation.js` は確認を開くだけでは通信しないこと、確定時の単発実行、
+  取消・Esc・背景クリック、対象・入力の保持、権限変更、二重クリック、確認部品欠落での停止、
+  取消直後の再表示と遅延closeイベントを実行テストで検証する。
 - Python テストは `MANAGE_MASTER` の UPSERT／物理DELETE（連鎖削除・追記専用台帳の非復活）／
   可逆な `active` 停止、二重登録防止、残高再計算、DataFlow集計（KPI／在庫／トレンド／不足／滞留／
   AIノート）、App Studioプロビジョニング契約を検証する。
@@ -36,6 +39,7 @@ python3 -m unittest discover -s tests
 ```bash
 node tests/layout/shoot.mjs                 # app（入出庫/ダッシュボード/履歴）＋ devguide を代表幅で
 node tests/layout/shoot.mjs --app devguide --widths 1366,390   # ページ2（開発ガイド）だけを限定
+node tests/layout/check-confirmations.mjs    # 共通確認の実ブラウザ操作・1366/768/390px・通信はモック
 # 出力: /tmp/inv-shots/<app>-<view>-<width>.png（--out で変更可、--height で縦を伸ばす）
 ```
 
