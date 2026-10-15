@@ -16,6 +16,7 @@ Copilot、Codex などシェルアクセスを持つもの）が読めばすぐ�
 | **スターターキット** | [`docs/`](docs/), [`scripts/`](scripts/), [`templates/`](templates/) | 認証フロー、API リファレンス、実行可能なシェル/Python ヘルパー、Pro Code アプリ雛形 |
 | **スキルライブラリ** | [`skills/`](skills/) | 55 件の作業メモ — Domo の各機能面（DataSets、Magic ETL、Workflows、Code Engine、Pro Code、AppDB、App Studio、AI Services 等）＋汎用エージェント作業スキル |
 | **リファレンスアーキテクチャ** | [`reference-architectures/`](reference-architectures/) | Pro Code + Code Engine + AppDB + Magic ETL + Workflows + App Studio の接続方法を示す、デプロイ可能な2つの完成アプリ |
+| **依頼テンプレート** | [`prompts/`](prompts/) | AI エージェントに実装・レビュー・プロンプト改訂を依頼するときのコピペ用テンプレート |
 
 ## 対象読者
 
@@ -77,6 +78,10 @@ bash scripts/list-datasets.sh
 プロビジョニングスクリプト付き。デプロイ前に ID を手編集する必要はありません。
 
 ## FAQ
+
+**Q: 更新はどう追えばよいですか？**
+[CHANGELOG.md](CHANGELOG.md) と [Releases](https://github.com/taichan7/domo-ai-toolkit/releases)
+を参照してください。バージョン管理されているので、手元のコピーが最新かどうか分かります。
 
 **Q: Domo 公式プロダクトですか？**
 いいえ。Domo SE が作ったフィールドキットです。使われている API は Domo プラットフォーム

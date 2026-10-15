@@ -16,6 +16,7 @@ It contains three layers:
 | **Starter kit** | [`docs/`](docs/), [`scripts/`](scripts/), [`templates/`](templates/) | Auth flow, API reference, runnable shell/Python helpers, a Pro Code app template |
 | **Skills library** | [`skills/`](skills/) | 55 operating notes — one per Domo surface (DataSets, Magic ETL, Workflows, Code Engine, Pro Code, AppDB, App Studio, AI Services, …) plus platform-agnostic agent-workflow skills |
 | **Reference architectures** | [`reference-architectures/`](reference-architectures/) | Two complete, deployable Domo apps showing how Pro Code + Code Engine + AppDB + Magic ETL + Workflows + App Studio fit together |
+| **Request templates** | [`prompts/`](prompts/) | Copy-paste request templates for asking an AI agent to implement / review / revise a prompt |
 
 ## Who this is for
 
@@ -92,6 +93,11 @@ This repo is designed so an agent can read it whole and immediately know how to:
    ([skills/domo-cross-instance-clone.md](skills/domo-cross-instance-clone.md))
 
 ## FAQ
+
+**Q: How do I know what changed?**
+See [CHANGELOG.md](CHANGELOG.md) and the
+[Releases](https://github.com/taichan7/domo-ai-toolkit/releases) page — the
+toolkit is versioned so you can tell whether your copy is current.
 
 **Q: Is this an official Domo product?**
 No. It is a field kit built by a Domo SE. The APIs used are the same ones the

@@ -20,6 +20,7 @@ Contributions are welcome — especially field reports and new patterns.
 - `docs/` — guides and API references (English files have a `.ja.md` twin)
 - `scripts/` — runnable helpers; keep them dependency-light (stdlib + Domo CLI)
 - `templates/` — starter skeletons
+- `prompts/` — request templates for handing work to an AI agent
 - `reference-architectures/` — complete apps; each is self-contained with its
   own README and tests
 

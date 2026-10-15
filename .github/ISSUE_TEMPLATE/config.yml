@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/taichan7/domo-ai-toolkit/discussions
+    about: General questions, show-and-tell, and ideas — please use Discussions
+  - name: 🔐 Security / leaked credential
+    url: https://github.com/taichan7/domo-ai-toolkit/security/advisories/new
+    about: Report credentials or customer data accidentally committed here — privately
