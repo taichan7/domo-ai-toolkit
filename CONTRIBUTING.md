@@ -35,6 +35,7 @@ python -m pip install pytest -r reference-architectures/inventory-management-app
 bash scripts/check-secrets.sh
 python3 scripts/check-public-distribution.py
 python3 scripts/check-links.py
+python3 -m unittest discover -s scripts -p 'test_auth_helpers.py' -v
 python -m pytest --import-mode=importlib reference-architectures/pl-summary-app/tests reference-architectures/inventory-management-app/tests -q
 ```
 

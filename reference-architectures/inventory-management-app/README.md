@@ -100,16 +100,21 @@ node --test tests/test_*.js
 
 ## Domoへの公開
 
-保守・検証用のリファレンスインスタンスは `maintenance-instance.domo.com` です。別インスタンスへ配布する場合は `export DOMO_INSTANCE=<your-instance>.domo.com` を設定し、`apply` の後に `sync-manifest` でManifestの配線IDを合わせます（手順は [セットアップガイド](docs/setup-guide.md) の「別インスタンスへの再現」）。通知Workflowモデルは `apply` が名称で発見または新規作成するため手作りは不要です（既存モデルに固定したいときだけ `DOMO_WORKFLOW_MODEL_ID` を設定＝任意）。App Studioアプリ＋カードも `app-studio` が名称で発見または新規作成するため、Domo UIでの手作業は不要です（配布既定のappIdが対象に無ければ404を自己修復して発見／作成し、解決した実IDを `domo-assets.json` へ書き戻します）。認証情報はDomo CLIの既存設定を使い、リポジトリに保存しません。
+公開toolkitのソースを使い、`DOMO_INSTANCE` を必ず指定します。初回はdesign ID・接続IDが未設定なので、
+`apply` 後に `sync-manifest` で配線します。AppDB・CE・DataFlow・通知Workflow・App Studioは名称で
+発見または作成し、解決した実IDを対象インスタンス・名札のローカル台帳へ保存します。
+導入手順の正本は [AI再構築ランブック](docs/ai-rebuild-runbook.md) です。
 
 **本番保護ガードと配備モードの選択（書込み系コマンドの前に必ず決める）**：`provision_domo.py` の書込み系コマンド（`apply`／`app-studio`／`workflow`／`cleanup-legacy`）は、対象アセット名が本番名のままだと誤って本番（App Studio「在庫入出庫管理ハンズオン」＋AppDB／Code Engine／DataFlow／出力DataSet／通知Workflow）を上書きしないよう**実行を拒否**します。次のいずれかを設定してから実行してください（読み取り専用の `verify`／`sync-manifest`／`export-app-studio` はガード対象外でそのまま通ります）。
 
-- 共有インスタンスでのハンズオン・検証（自分専用の隔離コピーをバックエンド込みで作る）→ `export INVENTORY_SANDBOX_SUFFIX='検証・<あなたの氏名>'`。全オブジェクト名へ全角括弧の名札（例「（検証・田中）」）が付き、本番や他参加者と衝突しません。解決した実IDは参加者ごとの状態ディレクトリ `~/.config/domo-utils/<instance>-deploy/inventory-management-app/sandbox-<slug>/` に書かれ、コミット済みの `domo-assets.json` は汚しません。
+- 共有インスタンスでのハンズオン・検証（自分専用の隔離コピーをバックエンド込みで作る）→ `export INVENTORY_SANDBOX_SUFFIX='検証・<あなたの氏名>'`。全オブジェクト名へ名札が付き、本番や他参加者と分離します。解決した実IDは名札専用のローカル台帳へ保存し、Gitや他顧客への配布に含めません。
 - 本番名のままの正規コピーを配備（本リファレンスの保守、または自分のインスタンスへ唯一の正規アプリを立てる）→ `export INVENTORY_ALLOW_PRODUCTION=1`。本番名で書込みます。
 
 ```bash
 cd inventory-management-app
 # 事前に対象インスタンスへログイン（詳細は docs/ai-rebuild-runbook.md）。通知Workflowモデルは apply が自動作成する
+export DOMO_INSTANCE=<your-instance>.domo.com
+domo login -i "$DOMO_INSTANCE"
 # 配備モードを選ぶ（下のどちらか一方。未設定だと apply/app-studio はガードで停止する）
 export INVENTORY_SANDBOX_SUFFIX='検証・<あなたの氏名>'   # ハンズオン: 名札付きの隔離コピー（バックエンド込み）
 # export INVENTORY_ALLOW_PRODUCTION=1                     # 本番名で正規コピーを配備するときだけ

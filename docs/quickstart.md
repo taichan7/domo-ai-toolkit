@@ -53,7 +53,7 @@ bash ../scripts/authenticate.sh your-company.domo.com
 
 (Replace `your-company.domo.com` with your actual instance domain.)
 
-If it prints `Authenticated to your-company.domo.com - SID=...`, you are good. The script saves a `.sid` file in the `../scripts/` folder. Other scripts read it automatically. `.sid` is in `.gitignore` so it will not be committed.
+If it reports authentication succeeded for the requested instance, you are ready. The script saves an owner-only, git-ignored `../scripts/.sid` file for the other scripts. Credentials are not printed. Do not copy or share the SID or authentication headers.
 
 ---
 

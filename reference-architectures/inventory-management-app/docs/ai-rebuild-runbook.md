@@ -10,20 +10,20 @@
 
 - **べき等**: `provision_domo.py` は全アセットを名称で「発見または作成」する。同じインスタンスで
   再実行しても重複を作らない。途中で失敗しても、原因を直して同じコマンドを再実行してよい。
-- **単一の成功ゲート**: 「完了」の唯一の定義は `verify` が `ok: true` を返し、かつ §2 の件数条件を
-  満たすこと。それ以外の中間出力（`ASSET_RESULT` のID等）は判断材料であって完了条件ではない。
+- **配備構造の成功ゲート**: `verify` が `ok: true` を返し、かつ §2 の件数条件を満たすこと。
+  中間出力のIDだけで成功としない。このゲートは本番適用の認定ではない。
+  [distribution-readiness.ja.md](distribution-readiness.ja.md) の権限・並行更新・負荷・通知・実機確認も配備先で行う。
 - **人手でUIからアセットを作る境界はゼロ**: AppDB／Code Engine／DataFlow／**通知Workflowモデル**／
   **App Studioアプリ本体＋ページ1カード埋め込み**／**ページ2＝開発ガイド**まで、すべて
-  `provision_domo.py` が documented API で「発見または作成」する。あなたが Domo の画面を開いてアセットを
+  `provision_domo.py` がDomo APIで「発見または作成」する。文書化範囲はAPIごとに異なり、配備先での検証が必要。あなたが Domo の画面を開いてアセットを
   手作りしたり、生成したIDを人に尋ねたりする必要は**一切ない**。かつては ①通知Workflowモデルの事前作成、
   ②App Studioアプリの作成とページ1カード埋め込み、が人手境界だったが、①は `apply`（§3 STEP 1）が、
   ②は `app-studio`（§3 STEP 5）が、それぞれ名称で発見または API で新規作成するようになり、**どちらも
-  人手不要**になった。配布時の `domo-assets.json` に参照インスタンスのIDが残っていても、新しいインスタンスで
-  そのIDへのGETが404になれば `app-studio` は停止せず名称による発見／作成へ自動フォールバックし、解決した
-  実IDを `domo-assets.json` へ書き戻す。あなたの仕事は認証してコマンドを順に実行することだけ。
+  人手不要**になった。公開ソースには `domo-assets.json` を同梱しない。
+  対象インスタンスの資産を名称で解決し、実IDをそのインスタンス・名札専用のローカル台帳へ保存する。
 - **配布物に固有名を残さない**: 顧客名・URL・個人名・メールを、コード／ドキュメント／コメント／
-  コミットメッセージ／App Studio JSON／テストに**一切書かない**。`maintenance-instance.domo.com` は本リ
-  ファレンスの保守用インスタンス既定値で、`DOMO_INSTANCE` で顧客インスタンスへ差し替える。
+  コミットメッセージ／App Studio JSON／テストに**一切書かない**。
+  `DOMO_INSTANCE` は必須で、未設定時の保守環境への自動接続はない。
 - **本番保護ガードと配備モード**: 書込み系コマンド（`apply`／`app-studio`／`workflow`／`cleanup-legacy`）は、
   対象アセット名が本番名（名札なし）のままだと、誤って本番の在庫入出庫管理アセット（App Studio
   「在庫入出庫管理ハンズオン」＋AppDB／Code Engine／DataFlow／出力DataSet／通知Workflow）を上書き
@@ -32,8 +32,8 @@
   付き、バックエンド（AppDB datastore＋collection／Code Engine／DataFlow／出力DataSet／通知Workflowモデル）と
   App Studioアプリ／カードまで丸ごと**自分専用の隔離コピー**になる（本番や他参加者と非衝突。alias値・operation名・
   タイル/セクションid・Workflow入力名などコード内部の契約は不変）。解決した実IDは参加者ごとの状態ディレクトリ
-  `~/.config/domo-utils/<instance>-deploy/inventory-management-app/sandbox-<slug>/` に書かれ、コミット済みの
-  `domo-assets.json` は汚さない。②本番名の正規コピーを配備する本番メンテナだけ `export INVENTORY_ALLOW_PRODUCTION=1`
+  `~/.config/domo-utils/<instance>-deploy/inventory-management-app/sandbox-<slug>/` に書かれ、
+  台帳は共有しない。②本番名の正規コピーを配備する本番メンテナだけ `export INVENTORY_ALLOW_PRODUCTION=1`
   を明示する（名札なし＝本番と byte 一致の従来挙動）。読み取り専用の `verify`／`sync-manifest`／`export-app-studio`
   はガード対象外でそのまま通る。
 - **開始前に読む**: 本書 → [setup-guide.md](setup-guide.md) →
@@ -42,16 +42,15 @@
 
 ## 0.5 AIが陥りやすい誤りと正しい対処（着手前に必ず読む）
 
-このリファレンスは**あなた（AIエージェント）が最後まで自動で完遂できる**ように作ってある。過去に、
-性能が控えめなモデルが以下の誤りを犯し、ユーザーに不要な手作業を求めたり、途中で止まったり、他者の
-資産を壊しかけた。着手前にこの5つを頭に入れ、同じ轍を踏まないこと。
+このリファレンスはAIエージェントが配備を支援できるように作ってある。不要な手作業や
+対象資産の取り違えを防ぐため、着手前に次の5つを確認する。
 
 1. **「App／AppDB／Workflow を画面で手作りしてIDを渡して」と言わない**（最頻の誤り）。
    AppDBコレクション・Code Engine・DataFlow・**通知Workflowモデル**・**App Studioアプリ＋カード**は、
-   すべて `apply`／`app-studio` が documented API で自動作成する。**人手でUIからアセットを作る境界はゼロ。**
+   すべて `apply`／`app-studio` がDomo APIで作成する。**通常の配備手順ではUIからの手作りは不要。**
    どれも「手で作れ」「IDを教えて」と求めるのは誤り。まず `apply`（§3 STEP 2）→ `app-studio`（§3 STEP 5）を
-   実行すれば資産は揃う。`app-studio` は配布既定の appId が対象インスタンスに無くても名称で発見／作成へ
-   自動フォールバックするので、あなたがIDを手で埋める必要はない。
+   実行する。`app-studio` は対象インスタンス・名札の資産を名称で発見／作成するので、
+   保守用IDをコピーする必要はない。
 
 2. **1時間規模の DataFlow 実行をキャンセル・再トリガーしない**。分析のAIテキスト生成タイルは残高件数と
    インスタンス負荷に比例して伸び、実測で数分〜1時間規模になり得る。`apply` はインラインで
@@ -323,7 +322,7 @@ python3 scripts/provision_domo.py verify
 
 | 変数 | 既定 | 用途 |
 |---|---|---|
-| `DOMO_INSTANCE` | `maintenance-instance.domo.com` | 対象インスタンス。顧客インスタンスへ必ず差し替える |
+| `DOMO_INSTANCE` | （未設定・必須） | 対象インスタンス。未設定・不正なら認証前に停止 |
 | `INVENTORY_SANDBOX_SUFFIX` | （未設定） | 設定すると全Domoオブジェクト名へ全角括弧の名札（例「（検証・田中）」）を付け、バックエンド（AppDB datastore＋collection／Code Engine／DataFlow／出力DataSet／通知Workflowモデル）とApp Studioアプリ／カードまで**自分専用の隔離コピー**を作る。共有インスタンスでのハンズオン・検証用。解決IDは `~/.config/domo-utils/<instance>-deploy/inventory-management-app/sandbox-<slug>/` へ（ローカル生成の `domo-assets.json` を汚さない）。未設定＝本番と byte 一致の従来挙動 |
 | `INVENTORY_ALLOW_PRODUCTION` | （未設定） | `1`／`true`／`yes` で本番保護ガードを明示解除し、本番名のまま書込み系（`apply`／`app-studio`／`workflow`／`cleanup-legacy`）を実行する。**本番名の正規コピーを配備する本番メンテナのみ**。名札（`INVENTORY_SANDBOX_SUFFIX`）を付ける場合は不要 |
 | `DOMO_WORKFLOW_MODEL_ID` | （未設定） | **任意**。未設定なら `apply` が通知Workflowモデルを名称で発見/作成する（推奨）。設定したときだけ、そのモデルにpin（発見/作成せず尊重）。**インスタンス個別** |
@@ -344,7 +343,7 @@ python3 scripts/provision_domo.py verify
 | `app-studio` | App Studioアプリ＋ページ1カードを発見または作成しlayoutを整え、ページ2（開発ガイド）を冪等に確保。解決した実IDを `domo-assets.json` へ書き戻す（`appStudio.appId` があれば再利用、無ければ・404なら名称で発見/作成） | STEP 4.5（`dev-guide-app` publish）の後。人手のUI操作は不要 |
 | `export-app-studio` | App Studio定義（2ページ・各ページのPro Code context）を再配置用JSONへ書き出す | layout確定後のスナップショット取得 |
 | `workflow` | 通知Workflowを3タイル定義へ整形（`apply` の一部を単独実行） | Workflow定義だけを再適用したいとき |
-| `verify` | 構造チェック（唯一の成功ゲート） | 各段の後、特に最終確認 |
+| `verify` | 配備構造チェック（本番適用の認定とは別） | 各段の後、特に最終確認 |
 | `cleanup-legacy` | 旧・分割コレクションの残骸を掃除 | 旧構成からの移行時のみ |
 
 書込み系（`apply`／`app-studio`／`workflow`／`cleanup-legacy`）は本番保護ガードの対象で、本番名のままでは

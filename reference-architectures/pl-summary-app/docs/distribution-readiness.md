@@ -6,7 +6,7 @@ This is a deployable teaching reference using synthetic store P/L data. It is
 not an accounting close system or a hosted multi-tenant service. Each customer
 deploys and verifies an independent stack in their own Domo instance.
 
-## Release contract
+## Source distribution contract
 
 - Use the current public toolkit source checkout.
 - Manifests omit design IDs and leave tenant bindings empty. Provision data,

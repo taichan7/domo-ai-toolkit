@@ -125,10 +125,7 @@ class AppStudioProvisioningTests(unittest.TestCase):
         self.assertFalse(any(method == "PUT" for method, _, _ in client.calls))
 
     def test_missing_registered_app_self_heals_by_discovery(self):
-        # 配布時の domo-assets.json は参照インスタンスの appId が入っており、対象インスタンスでは
-        # 404 になる。旧実装は「手作りしてIDを渡せ」と停止したが、いまは名称で発見／作成へ自動
-        # フォールバックして全自動デプロイを継続する（＝人手境界ゼロ）。ここでは同一インスタンスの
-        # 共有アプリを別の人が再利用するケース（名称一致で発見→重複作成なし）を検証する。
+        # 削除済みの台帳IDから、同じ配備先に存在する同名アプリを再発見する。
         pinned_app = self.registry["appId"]
         disc_app = "discovered-app"
         disc_view = "discovered-view-1"

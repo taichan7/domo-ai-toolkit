@@ -48,7 +48,8 @@ Download it from your Domo developer portal (`Admin → Developer → CLI`), the
 bash scripts/authenticate.sh your-company.domo.com
 ```
 
-If it prints `Authenticated to your-company.domo.com — SID=...`, you're good.
+When it reports authentication succeeded for your instance, you're ready.
+Credentials are not printed; the local session file is private and git-ignored.
 
 ### Step 3 — Make your first API call
 
@@ -107,9 +108,9 @@ See the [commit history](https://github.com/taichan7/domo-ai-toolkit/commits/mai
 Use `git pull` to update an existing clone.
 
 **Q: Is this an official Domo product?**
-No. It is a field kit built by a Domo SE. The APIs used are the same ones the
-Domo platform uses internally plus the published developer API — stable, but
-not all are formally part of the public developer API. Each skill file marks
+No. It is a field kit built by a Domo SE. It covers published developer APIs and
+selected internal endpoints; availability and compatibility must be checked on
+your instance. Not all are supported public API contracts. Each skill file marks
 claims as `[DOC]` (documented), `[REPO]` (verified in code), `[KB]`
 (knowledge base), or `[INFER]` (inferred) so you know how much to trust them.
 

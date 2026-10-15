@@ -963,9 +963,7 @@ def app_studio(client: DomoClient) -> Dict[str, Any]:
             details = client.request("GET", f"api/content/v1/dataapps/{app_id}") or {}
         except DomoApiError as error:
             if error.status == 404:
-                # 配布時の domo-assets.json は参照インスタンスの appId が入っている。対象インスタンスで
-                # 未上書きのまま実行すると参照IDへのGETが404になる。ここで重複作成に走らず停止し、
-                # 何をすべきか（自分のIDへ上書き or appStudio を空にして発見/作成）をメッセージで示す。
+                # 同じ配備先の登録済みアプリが削除された場合は、重複作成せず台帳の修正を案内する。
                 raise RuntimeError(
                     f"Registered App Studio app {app_id} is missing on this instance; refusing to create a duplicate. "
                     "Overwrite domo-assets.json appStudio with this instance's App/Page/Card/context IDs (runbook STEP 5), "

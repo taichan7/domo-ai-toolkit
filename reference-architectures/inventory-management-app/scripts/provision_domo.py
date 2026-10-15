@@ -1823,15 +1823,12 @@ def write_back_app_studio_ids(
 
     なぜ必要か: ``app-studio`` が App／Page／Card／context を「発見または作成」しても、その実IDを
     ローカルの ``domo-assets.json`` に定着させないと、別プロセスの ``export-app-studio`` / ``verify``
-    が配布時の参照インスタンスの旧IDを読み続け、人手でのID貼り替えを迫ってしまう（＝性能の低いAIが
-    「Appを手作りしてIDを渡せ」と誤案内する温床）。実IDを書き戻すことで、以後のコマンドは追加の
-    人手なく通る＝全自動デプロイ契約を満たす。
+    が解決済みの実IDを使えない。実IDを書き戻し、別プロセスでも同じ配備状態を参照できるようにする。
 
     identity ID（``appId/viewId/cardId/proxyId/contextId`` と ``page2`` の同種）に加え、
     利用先を限定する ``instance`` / ``sandboxSuffix`` を保存する。URLなど他の設定値は保持する。
     このローカル状態ファイルは配布対象外。``proxyId``/``contextId`` は解決結果で上書きする
-    （空なら空へ）——配布時の参照インスタンス値が対象インスタンスで無効なとき、それらを掴んだ 404
-    フォールバックの後に確実に消すため（残すと ``verify`` が無効な context を GET して誤失敗する）。
+    （空なら空へ）。削除済みの古いcontextを残すと ``verify`` が無効なIDをGETして失敗するため。
     変更が無ければ書き込まない（再利用の冪等パスでファイルを無用に触らない）。
     """
     registry = load_registry()
@@ -1885,13 +1882,7 @@ def app_studio(client: DomoClient) -> Dict[str, Any]:
         except DomoApiError as error:
             if error.status != 404:
                 raise
-            # 配布時の domo-assets.json は参照インスタンスの App/Page/Card/context ID が入っている。
-            # 対象インスタンスでそのまま実行すると参照 appId への GET が 404 になる。ここで停止して
-            # 「Appを手作りしてIDを渡せ」と促すのではなく、名称で発見または API で新規作成へ自動
-            # フォールバックする（＝全自動デプロイ契約）。参照インスタンス由来の Page/Card/context ID は
-            # 当該インスタンスで無効なので必ずクリアし、この後の発見／作成パスで実IDを採り直す。
-            # 名称一致での発見は、同一インスタンスへ複数名・複数回デプロイしても1アプリを共有し
-            # 重複を作らない（冪等）。
+            # 同じ配備先の台帳に残る削除済みIDを捨て、名称で再発見して重複作成を防ぐ。
             print(
                 f"note: registered App Studio app {app_id} is absent on this instance; "
                 "falling back to discover-or-create by name "

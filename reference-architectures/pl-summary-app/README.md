@@ -56,12 +56,12 @@ AIが作るHTMLは信用せず、画面側の許可リストを通して描画�
 
 ## 検証と保守
 
-リポジトリのルートから、ネットワークを使わない検証を実行できます。
+このアプリフォルダで、ネットワークを使わない検証を実行できます。
 
 ```bash
-python3 -m unittest discover -s pl-summary-app/tests
-node --test pl-summary-app/tests/test_*.js
-node pl-summary-app/dev-guide-app/tests/check.mjs
+python3 -m unittest discover -s tests
+node --test tests/test_*.js
+node dev-guide-app/tests/check.mjs
 ```
 
 配備先ではデータ層とワークフロー層の `verify` を実行します。正しい対象インスタンス・版・

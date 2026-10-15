@@ -28,6 +28,9 @@ jobs:
       - name: Markdown link check
         run: python3 scripts/check-links.py
 
+      - name: Authentication helpers (offline)
+        run: python3 -m unittest discover -s scripts -p 'test_auth_helpers.py' -v
+
       - name: JSON syntax
         run: |
           fail=0

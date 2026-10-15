@@ -7,7 +7,7 @@
 > **このガイドが扱う範囲**
 > - **データ層＋ Pro-Code ＋ ETL 短文 AI サマリー**は、このフォルダのスクリプトだけで**きれいに**
 >   デプロイできる（STEP 1〜5）。`apply` →データの`sync-manifest`→Workflow配備・CE配線→
-`domo publish`→`app-studio`→`verify`。
+>   `domo publish`→`app-studio`→`verify`。
 > - **AI 長文レポート（AppDB `analysis_html`）**は**ワークフロー層**（WF-01 メイン＋統合サブWF＋保存CE）が
 >   必要で、これも `scripts/provision_workflows.py provision` が**まっさらなインスタンスへゼロから配備**できる
 >   （初回はSTEP 3、詳細はSTEP 6）。CE・統合サブWF・WF-01 を**名称で発見または新規作成**し、保守用インスタンスの GUID を
@@ -21,13 +21,10 @@
 
 - このフォルダは特定インスタンスに固定されない。すべてのコマンドは環境変数 `DOMO_INSTANCE` で
   対象を切り替える。**ドキュメント中の `${DOMO_INSTANCE}` は自分のインスタンスに読み替える。**
-- `maintenance-instance.domo.com` は**本リファレンスの保守・検証用インスタンス**であり、顧客の環境ではない。
-  配布物のソースやスナップショットに保守用インスタンスのホスト名／ID が残っていても、スクリプトは
-  資産を**名称で発見または作成**し、`sync-manifest` が物理 ID を対象インスタンスへ合わせる。
-- `pro-code/manifest.json` と `scripts/*.py` に埋まっている保守用インスタンスの ID（App ID・
-  DataSet ID・AppDB コレクション ID 等）は、`sync-manifest`（データ／コレクション）と
-  `app-studio`（埋込カードの context mapping）が対象インスタンスの実 ID へ**自動で張り替える**。
-  手で書き換える必要はない。
+- 公開toolkitのソースを使う。配布manifestはdesign IDを省略し、接続IDを空にしてある。
+  スナップショットのIDは例示用で、配備先の資産台帳ではない。
+  資産を**名称で発見または作成**し、`sync-manifest` と `app-studio` が対象インスタンスへ束縛する。
+  `domo-assets.json` や他参加者の解決済みmanifestをコピーしない。
 - このフォルダは**顧客に複数配布するリファレンスアーキテクチャのデモ**である。特定顧客の実データ・
   実名・ホスト名・メール宛先を、コード／ドキュメント／コミットへ**焼き込まない**。
 
@@ -129,9 +126,8 @@ STEP 1 で確定した対象インスタンスの ID へ書き込む。名称で
 - **ゲート**: `git diff pro-code/manifest.json`（または目視）で、`summary`／`detail`（＋ `trend`／`dept`）の
   `dataSetId` とコレクション `id` が対象インスタンスの値へ更新されている（または既に一致）こと。
 
-> **保守用インスタンスの ID が気になる場合**: 配布時の `manifest.json` には保守用インスタンスの
-> DataSet / コレクション ID が入っているが、このコマンドが対象インスタンスの実 ID へ張り替えるので、
-> 手編集は不要。
+> **公開ソースのIDは未設定**: このコマンドが対象インスタンスのDataSet／コレクションIDを解決する。
+> Workflow／CEの配線は続くSTEP 3で行う。未解決のままpublishしない。
 
 ---
 
@@ -159,9 +155,8 @@ CEソースへ両IDを焼き込み、保存・手動起動・実行状況の1公
 - **`domo publish` は `-i` フラグを取らず、configstore の mtime 最大のインスタンスへ出版する**。
   STEP 0 で `domo login -i "$DOMO_INSTANCE"` 済みなら対象が最新。複数インスタンスを並行使用中は、
   出版直前に対象の configstore を `touch` し、出力の `Publishing ... to <instance>` を確認する。
-- **初回（新規インスタンス）**: `pro-code/manifest.json` トップレベルの `id`（＝保守用インスタンスの
-  Pro Code design ID）はそのインスタンスに存在しないので、**空にするか**新規 design に合わせて publish する。
-  Domo が払い出した design ID を控え、`manifest.json` の `id` に反映する。
+- **初回（新規インスタンス）**: 公開ソースはトップレベル `id` が未設定なので新規designを作る。
+  コピー元の解決済みmanifestを使わず、公開後にCLIが書き戻したdesign IDを確認する。
 - **更新（同一インスタンス）**: `id` はそのまま残して publish する。
 - **ゲート**: publish 成功。払い出された design が対象インスタンスに存在すること。
 

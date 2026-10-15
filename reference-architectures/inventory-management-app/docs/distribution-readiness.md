@@ -7,7 +7,7 @@ does not certify it as a production warehouse system or a multi-tenant service.
 Deploy an independent stack in each customer's Domo instance; do not share a
 maintainer's deployment state or credentials.
 
-## Release contract
+## Source distribution contract
 
 - Use the current public toolkit source checkout.
 - Distributed manifests omit design IDs and leave tenant bindings empty. Run

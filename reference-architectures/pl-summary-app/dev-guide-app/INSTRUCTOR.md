@@ -57,7 +57,7 @@
 - [ ] **当日端末のソフト導入可否**（会社管理 PC は winget / `npm i -g` が禁止のことがある。不可なら事前に情シス申請、または事前キッティング済みの貸与端末を手配）
 - [ ] **会場ネットワークで実機 1 台の事前疎通**（前日までに `npm i -g ryuu` / git clone / `domo login` / `cd pro-code && domo publish` まで通す＝false green 対策。失敗時は許可ドメイン `github.com` / `*.domo.com` を IT へ申請）
 - [ ] **後方支援比率**（受講者 6〜8 名ごとに巡回 TA 1 名。環境点検ゲート 0:10-0:30 に人員を厚く）
-- [ ] 共有エージェントアカウント（有料枠が無い人のため。**同時実行/利用量に上限**。目安 1 アカウント数名まで。**一斉利用で 429／上限に達し全員同時停止のリスク**→主エージェントは各自の GitHub Copilot 無料枠を既定にし、共有 Claude/Codex は副へ。詰まったら時間差実行）
+- [ ] 各参加者の利用許可済みエージェントアカウント／組織から割り当てられた席と利用上限。ログインやAPIキーを参加者間で共有しない。利用枠がない場合は講師の実演・ペア作業へ切り替える
 - [ ] インスタンス名の案内文（`<自社>.domo.com`）
 
 ## 3. 認証は 2 系統（トークン無し運用 ↔ 開発者トークン）
@@ -82,22 +82,22 @@ SID を要求する `scripts/deploy_dataflow_prompt.py`。WF 層は `domo login`
 
 | 症状 | 原因 | 対処 |
 |---|---|---|
-| `PL_SANDBOX_SUFFIX が未設定のまま…本番オブジェクトを…` でガード停止 | 名札なしで maintenance-instance の本番名を触ろうとした | `export PL_SANDBOX_SUFFIX="検証・<氏名>"` を設定して再実行（本番メンテナのみ `PL_ALLOW_PRODUCTION=1`） |
+| `PL_SANDBOX_SUFFIX が未設定のまま…本番オブジェクトを…` でガード停止 | 名札なしで共有の本番名へ書き込もうとした | `export PL_SANDBOX_SUFFIX="検証・<氏名>"` を設定して再実行（本番メンテナのみ `PL_ALLOW_PRODUCTION=1`）。全インスタンスに適用 |
 | `provision_workflows.py` が「認証情報がありません」で停止 | WF 層は configstore（`domo login`）を読まない | `config/secrets.env` に `DOMO_DEVELOPER_TOKEN` → `set -a; . config/secrets.env; set +a`、または `SID` を env に設定 |
 | `Run domo login -i <instance>` で停止 | 未ログイン、または `DOMO_INSTANCE` 未設定 | `export DOMO_INSTANCE=<自社>.domo.com` → `domo login -i "$DOMO_INSTANCE"` |
 | `domo publish` 後にアプリが全ツリー構成で壊れる | `pro-code/` の親から publish した（cwd 事故） | 必ず `cd pro-code` してから `domo publish` |
-| 初回 publish が design 不在で失敗 | `pro-code/manifest.json` の `id` が保守用の design ID のまま | `id` を空にして publish → 払い出された design ID を `id` に反映 |
+| 初回 publish が design 不在で失敗 | 別インスタンスの解決済みmanifestをコピーした | 公開ソースの未設定manifestからprovision・alias同期し、対象へ新規publishする |
 | publish 成功なのに画面が変わらない | キャッシュ/追従遅延 | ハードリロード → 数十秒待ち → `version` を上げて再 publish |
 | サマリータブが常に「準備中」 | WF 層（§3-(B)）未配備で `analysis_html` 未生成 | WF 層を配備するか、長文不要ならそのまま（概要/事業部別タブはデータ層だけで動く） |
 | トレンド空表示・事業部タブが出ない | 埋込カードの context mapping 未同期（`trend`/`dept` alias 未解決） | `python3 scripts/provision_domo.py app-studio` で context を同期 |
-| 共有エージェントアカウントが 429／利用上限 | 一斉に同一アカウントを叩きレート超過 | 各自の GitHub Copilot 無料枠へ退避、または時間差実行 |
+| エージェントが 429／利用上限 | 個人または組織の利用枠を超過 | 利用上限を確認して時間差実行、講師の実演・ペア作業へ切り替える。認証情報は共有しない |
 | `domo publish` が別インスタンスへ出版された | `domo publish` は `-i` を取らず configstore の mtime 最大のインスタンスへ出す | 出版直前に `domo login -i <自社>.domo.com`（または対象 configstore を `touch`）し、出力の `Publishing ... to <instance>` を確認 |
 | スクリプトが突然 401／ワークフロー API が 403 | `domo login` の SID 失効（約 1 時間）・ターミナル開き直し | `domo login -i <自社>` で入り直す。WF 層は `set -a; . config/secrets.env; set +a` を再読込（開発者トークン方式は失効が緩い） |
 
 ## 5. 絶対に守らせる線（名札で本番保護・復唱させる）
 
 - **名札（`PL_SANDBOX_SUFFIX="検証・<氏名>"`）を全員が必ず設定**＝データ層・WF 層・FE の全オブジェクトが自分専用名になり、本番や他参加者と分離（同一インスタンス上に複数サンドボックスが同居しても安全）。
-- `provision_domo.py apply` / `provision_workflows.py provision --apply` 等は、**名札なし（本番名のまま）で maintenance-instance の本番オブジェクトを触ろうとすると＝スクリプトが拒否**する（本番メンテナのみ `PL_ALLOW_PRODUCTION=1`）。顧客が**自分のインスタンス**へ配備する分にはガードは無関係。
+- `provision_domo.py apply` / `provision_workflows.py provision --apply` 等は、**どのインスタンスでも名札なしの書込みを拒否**する。ハンズオンでは名札を付け、本番名での正規配備は担当者が `PL_ALLOW_PRODUCTION=1` を明示する。
 - 本番の**開発ガイド design を上書きしない**＝`dev-guide-app` を publish しない（本番ガイドを守る）。参加者はコピー＝自分のサンドボックスでのみ扱う。
 - **AI クレジット警告**: 名札は名前を分けるだけで、配備先インスタンスの **AI／クレジット枠は分離しない**。`apply` の DataFlow 実行（TextGeneration 2 枚＝店舗/全社短文）と WF-01 実行（長文 AI）はいずれもクレジットを消費する。多人数回は少数店舗シード＋クレジット枠を事前確認。
 - 本番 design・共有資産・**他参加者の名札付き資産**に触れない。

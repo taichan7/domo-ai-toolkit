@@ -110,7 +110,7 @@ DataSet〔summary/detail/trend/dept〕・統合サブWF・WF-01・App Studio Dat
 配備は `scripts/provision_domo.py`（データ層: apply/sync-manifest/app-studio/embed-guide/verify）と
 `scripts/provision_workflows.py`（WF 層: provision/ce/subflow/mainflow/verify）。本番保護ガードは、
 **名札なし**で maintenance-instance の本番オブジェクトを作成／書き換えようとすると**拒否**する（本番メンテナ
-のみ `PL_ALLOW_PRODUCTION=1`）。顧客が**自分のインスタンス**へ配備する分にはガードは無関係。
+のみ `PL_ALLOW_PRODUCTION=1`）。この保護は**全インスタンス**に適用される。顧客の初回検証でも名札を付ける。
 
 ## 落とし穴（運用の罠）
 
