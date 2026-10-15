@@ -83,7 +83,7 @@
       <div><dt>文書種別</dt><dd>ハンズオン教材（手を動かす）</dd></div>
       <div><dt>所要</dt><dd>約 3 時間・ステップ順</dd></div>
       <div><dt>対象</dt><dd>店舗別損益AIデモ 開発者</dd></div>
-      <div><dt>版</dt><dd>v0.1.0（2026-10-06）</dd></div>
+      <div><dt>版</dt><dd>v0.2.0（2026-10-15）</dd></div>
     </dl>
 
     <div class="abstract">
@@ -176,7 +176,7 @@
         <li><b>アプリ一式（配布 ZIP）</b>を受け取って展開し、<code>pl-summary-app</code> フォルダを分かる場所に置く（§1「そろえる 6 つ」STEP 1）。</li>
         <li>VS&nbsp;Code とエージェント拡張を入れて、サインインできる（§1「VS&nbsp;Code を入れて、フォルダを開く」「エージェント拡張を入れる」）。</li>
         <li>Node・Python・Git・Domo CLI を入れて、<code>domo login</code> まで通す（§1「Node・Python・Git を入れる」「Domo CLI を入れて、ログインする」）。</li>
-        <li><code>domo-ai-starter</code> を clone して、疎通スクリプトが通る（§1「土台を置く」）。</li>
+        <li><code>domo-ai-toolkit</code> を clone して、疎通スクリプトが通る（§1「土台を置く」）。</li>
         <li><code>domo login -i your-company.domo.com</code>（ブラウザ SSO）まで通す。<b>データ層・Pro Code・App Studio 埋め込みはこのログインだけで動く</b>＝トークン不要。<b>開発者トークンはワークフロー層（AI 長文レポート）だけに要る任意</b>で、使う回のみ §1「②の認証を整える」で発行（<b>管理者権限が要る</b>・無ければ運営へ）。</li>
         <li><code>domo dev</code> で Pro Code のローカルプレビューがブラウザで開けることを確認（任意・<code>domo login</code> だけで動く）。</li>
         <li><b>（任意・人数が多い回は推奨）</b><code>~/handson-pl</code> へコピー → <code>pro-code/manifest.json</code> の <code>id</code> を外す → <code>domo publish</code> まで済ませる（§7）。</li>
@@ -232,7 +232,7 @@
           <span class="step__icon"><svg class="ic ic--lg" aria-hidden="true" focusable="false"><use href="#ic-git"/></svg></span>
           <span class="step__num">STEP 6</span>
           <h4>土台（starter）</h4>
-          <p><code>domo-ai-starter</code> を clone して同じ場所に置く。</p>
+          <p><code>domo-ai-toolkit</code> を clone して同じ場所に置く。</p>
         </li>
       </ol>
       <figcaption>そろえる 6 つ ― 上から順に進めれば、最後はエージェントに頼める状態になる</figcaption>
@@ -277,12 +277,12 @@
       <div class="callout callout--accent">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-ai"/></svg></span>
         <h4>Claude&nbsp;Code（Anthropic）</h4>
-        <p><b>Claude Code</b> を検索 → インストール → Anthropic アカウントでサインイン。<code>CLAUDE.md</code> を自動で読む。</p>
+        <p><b>Claude Code</b> を検索 → インストール → Anthropic アカウントでサインイン。この ZIP の規約 <code>AGENT.md</code> を入口に読む。</p>
       </div>
       <div class="callout">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-spark"/></svg></span>
         <h4>Codex（OpenAI）</h4>
-        <p><b>Codex</b> を検索 → インストール → ChatGPT アカウントでサインイン。<code>AGENTS.md</code> を読む。</p>
+        <p><b>Codex</b> を検索 → インストール → ChatGPT アカウントでサインイン。<code>AGENT.md</code> を読む。</p>
       </div>
       <div class="callout">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-git"/></svg></span>
@@ -295,13 +295,13 @@
         <table class="demotable demotable--sm" aria-labelledby="tblcap-2">
           <thead><tr><th scope="col">エージェント</th><th scope="col">最初に読む入口</th><th scope="col">起動の例</th></tr></thead>
           <tbody>
-            <tr><th scope="row" class="role">Claude Code</th><td><code>CLAUDE.md</code>（自動）→ <code>AGENTS.md</code></td><td class="memo">拡張のパネル／フォルダで <code>claude</code></td></tr>
-            <tr><th scope="row" class="role">Codex</th><td><code>AGENTS.md</code></td><td class="memo">VS&nbsp;Code 拡張／CLI</td></tr>
-            <tr><th scope="row" class="role">GitHub Copilot</th><td><code>.github/copilot-instructions.md</code></td><td class="memo">VS&nbsp;Code 拡張</td></tr>
+            <tr><th scope="row" class="role">Claude Code</th><td><code>AGENT.md</code></td><td class="memo">拡張のパネル／フォルダで <code>claude</code></td></tr>
+            <tr><th scope="row" class="role">Codex</th><td><code>AGENT.md</code></td><td class="memo">VS&nbsp;Code 拡張／CLI</td></tr>
+            <tr><th scope="row" class="role">GitHub Copilot</th><td><code>AGENT.md</code></td><td class="memo">VS&nbsp;Code 拡張</td></tr>
           </tbody>
         </table>
       </div>
-      <figcaption id="tblcap-2">エージェント別の入口ファイル ― どれも同じ規約へ合流する（→ §6）</figcaption>
+      <figcaption id="tblcap-2">エージェント別の入口ファイル ― この ZIP では 3 つとも <code>AGENT.md</code> が共通の入口（どれも同じ規約へ合流・→ §6）</figcaption>
     </figure>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-key"/></svg><b>ライセンスの注意</b>：Claude&nbsp;Code／Codex は有料プランまたは API キーが必要な場合がある。GitHub&nbsp;Copilot は無料枠がある。当日サインインできない場合は、運営が用意した共有アカウントか、使える別のエージェントに切り替えて進めてよい（どの道 §6 の規約は同じ）。</p>
 
@@ -436,20 +436,20 @@ git config --global --get http.proxy
 <span class="c"># export NODE_EXTRA_CA_CERTS="/path/to/company-ca.pem"</span></pre>
     </div>
 
-    <h3 class="sub">土台を置く ― domo-ai-starter</h3>
-    <p class="sec__lead">どのエージェントにも同じ「土台」を渡すための、Domo 社員（Will West 氏）が公開するコミュニティ製スターターキット（非公式・MIT・英/日）。アプリと同じ場所に clone して置くと、エージェントが Domo の認証・API・作法を把握し、<b>UI を触らず自然文で Domo を調べ・作れる</b>ようになる。入手先は <code>github.com/Willwwest/domo-ai-starter</code>（MIT・英/日 両対応）。URL は下のボタンでコピー（下の clone コマンドにも含まれる）。</p>
+    <h3 class="sub">土台を置く ― domo-ai-toolkit</h3>
+    <p class="sec__lead">どのエージェントにも同じ「土台」を渡すための、Domo 社員が実戦で育てた公開ツールキット（非公式・MIT・英/日）。アプリと同じ場所に clone して置くと、エージェントが Domo の認証・API・作法を把握し、<b>UI を触らず自然文で Domo を調べ・作れる</b>ようになる。入手先は <code>github.com/taichan7/domo-ai-toolkit</code>（MIT・英/日 両対応）。URL は下のボタンでコピー（下の clone コマンドにも含まれる）。</p>
     <div class="cmd">
       <div class="cmd__bar">
-        <span><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-git"/></svg>domo-ai-starter の URL</span>
+        <span><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-git"/></svg>domo-ai-toolkit の URL</span>
         <button class="copy-btn" type="button" data-copy="url-starter">コピー</button>
       </div>
-      <pre class="cmd__body" id="url-starter">https://github.com/Willwwest/domo-ai-starter</pre>
+      <pre class="cmd__body" id="url-starter">https://github.com/taichan7/domo-ai-toolkit</pre>
     </div>
     <div class="callouts callouts--2">
       <div class="callout callout--accent">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-doc"/></svg></span>
         <h4>核は「共通コンテキスト 2 点」</h4>
-        <p><code>CLAUDE.md</code>（エージェント規約）＋ <code>domo-api-reference.md</code>（認証＋API 一覧）。この 2 つを読ませれば、<b>どの LLM でも同じこと</b>ができる。</p>
+        <p><code>AGENTS.md</code>／<code>CLAUDE.md</code>（エージェント規約）＋ <code>docs/api-reference.md</code>（認証＋API 一覧）＋ <code>skills/</code>（機能別の作業メモ 55 件）。これらを読ませれば、<b>どの LLM でも同じこと</b>ができる。</p>
       </div>
       <div class="callout callout--accent">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-ai"/></svg></span>
@@ -459,12 +459,14 @@ git config --global --get http.proxy
     </div>
     <figure class="fig">
       <dl class="defs">
-        <dt>CLAUDE.md</dt><dd>エージェント用コンテキスト（認証経路・制約・やってよいこと）。</dd>
-        <dt>domo-api-reference</dt><dd>認証フローと API エンドポイント一覧（<code>.ja.md</code> 版あり）。</dd>
-        <dt>examples/*.sh</dt><dd>すぐ動く診断：<code>list-datasets.sh</code>／<code>query-dataset.sh</code>／<code>diagnose-etls.sh</code> ほか。</dd>
-        <dt>pro-code-app/</dt><dd>デザインシステム配線済みの<b>最小 Pro Code 雛形</b>（ゼロから作る時の出発点）。</dd>
+        <dt>AGENTS.md / CLAUDE.md</dt><dd>エージェント用コンテキスト（認証経路・制約・やってよいこと）。</dd>
+        <dt>docs/api-reference</dt><dd>認証フローと API エンドポイント一覧（<code>.ja.md</code> 版あり）。</dd>
+        <dt>skills/</dt><dd>Domo 機能別の作業メモ 55 件（DataSets／Magic ETL／Workflows／Code Engine／Pro Code …）。</dd>
+        <dt>scripts/*.sh</dt><dd>すぐ動く診断：<code>list-datasets.sh</code>／<code>query-dataset.sh</code>／<code>diagnose-etls.sh</code> ほか。</dd>
+        <dt>templates/pro-code-app/</dt><dd>デザインシステム配線済みの<b>最小 Pro Code 雛形</b>（ゼロから作る時の出発点）。</dd>
+        <dt>reference-architectures/</dt><dd>デプロイ可能な完成アプリ 2 本（在庫入出庫管理・店舗損益 AI 分析）。</dd>
       </dl>
-      <figcaption>domo-ai-starter の中身 ― 規約・API 参照・診断スクリプト・最小雛形</figcaption>
+      <figcaption>domo-ai-toolkit の中身 ― 規約・API 参照・スキル集・診断スクリプト・雛形・参照アプリ</figcaption>
     </figure>
     <div class="cmd">
       <div class="cmd__bar">
@@ -473,10 +475,10 @@ git config --global --get http.proxy
       </div>
       <pre class="cmd__body" id="cmd-s1-starter"><span class="c"># アプリと同じ（親）フォルダに clone し、疎通を確認（CLI 導入・login は上の手順）
 # Windows は Git Bash で実行（PowerShell に bash が無い場合）</span>
-cd ..   <span class="c"># アプリの親フォルダへ出てから（starter をアプリの中に入れない。親に pl-summary-app と並ぶ）</span>
-git clone https://github.com/Willwwest/domo-ai-starter
-bash domo-ai-starter/examples/authenticate.sh your-company.domo.com
-bash domo-ai-starter/examples/list-datasets.sh      <span class="c"># 先頭50件が出れば疎通OK</span></pre>
+cd ..   <span class="c"># アプリの親フォルダへ出てから（toolkit をアプリの中に入れない。親に pl-summary-app と並ぶ）</span>
+git clone https://github.com/taichan7/domo-ai-toolkit
+bash domo-ai-toolkit/scripts/authenticate.sh your-company.domo.com
+bash domo-ai-toolkit/scripts/list-datasets.sh      <span class="c"># 先頭50件が出れば疎通OK</span></pre>
     </div>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-bulb"/></svg>エージェントへの頼み方の例：「行数の多いデータセット上位 10 件を挙げて」「失敗している Magic ETL をエラーコード別にまとめて」「dataflow 92 の不具合と直し方は？」。長時間の無人作業では、1 時間で失効する SID でなく <code>DOMO_DEVELOPER_TOKEN</code>（開発者トークン・<code>config/secrets.env</code> に置いて読み込む）を使う。</p>
 
@@ -647,7 +649,7 @@ set -a; . config/secrets.env; set +a</pre>
         <span><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-ai"/></svg>エージェントへ渡すプロンプト（起点・何度でも使える）</span>
         <button class="copy-btn" type="button" data-copy="prompt-s1-check">コピー</button>
       </div>
-      <pre class="cmd__body" id="prompt-s1-check">私の PC は 〈Windows / macOS〉 です。AGENTS.md と prompts/deploy-with-agent.ja.md を読んで、
+      <pre class="cmd__body" id="prompt-s1-check">私の PC は 〈Windows / macOS〉 です。AGENT.md と prompts/deploy-with-agent.ja.md を読んで、
 この Domo 開発ハンズオン（環境準備 → 自分のサンドボックスをデプロイ → 編集 → 公開 → 確認）を
 最初から最後まで、1 ステップずつ案内してください。
 
@@ -655,7 +657,7 @@ set -a; . config/secrets.env; set +a</pre>
 - VS Code、コーディングエージェント拡張（Claude&nbsp;Code／Codex／Copilot のどれか）、
   Node、Python、Git、Domo CLI（domo --version）の有無
 - domo login 済みか（ログイン先インスタンス名も確認）
-- domo-ai-starter がアプリと同じ場所に clone されているか
+- domo-ai-toolkit がアプリと同じ場所に clone されているか
 足りないものがあれば、私の OS（Windows＝PowerShell／macOS＝ターミナル）向けのコマンドを 1 つずつ提示して。
 
 準備ができたら、権限も読取のみで点検してください:
@@ -680,7 +682,7 @@ set -a; . config/secrets.env; set +a</pre>
             <tr><th scope="row" class="role">Node・Python・Git</th><td><code>node --version</code>／<code>python3 --version</code>／<code>git --version</code> が下限を満たして出る</td></tr>
             <tr><th scope="row" class="role">Domo CLI</th><td><code>domo --version</code> が出る（出なければ <code>npm install -g ryuu</code>）</td></tr>
             <tr><th scope="row" class="role">ログイン</th><td><code>domo login -i your-company.domo.com</code> がブラウザ SSO で通る</td></tr>
-            <tr><th scope="row" class="role">土台（starter）</th><td>アプリと同じ親フォルダに <code>domo-ai-starter</code> を clone 済み</td></tr>
+            <tr><th scope="row" class="role">土台（starter）</th><td>アプリと同じ親フォルダに <code>domo-ai-toolkit</code> を clone 済み</td></tr>
             <tr><th scope="row" class="role">（任意）トークン</th><td>AI 長文レポートまで作る回だけ、<code>config/secrets.env</code> に 2 変数を設定</td></tr>
           </tbody>
         </table>
@@ -697,7 +699,7 @@ set -a; . config/secrets.env; set +a</pre>
         <li><code>node --version</code> ／ <code>python3 --version</code> ／ <code>git --version</code> が表示される。</li>
         <li><code>domo --version</code> が表示される（Domo CLI 導入済み）。</li>
         <li><code>domo login -i <b>your-company</b>.domo.com</code> でブラウザ SSO ログインできる（<code>your-company</code> は自分のインスタンス名に置換）。</li>
-        <li><code>domo-ai-starter</code> を clone し、<code>examples/authenticate.sh</code> が通る。</li>
+        <li><code>domo-ai-toolkit</code> を clone し、<code>scripts/authenticate.sh</code> が通る。</li>
       </ol>
     </div>
 
@@ -718,7 +720,7 @@ node --version / python3 --version / git --version / domo --version
     </div>
     <div class="cmd">
       <div class="cmd__bar"><span><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg>③ 安全ルールを要約</span><button class="copy-btn" type="button" data-copy="prompt-s1-t3">コピー</button></div>
-      <pre class="cmd__body" id="prompt-s1-t3">AGENTS.md の「やってはいけないこと」を、私が守るべき5つの箇条書きに要約して。
+      <pre class="cmd__body" id="prompt-s1-t3">AGENT.md の「やってはいけないこと」を、私が守るべき5つの箇条書きに要約して。
 それぞれ「なぜ危険か」を1行で添えて。</pre>
     </div>
     <div class="cmd">
@@ -750,7 +752,7 @@ node --version / python3 --version / git --version / domo --version
     </div>
     <div class="cmd">
       <div class="cmd__bar"><span><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-compass"/></svg>⑨ 土台を探索する</span><button class="copy-btn" type="button" data-copy="prompt-s1-t9">コピー</button></div>
-      <pre class="cmd__body" id="prompt-s1-t9">domo-ai-starter/examples フォルダの中身を一覧して、
+      <pre class="cmd__body" id="prompt-s1-t9">domo-ai-toolkit/scripts フォルダの中身を一覧して、
 各スクリプトで「何ができるか」を1行ずつ説明して。私が最初に試すべき順番も提案して。</pre>
     </div>
     <div class="cmd">
@@ -1002,7 +1004,7 @@ domo dev</pre>
       </div>
     </div>
 
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg><b>エージェントへの渡し物</b>＝<code>AGENTS.md</code>（この ZIP に同梱）で「やること／やらないこと／境界」を渡し、土台にスターターキット <code>domo-ai-starter</code>（API リファレンス＋規約）を置く。<b>認証</b>＝CLI の認証情報はユーザー設定領域に保存し、トークンはリポジトリに書かない。<b>ローカル確認は 2 通り</b>＝ロジックの回帰＝<b>Node テスト（<code>node tests/test_drill_helpers.js</code>）</b>／対話的な見た目プレビュー＝<code>domo dev</code>。</p>
+    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg><b>エージェントへの渡し物</b>＝<code>AGENT.md</code>（この ZIP に同梱）で「やること／やらないこと／境界」を渡し、土台にスターターキット <code>domo-ai-toolkit</code>（API リファレンス＋規約）を置く。<b>認証</b>＝CLI の認証情報はユーザー設定領域に保存し、トークンはリポジトリに書かない。<b>ローカル確認は 2 通り</b>＝ロジックの回帰＝<b>Node テスト（<code>node tests/test_drill_helpers.js</code>）</b>／対話的な見た目プレビュー＝<code>domo dev</code>。</p>
 
     <div class="try">
       <span class="try__tag"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-flask"/></svg>ローカルの砂場で先に回す</span>
@@ -1441,7 +1443,7 @@ node tests/test_drill_helpers.js</pre>
         <dt>AppDB（レポート保存）</dt><dd>アプリ専用の JSON 文書 DB。「<code>店舗別損益AI要約</code>」コレクション（<b>名前でなく UUID</b> で呼ぶ）。<b>店舗別＋全社の長文レポート</b>（<code>analysis_html</code>）。<code>doc_key</code>＝<code>{store_id}-{period}-{scenario}</code>（全社は <code>ALL-…</code>）。書けるのは <code>content</code> だけ。保存は保存CE 経由。表示は <code>generated_at</code> 降順の最新 1 件を選ぶ。</dd>
         <dt>Code Engine（サーバー関数）</dt><dd>公開 <b>1 関数 <code>pl_report_api(operation, request)</code></b>（非公開ヘルパは publish で消える）。<code>operation</code> は <b>2 つ</b>＝<code>save</code>（AppDB 保存＋<b>同一 <code>doc_key</code> の厳密に古い旧版だけ削除</b>＝重複除去を保存に内包・必須フィールド欠落は POST 前に弾く門番付き）／<code>validate</code>（保存前の軽い識別子検証・任意）。<code>collection_id</code> は GUID 形状のみ検証＝<b>インスタンス非依存</b>。認証トークン不要（<code>codeengine</code> ランタイムが注入）。レガシー <code>appdb_maintenance.py</code>（<code>dedupe_appdb_documents</code>・フロー非配線の手動バッチ用）も残置。</dd>
         <dt>メイン WF（WF-01）</dt><dd><b>並列サイドブランチ＋終了 2 つ</b>。開始→店舗別SQL から、本線（店舗ループ：単一店舗→整形→<b>15 秒待機タイマー</b>→統合サブWF(<code>store</code>)→次店舗?→終了#1）と、フォークした全社ブランチ（全店舗SQL→整形→統合サブWF(<code>company</code>)→終了#2）を並走。15 秒は <code>company</code> を <code>wait:False</code> で非同期投入する際の同時実行を抑え、AI 書込みの一時失敗を平準化する（従来 2 回連続実行で収束）。先頭の dedupe ノードは撤去済み（保存CE に内包）。座標・経路は <code>provision_workflows.py</code> の<b>数学的レイアウトエンジン</b>が算出し、PUT 前に <code>validate_layout</code> が重なり 0・経路貫通 0 をゲートする＝再デプロイで崩れない。</dd>
-        <dt>統合サブWF</dt><dd>開始→<b>5 秒待機</b>→レポート種別? ゲートウェイ（<code>report_type</code> で分岐）→店舗AI／全社AI→保存→終了。両 AI が <code>pl_report_api(save)</code> で AppDB 保存、全社 AI は <code>Send Email</code> も保持（宛先は env <code>PL_EMAIL_PERSON_RECIPIENTS</code>）。<b>旧 WF-02（店舗）／WF-03（全社）を 1 本に統合済み</b>（プロンプトのファイル名 <code>prompt_wf02_store.md</code>／<code>prompt_wf03_summary.md</code> の <code>wf02</code>／<code>wf03</code> はその名残）。</dd>
+        <dt>統合サブWF</dt><dd>開始→<b>5 秒待機</b>→レポート種別? ゲートウェイ（<code>report_type</code> で分岐）→店舗AI／全社AI→保存→終了。両 AI が <code>pl_report_api(save)</code> で AppDB 保存、全社 AI は <code>Send Email</code> も保持（宛先は env <code>PL_EMAIL_PERSON_RECIPIENTS</code>。未設定なら宛先ゼロで配備され配備時に警告が出る＝実行時は AI が宛先を創作せず送信をスキップする。保存は実施されるので成功を偽装しない）。<b>旧 WF-02（店舗）／WF-03（全社）を 1 本に統合済み</b>（プロンプトのファイル名 <code>prompt_wf02_store.md</code>／<code>prompt_wf03_summary.md</code> の <code>wf02</code>／<code>wf03</code> はその名残）。</dd>
         <dt>AI Agent（2 つ）</dt><dd>統合サブWF 内の自律ノード。①<b>店舗ブランチ</b>（<code>prompt_wf02_store.md</code>）＝店舗長文。②<b>全社ブランチ</b>（<code>prompt_wf03_summary.md</code>）＝全社長文（純利益ワースト視点）。両方 <b>context＝<code>summary</code>＋<code>detail</code></b>、<b>tool＝<code>pl_report_api</code></b>、指示＝プロンプト。計算させず解釈だけ、<b>状態ラベルは転記</b>、成果は<b>ツール引数（構造化 JSON）</b>で受け取る。</dd>
         <dt>名札（PL_SANDBOX_SUFFIX）とデプロイ入口</dt><dd>データ層は <code>provision_domo.py</code>（seed／CE／AppDB／DataFlow／4 出力）、ワークフロー層は <code>provision_workflows.py</code>（保存CE・統合サブWF・WF-01）が配備する。<b><code>PL_SANDBOX_SUFFIX</code> を 1 個設定</b>すると両層が読み、全オブジェクト名が一意化されて<b>本番や他参加者と衝突しない</b>。保守用インスタンス（<code>maintenance-instance</code>）の本番名のまま配備するのは<b>本番メンテナが <code>PL_ALLOW_PRODUCTION=1</code> を明示したときだけ</b>（既定は fail-closed で止まる）。</dd>
       </dl>
@@ -1874,7 +1876,7 @@ provision_domo.py app-studio で同期する手順（空マッピングは manif
         <dt>自動化（Workflow）</dt><dd>「WF-01 の 15 秒待機タイマーの意味を説明して」／「<code>instances/message</code>（<code>messageName=manual</code>）で手動起動する手順を、トークンの扱いに注意して教えて」／「取りこぼし店舗が出たとき、再実行が必須かどうかを保存CE の挙動から判断して」</dd>
         <dt>埋め込み（App Studio）</dt><dd>「Pro-Code カードの context mapping に全 alias が入っているか確認して」／「<code>DA0004</code> が出たとき、空マッピングと非空マッピングのどちらが原因か切り分けて」／「alias を増やしたら <code>provision_domo.py app-studio</code> で同期する手順を説明して」</dd>
         <dt>デプロイ（2 層）</dt><dd>「データ層（<code>provision_domo.py</code>）とワークフロー層（<code>provision_workflows.py</code>）で要る認証の違いを教えて」／「<code>PL_SANDBOX_SUFFIX</code> を付けて安全に試す手順を、本番ゲート（<code>PL_ALLOW_PRODUCTION</code>）の意味も含めて説明して」</dd>
-        <dt>困ったとき</dt><dd>「このエラーを切り分けて。確認コマンドは PowerShell で」／「publish が失敗した原因を、直す前に説明して」／「エージェントが同じミスを繰り返すので、AGENTS.md に 1 行足して」</dd>
+        <dt>困ったとき</dt><dd>「このエラーを切り分けて。確認コマンドは PowerShell で」／「publish が失敗した原因を、直す前に説明して」／「エージェントが同じミスを繰り返すので、AGENT.md に 1 行足して」</dd>
         <dt>進め方（規律）</dt><dd>「変更前にローカルテスト（<code>node tests/test_drill_helpers.js</code>）と <code>domo dev</code> 目視を必ず通して」／「1 変更＝1 コミット、明示パスだけ stage して」／「本番 publish は私が確認してから」</dd>
       </dl>
       <figcaption>面 × 頼み方の早見。安全な読取から始め、段階的に書き込み系へ広げる</figcaption>
@@ -2126,7 +2128,7 @@ python3 scripts/provision_workflows.py verify</pre>
       <div class="flow flow--long">
           <div class="tile tile--input"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-bulb"/></svg>意図を伝える</div>
           <div class="flow__arrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></div>
-          <div class="tile tile--step"><span class="tile__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-doc"/></svg><b>文脈読込</b></span><span>AGENTS.md→必要な資料</span></div>
+          <div class="tile tile--step"><span class="tile__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-doc"/></svg><b>文脈読込</b></span><span>AGENT.md→必要な資料</span></div>
           <div class="flow__arrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></div>
           <div class="tile tile--step"><span class="tile__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-edit"/></svg><b>実装</b></span><span>最小の変更</span></div>
           <div class="flow__arrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></div>
@@ -2147,13 +2149,13 @@ python3 scripts/provision_workflows.py verify</pre>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-info"/></svg><b>なぜ「小さく」なのか。</b> 1 周を小さく保つと、崩れたときに<b>原因が最後の 1 変更に絞れる</b>。pl は <code>pro-code</code>（画面）・<code>dataflow</code>（集計）・<code>workflow</code>／<code>code-engine</code>（AI 生成と保存）と層が分かれるので、<b>層をまたぐ変更ほど小さく刻む</b>。「1 文で説明できない変更」は分割の合図。</p>
 
     <h3 class="sub">「正しい文脈を渡す」＝ 作業に必要な資料だけを指す</h3>
-    <p class="sec__lead">エージェントに全部読ませない。<b>規約（AGENTS.md）＋その作業に要る資料だけ</b>を渡すと、賢さに関係なく作法どおり動く。やりたいことから渡す資料が決まる。</p>
+    <p class="sec__lead">エージェントに全部読ませない。<b>規約（AGENT.md）＋その作業に要る資料だけ</b>を渡すと、賢さに関係なく作法どおり動く。やりたいことから渡す資料が決まる。</p>
     <figure class="fig">
       <dl class="defs">
         <dt>画面を直す</dt><dd><code>pro-code/</code> ＋ この開発ガイド <b>§3・§5</b>、編集→公開のループは <b>§7</b>（検証は <code>node tests/test_drill_helpers.js</code>・<code>domo dev</code>）</dd>
         <dt>サーバー関数</dt><dd><code>code-engine/</code> ＋ <code>README.md</code></dd>
         <dt>集計を足す</dt><dd><code>dataflow/</code> ＋ <code>README.md</code></dd>
-        <dt>配備で迷う</dt><dd><code>AGENTS.md</code> ＋ <b>§5・§7・§8</b></dd>
+        <dt>配備で迷う</dt><dd><code>AGENT.md</code> ＋ <b>§5・§7・§8</b></dd>
       </dl>
       <figcaption>やりたいこと → 渡す資料。文脈を絞るほど、エージェントの精度は上がる</figcaption>
     </figure>
@@ -2231,7 +2233,7 @@ publish はまだしない（私が「publish して」と言ってから実行�
     <div class="callouts">
       <div class="callout callout--accent">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-ai"/></svg></span>
-        <h4>どれでも AGENTS.md に従わせる</h4>
+        <h4>どれでも AGENT.md に従わせる</h4>
         <p>Claude&nbsp;Code／Codex／Copilot。優劣でなく、<b>同じ規約</b>に従わせるのがコツ。</p>
       </div>
       <div class="callout">
@@ -2291,7 +2293,7 @@ git restore pro-code/index.html</pre>
         <dt>コストを意識する</dt><dd>Domo の AI クレジットとエージェント側の LLM 利用料。<b>重い生成は事前・バッチ</b>にし、無駄な再実行を避ける（→ §4・§5）。</dd>
         <dt>再現性を残す</dt><dd>同じ指示でも<b>結果は毎回ゆれる</b>。うまくいった手順は<b>スキル化</b>して残す（→ §9 冒頭）。</dd>
         <dt>長い作業はトークンで</dt><dd><code>domo login</code> の SID は<b>約 1 時間で失効</b>。無人・長時間は <code>DOMO_DEVELOPER_TOKEN</code>（→ §1 の②）。</dd>
-        <dt>長い対話は定期的に区切る</dt><dd>3 時間の対話でエージェントは<b>文脈を失う</b>ことがある（同じ説明の繰り返し・前の決定を忘れる）。おかしいと感じたら新しいチャット（<code>/clear</code> 等）で<b>起点プロンプトを貼り直す</b>・<code>AGENTS.md</code> を読み直させる。</dd>
+        <dt>長い対話は定期的に区切る</dt><dd>3 時間の対話でエージェントは<b>文脈を失う</b>ことがある（同じ説明の繰り返し・前の決定を忘れる）。おかしいと感じたら新しいチャット（<code>/clear</code> 等）で<b>起点プロンプトを貼り直す</b>・<code>AGENT.md</code> を読み直させる。</dd>
         <dt>レビューを往復する</dt><dd>一発で仕上げさせない。<b>変更の要点・影響範囲・自信のない箇所</b>を言わせ、人が是非を決めてから次へ。往復のたびに差分は小さく保つ。</dd>
         <dt>完了報告に中身を求める</dt><dd>「できました」だけで終わらせない。<b>何を・どのファイルで変え・どの検証を通したか</b>（緑か赤か）を必ず報告させる。未検証なら「未検証」と明記させる。</dd>
         <dt>本番名のまま配備させない</dt><dd>保守用 <code>maintenance-instance</code> では、名札 <code>PL_SANDBOX_SUFFIX</code> なしの本番書込みをスクリプトが<b>拒否</b>する。エージェントには<b>自分のサンドボックス名札</b>を付けさせる（名札運用は §8 に従う）。</dd>
@@ -2311,7 +2313,7 @@ git restore pro-code/index.html</pre>
             <tr><th scope="row" class="role">無い列・id・alias を創作</th><td>実データに無い名前を自信ありげに出す</td><td class="memo">読取プロンプトで実データ裏取り（§4①）</td></tr>
             <tr><th scope="row" class="role">名札なしで <code>apply</code>／<code>provision</code> を提案（本番名のまま）</th><td>本番上書きの経路（§8）</td><td class="memo">名札 <code>PL_SANDBOX_SUFFIX</code> を付けて自分のサンドボックスへ。名札なしはスクリプトが拒否</td></tr>
             <tr><th scope="row" class="role">巨大な差分を一括で <code>git add -A</code></th><td>無関係なファイルまで一度に stage／commit されている</td><td class="memo">明示パスで小さく分けて stage（この節「明示パスで、小さくコミットする」）</td></tr>
-            <tr><th scope="row" class="role">同じ説明を何度も求める／前の決定を忘れる</th><td>長い対話で文脈が薄れたサイン</td><td class="memo">新しいチャットで起点プロンプトを貼り直し、<code>AGENTS.md</code> を読み直させる</td></tr>
+            <tr><th scope="row" class="role">同じ説明を何度も求める／前の決定を忘れる</th><td>長い対話で文脈が薄れたサイン</td><td class="memo">新しいチャットで起点プロンプトを貼り直し、<code>AGENT.md</code> を読み直させる</td></tr>
           </tbody>
         </table>
       </div>
@@ -2417,7 +2419,7 @@ domo --version</pre>
         <button class="copy-btn" type="button" data-copy="prompt-s7-deploy">コピー</button>
       </div>
       <pre class="cmd__body" id="prompt-s7-deploy">pl-summary-app 一式を「自分専用のサンドボックス」として私の Domo（配備先インスタンス）へデプロイして。
-AGENTS.md・docs/setup-guide.md・prompts/deploy-with-agent.ja.md に従うこと。要件:
+AGENT.md・docs/setup-guide.md・prompts/deploy-with-agent.ja.md に従うこと。要件:
 - 作業フォルダ: 一式を ~/handson-pl へコピーし、以降 ~/handson-pl で作業する
 - 名札（最重要）: 環境変数 PL_SANDBOX_SUFFIX="検証・&lt;あなたの氏名&gt;" を設定
   ＝DataFlow/4出力/保存CE/統合サブWF/WF-01/AppDB/seed/DataApp すべてに名札が付き、本番や他参加者と衝突しない
@@ -2958,7 +2960,7 @@ export PL_SANDBOX_SUFFIX='検証・&lt;あなたの氏名&gt;'</pre>
     <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-database"/></svg><b>広げる先の地図</b>：このアプリの中心は DataFlow（DF-2042）が吐く <b>4 つの出力</b>＝<code>summary</code>（店舗×月サマリー）／<code>detail</code>（勘定科目明細）／<code>trend</code>（店舗×月トレンド・約 2,400 行）／<code>dept</code>（事業部別・48 行）。画面も AI も、すべてこの 4 本をハブに動く。<b>「どこを広げるか」はまずこの 4 本のどれに手を入れるかで考える</b>と迷わない。</p>
 
     <h3 class="sub">詰まった知見は「スキル」にして貯める（次に迷わない）</h3>
-    <p class="sec__lead">エージェントが<b>行き詰まった・時間がかかった</b>作業は、その場で解いて終わりにせず、<b>手順を「スキル」として書き残す</b>。次回から同じ場面で迷わず、エージェントも同じやり方を再現できる。スキルとは<b>再利用できる手順書</b>＝全エージェント共通の <code>AGENTS.md</code> への追記や、各ツールの手順ファイル（Claude Code の「スキル」、GitHub Copilot の <code>.github/copilot-instructions.md</code> など）のこと。</p>
+    <p class="sec__lead">エージェントが<b>行き詰まった・時間がかかった</b>作業は、その場で解いて終わりにせず、<b>手順を「スキル」として書き残す</b>。次回から同じ場面で迷わず、エージェントも同じやり方を再現できる。スキルとは<b>再利用できる手順書</b>＝全エージェント共通の <code>AGENT.md</code> への追記や、各ツールの手順ファイル（Claude Code の「スキル」、GitHub Copilot の <code>.github/copilot-instructions.md</code> など）のこと。</p>
     <div class="callouts callouts--2">
       <div class="callout callout--accent"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-bulb"/></svg></span><h4>いつ書くか</h4><p>①同じ説明を 2 回した ②つまずきを解くのに時間がかかった ③「次も必ずこうして」と思った。その<b>直後</b>が書き時。</p></div>
       <div class="callout callout--accent"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-doc"/></svg></span><h4>何を書くか</h4><p><b>きっかけ（どんな時に使う）／手順／確認方法／やってはいけないこと</b>。短く具体的に。1 スキル＝1 目的。</p></div>
@@ -2975,11 +2977,11 @@ export PL_SANDBOX_SUFFIX='検証・&lt;あなたの氏名&gt;'</pre>
 - 手順（コピペできるコマンド付き・私の OS は 〈Windows / macOS〉）
 - 確認方法（うまくいったと分かる合図）
 - やってはいけないこと（本番 publish・データ変更など）
-置き場所の候補も提案して（AGENTS.md への追記 ／ 各ツールの手順ファイル）。
+置き場所の候補も提案して（AGENT.md への追記 ／ 各ツールの手順ファイル）。
 まず内容を見せて。私が OK を出したらファイルに保存して（勝手に publish はしない）。</pre>
     </div>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-refresh"/></svg>こうして貯めた知見が、次のハンズオンや実プロジェクトの<b>チームの資産</b>になる。エージェントは賢さより「<b>正しい文脈（手順）を渡すこと</b>」で成果が決まる（→ §6）。</p>
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-git"/></svg><b>スキルは配布物の中に貯める</b>のがこのアプリの流儀。この ZIP では <code>AGENTS.md</code>（規約）と <code>prompts/</code>（AI への指示文の正本）がすでにチームのスキル置き場になっている。たとえば「集計 SQL の直し方」を解いたら、同じ手口を <code>AGENTS.md</code> の一節か <code>prompts/</code> の新しい md に残す。次の担当者とエージェントが<b>同じ ZIP を開くだけ</b>で同じ手順を再現できる。</p>
+    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-git"/></svg><b>スキルは配布物の中に貯める</b>のがこのアプリの流儀。この ZIP では <code>AGENT.md</code>（規約）と <code>prompts/</code>（AI への指示文の正本）がすでにチームのスキル置き場になっている。たとえば「集計 SQL の直し方」を解いたら、同じ手口を <code>AGENT.md</code> の一節か <code>prompts/</code> の新しい md に残す。次の担当者とエージェントが<b>同じ ZIP を開くだけ</b>で同じ手順を再現できる。</p>
 
     <h3 class="sub">次に触る面（＋初学者がハマる点）</h3>
     <div class="callouts callouts--2">
@@ -3178,8 +3180,8 @@ node --check pro-code/app.js と node tests/test_drill_helpers.js を通し、�
         <dt>引き継ぎノート</dt><dd><code>AGENT.md</code>（重要 ID 一覧・データフロー／AppDB スキーマ・ワークフロー操作）＝<b>エージェントに最初に読ませる</b>一冊</dd>
         <dt>AI の指示文（正本）</dt><dd><code>prompts/</code>（店舗／全社の DataFlow サマリー・統合サブWF の店舗／全社ブランチ・共通規約）。<b>AI の挙動を変えるときはここ</b></dd>
         <dt>決定的ゲート</dt><dd><code>dev-guide-app/tests/check.mjs</code>（この開発ガイドの参照整合チェック）／アプリ本体は <code>tests/</code>（<code>test_report_api.py</code>・<code>test_sandbox_isolation.py</code> ほか）。トークン雛形は <code>config/secrets.env.example</code></dd>
-        <dt>この ZIP 内</dt><dd><code>AGENTS.md</code>（規約）／各フォルダの <code>README.md</code>／<code>prompts/</code>／この開発ガイド</dd>
-        <dt>スターターキット</dt><dd><code>github.com/Willwwest/domo-ai-starter</code>（規約 <code>CLAUDE.md</code>・API リファレンス・診断スクリプト・最小 Pro Code 雛形。MIT・英/日。URL のコピーは §1「土台を置く」）</dd>
+        <dt>この ZIP 内</dt><dd><code>AGENT.md</code>（規約）／<code>README.md</code>（全体像）／<code>prompts/</code>／この開発ガイド</dd>
+        <dt>スターターキット</dt><dd><code>github.com/taichan7/domo-ai-toolkit</code>（規約 <code>AGENTS.md</code>／<code>CLAUDE.md</code>・API リファレンス・55 のスキル集・診断スクリプト・Pro Code 雛形・参照アプリ 2 本。MIT・英/日。URL のコピーは §1「土台を置く」）</dd>
         <dt>公式</dt><dd>Domo Developer Portal（Apps CLI・API）／各製品ドキュメント</dd>
       </dl>
       <figcaption>深掘りの入口 ― まず ZIP 内の資料（正典 <code>docs/setup-guide.md</code>・引き継ぎ <code>AGENT.md</code>）、次にスターターキット、最後に公式</figcaption>
@@ -3337,7 +3339,7 @@ python3 scripts/provision_domo.py apply</pre>
         <dt>SSO / MFA</dt><dd>会社の統合ログイン（シングルサインオン）／多要素認証。<code>domo login</code> はこれに乗る。</dd>
         <dt>~（チルダ）／$HOME</dt><dd>あなたの<b>ホームフォルダ</b>。mac/Linux は <code>/Users/あなた</code>、Windows は <code>C:\Users\あなた</code>。<code>~/handson-pl</code> と <code>$HOME\handson-pl</code> は<b>同じ場所</b>を指す。</dd>
         <dt><code>~/handson-pl</code></dt><dd>ハンズオンで作る<b>使い捨ての自分用コピー</b>の既定置き場。壊れても元フォルダから作り直せる。本番フォルダのまま操作しないための隔離先。</dd>
-        <dt>v0.1.0</dt><dd>本アプリ（Pro-Code カード／ドリルダウン）の版。版は <code>manifest.json</code> を単一ソースとし、画面にもその版が出る。</dd>
+        <dt>v0.2.1</dt><dd>本アプリ（Pro-Code カード／ドリルダウン）の版。版は <code>manifest.json</code> を単一ソースとする（画面には出さない）。</dd>
       </dl>
       <figcaption>主要な用語 ― これだけ押さえれば本書は読める（必要に応じて追加）</figcaption>
     </figure>
@@ -3460,7 +3462,7 @@ git config --global http.proxy http://proxy.example.co.jp:8080</pre>
 </main>
 
 <footer class="sitefoot">
-  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>店舗別損益 ・ 開発ガイド ― 店舗別損益AI分析 ・ v0.1.0
+  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>店舗別損益 ・ 開発ガイド ― 店舗別損益AI分析 ・ v0.2.0
 </footer>
 
 <!-- トースト（コピー等のフィードバック） -->

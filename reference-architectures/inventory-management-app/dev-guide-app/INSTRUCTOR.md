@@ -2,7 +2,7 @@
 
 対象: 在庫入出庫管理アプリを配布された開発者向け / VS Code × コーディングエージェントで Domo を開発。
 教材本体: `dev-guide-app/`（App Studio ページ2「開発ガイド」）。配布: `inventory-management-app/` を ZIP で各自へ。
-土台スターターキット: `domo-ai-starter`。
+土台スターターキット: `domo-ai-toolkit`。
 
 > 表記約束: 本ノートの `<自社>` は教材 `index.html` のインスタンス名プレースホルダ（各自の Domo インスタンス名）と同じ。
 > §参照の約束: 教材（dev-guide-app）の節は `dev-guide §N`、このファイル自身の節は `本ノート §N`。無印の `§N` は教材を指す。
@@ -15,7 +15,7 @@
 0) 配布された inventory-management-app（ZIP）を展開し、分かる場所に置く（以降すべての前提）
 1) VS Code を入れて、コーディングエージェント拡張（Claude Code / Codex / GitHub Copilot のどれか）にサインイン
 2) Node・Python・Git と Domo CLI（npm install -g ryuu）を入れ、`domo login -i <自社>.domo.com` まで通す
-3) domo-ai-starter を clone（dev-guide §1「土台を置く」、または starter リポジトリの README）
+3) domo-ai-toolkit を clone（dev-guide §1「土台を置く」、または starter リポジトリの README）
 4) 開発者トークンを発行し、環境変数（DOMO_INSTANCE / DOMO_DEVELOPER_TOKEN）に設定
    （運営が参加者ぶんのサンドボックスを用意する回はトークン不要）
 5) Google Chrome を入れ、`node tests/layout/shoot.mjs` を1回動かして PNG が出ることを確認（業務アプリ本体の目視）
@@ -123,13 +123,13 @@ unzip -p <配布>.zip inventory-management-app/pro-code/manifest.json     | grep
 
 ## 9. 版同期（版の単一ソース）
 
-教材の版は `dev-guide-app/manifest.json` の `version`（本書 **v2.0.1**）を正とする。配布元メンテナが版を上げるときは、
+教材の版は `dev-guide-app/manifest.json` の `version`（本書 **v2.1.0**）を正とする。配布元メンテナが版を上げるときは、
 次の 3 箇所を**同時に**合わせてから `node tests/make-thumbnail.mjs` で `thumbnail.png` を再生成する:
 
-1. `dev-guide-app/manifest.json` の `version`（例 `2.0.1`）＝正
-2. `dev-guide-app/index.html` の colophon（`<dt>版</dt><dd>…</dd>`）＝ `major.minor`（例 `2.0`）
-3. `dev-guide-app/tests/thumbnail.html` のフッター（`<span>v2.0.1</span>`）＝ `v` ＋フル版
+1. `dev-guide-app/manifest.json` の `version`（例 `2.1.0`）＝正
+2. `dev-guide-app/index.html` の colophon（`<dt>版</dt><dd>…</dd>`）とフッター ＝ `v` ＋フル版（colophon は日付付き、例 `v2.1.0（2026-10-15）`）
+3. `dev-guide-app/tests/thumbnail.html` のフッター（`<span>v2.1.0</span>`）＝ `v` ＋フル版
 
-`node tests/check.mjs` は colophon が `manifest` の `major.minor` と一致するか（版ドリフト）を、
+`node tests/check.mjs` は index.html（colophon＋フッターの 2 箇所）と `thumbnail.html` に `v`＋`manifest` のフル版が現れるか（版ドリフト）を、
 `node tests/make-thumbnail.mjs` は `manifest` と `thumbnail.html` の版一致を、それぞれデプロイ前に機械検査する。
 バックエンド（CE/DataFlow/通知WF）の版は `provision_domo.py` が別系統で扱い、`sync-manifest` は版欄を書き戻さない（想定どおりで verify は落ちない）。

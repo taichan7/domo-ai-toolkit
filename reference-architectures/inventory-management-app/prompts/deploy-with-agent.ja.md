@@ -20,7 +20,7 @@ Workflow モデルと App Studio アプリの手作りが人手境界でした�
 ### 用意してほしいもの
 
 - `inventory-management-app/` 一式がローカルの VS Code に展開済み。
-- `Willwwest/domo-ai-starter` のスキル一式（Domo API リファレンス等）がローカルに展開済み。
+- `taichan7/domo-ai-toolkit` のスキル一式（Domo API リファレンス等）がローカルに展開済み。
 - 対象 Domo インスタンスの**管理者権限**（アプリ作成・カード埋め込み・データフロー実行が可能）。
 - 実行環境（**Node.js** / **Python 3.9 以上** / **Domo CLI**）。無ければ次の手順で入れます。
 

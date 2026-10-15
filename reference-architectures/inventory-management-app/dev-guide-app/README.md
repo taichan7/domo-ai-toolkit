@@ -73,13 +73,13 @@ node tests/make-thumbnail.mjs  # thumbnail.png を再生成（版を bump した
 
 版は `manifest.json` の `version` を正とし、次の 3 箇所を**同時に**合わせる:
 
-1. `manifest.json` の `version`（例 `2.0.0`）＝正
-2. `index.html` の colophon（`<dt>版</dt><dd>…</dd>`）＝ `major.minor`（例 `2.0`）
-3. `tests/thumbnail.html` のフッター（`<span>v2.0.1</span>`）＝ `v` ＋フル版
+1. `manifest.json` の `version`（例 `2.1.0`）＝正
+2. `index.html` の colophon（`<dt>版</dt><dd>…</dd>`）とフッター ＝ `v` ＋フル版（colophon は日付付き、例 `v2.1.0（2026-10-15）`）
+3. `tests/thumbnail.html` のフッター（`<span>v2.1.0</span>`）＝ `v` ＋フル版
 
 その後 `node tests/make-thumbnail.mjs` で **thumbnail.png を再生成**する（版を画像へ焼き込むため）。
 `make-thumbnail.mjs` は `manifest.json` と `thumbnail.html` の版が食い違うと失敗し、`node tests/check.mjs` は
-colophon が `manifest` の `major.minor` と一致するかを検査する（ズレたらデプロイ前に落ちる）。
+index.html（colophon＋フッターの 2 箇所）と `thumbnail.html` に `v`＋`manifest` のフル版が現れるかを検査する（ズレたらデプロイ前に落ちる）。
 
 ## 配布方針（重要）
 
