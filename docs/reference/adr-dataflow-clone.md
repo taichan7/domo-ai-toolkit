@@ -83,7 +83,7 @@ for a in df["actions"]:
         a["dataSource"]["name"] = a["dataSource"]["name"] + "_<suffix>"
         a["dataSource"].pop("cloudId", None)
 
-df["name"] = df["name"] + " (modocorp clone)"
+df["name"] = df["name"] + " (source-instance clone)"
 ```
 
 ## Create + run cycle

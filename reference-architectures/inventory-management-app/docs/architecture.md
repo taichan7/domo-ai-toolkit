@@ -70,7 +70,7 @@ UIはDomo APIパスや物理IDを知らない。ManifestのAppDB、DataSet、Cod
 | Pro Code Manifest | 現行版は `manifest.json` の `version`。App Studioカードが最新公開版を追従し、`verify` が3者一致を確認する |
 | Code Engine mapping | alias `inventoryApi` / physical function `inventory_api` / released version固定（実値は `manifest.json`、物理packageIDは [domo-assets.md](domo-assets.md) が正） |
 | Workflow mapping | alias `lowStockNotification` / 物理 model ID（`modelId`）を固定（実値は `manifest.json`、対応は [domo-assets.md](domo-assets.md) が正）。同じ modelId を `apply` がCode Engineソースへ焼き込み、CEが起動時に最新の有効版を解決する。**released version は固定しない**＝インスタンス依存で動くため `verify` の `ok` 条件に含めず、宣言版と live 版の乖離は `workflowWarnings` に可視化するだけ |
-| App Studio card | `designVersion: null` による最新公開版追従（実効版はManifest最新公開版に一致、`verify`で確認）。1×1／既定`fullpage:false`、compact 12×29、`fitToFrame:false`、カード操作は既定（`interaction`未設定＝操作許可、`editInAppViewer:true`）。card／outer proxy／inner context／design の実IDは [domo-assets.md](domo-assets.md)・[domo-assets.json](../domo-assets.json) が正（インスタンスごとに採番） |
+| App Studio card | `designVersion: null` による最新公開版追従（実効版はManifest最新公開版に一致、`verify`で確認）。1×1／既定`fullpage:false`、compact 12×29、`fitToFrame:false`、カード操作は既定（`interaction`未設定＝操作許可、`editInAppViewer:true`）。card／outer proxy／inner context／design の実IDは [domo-assets.md](domo-assets.md)・`domo-assets.json`（ローカル生成・配布しない） が正（インスタンスごとに採番） |
 
 Code Engineはreleased versionを文字列で固定し、`latest`へ暗黙追従させない。通知Workflowは物理 model ID（`modelId`）だけを固定し、版はインスタンス依存で動くため固定しない（`verify` の `ok` は `modelId` 一致と `codeEngineWorkflowModelEmbedded`＝CEソースへの起動先焼き込みで判定）。App Studioカードだけは同一designの修正版を自動反映する既存contextを維持し、`provision_domo.py verify` が公開latest・Manifest・カード実効版の3者一致を検証する。
 

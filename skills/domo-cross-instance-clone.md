@@ -1,6 +1,6 @@
 ---
 name: clone-content
-description: Clone Domo objects (App Studio Apps, Pro Code Apps, Magic ETL Dataflows, Workflows) from one Domo instance to another. Handles dataset ID bridging by name/column matching on the target, workflow environment variable migration, ADR Databricks-integration prerequisites, layout/TABS reconstruction, image/PDF tile cloning, and emits manual-task checklists when API/CLI cannot complete a step. Trigger on phrases like "clone this app to <instance>", "copy this workflow to <instance>", "move this dataflow to <tenant>", "replicate <object> from modocorp to <target>", "promote this to production". Skip for single-instance CRUD (use object-specific skills) and dataset copying (never supported — target must already have data).
+description: Clone Domo objects (App Studio Apps, Pro Code Apps, Magic ETL Dataflows, Workflows) from one Domo instance to another. Handles dataset ID bridging by name/column matching on the target, workflow environment variable migration, ADR Databricks-integration prerequisites, layout/TABS reconstruction, image/PDF tile cloning, and emits manual-task checklists when API/CLI cannot complete a step. Trigger on phrases like "clone this app to <instance>", "copy this workflow to <instance>", "move this dataflow to <tenant>", "replicate <object> from source-instance to <target>", "promote this to production". Skip for single-instance CRUD (use object-specific skills) and dataset copying (never supported — target must already have data).
 ---
 
 # Clone Content Between Domo Instances
@@ -44,7 +44,7 @@ Before any read, confirm these four facts and write them down for the run:
 | Fact | Example |
 |------|---------|
 | Source instance hostname | `source-instance.domo.com` |
-| Target instance hostname | `modocorp.domo.com` |
+| Target instance hostname | `source-instance.domo.com` |
 | Object kind | App Studio / Pro Code / Dataflow / Workflow |
 | Source object identifier | dataapp ID, design ID, dataflow ID, model ID |
 
@@ -98,7 +98,7 @@ Most reads and most writes use the **Ryuu refresh token as a developer-token hea
 ```bash
 npm install -g ryuu
 domo login -i <source-host>      # e.g. source-instance.domo.com
-domo login -i <target-host>      # e.g. modocorp.domo.com
+domo login -i <target-host>      # e.g. source-instance.domo.com
 ```
 
 Ryuu stores each session at `~/.config/configstore/ryuu/<host>.json` (filename includes `.domo.com`).
@@ -107,7 +107,7 @@ Ryuu stores each session at `~/.config/configstore/ryuu/<host>.json` (filename i
 
 ```bash
 export SOURCE_HOST=source-instance.domo.com
-export TARGET_HOST=modocorp.domo.com
+export TARGET_HOST=source-instance.domo.com
 
 export SOURCE_REFRESH=$(jq -r '.refreshToken' ~/.config/configstore/ryuu/$SOURCE_HOST.json)
 export TARGET_REFRESH=$(jq -r '.refreshToken' ~/.config/configstore/ryuu/$TARGET_HOST.json)
@@ -137,7 +137,7 @@ DOMO_INSTANCE=${SOURCE_HOST%%.*} community-domo-cli datasets list >/dev/null    
 DOMO_INSTANCE=${TARGET_HOST%%.*} community-domo-cli datasets list >/dev/null      # target
 ```
 
-The CLI swaps instances by changing `DOMO_INSTANCE` — that's the host's first label (e.g., `modocorp` for `modocorp.domo.com`).
+The CLI swaps instances by changing `DOMO_INSTANCE` — that's the host's first label (e.g., `source-instance` for `source-instance.domo.com`).
 
 **Why not OAuth-exchange to SID?** The CLI's OAuth flow (POST `/api/oauth2/token` → GET `/api/oauth2/sid`) only works for the in-process CLI session — the refresh token rotates and the exchange fails on re-use from a separate process. Using the refresh token as a dev-token header sidesteps that entirely and matches what the CLI actually does on the wire when `devToken: true`.
 
@@ -392,7 +392,7 @@ Verify:
            a["dataSource"]["name"] += "_<suffix>"
            a["dataSource"].pop("cloudId", None)
    ```
-   Suffix is whatever distinguishes target outputs from any existing static-CSV copies (e.g. `_modocorp`).
+   Suffix is whatever distinguishes target outputs from any existing static-CSV copies (e.g. `_source-instance`).
 
 5. **For ADR flows**, set required engine fields:
    ```python
@@ -649,7 +649,7 @@ Persist the source-viewId → target-viewId map at `/tmp/clone-<obj>-views.tsv`.
 
 ### Step 10d — Unified dataapp PUT (theme, nav, landing, view-order)
 
-The shape the App Studio editor sends on save (capture verified 2026-05-12 against modocorp):
+The shape the App Studio editor sends on save (capture verified 2026-05-12 against source-instance):
 
 ```
 PUT /api/content/v1/dataapps/<dataappId>?includeHiddenViews=true
@@ -710,7 +710,7 @@ GET /api/content/v4/pages/<view_id>/layouts
 #    DELETE /api/content/v4/pages/layouts/<layoutId>/writelock
 ```
 
-Writelock enforcement is instance-dependent. `modocorp` accepted the layout PUT without a lock, while `maintenance-instance` returned 403 `WL003` until `PUT .../writelock` with `{}` was called. `POST .../writelock` is the wrong method and can return 405. When a lock is acquired, always release it with `DELETE` in a `finally` block.
+Writelock enforcement is instance-dependent. `source-instance` accepted the layout PUT without a lock, while `maintenance-instance` returned 403 `WL003` until `PUT .../writelock` with `{}` was called. `POST .../writelock` is the wrong method and can return 405. When a lock is acquired, always release it with `DELETE` in a `finally` block.
 
 **Source TABS-flattening**: if source uses TABS/TAB_CONTENT containers, recurse `children[]` and compute absolute positions (`abs_x = parent.x + child.x`). Cards in multiple tabs collapse to first-tab position (lossy but acceptable for demo). If reconstructing TABS on target is needed, see [docs/reference/app-studio-clone.md](../docs/reference/app-studio-clone.md)'s **fresh-contentKey surgical append** recipe.
 

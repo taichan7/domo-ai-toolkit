@@ -4,7 +4,7 @@
 背景: manifest に alias（trend / dept）を追加しても、埋込済みカードの App Framework
 context mapping は自動追随しない。未マッピングの alias は proxy で解決できず、FE は
 graceful degrade（トレンド空表示・事業部タブ非表示）に落ちる。本関数は manifest を
-正として context mapping を冪等に同期する（2026-09-16 の music-yamaha-dx 事象の回帰ガード）。
+正として context mapping を冪等に同期する（2026-09-16 の別インスタンスでの事象の回帰ガード）。
 
 固定する契約:
 - 差分なしなら PUT しない（changed:false）。
@@ -14,8 +14,13 @@ graceful degrade（トレンド空表示・事業部タブ非表示）に落ち�
 - contextId 未解決は警告のみで changed:false（既存 discovery 経路を壊さない）。
 """
 import importlib.util
+import contextlib
+import io
+import json
 import pathlib
+import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("provision_domo", ROOT / "scripts" / "provision_domo.py")
@@ -129,6 +134,92 @@ class ReconcileAppStudioContextTest(unittest.TestCase):
         result = provision_domo.reconcile_app_studio_context(client, "", MANIFEST)
         self.assertFalse(result["changed"])
         self.assertEqual(client.calls, [])
+
+
+class CurrentArchitectureVerification(unittest.TestCase):
+    COLLECTION = "11111111-2222-4333-8444-555555555555"
+
+    def verify(self, *, code_collection=None, missing_alias=None, wrong_alias=None, legacy_only=False):
+        mod = provision_domo
+        names = {"summary": mod.SUMMARY_OUTPUT_NAME, "detail": mod.DETAIL_OUTPUT_NAME,
+                 "trend": mod.TREND_OUTPUT_NAME, "dept": mod.DEPT_OUTPUT_NAME}
+        flow = {"id": "flow-test", "inputs": [{"dataSourceId": "input-test"}], "actions": [],
+                "outputs": [{"dataSourceName": name, "dataSourceId": "ds-" + alias}
+                            for alias, name in names.items() if alias != missing_alias]}
+        manifest = {"collectionsMapping": [{"id": self.COLLECTION}],
+                    "datasetsMapping": [{"alias": alias, "dataSetId": "wrong" if alias == wrong_alias else "ds-" + alias} for alias in names],
+                    "packagesMapping": [{"alias": "plReportApi", "packageId": "pkg-report", "version": "1.0.4"}]}
+
+        class Client:
+            def request(self, method, path):
+                if "dataflows/flow-test" in path:
+                    return flow
+                if "packages/pkg-report/versions/1.0.4?" in path:
+                    return {"functions": [{"name": "pl_report_api", "isPrivate": False}],
+                            "code": 'REPORT_COLLECTION_ID = "' + (code_collection or CurrentArchitectureVerification.COLLECTION) + '"\n'}
+                if "api/data/v3/datasources/" in path:
+                    return {"rowCount": 10}
+                raise AssertionError(path)
+
+        with tempfile.TemporaryDirectory() as tmp, contextlib.ExitStack() as stack:
+            path = pathlib.Path(tmp) / "manifest.json"
+            path.write_text(json.dumps(manifest))
+            stack.enter_context(patch.object(mod, "MANIFEST_PATH", path))
+            stack.enter_context(patch.object(mod, "list_collections", return_value=[{"id": self.COLLECTION, "name": mod.BUSINESS_COLLECTION_NAME}]))
+            packages = [{"id": "legacy-only", "name": mod.PACKAGE_NAME}] if legacy_only else [{"id": "pkg-report"}]
+            stack.enter_context(patch.object(mod, "list_packages", return_value=packages))
+            stack.enter_context(patch.object(mod, "list_dataflows", return_value=[{"id": "flow-test", "name": mod.DATAFLOW_NAME}]))
+            stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+            return mod.verify(Client())
+
+    def test_verifies_active_report_api_and_existing_input_without_legacy_assets(self):
+        result = self.verify()
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["codeEngineId"], "pkg-report")
+        self.assertEqual(result["seedMode"], "existing-flow-input")
+
+    def test_legacy_package_cannot_substitute_for_the_active_report_api(self):
+        self.assertFalse(self.verify(legacy_only=True)["ok"])
+
+    def test_report_api_bound_to_a_foreign_collection_fails(self):
+        self.assertFalse(self.verify(code_collection="foreign-collection")["ok"])
+
+    def test_missing_or_wrong_trend_and_department_bindings_fail(self):
+        for alias in ("trend", "dept"):
+            with self.subTest(alias=alias):
+                self.assertFalse(self.verify(missing_alias=alias)["ok"])
+                self.assertFalse(self.verify(wrong_alias=alias)["ok"])
+
+    def test_data_provisioning_does_not_create_unused_legacy_ce(self):
+        mod = provision_domo
+        with contextlib.ExitStack() as stack:
+            for name, value in (("_guard_production_write", None), ("current_user", {"id": "test-user"}),
+                                ("resolve_seed_dataset", ({"id": "seed-test"}, "ds-seed")),
+                                ("ensure_business_collection", {"id": self.COLLECTION}),
+                                ("ensure_dataflow", {"id": "flow-test"})):
+                stack.enter_context(patch.object(mod, name, return_value=value))
+            legacy = stack.enter_context(patch.object(mod, "ensure_package"))
+            stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+            result = mod.apply(object(), False)
+        legacy.assert_not_called()
+        self.assertEqual(result["codeEngine"]["status"], "deferred-to-workflow-provisioner")
+
+
+class RegistryScopeTest(unittest.TestCase):
+    def test_registry_roundtrip_requires_instance_and_name_tag(self):
+        mod = provision_domo
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(mod, "_registry_path", return_value=pathlib.Path(tmp) / "state.json"), \
+             patch.object(mod, "INSTANCE", "tenant.domo.com"), \
+             patch.object(mod, "_sandbox_suffix", return_value="participant"):
+            mod._write_registry({"appStudio": {"appId": "own-app"}})
+            own = mod._read_registry()
+            self.assertEqual(own["appStudio"]["appId"], "own-app")
+            for key, value in (("instance", "other.domo.com"), ("sandboxSuffix", "another-participant")):
+                mod._registry_path().write_text(json.dumps(dict(own, **{key: value})))
+                self.assertEqual(mod._read_registry(), {})
+            mod._registry_path().write_text('[]')
+            self.assertEqual(mod._read_registry(), {})
 
 
 class AppIdentityTest(unittest.TestCase):

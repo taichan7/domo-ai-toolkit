@@ -7,7 +7,7 @@ provision_workflows.py（WF 層＝保存CE/統合サブWF/WF-01/業務コレク�
   - 設定時: 全オブジェクト名に名札サフィックス（検証・氏名）が付き一意化（本番/他参加者と衝突しない）
 alias（summary/detail/trend/dept）・公開関数名（pl_report_api / dedupe_appdb_documents）は不変であること、
 両スクリプトが同じ名札で業務コレクション名を揃えること、state 保存先が参加者ごとに分かれること、
-本番保護ガードが maintenance-instance の本番オブジェクトだけを守り顧客自身のインスタンスは素通しすることを確認する。
+本番保護ガードが全インスタンスの本番名を保護することを確認する。
 
 実行: python3 tests/test_sandbox_isolation.py
 """
@@ -130,7 +130,7 @@ class StatePathIsolated(unittest.TestCase):
 
 
 class ProductionWriteGuard(unittest.TestCase):
-    """本番保護ガードは maintenance-instance の本番オブジェクトだけを守り、顧客自身のインスタンスは素通しする。"""
+    """本番保護ガードはすべてのインスタンスの本番名を保護する。"""
 
     CUSTOM = {"DOMO_INSTANCE": "maintenance-instance.domo.com"}
 
@@ -143,12 +143,12 @@ class ProductionWriteGuard(unittest.TestCase):
     def test_provision_passes_on_custom_apj_with_allow_production(self):
         self.assertEqual(_guard({**self.CUSTOM, "PL_ALLOW_PRODUCTION": "1"}, "w._guard_provision_write()"), "PASS")
 
-    def test_provision_passes_on_customer_instance_without_suffix(self):
-        # 顧客が自分のインスタンスへ配備する既定フローは名札なしでも通る（instance != maintenance-instance）。
-        self.assertEqual(_guard({"DOMO_INSTANCE": "acme.domo.com"}, "w._guard_provision_write()"), "PASS")
+    def test_provision_refuses_customer_instance_without_suffix(self):
+        # 顧客環境でも本番名への無言の上書きを拒否する。
+        self.assertEqual(_guard({"DOMO_INSTANCE": "acme.domo.com"}, "w._guard_provision_write()"), "REFUSED")
 
     def test_default_instance_is_guarded(self):
-        # DOMO_INSTANCE 未設定の既定先は maintenance-instance なのでガード対象（名札なし→拒否）。
+        # 未指定時の接続先は無い。認証・配備より前に拒否する。
         self.assertEqual(_guard({}, "w._guard_provision_write()"), "REFUSED")
 
     def test_maintenance_commands_refused_in_sandbox(self):

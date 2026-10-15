@@ -5,18 +5,31 @@
     {
       "key": "records_standard_sync",
       "name": "inventory_management_records",
-      "owner": "DOMO_STANDARD_APPDB_SYNC",
       "source": "inventory_management_records",
       "purpose": "All ITEM, LOCATION, RULE, TRANSACTION, BALANCE, ALERT_STATE, and ALERT_HISTORY rows."
     },
     {
       "key": "dashboard",
       "name": "Inventory Management | Dashboard",
-      "owner": "MAGIC_ETL_DATAFLOW",
       "source": "records_standard_sync",
       "purpose": "Shared KPI, item-stock, location-stock, trend, shortage, dormant-inventory, alert, and per-item AI note rows for Pro Code and App Studio.",
-      "recordTypes": ["KPI", "ITEM_STOCK", "LOCATION", "TREND", "SHORTAGE", "DORMANT", "ALERT", "AI_NOTE"],
-      "kpiKeys": ["TOTAL_QUANTITY", "ITEM_COUNT", "SHORTAGE_COUNT", "TODAY_IN_COUNT", "TODAY_OUT_COUNT"]
+      "recordTypes": [
+        "KPI",
+        "ITEM_STOCK",
+        "LOCATION",
+        "TREND",
+        "SHORTAGE",
+        "DORMANT",
+        "ALERT",
+        "AI_NOTE"
+      ],
+      "kpiKeys": [
+        "TOTAL_QUANTITY",
+        "ITEM_COUNT",
+        "SHORTAGE_COUNT",
+        "TODAY_IN_COUNT",
+        "TODAY_OUT_COUNT"
+      ]
     }
   ]
 }

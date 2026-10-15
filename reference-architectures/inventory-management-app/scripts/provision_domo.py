@@ -10,8 +10,7 @@ instance -- the AppDB collection, Code Engine package, DataFlow, and the
 notification Workflow model are all provisioned automatically (no hand-built
 assets, no IDs to paste in). To reproduce the stack on a different instance,
 set ``DOMO_INSTANCE`` (target host, e.g. ``<your-instance>.domo.com`` -- run
-``domo login -i`` for it first); it defaults to the maintained reference
-instance when unset. ``DOMO_WORKFLOW_MODEL_ID`` is *optional*: leave it unset
+``domo login -i`` for it first); an unset target is rejected before authentication. ``DOMO_WORKFLOW_MODEL_ID`` is *optional*: leave it unset
 and `apply` discovers-or-creates the notification Workflow model by name
 (recommended); set it only to pin an existing model on that instance (backward
 compat). See docs/setup-guide.md for the reproduction runbook.
@@ -39,7 +38,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 
-INSTANCE = os.environ.get("DOMO_INSTANCE", "maintenance-instance.domo.com")
+INSTANCE = (os.environ.get("DOMO_INSTANCE") or os.environ.get("INSTANCE") or "").strip().lower()
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCHEMAS_PATH = ROOT / "appdb" / "schemas.json"
 SERVICE_PATH = ROOT / "code-engine" / "inventory_service.py"
@@ -82,7 +81,7 @@ def _slugify(text: str) -> str:
 
 
 def registry_write_path() -> pathlib.Path:
-    """解決済み ID（domo-assets.json）の保存先。既定はリポ内（配布物へ同梱）。サンドボックスでは
+    """解決済み ID（domo-assets.json）の保存先。既定はリポ内（ローカル生成物・配布しない）。サンドボックスでは
     参加者ごとに ~/.config/domo-utils/<instance>-deploy/inventory-management-app/sandbox-<slug>/ へ
     分離し、共有クローンの domo-assets.json を上書きしない（複数参加者が互いに衝突しない）。
     DOMO_ASSETS_PATH を設定すればそれを最優先する。"""
@@ -97,14 +96,17 @@ def registry_write_path() -> pathlib.Path:
 
 
 def load_registry() -> Dict[str, Any]:
-    """解決済み ID を読む。サンドボックスでは参加者ファイルを優先し、無ければリポ内の参照 ID を種に
-    する（参照 ID で 404 自己修復を起動し、実 ID の書き戻しは参加者ファイル側＝共有物を汚さない）。"""
-    for path in (registry_write_path(), IN_REPO_REGISTRY_PATH):
-        try:
-            if path.exists():
-                return json.loads(path.read_text(encoding="utf-8"))
-        except (ValueError, OSError):
-            continue
+    """Read only the selected instance/name-tag state; never inherit base IDs."""
+    path = registry_write_path()
+    try:
+        if path.exists():
+            registry = json.loads(path.read_text(encoding="utf-8"))
+            if (isinstance(registry, dict)
+                    and str(registry.get("instance") or "").strip().lower() == INSTANCE
+                    and str(registry.get("sandboxSuffix") or "") == _sandbox_suffix()):
+                return registry
+    except (ValueError, OSError):
+        pass
     return {}
 
 
@@ -127,7 +129,7 @@ DEV_GUIDE_PAGE_TITLE = "開発ガイド"
 DEV_GUIDE_CARD_TITLE = _sx("在庫管理リファレンス ガイド")
 DEV_GUIDE_STANDARD = (60, 82)  # ページ2 standard layout（自己フィットの縦スクロール文書）
 DEV_GUIDE_COMPACT = (12, 29)   # ページ2 compact layout（現行 12x6 はモバイルで低すぎ→上書き）
-WORKFLOW_MODEL_ID = os.environ.get("DOMO_WORKFLOW_MODEL_ID", "0c61146c-9e04-4a9b-bc5e-7c43384d06d6")
+WORKFLOW_MODEL_ID = os.environ.get("DOMO_WORKFLOW_MODEL_ID", "").strip()
 # DOMO_WORKFLOW_MODEL_ID が明示指定されたか（＝既定値でなく人が固定したか）。指定時は
 # ensure_workflow_model が発見/作成せずその ID を尊重する（既存運用の互換）。既定のままなら
 # 名称で発見または API で新規作成する（境界①の自動化）。
@@ -174,19 +176,19 @@ DATAFLOW_TERMINAL_STATES = {"SUCCESS", "FAILED", "FAILED_DATA_FLOW", "CANCELLED"
 DATAFLOW_FAILURE_STATES = {"FAILED", "FAILED_DATA_FLOW", "CANCELLED", "CANCELED", "ABORTED", "ERROR"}
 
 LEGACY_COLLECTIONS = {
-    "inventory_management_items": ("482b65b3-2c28-46ac-ba84-23308cb4e39c", "f8623a69-4edf-4332-bd1b-68f8506472cf"),
-    "inventory_management_locations": ("3d56e08c-ec28-4753-9cf0-65dddd351629", "f5f8ecd2-b877-4df1-905c-f5ebcf3435e7"),
-    "inventory_management_rules": ("4b862ce7-22a0-4c70-bfa8-597700cf3aa3", "8af5c4b3-6d4a-4a2c-a066-b4b2e577e72d"),
-    "inventory_management_transactions": ("0bce5db7-92ef-4ba2-ad54-caf9b2e88313", "8b3a0052-6802-4e48-9936-bf2bcf7b61a2"),
-    "inventory_management_balances": ("04fc62df-ac2d-40f9-8abd-f85fb5fc2ef5", "f78acffe-1123-4b4d-bf83-eddefb3eae3b"),
-    "inventory_management_alert_states": ("35cea7b7-1692-4373-bfed-768c17ab2b5d", "35b49f48-62dc-41a4-8673-a8800cd9f5d4"),
-    "inventory_management_alert_history": ("6e3971da-ce76-49d1-87fb-4a47d14f86b8", "c980a628-467e-4ef5-bb80-ad624ab823b1"),
+    "inventory_management_items": ("b1886f2c-f079-5add-b4c5-64387bc778e0", "616317b9-76d9-5b20-9b15-07a5e28ff304"),
+    "inventory_management_locations": ("b1d0f24a-9f0c-5199-bd26-a8c667dcb2fa", "4bb59a5e-0f39-5c6b-bb9f-18699f42836b"),
+    "inventory_management_rules": ("9d97e3c9-ac81-57d7-9199-2b205a010b35", "e85615c2-d162-571c-ac8a-c2c4d782b3d9"),
+    "inventory_management_transactions": ("f1995196-e8fe-5cd3-ac23-d71d13a05609", "1fca1b17-a58b-5b9c-864b-2332bf9a201b"),
+    "inventory_management_balances": ("05eb1020-d424-5745-b405-3721c81befce", "de5c2707-2782-5c30-bc09-01d03abae6d8"),
+    "inventory_management_alert_states": ("8978de1c-b0c8-50f8-85fd-6fc4f42071d8", "08e3470c-af6a-5a61-9588-3a31f6c70cec"),
+    "inventory_management_alert_history": ("f21f52c6-86f0-5973-8831-5b7335b202a2", "50f51d36-cec9-509d-b603-79b76a1e7506"),
 }
 
 
 class DomoApiError(RuntimeError):
     def __init__(self, method: str, path: str, status: int, detail: str):
-        super().__init__(f"{method} {path} -> HTTP {status}: {detail[:500]}")
+        super().__init__(f"{method} {path} -> HTTP {status}")
         self.method = method
         self.path = path
         self.status = status
@@ -195,15 +197,23 @@ class DomoApiError(RuntimeError):
 
 class DomoClient:
     def __init__(self, instance: str = INSTANCE):
+        instance = str(instance or "").strip().lower()
+        if not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.domo\.com", instance):
+            raise ValueError("DOMO_INSTANCE must explicitly name your instance (example.domo.com).")
         self.instance = instance
         self.base = f"https://{instance}"
+        # A redirect must never forward custom Domo authentication headers.
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, req, fp, code, msg, headers, newurl):
+                return None
+        self._open = urllib.request.build_opener(NoRedirect()).open
         self.sid = ""
         # 開発者トークン(DOMO_DEVELOPER_TOKEN)があれば、SID を介さず X-DOMO-Developer-Token
         # ヘッダで直接認証する。なぜ: 別インスタンスへ繰り返し配布する運用では、対話的な
         # domo login(OAuth)を挟めない自動化・非対話環境でも、発行済みトークン1つで全 API 面
         # (CodeEngine/DataFlow/Workflow/AppDB/DataApp/DataSet)へ到達できる方が再現性が高い。
         # トークンはソースへ焼き込まず環境変数からのみ読む(配布物の清潔さを保つ)。
-        self.dev_token = os.environ.get("DOMO_DEVELOPER_TOKEN", "").strip()
+        self.dev_token = (os.environ.get("DOMO_DEVELOPER_TOKEN") or os.environ.get("DOMO_TOKEN") or "").strip()
         if not self.dev_token:
             self.refresh_sid()
 
@@ -220,14 +230,17 @@ class DomoClient:
         refresh_token = json.loads(config.read_text(encoding="utf-8")).get("refreshToken")
         token_body = urllib.parse.urlencode({"client_id": "domo:internal:devstudio", "grant_type": "refresh_token", "refresh_token": refresh_token}).encode()
         request = urllib.request.Request(f"{self.base}/api/oauth2/token", data=token_body, method="POST", headers={"content-type": "application/x-www-form-urlencoded;charset=utf-8"})
-        with urllib.request.urlopen(request, timeout=60) as response:
+        with self._open(request, timeout=60) as response:
             access_token = (json.loads(response.read()) or {}).get("access_token")
         request = urllib.request.Request(f"{self.base}/api/oauth2/sid", headers={"Authorization": f"Bearer {access_token}"})
-        with urllib.request.urlopen(request, timeout=60) as response:
+        with self._open(request, timeout=60) as response:
             self.sid = str((json.loads(response.read()) or {}).get("sid") or "")
 
     def request(self, method: str, path: str, body: Any = None, *, retry: bool = True) -> Any:
-        url = path if path.startswith("http") else f"{self.base}/{path.lstrip('/')}"
+        url = path if urllib.parse.urlsplit(path).scheme else f"{self.base}/{path.lstrip('/')}"
+        parsed = urllib.parse.urlsplit(url)
+        if parsed.scheme != "https" or parsed.netloc != self.instance or parsed.fragment:
+            raise ValueError("Refusing to send Domo credentials outside the selected instance.")
         # 認証ヘッダは運用方式で切り替える。開発者トークンは静的なので再認証(リトライ更新)しない。
         if self.dev_token:
             headers = {"X-DOMO-Developer-Token": self.dev_token, "Accept": "application/json"}
@@ -239,7 +252,7 @@ class DomoClient:
             headers["Content-Type"] = "application/json"
         request = urllib.request.Request(url, data=data, method=method.upper(), headers=headers)
         try:
-            with urllib.request.urlopen(request, timeout=120) as response:
+            with self._open(request, timeout=120) as response:
                 raw = response.read()
                 if not raw:
                     return None
@@ -823,7 +836,7 @@ def resolve_workflow_model_id(client: DomoClient) -> str:
       1. DOMO_WORKFLOW_MODEL_ID が明示指定（pin）されていればそれを尊重。
       2. WORKFLOW_MODEL_NAME でインスタンス内を発見できればその ID（`apply` が作成済みのはず）。
       3. manifest.json が既に宣言している workflowsMapping[0].modelId（あれば）。
-      4. どれも無ければモジュール既定（保守用）へフォールバック。
+      4. どれも無ければ未解決（空文字）。古いモジュール状態を別環境へ持ち込まない。
     書き込み経路は ensure_workflow_model 側。ここは発見のみで、他人が作ったモデルにも触れない。
     """
     if WORKFLOW_MODEL_ID_PINNED:
@@ -838,7 +851,7 @@ def resolve_workflow_model_id(client: DomoClient) -> str:
             return declared
     except Exception:
         pass
-    return WORKFLOW_MODEL_ID
+    return ""
 
 
 def agent_email_workflow_definition(source: Dict[str, Any], dashboard_dataset_id: str, send_email_version: str = "") -> Dict[str, Any]:
@@ -1191,8 +1204,8 @@ def sync_manifest(client: DomoClient) -> Dict[str, Any]:
 
     別インスタンスで `apply` が新規作成した資産IDを、`domo publish` の前にバンドルへ配線する
     ための冪等な補助。Domo資産は名称で「発見」するだけで作成・変更しない（read-only）。書き換える
-    のは collection / dashboard DataSet / Code Engine package / Workflow model の4つのID欄のみで、
-    version・alias・schema・design `id`（トップレベル）は触れない。IDが既に一致していれば書き込まず、
+    のは collection / dashboard DataSet / Code Engine package / Workflow model の接続IDと解決済み版。
+    alias・schema・design `id`（トップレベル）は維持する。一致していれば書き込まず、
     差分ゼロで終了する。design `id` は初回publishでDomoが払い出すため本コマンドの対象外。
     """
     manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
@@ -1207,6 +1220,20 @@ def sync_manifest(client: DomoClient) -> Dict[str, Any]:
     # ため、発見に失敗した際に顧客インスタンスの manifest へ誤ID（保守用）を焼き込む恐れがあった。
     # ここは apply とは別プロセス起動なので都度発見する。
     workflow_model_id = resolve_workflow_model_id(client)
+    package_version = ""
+    if _id(package):
+        latest = client.request("GET", f"api/codeengine/v2/packages/{_id(package)}/versions/latest?parts=functions") or {}
+        package_version = str(latest.get("version") or "")
+        if not package_version:
+            raise RuntimeError("Code Engine version is unresolved; refusing to publish a source-instance version.")
+    workflow_active_version = ""
+    if workflow_model_id:
+        metadata = client.request("GET", f"api/workflow/v1/models/{workflow_model_id}") or {}
+        active = [str(row.get("version") or "") for row in metadata.get("versions") or []
+                  if isinstance(row, dict) and row.get("active") is True and re.fullmatch(r"\d+\.\d+\.\d+", str(row.get("version") or ""))]
+        if not active:
+            raise RuntimeError("Notification Workflow has no active version; provision it before publishing.")
+        workflow_active_version = max(active, key=lambda value: tuple(map(int, value.split("."))))
 
     changes: Dict[str, Any] = {}
 
@@ -1222,7 +1249,9 @@ def sync_manifest(client: DomoClient) -> Dict[str, Any]:
     _bind(collections_mapping[0] if collections_mapping else None, "id", _id(collection), "collection.id")
     _bind(datasets_mapping[0] if datasets_mapping else None, "dataSetId", dashboard_id, "dataset.dataSetId")
     _bind(packages_mapping[0] if packages_mapping else None, "packageId", _id(package), "package.packageId")
+    _bind(packages_mapping[0] if packages_mapping else None, "version", package_version, "package.version")
     _bind(workflows_mapping[0] if workflows_mapping else None, "modelId", workflow_model_id, "workflow.modelId")
+    _bind(workflows_mapping[0] if workflows_mapping else None, "version", workflow_active_version, "workflow.version")
 
     # 配線先は配布コピー自身の pro-code/manifest.json。サンドボックス（名札付き）では、ここで
     # トップレベル id を外す＝続く `cd pro-code && domo publish` が id 省略で“自分専用デザインを
@@ -1240,6 +1269,12 @@ def sync_manifest(client: DomoClient) -> Dict[str, Any]:
     if changes or stripped_id is not None:
         manifest_out.parent.mkdir(parents=True, exist_ok=True)
         manifest_out.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    asset_path = MANIFEST_PATH.parent.parent / "code-engine" / "asset.json"
+    if package_version and asset_path.exists():
+        asset = json.loads(asset_path.read_text(encoding="utf-8"))
+        if asset.get("version") != package_version or asset.get("packageId") != _id(package):
+            asset.update(version=package_version, packageId=_id(package))
+            asset_path.write_text(json.dumps(asset, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     result = {
         "instance": INSTANCE,
         "changed": bool(changes) or stripped_id is not None,
@@ -1792,15 +1827,17 @@ def write_back_app_studio_ids(
     「Appを手作りしてIDを渡せ」と誤案内する温床）。実IDを書き戻すことで、以後のコマンドは追加の
     人手なく通る＝全自動デプロイ契約を満たす。
 
-    書き戻すのは不透明な identity ID だけ（``appId/viewId/cardId/proxyId/contextId`` と ``page2`` の
-    同種）。ホスト名を含む ``url`` など他の設定値は一切触らない（既存値をそのまま保持＝再配布物へ
-    新たなインスタンス固有情報を書き込まない）。``proxyId``/``contextId`` は解決結果で上書きする
+    identity ID（``appId/viewId/cardId/proxyId/contextId`` と ``page2`` の同種）に加え、
+    利用先を限定する ``instance`` / ``sandboxSuffix`` を保存する。URLなど他の設定値は保持する。
+    このローカル状態ファイルは配布対象外。``proxyId``/``contextId`` は解決結果で上書きする
     （空なら空へ）——配布時の参照インスタンス値が対象インスタンスで無効なとき、それらを掴んだ 404
     フォールバックの後に確実に消すため（残すと ``verify`` が無効な context を GET して誤失敗する）。
     変更が無ければ書き込まない（再利用の冪等パスでファイルを無用に触らない）。
     """
     registry = load_registry()
     before = json.dumps(registry, ensure_ascii=False, sort_keys=True)
+    registry["instance"] = INSTANCE
+    registry["sandboxSuffix"] = _sandbox_suffix()
     app = registry.setdefault("appStudio", {})
     for key in ("appId", "viewId", "cardId", "proxyId", "contextId"):
         if key in page1:

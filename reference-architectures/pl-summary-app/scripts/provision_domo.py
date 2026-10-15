@@ -9,16 +9,15 @@ The data layer this script stands up, in dependency order:
                        ignores the input rows, so any readable DataSet serves;
                        a dedicated seed keeps the stack self-contained and
                        reproducible on a fresh instance.
-  2. Code Engine    -- appdb_maintenance.py -> one public dedupe function
-                       (dedupe_appdb_documents). Instance-independent: the
-                       collection GUID is a required argument, not baked in.
+  Runtime Code Engine is provisioned with the Workflow layer. The legacy dedupe
+  utility remains for compatibility but is not automatically created here.
   3. AppDB collection -- 店舗別損益AI要約 (syncEnabled:false). The long-form
                        analysis_html reports are written here by the WF-01 + consolidated sub-WF
                        workflow layer (provisioned by scripts/provision_workflows.py).
                        The Pro Code app reads it for the サマリー tab.
   4. DataFlow       -- DF｜店舗別損益データフロー (Magic ETL v2), rebuilt from the
-                       captured dataflow/2042.json. Emits two output DataSets
-                       (明細 / 要約) carrying the short-form AI summaries produced
+                       captured dataflow/2042.json. Emits four output DataSets
+                       (明細 / 要約 / トレンド / 事業部) carrying the short-form AI summaries produced
                        by its two TextGeneration tiles. These two DataSets drive
                        the bulk of the Pro Code app (KPIs, charts, short notes).
 
@@ -27,8 +26,8 @@ To reproduce the stack on another instance set DOMO_INSTANCE (target host, e.g.
   * DOMO_DEVELOPER_TOKEN -- an instance developer token (no interactive login;
     best for repeatable, non-interactive distribution), or
   * ``domo login -i <host>`` first, so the CLI refresh token is available.
-Both instance and model default to the maintained reference instance when unset,
-so committing this file leaks no per-customer IDs.
+The target instance must be explicit; an unset or malformed host is rejected
+before authentication. Model availability must be verified on the destination.
 
 After ``apply`` creates the assets on a fresh instance, run ``sync-manifest`` to
 write the discovered DataSet / collection IDs into pro-code/manifest.json before
@@ -52,7 +51,7 @@ import urllib.request
 from typing import Any, Dict, List, Optional, Tuple
 
 
-INSTANCE = os.environ.get("DOMO_INSTANCE", "maintenance-instance.domo.com")
+INSTANCE = (os.environ.get("DOMO_INSTANCE") or os.environ.get("INSTANCE") or "").strip().lower()
 
 # --------------------------------------------------------------------------- #
 # サンドボックス隔離（ハンズオン参加者ごと・バックエンド完全隔離）
@@ -63,7 +62,6 @@ INSTANCE = os.environ.get("DOMO_INSTANCE", "maintenance-instance.domo.com")
 # 揃えるので、バックエンド全体が1つの名札で隔離される。未設定（既定）なら従来挙動を一切変えない。
 # dedupe 公開関数名・データセット alias（summary/detail/trend/dept）は契約として不変（_sx で包まない）。
 # --------------------------------------------------------------------------- #
-MAINTENANCE_INSTANCE = "maintenance-instance.domo.com"   # 配布元の保守・検証用共有インスタンス（顧客環境ではない）
 
 
 def _sandbox_suffix() -> str:
@@ -85,28 +83,22 @@ def _slugify(text: str) -> str:
     return out or "unknown"
 
 
-def _norm_instance() -> str:
-    return INSTANCE.lower().rstrip("/")
-
-
 def _allow_production() -> bool:
     return os.environ.get("PL_ALLOW_PRODUCTION", "").strip().lower() in ("1", "true", "yes")
 
 
 def _guard_production_write(action: str) -> None:
-    """apply / app-studio / embed-guide（Domo への書込み）用の本番保護ガード。
-
-    保守用共有インスタンス（maintenance-instance）で名札なしに本番名のオブジェクトを作成/更新するのを防ぐ。
-    名札（PL_SANDBOX_SUFFIX）を付ければ全オブジェクト名が一意化され安全に通る。顧客が自分の
-    インスタンスへ配備する場合（INSTANCE != maintenance-instance）は対象外＝従来どおり動く。"""
-    if _norm_instance() == MAINTENANCE_INSTANCE and not SANDBOX and not _allow_production():
+    """Shared base-name writes require an explicit opt-in on every instance."""
+    if not INSTANCE:
+        raise SystemExit("Set DOMO_INSTANCE explicitly before deployment.")
+    if not SANDBOX and not _allow_production():
         raise SystemExit(
-            f"PL_SANDBOX_SUFFIX が未設定のまま保守用インスタンス（maintenance-instance）の本番オブジェクトを "
+            f"PL_SANDBOX_SUFFIX が未設定のまま対象インスタンスの本番オブジェクトを "
             f"`{action}` で作成/書き換えようとしています。ハンズオンでは名札を付けてください"
             "（本番や他参加者と別名になり衝突しません）:\n"
             "  export PL_SANDBOX_SUFFIX='検証・<あなたの氏名>'\n"
             "顧客が自分の環境へ配備する場合は、まず自分のインスタンスを指定してください"
-            "（export DOMO_INSTANCE=<your-instance>.domo.com・既定の maintenance-instance は配布元の保守用）。\n"
+            "（export DOMO_INSTANCE=<your-instance>.domo.com）。\n"
             "⚠本番メンテナが本番を更新する場合のみ PL_ALLOW_PRODUCTION=1 を明示してください（本番を上書きします）。")
 
 
@@ -135,6 +127,25 @@ def _registry_path() -> pathlib.Path:
         return ROOT / ("sandbox-" + _slugify(_sandbox_suffix())) / "domo-assets.json"
     return REGISTRY_PATH
 
+
+def _read_registry() -> Dict[str, Any]:
+    """Use IDs only for the selected instance and exact sandbox name tag."""
+    try:
+        data = json.loads(_registry_path().read_text(encoding="utf-8"))
+        if (isinstance(data, dict) and data.get("instance") == INSTANCE
+                and str(data.get("sandboxSuffix") or "") == _sandbox_suffix()):
+            return data
+    except (OSError, ValueError):
+        pass
+    return {}
+
+
+def _write_registry(registry: Dict[str, Any]) -> None:
+    path = _registry_path()
+    data = dict(registry, instance=INSTANCE, sandboxSuffix=_sandbox_suffix())
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
 # 全て「名称で発見 or 作成」する。既定値は維持中の参照インスタンス(maintenance-instance)の値で、
 # 別インスタンスでも同じ名前で発見/作成されるため、この定数群に顧客固有IDは一切入らない。
 SEED_DATASTORE_NAME = _sx(os.environ.get("DOMO_PL_SEED_DATASTORE", "pl-summary-app"))
@@ -156,7 +167,7 @@ AI_SUMMARY_MODEL_ID = os.environ.get("DOMO_AI_SUMMARY_MODEL_ID", "domo.domo_ai.d
 
 class DomoApiError(RuntimeError):
     def __init__(self, method: str, path: str, status: int, detail: str):
-        super().__init__(f"{method} {path} -> HTTP {status}: {detail[:500]}")
+        super().__init__(f"{method} {path} -> HTTP {status}")
         self.method = method
         self.path = path
         self.status = status
@@ -165,13 +176,21 @@ class DomoApiError(RuntimeError):
 
 class DomoClient:
     def __init__(self, instance: str = INSTANCE):
+        instance = str(instance or "").strip().lower()
+        if not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.domo\.com", instance):
+            raise ValueError("DOMO_INSTANCE must explicitly name your instance (example.domo.com).")
         self.instance = instance
         self.base = f"https://{instance}"
+        # A redirect must never forward custom Domo authentication headers.
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, req, fp, code, msg, headers, newurl):
+                return None
+        self._open = urllib.request.build_opener(NoRedirect()).open
         self.sid = ""
         # 開発者トークン(DOMO_DEVELOPER_TOKEN)があれば SID を介さず X-DOMO-Developer-Token
         # ヘッダで直接認証する。非対話・自動配布では発行済みトークン1つで全 API 面へ到達できる
         # 方が再現性が高い。トークンはソースへ焼き込まず環境変数からのみ読む。
-        self.dev_token = os.environ.get("DOMO_DEVELOPER_TOKEN", "").strip()
+        self.dev_token = (os.environ.get("DOMO_DEVELOPER_TOKEN") or os.environ.get("DOMO_TOKEN") or "").strip()
         if not self.dev_token:
             self.refresh_sid()
 
@@ -187,14 +206,17 @@ class DomoClient:
         refresh_token = json.loads(config.read_text(encoding="utf-8")).get("refreshToken")
         token_body = urllib.parse.urlencode({"client_id": "domo:internal:devstudio", "grant_type": "refresh_token", "refresh_token": refresh_token}).encode()
         request = urllib.request.Request(f"{self.base}/api/oauth2/token", data=token_body, method="POST", headers={"content-type": "application/x-www-form-urlencoded;charset=utf-8"})
-        with urllib.request.urlopen(request, timeout=60) as response:
+        with self._open(request, timeout=60) as response:
             access_token = (json.loads(response.read()) or {}).get("access_token")
         request = urllib.request.Request(f"{self.base}/api/oauth2/sid", headers={"Authorization": f"Bearer {access_token}"})
-        with urllib.request.urlopen(request, timeout=60) as response:
+        with self._open(request, timeout=60) as response:
             self.sid = str((json.loads(response.read()) or {}).get("sid") or "")
 
     def request(self, method: str, path: str, body: Any = None, *, retry: bool = True) -> Any:
-        url = path if path.startswith("http") else f"{self.base}/{path.lstrip('/')}"
+        url = path if urllib.parse.urlsplit(path).scheme else f"{self.base}/{path.lstrip('/')}"
+        parsed = urllib.parse.urlsplit(url)
+        if parsed.scheme != "https" or parsed.netloc != self.instance or parsed.fragment:
+            raise ValueError("Refusing to send Domo credentials outside the selected instance.")
         if self.dev_token:
             headers = {"X-DOMO-Developer-Token": self.dev_token, "Accept": "application/json"}
         else:
@@ -205,7 +227,7 @@ class DomoClient:
             headers["Content-Type"] = "application/json"
         request = urllib.request.Request(url, data=data, method=method.upper(), headers=headers)
         try:
-            with urllib.request.urlopen(request, timeout=180) as response:
+            with self._open(request, timeout=180) as response:
                 raw = response.read()
                 if not raw:
                     return None
@@ -535,7 +557,6 @@ def apply(client: DomoClient, run_dataflow: bool) -> Dict[str, Any]:
     seed_collection, seed_dataset_id = resolve_seed_dataset(client)
     if not seed_dataset_id:
         raise RuntimeError("Seed DataSet was not minted by standard sync; cannot create the DataFlow input")
-    package, version = ensure_package(client)
     business = ensure_business_collection(client)
     dataflow = ensure_dataflow(client, seed_dataset_id)
     state, execution_id = "NOT_RUN", ""
@@ -547,7 +568,7 @@ def apply(client: DomoClient, run_dataflow: bool) -> Dict[str, Any]:
         "instance": INSTANCE,
         "ownerUserId": user["id"],
         "seedCollection": {"name": SEED_COLLECTION_NAME, "id": _id(seed_collection), "datasetId": seed_dataset_id},
-        "codeEngine": {"name": PACKAGE_NAME, "id": _id(package), "version": version, "publicFunctionCount": 1},
+        "codeEngine": {"status": "deferred-to-workflow-provisioner", "id": "", "version": "", "publicFunctionCount": 0},
         "businessCollection": {"name": BUSINESS_COLLECTION_NAME, "id": _id(business)},
         "dataflow": {"name": DATAFLOW_NAME, "id": _id(dataflow), "lastExecutionId": execution_id, "lastExecutionState": state},
         "summaryDataset": {"name": SUMMARY_OUTPUT_NAME, "id": outputs.get(SUMMARY_OUTPUT_NAME, "")},
@@ -609,10 +630,17 @@ def sync_manifest(client: DomoClient) -> Dict[str, Any]:
 
 
 def verify(client: DomoClient) -> Dict[str, Any]:
+    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    manifest_ds = {row.get("alias"): str(row.get("dataSetId") or "") for row in manifest.get("datasetsMapping") or []}
+    manifest_collection = str(((manifest.get("collectionsMapping") or [{}])[0]).get("id") or "")
+    binding = next((row for row in manifest.get("packagesMapping") or [] if row.get("alias") == "plReportApi"), {})
     seed = next((row for row in list_collections(client) if row.get("name") == SEED_COLLECTION_NAME), {})
     business = next((row for row in list_collections(client) if row.get("name") == BUSINESS_COLLECTION_NAME), {})
-    package = next((row for row in list_packages(client) if row.get("name") == PACKAGE_NAME), {})
-    latest = client.request("GET", f"api/codeengine/v2/packages/{_id(package)}/versions/latest?parts=functions") if package else {}
+    package = next((row for row in list_packages(client) if _id(row) == binding.get("packageId")), {})
+    version = str(binding.get("version") or "")
+    latest = client.request("GET", f"api/codeengine/v2/packages/{_id(package)}/versions/{version}?parts=functions,code") if package and version else {}
+    public_functions = [row for row in (latest or {}).get("functions") or [] if not row.get("isPrivate")]
+    collection_binding = re.search(r'^REPORT_COLLECTION_ID\s*=\s*[\"\']([^\"\']+)[\"\']', str((latest or {}).get("code") or ""), re.M)
     flow_row = next((row for row in list_dataflows(client) if row.get("name") == DATAFLOW_NAME), {})
     dataflow = client.request("GET", f"api/dataprocessing/v1/dataflows/{_id(flow_row)}") if flow_row else {}
     outputs = _flow_output_ids(dataflow or {})
@@ -620,6 +648,11 @@ def verify(client: DomoClient) -> Dict[str, Any]:
     detail_id = outputs.get(DETAIL_OUTPUT_NAME, "")
     trend_id = outputs.get(TREND_OUTPUT_NAME, "")
     dept_id = outputs.get(DEPT_OUTPUT_NAME, "")
+    input_ids = [str(row.get("dataSourceId") or "") for row in (dataflow or {}).get("inputs") or []]
+    seed_id = str(seed.get("datasourceId") or "")
+    # Earlier deployments used an existing readable input; the generator ignores
+    # its rows. A fresh stack still provisions its own standard-sync seed.
+    expected_input = seed_id or (input_ids[0] if len(input_ids) == 1 else "")
 
     def _rows(dataset_id: str) -> int:
         if not dataset_id:
@@ -627,16 +660,17 @@ def verify(client: DomoClient) -> Dict[str, Any]:
         meta = client.request("GET", f"api/data/v3/datasources/{dataset_id}") or {}
         return int(meta.get("rowCount") or 0)
 
-    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
-    manifest_ds = {row.get("alias"): str(row.get("dataSetId") or "") for row in manifest.get("datasetsMapping") or []}
-    manifest_collection = str(((manifest.get("collectionsMapping") or [{}])[0]).get("id") or "")
-
     result = {
         "instance": INSTANCE,
-        "seedDatasetId": str(seed.get("datasourceId") or ""),
+        "seedDatasetId": expected_input,
+        "seedMode": "standard-sync" if seed_id else "existing-flow-input",
+        "dataflowInputMatchesSeed": input_ids == [expected_input] and bool(expected_input),
         "businessCollectionId": _id(business),
         "codeEngineId": _id(package),
-        "codeEngineFunctionCount": len((latest or {}).get("functions") or []),
+        "codeEngineVersion": version,
+        "codeEngineFunctionCount": len(public_functions),
+        "codeEnginePublicFunction": public_functions[0].get("name") if len(public_functions) == 1 else "",
+        "codeEngineCollectionBound": bool(collection_binding and collection_binding.group(1).lower() == manifest_collection.lower()),
         "dataflowId": _id(dataflow),
         "dataflowInputCount": len((dataflow or {}).get("inputs") or []),
         "dataflowTileCount": len((dataflow or {}).get("actions") or []),
@@ -646,16 +680,23 @@ def verify(client: DomoClient) -> Dict[str, Any]:
         "deptDatasetId": dept_id, "deptRowCount": _rows(dept_id),
         "manifestSummaryDatasetId": manifest_ds.get("summary", ""),
         "manifestDetailDatasetId": manifest_ds.get("detail", ""),
+        "manifestTrendDatasetId": manifest_ds.get("trend", ""),
+        "manifestDeptDatasetId": manifest_ds.get("dept", ""),
         "manifestCollectionId": manifest_collection,
     }
     result["ok"] = bool(
         result["seedDatasetId"] and result["businessCollectionId"]
+        and result["dataflowInputMatchesSeed"]
         and result["codeEngineId"] and result["codeEngineFunctionCount"] == 1
+        and result["codeEnginePublicFunction"] == "pl_report_api" and result["codeEngineCollectionBound"]
         and result["dataflowId"] and result["dataflowInputCount"] == 1
-        and summary_id and detail_id
+        and summary_id and detail_id and trend_id and dept_id
         and result["summaryRowCount"] > 0 and result["detailRowCount"] > 0
+        and result["trendRowCount"] > 0 and result["deptRowCount"] > 0
         and result["manifestSummaryDatasetId"] == summary_id
         and result["manifestDetailDatasetId"] == detail_id
+        and result["manifestTrendDatasetId"] == trend_id
+        and result["manifestDeptDatasetId"] == dept_id
         and result["manifestCollectionId"] == result["businessCollectionId"]
     )
     print("VERIFY_RESULT=" + json.dumps(result, ensure_ascii=False, sort_keys=True), flush=True)
@@ -908,7 +949,7 @@ def app_studio(client: DomoClient) -> Dict[str, Any]:
     _guard_production_write("app-studio")
     manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
     design_id = str(manifest.get("id") or "")
-    registry = json.loads(_registry_path().read_text(encoding="utf-8")) if _registry_path().exists() else {}
+    registry = _read_registry()
     registered = registry.get("appStudio") or {}
     app_id = str(registered.get("appId") or "")
     registered_view_id = str(registered.get("viewId") or "")
@@ -992,6 +1033,8 @@ def app_studio(client: DomoClient) -> Dict[str, Any]:
             "effectiveDesignVersion": context_version or str(design.get("latestVersion") or ""),
         },
     }
+    registry["appStudio"] = {"appId": app_id, "viewId": view_id, "cardId": card_id}
+    _write_registry(registry)
     print("APP_STUDIO_RESULT=" + json.dumps(result, ensure_ascii=False, sort_keys=True), flush=True)
     return result
 
@@ -1042,7 +1085,7 @@ def embed_guide(client: DomoClient) -> Dict[str, Any]:
         raise
 
     # DataApp の解決（app_studio と同じ: registry の appId → 無ければ APP_STUDIO_NAME で厳密発見）。
-    registry = json.loads(_registry_path().read_text(encoding="utf-8")) if _registry_path().exists() else {}
+    registry = _read_registry()
     app_id = str((registry.get("appStudio") or {}).get("appId") or "")
     if not app_id:
         apps = _items(client.request("GET", "api/content/v1/dataapps?limit=500&offset=0"), "dataapps", "apps")
@@ -1098,11 +1141,9 @@ def embed_guide(client: DomoClient) -> Dict[str, Any]:
     }
     # 解決した guide ページ情報を registry へ書き戻す（再実行で確実に再利用。gitignore 済み・配布されない）。
     try:
-        reg_path = _registry_path()
-        reg = json.loads(reg_path.read_text(encoding="utf-8")) if reg_path.exists() else {}
+        reg = _read_registry()
         reg["appStudioGuide"] = result["appStudioGuide"]
-        reg_path.parent.mkdir(parents=True, exist_ok=True)
-        reg_path.write_text(json.dumps(reg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        _write_registry(reg)
     except OSError as error:
         print(f"warning: registry 書き戻しに失敗（続行）: {error}", flush=True)
     print("GUIDE_RESULT=" + json.dumps(result, ensure_ascii=False, sort_keys=True), flush=True)

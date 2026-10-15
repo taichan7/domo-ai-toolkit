@@ -20,7 +20,7 @@
             "backgroundColor": "var(--colorChartBlue6)"
           },
           {
-            "id": "LoadFromVault-2a654779-e073-4b77-9c10-a6cca0b24126",
+            "id": "LoadFromVault-71584c9c-4b30-5917-8e2b-7147e6adc391",
             "type": "Tile",
             "x": 64,
             "y": 88,
@@ -28,7 +28,7 @@
             "colorSource": null
           },
           {
-            "id": "3fdc212f-32f5-4e25-88fb-01335509fb82",
+            "id": "3d316cd3-64e4-5df6-8100-8b61423f4a6e",
             "type": "Tile",
             "x": 284,
             "y": 88,
@@ -36,7 +36,7 @@
             "colorSource": null
           },
           {
-            "id": "Metadata-d7194316-533a-4367-bbc6-fa114e880e23",
+            "id": "Metadata-b7a85102-fb8f-505c-a82f-32c98a1f6a94",
             "type": "Tile",
             "x": 504,
             "y": 88,
@@ -44,7 +44,7 @@
             "colorSource": null
           },
           {
-            "id": "dab1e13b-54a4-4833-9c77-f247dc84fa62",
+            "id": "b59165ec-12aa-5c2a-8ade-07a9fdfddc50",
             "type": "Tile",
             "x": 724,
             "y": 88,
@@ -62,7 +62,7 @@
             "backgroundColor": "var(--colorChartPurple6)"
           },
           {
-            "id": "SQL-2aad9739-d14d-4039-a06d-9a959b14e530",
+            "id": "SQL-e43dca3d-de70-5822-a65f-865bed79f81c",
             "type": "Tile",
             "x": 724,
             "y": 376,
@@ -70,7 +70,7 @@
             "colorSource": null
           },
           {
-            "id": "PythonEngineAction-71dc1c5e-6baf-48d5-b3a1-daf8be58f17b",
+            "id": "PythonEngineAction-51c413a4-d864-52bb-9771-1ed36e24af57",
             "type": "Tile",
             "x": 944,
             "y": 376,
@@ -78,7 +78,7 @@
             "colorSource": null
           },
           {
-            "id": "TextGeneration-fac0a778-db80-4e93-96e3-0f20b591bc4e",
+            "id": "TextGeneration-225dc1a3-1d5b-53e7-afe7-cee582c8fea3",
             "type": "Tile",
             "x": 1164,
             "y": 376,
@@ -86,7 +86,7 @@
             "colorSource": null
           },
           {
-            "id": "Metadata-fdcee276-52f4-4d27-a127-6ab367bd0be8",
+            "id": "Metadata-1adda7cb-bc5d-59d0-b2a7-794fd990520d",
             "type": "Tile",
             "x": 1384,
             "y": 376,
@@ -104,7 +104,7 @@
             "backgroundColor": "var(--colorChartYellow6)"
           },
           {
-            "id": "TextGeneration-0fa8df6c-10d9-4d28-8d8d-93dbd625a395",
+            "id": "TextGeneration-101dcc29-b9b5-5437-a6b5-f614093b16d0",
             "type": "Tile",
             "x": 1712,
             "y": 376,
@@ -112,7 +112,7 @@
             "colorSource": null
           },
           {
-            "id": "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061",
+            "id": "Metadata-6e20b424-0a5f-5a34-bbd4-5fa15933cb00",
             "type": "Tile",
             "x": 1932,
             "y": 376,
@@ -120,7 +120,7 @@
             "colorSource": null
           },
           {
-            "id": "364a005d-742b-455c-a33f-3afbfb2fc32a",
+            "id": "e4bac949-7da2-5ec5-be6d-99a92b264db1",
             "type": "Tile",
             "x": 2152,
             "y": 376,
@@ -138,7 +138,7 @@
             "backgroundColor": "var(--colorChartBlue6)"
           },
           {
-            "id": "SQL-c4bdc5d5-9e9c-5d81-a817-0816308570fc",
+            "id": "SQL-d99f6efd-0e45-5d4b-accf-cf640c67da84",
             "type": "Tile",
             "x": 724,
             "y": 664,
@@ -146,7 +146,7 @@
             "colorSource": null
           },
           {
-            "id": "0e861cea-7c34-53a2-8f3f-d2f3653290be",
+            "id": "73b28ae9-910f-591e-b123-0cb62b090a09",
             "type": "Tile",
             "x": 944,
             "y": 664,
@@ -164,7 +164,7 @@
             "backgroundColor": "var(--colorChartGreen6)"
           },
           {
-            "id": "SQL-bfb09e1d-af6d-5506-add0-99d81e326683",
+            "id": "SQL-4c6e6625-a297-5e0e-8082-977e4880300c",
             "type": "Tile",
             "x": 724,
             "y": 952,
@@ -172,7 +172,7 @@
             "colorSource": null
           },
           {
-            "id": "b351222a-8c12-5e6c-b687-849d36c538cd",
+            "id": "65a60afd-0f5e-50f7-89c7-01efc9b55238",
             "type": "Tile",
             "x": 944,
             "y": 952,
@@ -195,7 +195,7 @@
         "backgroundColor": "var(--colorChartBlue6)"
       },
       {
-        "id": "LoadFromVault-2a654779-e073-4b77-9c10-a6cca0b24126",
+        "id": "LoadFromVault-71584c9c-4b30-5917-8e2b-7147e6adc391",
         "type": "Tile",
         "x": 64,
         "y": 88,
@@ -203,7 +203,7 @@
         "colorSource": null
       },
       {
-        "id": "3fdc212f-32f5-4e25-88fb-01335509fb82",
+        "id": "3d316cd3-64e4-5df6-8100-8b61423f4a6e",
         "type": "Tile",
         "x": 284,
         "y": 88,
@@ -211,7 +211,7 @@
         "colorSource": null
       },
       {
-        "id": "Metadata-d7194316-533a-4367-bbc6-fa114e880e23",
+        "id": "Metadata-b7a85102-fb8f-505c-a82f-32c98a1f6a94",
         "type": "Tile",
         "x": 504,
         "y": 88,
@@ -219,7 +219,7 @@
         "colorSource": null
       },
       {
-        "id": "dab1e13b-54a4-4833-9c77-f247dc84fa62",
+        "id": "b59165ec-12aa-5c2a-8ade-07a9fdfddc50",
         "type": "Tile",
         "x": 724,
         "y": 88,
@@ -237,7 +237,7 @@
         "backgroundColor": "var(--colorChartPurple6)"
       },
       {
-        "id": "SQL-2aad9739-d14d-4039-a06d-9a959b14e530",
+        "id": "SQL-e43dca3d-de70-5822-a65f-865bed79f81c",
         "type": "Tile",
         "x": 724,
         "y": 376,
@@ -245,7 +245,7 @@
         "colorSource": null
       },
       {
-        "id": "PythonEngineAction-71dc1c5e-6baf-48d5-b3a1-daf8be58f17b",
+        "id": "PythonEngineAction-51c413a4-d864-52bb-9771-1ed36e24af57",
         "type": "Tile",
         "x": 944,
         "y": 376,
@@ -253,7 +253,7 @@
         "colorSource": null
       },
       {
-        "id": "TextGeneration-fac0a778-db80-4e93-96e3-0f20b591bc4e",
+        "id": "TextGeneration-225dc1a3-1d5b-53e7-afe7-cee582c8fea3",
         "type": "Tile",
         "x": 1164,
         "y": 376,
@@ -261,7 +261,7 @@
         "colorSource": null
       },
       {
-        "id": "Metadata-fdcee276-52f4-4d27-a127-6ab367bd0be8",
+        "id": "Metadata-1adda7cb-bc5d-59d0-b2a7-794fd990520d",
         "type": "Tile",
         "x": 1384,
         "y": 376,
@@ -279,7 +279,7 @@
         "backgroundColor": "var(--colorChartYellow6)"
       },
       {
-        "id": "TextGeneration-0fa8df6c-10d9-4d28-8d8d-93dbd625a395",
+        "id": "TextGeneration-101dcc29-b9b5-5437-a6b5-f614093b16d0",
         "type": "Tile",
         "x": 1712,
         "y": 376,
@@ -287,7 +287,7 @@
         "colorSource": null
       },
       {
-        "id": "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061",
+        "id": "Metadata-6e20b424-0a5f-5a34-bbd4-5fa15933cb00",
         "type": "Tile",
         "x": 1932,
         "y": 376,
@@ -295,7 +295,7 @@
         "colorSource": null
       },
       {
-        "id": "364a005d-742b-455c-a33f-3afbfb2fc32a",
+        "id": "e4bac949-7da2-5ec5-be6d-99a92b264db1",
         "type": "Tile",
         "x": 2152,
         "y": 376,
@@ -313,7 +313,7 @@
         "backgroundColor": "var(--colorChartBlue6)"
       },
       {
-        "id": "SQL-c4bdc5d5-9e9c-5d81-a817-0816308570fc",
+        "id": "SQL-d99f6efd-0e45-5d4b-accf-cf640c67da84",
         "type": "Tile",
         "x": 724,
         "y": 664,
@@ -321,7 +321,7 @@
         "colorSource": null
       },
       {
-        "id": "0e861cea-7c34-53a2-8f3f-d2f3653290be",
+        "id": "73b28ae9-910f-591e-b123-0cb62b090a09",
         "type": "Tile",
         "x": 944,
         "y": 664,
@@ -339,7 +339,7 @@
         "backgroundColor": "var(--colorChartGreen6)"
       },
       {
-        "id": "SQL-bfb09e1d-af6d-5506-add0-99d81e326683",
+        "id": "SQL-4c6e6625-a297-5e0e-8082-977e4880300c",
         "type": "Tile",
         "x": 724,
         "y": 952,
@@ -347,7 +347,7 @@
         "colorSource": null
       },
       {
-        "id": "b351222a-8c12-5e6c-b687-849d36c538cd",
+        "id": "65a60afd-0f5e-50f7-89c7-01efc9b55238",
         "type": "Tile",
         "x": 944,
         "y": 952,
@@ -363,7 +363,7 @@
   "actions": [
     {
       "type": "LoadFromVault",
-      "id": "LoadFromVault-2a654779-e073-4b77-9c10-a6cca0b24126",
+      "id": "LoadFromVault-71584c9c-4b30-5917-8e2b-7147e6adc391",
       "name": "IN｜P/L入力データ",
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
@@ -378,7 +378,7 @@
       "previewRowLimit": 10000,
       "propagateAi": false,
       "filterPolicy": "LEGACY",
-      "dataSourceId": "cdacbd54-23dd-4ec9-8e16-8b7c7aa69677",
+      "dataSourceId": "62ce85c6-67bc-52df-8c46-e45f607c51a1",
       "sourceType": "AUTO",
       "executeFlowWhenUpdated": false,
       "pseudoDataSource": false,
@@ -401,10 +401,10 @@
     },
     {
       "type": "PythonEngineAction",
-      "id": "3fdc212f-32f5-4e25-88fb-01335509fb82",
+      "id": "3d316cd3-64e4-5df6-8100-8b61423f4a6e",
       "name": "PY｜損益データ生成",
       "dependsOn": [
-        "LoadFromVault-2a654779-e073-4b77-9c10-a6cca0b24126"
+        "LoadFromVault-71584c9c-4b30-5917-8e2b-7147e6adc391"
       ],
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
@@ -417,7 +417,7 @@
         "sampleJson": null
       },
       "inputs": [
-        "LoadFromVault-2a654779-e073-4b77-9c10-a6cca0b24126"
+        "LoadFromVault-71584c9c-4b30-5917-8e2b-7147e6adc391"
       ],
       "removeByDefault": true,
       "condaEnv": "domo-2",
@@ -579,10 +579,10 @@
     },
     {
       "type": "Metadata",
-      "id": "Metadata-d7194316-533a-4367-bbc6-fa114e880e23",
+      "id": "Metadata-b7a85102-fb8f-505c-a82f-32c98a1f6a94",
       "name": "日付型変更",
       "dependsOn": [
-        "3fdc212f-32f5-4e25-88fb-01335509fb82"
+        "3d316cd3-64e4-5df6-8100-8b61423f4a6e"
       ],
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
@@ -594,7 +594,7 @@
         "colorSource": null,
         "sampleJson": null
       },
-      "input": "3fdc212f-32f5-4e25-88fb-01335509fb82",
+      "input": "3d316cd3-64e4-5df6-8100-8b61423f4a6e",
       "fields": [
         {
           "name": "日付",
@@ -620,10 +620,10 @@
     },
     {
       "type": "PublishToVault",
-      "id": "dab1e13b-54a4-4833-9c77-f247dc84fa62",
+      "id": "b59165ec-12aa-5c2a-8ade-07a9fdfddc50",
       "name": "OUT｜P/L明細（店舗×勘定×月）",
       "dependsOn": [
-        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+        "Metadata-b7a85102-fb8f-505c-a82f-32c98a1f6a94"
       ],
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
@@ -636,10 +636,10 @@
         "sampleJson": null
       },
       "inputs": [
-        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+        "Metadata-b7a85102-fb8f-505c-a82f-32c98a1f6a94"
       ],
       "dataSource": {
-        "guid": "a1ba80ca-147e-4ac8-8464-5867d665860e",
+        "guid": "4bb91044-f018-5697-92fe-25545a11f81b",
         "type": "DataFlow",
         "name": "OUT｜P/L明細（店舗×勘定×月）",
         "description": "店舗別・勘定科目別の損益実績データ（月次粒度）。2024年1月の実績シナリオにおける売上金額、費用金額、利益、損失、純額を記録し、予算との差異分析が可能。勘定科目は階層構造（レベル1/2）を持ち、衣料品・生活雑貨・食品などの事業部別に管理。店舗の地域情報（都道府県、市区町村、地域）を含み、地域別・店舗別の収益性分析に活用される財務管理データ。",
@@ -663,10 +663,10 @@
     },
     {
       "type": "SQL",
-      "id": "SQL-2aad9739-d14d-4039-a06d-9a959b14e530",
+      "id": "SQL-e43dca3d-de70-5822-a65f-865bed79f81c",
       "name": "SQL｜要約集計（店舗×月）",
       "dependsOn": [
-        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+        "Metadata-b7a85102-fb8f-505c-a82f-32c98a1f6a94"
       ],
       "settings": {
         "sqlDialect": "MAGIC",
@@ -689,7 +689,7 @@
         "sampleJson": null
       },
       "inputs": [
-        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+        "Metadata-b7a85102-fb8f-505c-a82f-32c98a1f6a94"
       ],
       "statements": [
         "--   `PY｜損益データ生成` → あなたの実テーブル名\nWITH base AS (\n  SELECT\n    b.*,\n    (b.年 * 100 + b.月) AS ym\n  FROM `日付型変更` b\n),\n\n-- サマリ区分が 1 でも TRUE でも通るようフラグ化\nbflags AS (\n  SELECT\n    *,\n    CASE\n      WHEN サマリ区分 IN (1, TRUE) THEN 1\n      ELSE 0\n    END AS is_summary\n  FROM base\n),\n\nlatest AS (\n  SELECT MAX(ym) AS 現在YM\n  FROM bflags\n  WHERE シナリオ = 'Actual'\n),\n\nparams AS (\n  SELECT\n    現在YM,\n    CASE\n      WHEN MOD(現在YM,100)=1\n        THEN (FLOOR(現在YM/100)-1)*100 + 12\n      ELSE 現在YM - 1\n    END AS 前月YM,\n    現在YM - 100 AS 一年前YM\n  FROM latest\n),\n\ncurrent_period AS (\n  SELECT\n    b.店舗ID, b.店舗名, b.都道府県, b.市区町村, b.地域,\n    MAX(CONCAT(b.年,'-',LPAD(b.月,2,'0'))) AS 期間,\n    'Actual' AS シナリオ,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.is_summary=1 THEN b.売上金額 ELSE 0 END) AS 総売上,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.is_summary=1 THEN b.費用金額 ELSE 0 END) AS 総費用,\n    SUM(CASE WHEN b.is_summary=1 THEN b.純額 ELSE 0 END) AS 純利益,\n    AVG(CASE WHEN b.is_summary=1 THEN b.差異率 END) AS 平均差異率\n  FROM bflags b\n  JOIN params p ON b.ym = p.現在YM\n  WHERE b.シナリオ='Actual'\n  GROUP BY b.店舗ID, b.店舗名, b.都道府県, b.市区町村, b.地域\n),\n\nprevious_month AS (\n  SELECT\n    b.店舗ID,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.is_summary=1 THEN b.売上金額 ELSE 0 END) AS 前月売上,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.is_summary=1 THEN b.費用金額 ELSE 0 END) AS 前月費用,\n    SUM(CASE WHEN b.is_summary=1 THEN b.純額 ELSE 0 END) AS 前月利益\n  FROM bflags b\n  JOIN params p ON b.ym = p.前月YM\n  WHERE b.シナリオ='Actual'\n  GROUP BY b.店舗ID\n),\n\nyear_ago AS (\n  SELECT\n    b.店舗ID,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.is_summary=1 THEN b.売上金額 ELSE 0 END) AS 前年同月売上,\n    SUM(CASE WHEN b.is_summary=1 THEN b.純額 ELSE 0 END) AS 前年同月利益\n  FROM bflags b\n  JOIN params p ON b.ym = p.一年前YM\n  WHERE b.シナリオ='Actual'\n  GROUP BY b.店舗ID\n),\n\n/* ---------- FIX-1: カテゴリは明細から集計（is_summary=0） ---------- */\ndepartment_summary AS (\n  SELECT\n    b.店舗ID,\n    -- 収益ブレークダウン（ライフスタイルブランド版）\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.部門='衣料品事業部'     AND b.is_summary=0 THEN b.売上金額 ELSE 0 END) AS 衣料品売上,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.部門='生活雑貨事業部'   AND b.is_summary=0 THEN b.売上金額 ELSE 0 END) AS 生活雑貨売上,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.部門='食品事業部'       AND b.is_summary=0 THEN b.売上金額 ELSE 0 END) AS 食品売上,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.部門='新規事業部'       AND b.is_summary=0 THEN b.売上金額 ELSE 0 END) AS その他売上,\n\n    -- 主要費用カテゴリ（明細で重複排除）\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.勘定科目サブタイプ='COGS'                    AND b.is_summary=0 THEN b.費用金額 ELSE 0 END) AS 商品原価,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.勘定科目サブタイプ='Labor'                   AND b.is_summary=0 THEN b.費用金額 ELSE 0 END) AS 総人件費,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.勘定科目サブタイプ IN ('Facility','Utilities') AND b.is_summary=0 THEN b.費用金額 ELSE 0 END) AS 施設費,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.勘定科目サブタイプ='Sales & Marketing'       AND b.is_summary=0 THEN b.費用金額 ELSE 0 END) AS マケ費用,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.勘定科目サブタイプ IN ('Administrative','Technology','Professional Services')\n                                                                                                   AND b.is_summary=0 THEN b.費用金額 ELSE 0 END) AS 管理費用\n  FROM bflags b\n  JOIN params p ON b.ym = p.現在YM\n  WHERE b.シナリオ='Actual'\n  GROUP BY b.店舗ID\n),\n\n/* ---------- FIX-2: 地域平均は「店舗合計の平均」で算出 ---------- */\nregion_store_totals AS (\n  SELECT\n    b.地域,\n    b.店舗ID,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.is_summary=1 THEN b.売上金額 ELSE 0 END) AS store_売上,\n    SUM(CASE WHEN b.勘定科目種類='Expense' AND b.is_summary=1 THEN b.費用金額 ELSE 0 END) AS store_費用,\n    SUM(CASE WHEN b.is_summary=1 THEN b.純額 ELSE 0 END) AS store_利益\n  FROM bflags b\n  JOIN params p ON b.ym = p.現在YM\n  WHERE b.シナリオ='Actual'\n  GROUP BY b.地域, b.店舗ID\n),\nregional_benchmarks AS (\n  SELECT\n    地域,\n    AVG(store_売上)  AS 地域平均売上,\n    AVG(store_費用)  AS 地域平均費用,\n    AVG(store_利益)  AS 地域平均利益\n  FROM region_store_totals\n  GROUP BY 地域\n),\n\nvariance_analysis AS (\n  SELECT\n    b.店舗ID,\n    COUNT(CASE WHEN ABS(b.差異率) > 10 AND b.is_summary=0 THEN 1 END) AS 高差異勘定数,\n    MAX(CASE WHEN b.差異率 > 0  AND b.is_summary=0 THEN b.差異率 END) AS 最大プラス差異,\n    MIN(CASE WHEN b.差異率 < 0  AND b.is_summary=0 THEN b.差異率 END) AS 最大マイナス差異,\n    SUM(CASE WHEN b.勘定科目種類='Revenue' AND b.is_summary=1 THEN b.予算差異 ELSE 0 END) AS 売上予算差異,\n    SUM(CASE WHEN b.勘定科目サブタイプ='COGS' AND b.is_summary=1 THEN b.予算差異 ELSE 0 END) AS 原価予算差異\n  FROM bflags b\n  JOIN params p ON b.ym = p.現在YM\n  WHERE b.シナリオ='Actual'\n  GROUP BY b.店舗ID\n)\n\nSELECT\n  cp.店舗ID, cp.店舗名, cp.都道府県, cp.市区町村, cp.地域, cp.期間, cp.シナリオ,\n  cp.総売上, cp.総費用, cp.純利益,\n  ROUND((cp.純利益 / NULLIF(cp.総売上,0)) * 100, 1) AS 利益率,\n  cp.平均差異率,\n  pm.前月売上, pm.前月費用, pm.前月利益,\n  ROUND(((cp.総売上 - pm.前月売上) / NULLIF(pm.前月売上,0)) * 100, 1) AS 前月比売上変化率,\n  ROUND(((cp.純利益 - pm.前月利益) / NULLIF(ABS(pm.前月利益),0)) * 100, 1) AS 前月比利益変化率,\n  ya.前年同月売上, ya.前年同月利益,\n  ROUND(((cp.総売上 - ya.前年同月売上) / NULLIF(ya.前年同月売上,0)) * 100, 1) AS 前年同月比売上変化率,\n  ds.衣料品売上, ds.生活雑貨売上, ds.食品売上, ds.その他売上,\n  ds.商品原価, ds.総人件費, ds.施設費, ds.マケ費用, ds.管理費用,\n  ROUND((ds.衣料品売上   / NULLIF(cp.総売上,0)) * 100, 1) AS 衣料品売上比率,\n  ROUND((ds.生活雑貨売上 / NULLIF(cp.総売上,0)) * 100, 1) AS 生活雑貨売上比率,\n  ROUND((ds.管理費用     / NULLIF(cp.総売上,0)) * 100, 1) AS 管理費用比率,\n  ROUND((ds.総人件費     / NULLIF(cp.総売上,0)) * 100, 1) AS 人件費比率,\n  rb.地域平均売上, rb.地域平均費用, rb.地域平均利益,\n  ROUND(((cp.総売上 - rb.地域平均売上) / NULLIF(rb.地域平均売上,0)) * 100, 1) AS 地域比売上差異,\n  ROUND(((cp.純利益 - rb.地域平均利益) / NULLIF(ABS(rb.地域平均利益),0)) * 100, 1) AS 地域比利益差異,\n  va.高差異勘定数, va.最大プラス差異, va.最大マイナス差異,\n  va.売上予算差異, va.原価予算差異,\n  CASE\n    WHEN ROUND((cp.純利益 / NULLIF(cp.総売上,0)) * 100, 1) >= 8.0 THEN '好調'\n    WHEN ROUND((cp.純利益 / NULLIF(cp.総売上,0)) * 100, 1) >= 5.0 THEN '堅調'\n    WHEN ROUND((cp.純利益 / NULLIF(cp.総売上,0)) * 100, 1) >= 0.0 THEN '要注意'\n    WHEN ROUND(((cp.純利益 - pm.前月利益) / NULLIF(ABS(pm.前月利益),0)) * 100, 1) > 0 THEN '回復基調'\n    ELSE '不振'\n  END AS 状態ラベル,\n  CASE\n    WHEN cp.純利益 > 0 THEN '黒字'\n    WHEN cp.純利益 = 0 THEN '損益分岐点'\n    ELSE '赤字'\n  END AS 収益性ステータス,\n  CASE\n    WHEN ABS(cp.平均差異率) > 15 THEN '高差異'\n    WHEN ABS(cp.平均差異率) > 5  THEN '中差異'\n    ELSE '低差異'\n  END AS 予算達成度,\n  /* ---------- FIX-3: リスクレベルは '高' | '中' | '低' に正規化 ---------- */\n  CASE\n    WHEN (cp.純利益 / NULLIF(cp.総売上,0)) * 100 < 5  THEN '高'\n    WHEN (cp.純利益 / NULLIF(cp.総売上,0)) * 100 < 15 THEN '中'\n    ELSE '低'\n  END AS リスクレベル\nFROM current_period cp\nLEFT JOIN previous_month pm      ON cp.店舗ID = pm.店舗ID\nLEFT JOIN year_ago ya            ON cp.店舗ID = ya.店舗ID\nLEFT JOIN department_summary ds  ON cp.店舗ID = ds.店舗ID\nLEFT JOIN regional_benchmarks rb ON cp.地域  = rb.地域\nLEFT JOIN variance_analysis va   ON cp.店舗ID = va.店舗ID\nORDER BY cp.総売上 DESC;"
@@ -701,10 +701,10 @@
     },
     {
       "type": "PythonEngineAction",
-      "id": "PythonEngineAction-71dc1c5e-6baf-48d5-b3a1-daf8be58f17b",
+      "id": "PythonEngineAction-51c413a4-d864-52bb-9771-1ed36e24af57",
       "name": "PY｜AI入力用テキスト結合",
       "dependsOn": [
-        "SQL-2aad9739-d14d-4039-a06d-9a959b14e530"
+        "SQL-e43dca3d-de70-5822-a65f-865bed79f81c"
       ],
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
@@ -717,7 +717,7 @@
         "sampleJson": null
       },
       "inputs": [
-        "SQL-2aad9739-d14d-4039-a06d-9a959b14e530"
+        "SQL-e43dca3d-de70-5822-a65f-865bed79f81c"
       ],
       "removeByDefault": true,
       "condaEnv": "domo-2",
@@ -935,10 +935,10 @@
     },
     {
       "type": "TextGeneration",
-      "id": "TextGeneration-fac0a778-db80-4e93-96e3-0f20b591bc4e",
+      "id": "TextGeneration-225dc1a3-1d5b-53e7-afe7-cee582c8fea3",
       "name": "店舗別AIサマリー生成",
       "dependsOn": [
-        "PythonEngineAction-71dc1c5e-6baf-48d5-b3a1-daf8be58f17b"
+        "PythonEngineAction-51c413a4-d864-52bb-9771-1ed36e24af57"
       ],
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
@@ -959,7 +959,7 @@
         "colorSource": null,
         "sampleJson": null
       },
-      "input": "PythonEngineAction-71dc1c5e-6baf-48d5-b3a1-daf8be58f17b",
+      "input": "PythonEngineAction-51c413a4-d864-52bb-9771-1ed36e24af57",
       "modelId": "domo.domo_ai.domogpt-medium-v2.1:anthropic",
       "temperature": 0.0,
       "instructions": "あなたは小売業のシニア財務アナリスト兼経営コンサルタントです。\n入力された1ヶ月分の店舗P/L要約データ（売上・費用・利益率・前月比/前年同月比・費用内訳・地域比較・リスクレベル等）を多角的に分析し、店長と本部が一目で状況を把握できる簡潔な要約を作成してください。\n\n【分析の視点（内部で必ず検討し、結論のみ出力）】\n- 収益性: 利益率と純利益の水準、黒字/赤字、地域平均との差（地域比利益差異）\n- モメンタム: 前月比・前年同月比の売上/利益変化率で改善か悪化かを判断\n- コスト構造: 商品原価・総人件費・施設費・マケ費用・管理費用のうち売上比で過大な項目を特定（人件費比率・管理費用比率を活用）\n- リスク: リスクレベル・予算達成度・予算差異\n\n【絶対遵守の出力要件】\n1) 装飾のないプレーンテキストのみ（HTML・Markdown・記号の箇条書き・挨拶・前置き・解説は一切禁止）。\n2) 全体120〜180文字。3段落構成とし、各段落の間に改行（\\n）を1つだけ入れる。\n3) 1段落目【状況判断】: 状態ラベルは、入力データに含まれる「状態ラベル」列の値（好調／堅調／要注意／回復基調／不振 のいずれか1つ）を**一字一句そのまま**使用する。利益率から自分で再判定・変更・言い換えをしてはならない（このラベルはETL側で機械的に確定済みの単一の真実）。このラベルに利益率(%)を必ず添え、収益性とモメンタムの要点を簡潔に述べる。\n   （参考・判定規則: 好調=利益率≥8.0% / 堅調=5.0〜8.0% / 要注意=0.0〜5.0% / 回復基調=利益率<0%かつ前月比利益変化率>0 / 不振=利益率<0%かつ前月比利益変化率≤0。赤字店舗の回復基調／不振は前月比利益変化率の符号のみで決まり、赤字の深さや改善幅の大小では変わらない。）\n   ※「黒字/赤字」は状態ラベルに使わない（説明文で使うのは可）。\n4) 2段落目【主要因】: 利益を左右した最大の要因を「売上不足」「コスト構造過剰」「売上・コスト両面」のいずれか（共通規約§3）で結論づけ、売上側（例: 前年同月比◯%）とコスト側（例: ◯◯費が売上比◯%で過大）の具体数値を最低1つずつ挙げて説明する。\n5) 3段落目【次の一手】: 上記要因に直結する、次月に店長が実行すべき具体的アクションを1つだけ、可能なら数値目標を添えて提示する。\n\n【厳守事項】\n- 数値は入力データの値のみを使用し、創作しない。「取得不可」の指標には言及しない。\n- 「〜と思われる」等の曖昧表現は避け、データに基づき明確に述べる。",
@@ -987,10 +987,10 @@
     },
     {
       "type": "Metadata",
-      "id": "Metadata-fdcee276-52f4-4d27-a127-6ab367bd0be8",
+      "id": "Metadata-1adda7cb-bc5d-59d0-b2a7-794fd990520d",
       "name": "AIエラー列を除去(全社前)",
       "dependsOn": [
-        "TextGeneration-fac0a778-db80-4e93-96e3-0f20b591bc4e"
+        "TextGeneration-225dc1a3-1d5b-53e7-afe7-cee582c8fea3"
       ],
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
@@ -1002,7 +1002,7 @@
         "colorSource": null,
         "sampleJson": null
       },
-      "input": "TextGeneration-fac0a778-db80-4e93-96e3-0f20b591bc4e",
+      "input": "TextGeneration-225dc1a3-1d5b-53e7-afe7-cee582c8fea3",
       "fields": [
         {
           "name": "DOMO_AI_BATCH_ERROR",
@@ -1028,10 +1028,10 @@
     },
     {
       "type": "TextGeneration",
-      "id": "TextGeneration-0fa8df6c-10d9-4d28-8d8d-93dbd625a395",
+      "id": "TextGeneration-101dcc29-b9b5-5437-a6b5-f614093b16d0",
       "name": "全社AIサマリー生成",
       "dependsOn": [
-        "Metadata-fdcee276-52f4-4d27-a127-6ab367bd0be8"
+        "Metadata-1adda7cb-bc5d-59d0-b2a7-794fd990520d"
       ],
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
@@ -1052,7 +1052,7 @@
         "colorSource": null,
         "sampleJson": null
       },
-      "input": "Metadata-fdcee276-52f4-4d27-a127-6ab367bd0be8",
+      "input": "Metadata-1adda7cb-bc5d-59d0-b2a7-794fd990520d",
       "modelId": "domo.domo_ai.domogpt-medium-v2.1:anthropic",
       "temperature": 0.0,
       "instructions": "あなたは小売チェーン全体を統括する経営企画のシニアアナリストです。\n入力された全社（全店舗合算）の1ヶ月P/Lサマリー（全社売上・費用・純利益・利益率・黒字店舗数・費用内訳・カテゴリ別売上・純利益の上位/下位店舗）を分析し、経営層が全社の状況を一目で把握できる簡潔な要約を作成してください。\n\n【分析の視点（内部で必ず検討し、結論のみ出力）】\n- 全社収益性: 全社利益率と純利益の水準、黒字店舗の比率\n- コスト構造: 商品原価・総人件費・施設費・マケ費用・管理費用のうち売上比で過大な項目\n- 店舗間のばらつき: 純利益ワースト店舗（赤字・低収益）の格差と、それらが全社純利益に与える影響（要介入店舗は必ず純利益ワーストで選ぶ。予算差異ワーストは使わない）\n- カテゴリ: 衣料品・生活雑貨・食品・その他の売上構成\n\n【絶対遵守の出力要件】\n1) 装飾のないプレーンテキストのみ（HTML・Markdown・記号の箇条書き・挨拶・前置き・解説は一切禁止）。\n2) 全体120〜180文字。3段落構成とし、各段落の間に改行（\\n）を1つだけ入れる。\n3) 1段落目【全社状況】: 全社を全社利益率で以下の4値のいずれかに一意に判定し、全社利益率(%)と黒字店舗数(◯/◯店)を必ず添える（共通規約§2.1の閾値に厳密に従う）。\n   - 好調: 利益率 ≥ 8.0%\n   - 堅調: 5.0% ≤ 利益率 < 8.0%\n   - 要注意: 0.0% ≤ 利益率 < 5.0%\n   - 不振: 利益率 < 0.0%（全社赤字）\n   ※「黒字/赤字」は状態ラベルに使わない（説明文で使うのは可）。\n4) 2段落目【主要因】: 全社業績を左右した最大の要因を「売上不足」「コスト構造過剰」「売上・コスト両面」のいずれか（共通規約§3）で結論づけ、コスト側（例: ◯◯費が売上比◯%で過大）と店舗間格差（例: 純利益ワースト店舗が全社純利益を押し下げ）の具体数値を挙げて説明する。\n5) 3段落目【次の一手】: 経営層・統括マネージャーが次月に実行すべき全社施策を1つだけ、可能なら数値目標を添えて提示する。\n\n【厳守事項】\n- 数値は入力データの値のみを使用し、創作しない。「取得不可」の指標には言及しない。\n- 「〜と思われる」等の曖昧表現は避け、データに基づき明確に述べる。",
@@ -1080,10 +1080,10 @@
     },
     {
       "type": "Metadata",
-      "id": "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061",
+      "id": "Metadata-6e20b424-0a5f-5a34-bbd4-5fa15933cb00",
       "name": "列を変更",
       "dependsOn": [
-        "TextGeneration-0fa8df6c-10d9-4d28-8d8d-93dbd625a395"
+        "TextGeneration-101dcc29-b9b5-5437-a6b5-f614093b16d0"
       ],
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
@@ -1095,7 +1095,7 @@
         "colorSource": null,
         "sampleJson": null
       },
-      "input": "TextGeneration-0fa8df6c-10d9-4d28-8d8d-93dbd625a395",
+      "input": "TextGeneration-101dcc29-b9b5-5437-a6b5-f614093b16d0",
       "fields": [
         {
           "name": "ai_input_text",
@@ -1137,10 +1137,10 @@
     },
     {
       "type": "PublishToVault",
-      "id": "364a005d-742b-455c-a33f-3afbfb2fc32a",
+      "id": "e4bac949-7da2-5ec5-be6d-99a92b264db1",
       "name": "OUT｜P/L要約（店舗×月）",
       "dependsOn": [
-        "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061"
+        "Metadata-6e20b424-0a5f-5a34-bbd4-5fa15933cb00"
       ],
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
@@ -1153,10 +1153,10 @@
         "sampleJson": null
       },
       "inputs": [
-        "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061"
+        "Metadata-6e20b424-0a5f-5a34-bbd4-5fa15933cb00"
       ],
       "dataSource": {
-        "guid": "e05581f1-d70a-474d-91f3-f5a2080c9d05",
+        "guid": "37754c30-644a-5f64-95fa-a161552c90b3",
         "type": "DataFlow",
         "name": "OUT｜P/L要約（店舗×月）",
         "description": "小売チェーン「シンプルスタイル」の店舗別月次経営実績データ。2025年12月の実績値（Actual）を店舗単位で集計し、売上・費用・利益の財務指標、カテゴリ別売上構成、前月・前年同月比較、地域平均との差異分析、予算差異、収益性ステータス、リスクレベル評価、AIサマリーを含む。経営判断・店舗評価・改善施策立案に活用。",
@@ -1180,13 +1180,13 @@
     },
     {
       "type": "SQL",
-      "id": "SQL-c4bdc5d5-9e9c-5d81-a817-0816308570fc",
+      "id": "SQL-d99f6efd-0e45-5d4b-accf-cf640c67da84",
       "name": "SQL｜トレンド集計（店舗×月）",
       "dependsOn": [
-        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+        "Metadata-b7a85102-fb8f-505c-a82f-32c98a1f6a94"
       ],
       "inputs": [
-        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+        "Metadata-b7a85102-fb8f-505c-a82f-32c98a1f6a94"
       ],
       "settings": {
         "sqlDialect": "MAGIC",
@@ -1218,12 +1218,12 @@
     },
     {
       "type": "PublishToVault",
-      "id": "0e861cea-7c34-53a2-8f3f-d2f3653290be",
+      "id": "73b28ae9-910f-591e-b123-0cb62b090a09",
       "dependsOn": [
-        "SQL-c4bdc5d5-9e9c-5d81-a817-0816308570fc"
+        "SQL-d99f6efd-0e45-5d4b-accf-cf640c67da84"
       ],
       "inputs": [
-        "SQL-c4bdc5d5-9e9c-5d81-a817-0816308570fc"
+        "SQL-d99f6efd-0e45-5d4b-accf-cf640c67da84"
       ],
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
@@ -1260,13 +1260,13 @@
     },
     {
       "type": "SQL",
-      "id": "SQL-bfb09e1d-af6d-5506-add0-99d81e326683",
+      "id": "SQL-4c6e6625-a297-5e0e-8082-977e4880300c",
       "name": "SQL｜事業部別集計（部門×月）",
       "dependsOn": [
-        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+        "Metadata-b7a85102-fb8f-505c-a82f-32c98a1f6a94"
       ],
       "inputs": [
-        "Metadata-d7194316-533a-4367-bbc6-fa114e880e23"
+        "Metadata-b7a85102-fb8f-505c-a82f-32c98a1f6a94"
       ],
       "settings": {
         "sqlDialect": "MAGIC",
@@ -1298,12 +1298,12 @@
     },
     {
       "type": "PublishToVault",
-      "id": "b351222a-8c12-5e6c-b687-849d36c538cd",
+      "id": "65a60afd-0f5e-50f7-89c7-01efc9b55238",
       "dependsOn": [
-        "SQL-bfb09e1d-af6d-5506-add0-99d81e326683"
+        "SQL-4c6e6625-a297-5e0e-8082-977e4880300c"
       ],
       "inputs": [
-        "SQL-bfb09e1d-af6d-5506-add0-99d81e326683"
+        "SQL-4c6e6625-a297-5e0e-8082-977e4880300c"
       ],
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
@@ -1344,7 +1344,7 @@
   },
   "inputs": [
     {
-      "dataSourceId": "cdacbd54-23dd-4ec9-8e16-8b7c7aa69677",
+      "dataSourceId": "62ce85c6-67bc-52df-8c46-e45f607c51a1",
       "executeFlowWhenUpdated": false,
       "dataSourceName": "IN｜P/L入力データ",
       "onlyLoadNewVersions": false,
@@ -1354,13 +1354,13 @@
   "outputs": [
     {
       "onboardFlowId": null,
-      "dataSourceId": "a1ba80ca-147e-4ac8-8464-5867d665860e",
+      "dataSourceId": "4bb91044-f018-5697-92fe-25545a11f81b",
       "dataSourceName": "OUT｜P/L明細（店舗×勘定×月）",
       "versionChainType": "REPLACE"
     },
     {
       "onboardFlowId": null,
-      "dataSourceId": "e05581f1-d70a-474d-91f3-f5a2080c9d05",
+      "dataSourceId": "37754c30-644a-5f64-95fa-a161552c90b3",
       "dataSourceName": "OUT｜P/L要約（店舗×月）",
       "versionChainType": "REPLACE"
     },
@@ -1391,7 +1391,7 @@
         "title": "トリガーのタイトル1",
         "triggerEvents": [
           {
-            "id": "695c51f7-7ee4-41ec-a0d2-70741ba10cd9",
+            "id": "9b24db6a-38bd-59b3-a868-33f9f60c3587",
             "schedule": {
               "second": "0",
               "minute": "0",

@@ -32,7 +32,7 @@
             "children": [],
             "displayName": "CollectionId",
             "visible": true,
-            "formFieldId": "9e29f0af-ccfa-4503-bc81-dbfd55659126",
+            "formFieldId": "979d772a-7b2c-5cac-9341-c6f95b300beb",
             "formFieldType": null,
             "flag": "input",
             "customMappingType": "form_start",
@@ -55,7 +55,7 @@
             "children": [],
             "displayName": "AiPromptText",
             "visible": true,
-            "formFieldId": "aa8b4e0c-9561-4e05-9ecc-79baf5dcaead",
+            "formFieldId": "1f8ccabf-c9c0-5b4b-afac-ce674035a8e7",
             "formFieldType": null,
             "flag": "input",
             "customMappingType": "form_start",
@@ -78,7 +78,7 @@
             "children": [],
             "displayName": "report_type",
             "visible": true,
-            "formFieldId": "b5edb3e3-af2f-411c-bc6a-1bac4a97f149",
+            "formFieldId": "3995d768-0b2d-5fe4-8abc-46a2a27eacbe",
             "formFieldType": null,
             "flag": "input",
             "customMappingType": "form_start",
@@ -88,7 +88,7 @@
           }
         ],
         "output": [],
-        "formId": "900a3574-bed7-4f0d-ad00-f39ca43224f3",
+        "formId": "0cee9050-4fe8-57cf-81d7-21c859154aee",
         "formTitle": "null",
         "formDescription": "null"
       },
@@ -404,7 +404,7 @@
               "id": "d5bc1ea63420412",
               "name": "pl_report_api",
               "description": "店舗別損益AIレポートの検証(validate)・保存(save)を operation で切り替える単一ツール",
-              "packageId": "43e0a52b-83df-4f52-a2bf-1a3634898215",
+              "packageId": "d318e77d-6586-578a-b7c9-5e5b2ba08c5c",
               "packageVersion": "1.0.0",
               "output": {
                 "id": "ff387b6ae6994a4",
@@ -604,10 +604,10 @@
           "context": {
             "datasets": [
               {
-                "id": "e05581f1-d70a-474d-91f3-f5a2080c9d05"
+                "id": "37754c30-644a-5f64-95fa-a161552c90b3"
               },
               {
-                "id": "a1ba80ca-147e-4ac8-8464-5867d665860e"
+                "id": "4bb91044-f018-5697-92fe-25545a11f81b"
               }
             ],
             "directories": [],
@@ -866,7 +866,7 @@
               "id": "3ef0cbe12eaa46f",
               "name": "pl_report_api",
               "description": "店舗別損益AIレポートの検証(validate)・保存(save)を operation で切り替える単一ツール",
-              "packageId": "43e0a52b-83df-4f52-a2bf-1a3634898215",
+              "packageId": "d318e77d-6586-578a-b7c9-5e5b2ba08c5c",
               "packageVersion": "1.0.0",
               "output": {
                 "id": "1ebda2aaeb1447e",
@@ -891,10 +891,10 @@
           "context": {
             "datasets": [
               {
-                "id": "e05581f1-d70a-474d-91f3-f5a2080c9d05"
+                "id": "37754c30-644a-5f64-95fa-a161552c90b3"
               },
               {
-                "id": "a1ba80ca-147e-4ac8-8464-5867d665860e"
+                "id": "4bb91044-f018-5697-92fe-25545a11f81b"
               }
             ],
             "directories": [],

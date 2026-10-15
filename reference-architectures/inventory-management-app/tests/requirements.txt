@@ -1,0 +1,2 @@
+# Local DataFrame regression tests; Domo supplies its own tile runtime packages.
+pandas==2.3.3

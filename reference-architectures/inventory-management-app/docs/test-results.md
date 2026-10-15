@@ -9,6 +9,7 @@
 `inventory-management-app/` 直下で実行する。
 
 ```bash
+python3 -m pip install -r tests/requirements.txt
 # フロントエンド／SDK契約／Manifest／QR（Node）
 node --test tests/test_*.js
 # 各Pro Code JSの構文
@@ -26,10 +27,13 @@ python3 -m unittest discover -s tests
 - `test_frontend_confirmation.js` は確認を開くだけでは通信しないこと、確定時の単発実行、
   取消・Esc・背景クリック、対象・入力の保持、権限変更、二重クリック、確認部品欠落での停止、
   取消直後の再表示と遅延closeイベントを実行テストで検証する。
+- トレンド描画は、不正な日付がHTMLを含んでも要素を生成せず、通常の日付の表示を保つことを
+  `test_frontend_guards.js` で検証する。日付formatterの不正値フォールバックは安全な数値とは扱わない。
 - Python テストは `MANAGE_MASTER` の UPSERT／物理DELETE（連鎖削除・追記専用台帳の非復活）／
   可逆な `active` 停止、二重登録防止、残高再計算、DataFlow集計（KPI／在庫／トレンド／不足／滞留／
   AIノート）、App Studioプロビジョニング契約を検証する。
-- DataFlow変換テストは一時ディレクトリへ pandas を導入して実行する。
+- DataFlow変換テストはローカルの pandas を使う。未導入時はskipされるため、全件検証では
+  先に `tests/requirements.txt` を導入し、skipがないことを確認する。公開CIも同じ依存を導入する。
 
 ## レイアウトハーネス（デプロイ前に必須の目視）
 

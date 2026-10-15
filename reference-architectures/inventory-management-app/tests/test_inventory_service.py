@@ -145,6 +145,11 @@ SERVICE._resolve_recipient_email = _TOOLKIT["resolve_recipient_email"]
 
 class InventoryServiceTest(unittest.TestCase):
     def setUp(self):
+        # Other independently collected app suites may replace the runtime stub.
+        # Bind a fresh fake to this imported service for every test.
+        global FAKE
+        FAKE = FakeCodeEngine()
+        SERVICE.codeengine = FAKE
         FAKE.stores = {}
         FAKE.counter = 0
         FAKE.user_id = "admin-1"

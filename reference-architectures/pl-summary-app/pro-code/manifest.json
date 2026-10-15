@@ -1,7 +1,6 @@
 {
-  "id": "08463c98-38a9-4caa-a762-b857a37e2826",
   "name": "Store PL AI Insights",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "size": {
     "width": 1,
     "height": 1
@@ -12,25 +11,25 @@
   ],
   "datasetsMapping": [
     {
-      "dataSetId": "e05581f1-d70a-474d-91f3-f5a2080c9d05",
+      "dataSetId": "",
       "alias": "summary",
       "fields": [],
       "dql": null
     },
     {
-      "dataSetId": "a1ba80ca-147e-4ac8-8464-5867d665860e",
+      "dataSetId": "",
       "alias": "detail",
       "fields": [],
       "dql": null
     },
     {
-      "dataSetId": "9e330baf-c643-4414-a2ec-2e9ef773c8d0",
+      "dataSetId": "",
       "alias": "trend",
       "fields": [],
       "dql": null
     },
     {
-      "dataSetId": "d297d01a-0003-45fa-b9f9-7a65727f26e2",
+      "dataSetId": "",
       "alias": "dept",
       "fields": [],
       "dql": null
@@ -38,7 +37,7 @@
   ],
   "collectionsMapping": [
     {
-      "id": "ca132957-d14d-4fa0-9c69-3e6721d27141",
+      "id": "",
       "name": "店舗別損益AI要約",
       "syncEnabled": false
     }
@@ -48,8 +47,8 @@
     {
       "name": "plReportService",
       "alias": "plReportApi",
-      "packageId": "43e0a52b-83df-4f52-a2bf-1a3634898215",
-      "version": "1.0.3",
+      "packageId": "",
+      "version": "1.0.4",
       "functionName": "pl_report_api",
       "parameters": [
         {

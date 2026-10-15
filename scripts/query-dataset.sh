@@ -5,7 +5,7 @@
 #   bash scripts/query-dataset.sh <datasetId> "SELECT * FROM table LIMIT 10"
 #
 # Examples:
-#   bash scripts/query-dataset.sh 12345678-1234-1234-1234-123456789abc "SELECT * FROM table LIMIT 5"
+#   bash scripts/query-dataset.sh e39af6f5-fa2f-5f62-8a3a-048a008f25dc "SELECT * FROM table LIMIT 5"
 #   bash scripts/query-dataset.sh <id> "SELECT \`Column Name\` FROM table WHERE status = 'open'"
 #   bash scripts/query-dataset.sh <id> "SELECT * FROM table LIMIT 0"   # schema only
 #

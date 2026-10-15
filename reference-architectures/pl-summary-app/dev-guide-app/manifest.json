@@ -1,6 +1,6 @@
 {
   "name": "店舗別損益｜開発ガイド",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "size": {
     "width": 1,
     "height": 1
@@ -13,6 +13,5 @@
     "README.md",
     "INSTRUCTOR.md",
     "tests/**"
-  ],
-  "id": "8b61c346-997f-40fb-89fd-7121b79c2e9e"
+  ]
 }

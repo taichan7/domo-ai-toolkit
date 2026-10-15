@@ -4,10 +4,14 @@
 
 **A field-tested toolkit for building on Domo with AI coding agents.**
 
-Everything in this repo was developed and verified against real Domo instances
-while shipping production apps. It packages that know-how so that an AI agent
-(Claude Code, Cursor, Copilot, Codex — anything with shell access) can read it
-and immediately know how to authenticate, query, diagnose, and build on Domo.
+This toolkit combines documented Domo contracts with patterns verified in Domo
+deployments. Skills label their evidence strength; destination permissions,
+features and production behavior still require validation. The reference apps
+are teaching examples with synthetic data. Read their distribution and production
+limits before deploying them.
+
+Use the latest release for customer distribution. Earlier revisions may retain
+reference-instance metadata that has since been removed.
 
 It contains three layers:
 

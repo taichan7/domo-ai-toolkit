@@ -17,8 +17,8 @@ domo login -i "${DOMO_INSTANCE:-maintenance-instance.domo.com}"
 
 このフォルダは特定インスタンスに固定されない。プロビジョニングは全アセットを名称で「発見または作成」する冪等処理のため、新しいインスタンスでも同じ構成を再生成できる。手順は次の通り。
 
-1. 対象インスタンスへログインする（`domo login -i <your-instance>.domo.com`）。
-2. `export DOMO_INSTANCE=<your-instance>.domo.com` を設定する。あわせて**配備モード**を選ぶ：共有インスタンスでのハンズオン・検証は `export INVENTORY_SANDBOX_SUFFIX='検証・<あなたの氏名>'`（全Domoオブジェクト名へ全角括弧の名札が付き、バックエンド＝AppDB／Code Engine／DataFlow／出力DataSet／通知Workflowモデルも、App Studioアプリ／カードも**自分専用の隔離コピー**になって本番・他参加者と衝突しない。解決IDは参加者ごとの状態ディレクトリ `~/.config/domo-utils/<instance>-deploy/inventory-management-app/sandbox-<slug>/` へ書かれ、コミット済み `domo-assets.json` を汚さない）、本番名の正規コピーを配備する本番メンテナだけ `export INVENTORY_ALLOW_PRODUCTION=1`。未設定だと `apply`／`app-studio` などの書込み系コマンドは本番の上書きを防ぐガードで停止する（読み取り専用の `verify`／`sync-manifest`／`export-app-studio` はガード対象外）。
+1. 対象インスタンスへログインする（`domo login -i "$DOMO_INSTANCE"`）。
+2. `export DOMO_INSTANCE=<your-instance>.domo.com` を設定する。あわせて**配備モード**を選ぶ：共有インスタンスでのハンズオン・検証は `export INVENTORY_SANDBOX_SUFFIX='検証・<あなたの氏名>'`（全Domoオブジェクト名へ全角括弧の名札が付き、バックエンド＝AppDB／Code Engine／DataFlow／出力DataSet／通知Workflowモデルも、App Studioアプリ／カードも**自分専用の隔離コピー**になって本番・他参加者と衝突しない。解決IDは参加者ごとの状態ディレクトリ `~/.config/domo-utils/<instance>-deploy/inventory-management-app/sandbox-<slug>/` へ書かれ、ローカル生成の `domo-assets.json` を汚さない）、本番名の正規コピーを配備する本番メンテナだけ `export INVENTORY_ALLOW_PRODUCTION=1`。未設定だと `apply`／`app-studio` などの書込み系コマンドは本番の上書きを防ぐガードで停止する（読み取り専用の `verify`／`sync-manifest`／`export-app-studio` はガード対象外）。
 3. （任意）通知Workflowモデルは `apply` が名称で発見または API で新規作成するため、事前の手作りは不要。作成時は **Start → AI Agent → End** の3タイル雛形と「メール送信（sendEmail）」toolを流し込み、AI Agentの指示文・入力・プロンプト・DataSet接地（実DataSetの実IDへ後付け）・メール配線まで整える。**既存の特定モデルに固定したいときだけ** `export DOMO_WORKFLOW_MODEL_ID=<model-id>`（任意）を設定する（指定すると `apply` は発見/作成せずそのIDを尊重し、空モデルなら雛形を流し込む）。
 4. `apply` を実行し、出力の `ASSET_RESULT` に並ぶ作成済みID（collection／dashboard DataSet／Code Engine package／Workflow model）を確認する。
 5. `sync-manifest` を実行する。`pro-code/manifest.json` の alias→物理ID（`collectionsMapping.id`／`datasetsMapping.dataSetId`／`packagesMapping.packageId`／`workflowsMapping.modelId`）を対象インスタンスの新IDへ合わせる。Domo資産は変更せず、名称で発見したIDをID欄へ書き込むだけの冪等処理で、既に一致していれば差分は出ない。**サンドボックス（名札付き）ではこのとき FE 完全隔離のため、配線に加えてトップレベルの `id` を自動で外す**（＝次の `domo publish` が id 省略で“参加者専用デザイン”を新規採番し、名札バックエンドへ束縛する。これで App Studio のカードも参照バックエンドではなく自分のバックエンドを指す）。
@@ -87,7 +87,7 @@ cd inventory-management-app
 python3 scripts/provision_domo.py app-studio
 ```
 
-同名の最小構成カードがある場合は再利用し、重複作成しない。参照インスタンスの現行カード／outer proxy／inner context IDは [domo-assets.json](../domo-assets.json) の `appStudio` に記録する（別インスタンスでは新しいIDが採番される）。
+同名の最小構成カードがある場合は再利用し、重複作成しない。参照インスタンスの現行カード／outer proxy／inner context IDは `domo-assets.json`（ローカル生成・配布しない） の `appStudio` に記録する（別インスタンスでは新しいIDが採番される）。
 
 スクリプトは登録済みApp／Page／Card IDを先に検証し、見つからない場合は重複作成せず停止する。新規カード生成時はcontext IDをinstance IDとして強制せず、Domoが別のouter proxyを採番する標準2層構造にする。既存layoutはwritelock下で対象カード1枚へ整理し、compact 12列×29行、`fitToFrame:false`へ設定する。カード操作は既定（`interaction`未設定＝操作許可）に戻し、`hideWrench: true`、`editInAppViewer: true` を維持する。**`interaction: DISABLED` はモバイルの青い選択枠を消す一方でPCのクリックも殺す（`editInAppViewer: true` でもPC操作不能）ことが実機で判明したため採用しない（2.4.22で試行→2.4.23で撤回）。** Domo Mobileでのカード選択枠とスクロールロックは、`interaction` ではなく、iframeを実ビューポート（100dvh）へ固定するCSS＋静的layout（`isDynamic: false`）＋終端PAGE_BREAK＋WebKitのタップハイライト無効化で抑える。カードmetadataは1×1／`fullpage:false`を検証するだけで書き換えない。
 

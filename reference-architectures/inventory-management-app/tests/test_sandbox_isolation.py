@@ -127,6 +127,29 @@ class NameplateTagsEveryObject(unittest.TestCase):
 
 
 class StateIsolation(unittest.TestCase):
+    def test_new_sandbox_never_inherits_the_same_instance_base_registry(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base = pathlib.Path(tmp) / "base.json"
+            own = pathlib.Path(tmp) / "participant.json"
+            base.write_text(json.dumps({"instance": "tenant.domo.com", "appStudio": {"appId": "base-app"}}))
+            with env_module(DOMO_INSTANCE="tenant.domo.com", INVENTORY_SANDBOX_SUFFIX=SUFFIX, DOMO_ASSETS_PATH=str(own)) as mod:
+                mod.IN_REPO_REGISTRY_PATH = base
+                self.assertEqual(mod.load_registry(), {})
+
+    def test_new_registry_roundtrips_scope_and_rejects_foreign_scope(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            own = pathlib.Path(tmp) / "participant.json"
+            with env_module(DOMO_INSTANCE="tenant.domo.com", INVENTORY_SANDBOX_SUFFIX=SUFFIX, DOMO_ASSETS_PATH=str(own)) as mod:
+                self.assertTrue(mod.write_back_app_studio_ids({"appId": "own-app"}))
+                self.assertEqual(mod.load_registry()["appStudio"]["appId"], "own-app")
+                data = json.loads(own.read_text())
+                self.assertEqual(data["instance"], "tenant.domo.com")
+                self.assertEqual(data["sandboxSuffix"], SUFFIX)
+                for key, value in (("instance", "other.domo.com"), ("sandboxSuffix", "another-participant")):
+                    foreign = dict(data, **{key: value})
+                    own.write_text(json.dumps(foreign))
+                    self.assertEqual(mod.load_registry(), {})
+
     def test_state_path_is_participant_scoped(self):
         with env_module(INVENTORY_SANDBOX_SUFFIX=SUFFIX) as m:
             p = str(m.registry_write_path())
@@ -201,7 +224,7 @@ class SandboxFeManifestWiring(unittest.TestCase):
             return result, written, manifest_path
 
     def test_sandbox_strips_top_level_id_and_writes_pro_code_manifest(self):
-        seed = {"id": "3c156897-8ddb-4761-9664-9073a9f2aa90", "version": "1.0.0",
+        seed = {"id": "e4e7b1d1-5c98-5cad-bd3c-ae902908a2af", "version": "1.0.0",
                 "collectionsMapping": [{"name": "c", "id": "old"}],
                 "datasetsMapping": [{"alias": "d", "dataSetId": "old", "fields": []}]}
         with env_module(INVENTORY_SANDBOX_SUFFIX=SUFFIX) as m:
@@ -213,7 +236,7 @@ class SandboxFeManifestWiring(unittest.TestCase):
             self.assertNotIn("id", written)  # ryuu は id 省略で新規採番（空文字では失敗）＝キーごと除去
 
     def test_production_retains_top_level_id(self):
-        seed = {"id": "3c156897-8ddb-4761-9664-9073a9f2aa90", "version": "1.0.0",
+        seed = {"id": "e4e7b1d1-5c98-5cad-bd3c-ae902908a2af", "version": "1.0.0",
                 "collectionsMapping": [{"name": "c", "id": "x"}],
                 "datasetsMapping": [{"alias": "d", "dataSetId": "x", "fields": []}]}
         with env_module() as m:  # 名札なし＝本番
@@ -232,6 +255,46 @@ class SandboxFeManifestWiring(unittest.TestCase):
                 m.MANIFEST_PATH = manifest_path
                 with self.assertRaises(SystemExit):
                     m.app_studio(_FakeClient())
+
+    def _version_fixture(self, mod, root, ce_version="1.0.0", active=True):
+        bundle = root / "pro-code"
+        assets = root / "code-engine"
+        bundle.mkdir()
+        assets.mkdir()
+        mod.MANIFEST_PATH = bundle / "manifest.json"
+        manifest = {"version": "2.0.0", "packagesMapping": [{"alias": "inventoryApi", "packageId": "old", "version": "9.9.9"}],
+                    "workflowsMapping": [{"alias": "lowStockNotification", "modelId": "old", "version": "9.9.9"}]}
+        mod.MANIFEST_PATH.write_text(json.dumps(manifest))
+        (assets / "asset.json").write_text(json.dumps({"packageId": "old", "version": "9.9.9"}))
+        _stub_discovery(mod)
+        mod.list_packages = lambda client: [{"name": mod.PACKAGE_NAME, "id": "pkg-new"}]
+        mod.resolve_workflow_model_id = lambda client: "wf-new"
+
+        class Client:
+            def request(self, method, path):
+                if "codeengine" in path:
+                    return {"version": ce_version}
+                return {"versions": [{"version": "1.0.0", "active": active}, {"version": "99.0.0", "active": False}]}
+
+        return Client(), manifest, assets / "asset.json"
+
+    def test_fresh_instance_versions_replace_source_versions_and_asset_metadata(self):
+        with env_module() as mod, tempfile.TemporaryDirectory() as tmp:
+            client, _, asset_path = self._version_fixture(mod, pathlib.Path(tmp))
+            mod.sync_manifest(client)
+            written = json.loads(mod.MANIFEST_PATH.read_text())
+            self.assertEqual(written["packagesMapping"][0]["version"], "1.0.0")
+            self.assertEqual(written["workflowsMapping"][0]["version"], "1.0.0")
+            self.assertEqual(json.loads(asset_path.read_text()), {"packageId": "pkg-new", "version": "1.0.0"})
+
+    def test_unresolved_versions_abort_before_writing_any_binding(self):
+        for ce_version, active in (("", True), ("1.0.0", False)):
+            with self.subTest(ce_version=ce_version, active=active), env_module() as mod, tempfile.TemporaryDirectory() as tmp:
+                client, manifest, _ = self._version_fixture(mod, pathlib.Path(tmp), ce_version, active)
+                before = mod.MANIFEST_PATH.read_bytes()
+                with self.assertRaises(RuntimeError):
+                    mod.sync_manifest(client)
+                self.assertEqual(mod.MANIFEST_PATH.read_bytes(), before)
 
 
 if __name__ == "__main__":

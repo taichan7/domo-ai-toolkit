@@ -8,7 +8,7 @@ DataApp のページ2**に載る、純静的な Domo Pro Code アプリ。VS Cod
 （データ接続を持たない静的 Pro Code アプリ）。
 
 - design 名: `店舗別損益｜開発ガイド`（manifest 版 **0.3.0**）
-- design id: `8b61c346-997f-40fb-89fd-7121b79c2e9e`（**保守用 `maintenance-instance` 固有の実 id**・リポジトリに保持）。
+- design id: `531a3c0f-bf42-500c-a4ce-87b60c743414`（**保守用 `maintenance-instance` 固有の実 id**・リポジトリに保持）。
   配布 ZIP では builder が除去し、別インスタンスへ複製する時も `id` を外して採番し直す（下記「publish 方法」「注意」）。
 - 種別: Pro Code（純静的・`datasetsMapping` 空＝データに紐づかない）
 - 配色: 本体アプリと揃えた臙脂（enji）系。`app.css` の `--brand-primary`（`#7F1D2D`）**1行**から

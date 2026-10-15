@@ -31,10 +31,11 @@ and the offline test suites of both reference apps. You can run the same
 locally:
 
 ```bash
+python -m pip install pytest -r reference-architectures/inventory-management-app/tests/requirements.txt
 bash scripts/check-secrets.sh
+python3 scripts/check-public-distribution.py
 python3 scripts/check-links.py
-python -m pytest reference-architectures/pl-summary-app/tests -q
-python -m pytest reference-architectures/inventory-management-app/tests -q
+python -m pytest --import-mode=importlib reference-architectures/pl-summary-app/tests reference-architectures/inventory-management-app/tests -q
 ```
 
 ## Note for maintainers

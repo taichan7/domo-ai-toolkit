@@ -11,6 +11,7 @@ import importlib.util
 import pathlib
 import sys
 import unittest
+from unittest.mock import patch
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 _spec = importlib.util.spec_from_file_location("provision_workflows", ROOT / "scripts" / "provision_workflows.py")
@@ -19,8 +20,8 @@ sys.modules["provision_workflows"] = pw
 _spec.loader.exec_module(pw)
 
 # 保守用インスタンス（snapshot）に焼かれている GUID。顧客配備ではこれが残ってはならない。
-SNAP_COLLECTION = "ca132957-d14d-4fa0-9c69-3e6721d27141"
-SNAP_SUMMARY_DS = "e05581f1-d70a-474d-91f3-f5a2080c9d05"
+SNAP_COLLECTION = "2693a918-74c0-5160-bffe-75275cf39489"
+SNAP_SUMMARY_DS = "37754c30-644a-5f64-95fa-a161552c90b3"
 # 配備先（顧客）の実 ID を模した別値。
 NEW_COLLECTION = "11111111-aaaa-bbbb-cccc-222222222222"
 NEW_SUMMARY_DS = "33333333-dddd-eeee-ffff-444444444444"
@@ -220,6 +221,34 @@ class ManualTriggerSafety(unittest.TestCase):
         pw.request = lambda method, path, body=None: self.rows if "/model/" in path else self.rows[0]
         with self.assertRaises(RuntimeError):
             pw.ensure_manual_only(NEW_SUB_MODEL, True)
+
+
+class ReportCollectionBinding(unittest.TestCase):
+    def test_new_package_embeds_the_discovered_collection(self):
+        calls = []
+
+        def request(method, path, body=None):
+            calls.append((method, path, body))
+            if path.startswith("api/datastores/v1/collections?"):
+                return [{"id": NEW_COLLECTION, "name": pw.BUSINESS_COLLECTION_NAME}]
+            if path.startswith("api/codeengine/v2/packages?"):
+                return []
+            if method == "POST" and path == "api/codeengine/v2/packages":
+                return {"id": "created-package", "version": "1.0.0"}
+            return {}
+
+        with patch.object(pw, "request", side_effect=request):
+            pw.ensure_report_api_package(True, NEW_SUB_MODEL, NEW_SUMMARY_DS)
+        source = next(body["code"] for method, path, body in calls
+                      if method == "POST" and path == "api/codeengine/v2/packages")
+        self.assertIn('REPORT_COLLECTION_ID = "' + NEW_COLLECTION + '"', source)
+        self.assertNotIn("__REPORT_COLLECTION_ID__", source)
+
+    def test_missing_collection_aborts_before_package_creation(self):
+        with patch.object(pw, "request", return_value=[]) as request:
+            with self.assertRaisesRegex(RuntimeError, "AppDB"):
+                pw.ensure_report_api_package(True, NEW_SUB_MODEL, NEW_SUMMARY_DS)
+        self.assertTrue(all(call.args[0] == "GET" for call in request.call_args_list))
 
 
 if __name__ == "__main__":

@@ -1158,7 +1158,7 @@ authoring workflow (GET/PUT/run/verify, the create-from-scratch recipe, safety),
 
 - **What it does:** Defines the runtime for scripting tiles: a preinstalled 'Domo 2.0' environment plus two shared filesystem locations for passing objects/models between tiles or executions.
 - **When to use:** When you need to persist a trained model between runs, share intermediate objects across scripting tiles in the same DataFlow, or know which libraries are available before writing code.
-- **API / JSON representation:** Not a separate action type; environment is a setting on the Python/R tile. Shared dirs: Project Directory (/home/domo/project or `project`) and /tmp.
+- **API / JSON representation:** Not a separate action type; environment is a setting on the Python/R tile. Shared dirs: Project Directory (/path/to/home/project or `project`) and /tmp.
 - **Config options:** Domo 2.0 Python includes (versions from Domo docs) pandas 1.4.1, numpy 1.22.3, scikit-learn 1.0.2, scipy 1.8.0, statsmodels, xgboost 1.5.1, tensorflow 2.7.0, keras 2.7.0, torch 1.11.0, plus ~80+ packages; R includes forecast 8.16, caret 6.0-91, tidyverse 1.3.1, xgboost 1.5.1, cluster, tsoutliers, plus ~200+ packages. Project Directory persists between executions and is shared across all tiles (8 GB limit). /tmp is shared within a run but cleared between DataFlow executions.
 - **Gotchas:** Library versions are pinned/older — do not assume latest APIs. Custom package installation / alternative environments are limited and not documented as self-serve; heavy models should be written to the Project Directory rather than retrained each run.
 - **Sources:** https://www.domo.com/docs/s/article/000005117, https://domo-support.domo.com/minasan/s/article/000005117?language=en_US

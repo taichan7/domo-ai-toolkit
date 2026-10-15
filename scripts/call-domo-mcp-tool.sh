@@ -62,7 +62,7 @@ echo "Tool: $TOOL_NAME" >&2
 echo "Arguments: $TOOL_ARGS_JSON" >&2
 
 mcp_post initialize \
-  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"domoutils-mcp-call","version":"1.0.0"}}}'
+  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"domokit-mcp-call","version":"1.0.0"}}}'
 
 SESSION_ID="$(awk 'BEGIN{IGNORECASE=1} /^mcp-session-id:/{gsub("\r",""); sub(/^[^:]+:[[:space:]]*/,""); print}' "$TMP_DIR/initialize.headers" | tail -1)"
 if [[ -z "$SESSION_ID" ]]; then

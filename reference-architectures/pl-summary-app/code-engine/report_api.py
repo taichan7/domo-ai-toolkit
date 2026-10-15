@@ -40,13 +40,12 @@ DELETE_CHUNK_SIZE = 100
 REQUIRED_SAVE_FIELDS = ("doc_key", "store_id", "location_name", "analysis_html")
 MAIN_WORKFLOW_MODEL_ID = "__MAIN_WORKFLOW_MODEL_ID__"
 SUB_WORKFLOW_MODEL_ID = "__SUB_WORKFLOW_MODEL_ID__"
+REPORT_COLLECTION_ID = "__REPORT_COLLECTION_ID__"
 RUNNING_STATUSES = {"IN_PROGRESS", "RUNNING", "PENDING", "STARTED"}
 
-# 【信頼境界メモ（意図的設計）】collection_id は呼び出し側（Workflow 変数経由で AI ツール引数）から
-# 受け取り、GUID 形状のみ検証する。reference-app はコレクションIDを配備時に
-# RUNTIME_CONFIG へ固定（fail-closed）するが、本アプリは「CE はインスタンス非依存・collection_id は
-# Workflow 変数から渡す」ことを配布容易性のための設計判断として採用している（AGENT.md「移植」節）。
-# したがってコレクション固定は行わない（移植先では WF-01 の CollectionId 変数だけ差し替えれば動く）。
+# The provisioner embeds the discovered business collection for this deployment.
+# Caller-supplied collection_id is retained for Workflow compatibility, but may
+# only select that collection. An unresolved binding fails before any AppDB I/O.
 
 
 def _service() -> dict:
@@ -195,9 +194,15 @@ def _service() -> dict:
 
     def _require_collection(request: Dict[str, Any]) -> str:
         collection_id = str(request.get("collection_id") or "").strip()
-        if not GUID_PATTERN.match(collection_id):
+        if not GUID_PATTERN.fullmatch(collection_id):
             raise Exception({"code": "INVALID_COLLECTION_ID",
                              "message": "collection_id の形式が正しくありません", "details": {}})
+        if not GUID_PATTERN.fullmatch(REPORT_COLLECTION_ID):
+            raise Exception({"code": "COLLECTION_NOT_CONFIGURED",
+                             "message": "保存先が未設定です。配備設定を確認してください。", "details": {}})
+        if collection_id.lower() != REPORT_COLLECTION_ID.lower():
+            raise Exception({"code": "COLLECTION_NOT_ALLOWED",
+                             "message": "このアプリの保存先以外は指定できません。", "details": {}})
         return collection_id
 
     def _validate(request: Dict[str, Any]) -> Dict[str, Any]:

@@ -62,8 +62,9 @@
  *     起動時に一度だけ描くサンプル表示。生 `${svg}` を「escapeHtml 済み」と偽って positive 固定はしない。
  *     ⚠ これは data-qr が作者静的である限りの前提。data-qr が runtime データで埋まるなら、`${svg}` と
  *     InventoryQR の title（payload を埋め込む）は再検討を要する。
- *   - **真に数値・日付のみの補間**（line 913 の7日間トレンドチャート＝formatDisplayDate / number.format と、
- *     detailStats・balanceFlow・棒トラック幅）: 注入不能なので対象外（過剰ガードを避ける）。
+ *   - **真に数値のみの補間**（number.format、detailStats・balanceFlow・棒トラック幅）は対象外。
+ *     日付formatterは不正値をそのまま返す分岐があるため、数値と同じ扱いにしない。
+ *     トレンドの日付HTMLは下の実描画回帰テストで悪意のある文字列と正常日付を検証する。
  *     ※ barRowHtml と kpi-grid は「数値のみ」に見えて実際は untrusted な**表示名** row.label を escape して
  *     いるため**除外しない**＝上で固定する（初版はここを number-only と誤記して両者を取りこぼしていた。
  *     adversarial-refute で検出＝両刃の under-claim を是正）。
@@ -79,6 +80,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
+const vm = require('node:vm');
 
 // prove-the-bug では INV_APP_JS で退行させたコピーを指せる。既定は同梱の app.js。
 const APP_PATH = process.env.INV_APP_JS || path.join(__dirname, '..', 'pro-code', 'app.js');
@@ -286,6 +288,30 @@ test('renderDashboard inline builders（kpi-grid/在庫不足/滞留の行ビル
   // sink コンテキスト限定の負ガード（1ビルダだけ escape を落とす退行も捕える。tooltip の wrapped-concat には false-fire しない）。
   assert.doesNotMatch(src, /<strong>\$\{\s*row\.item_name\b/, '生の row.item_name を <strong> へ差し込んでいる（XSS 退行）');
   assert.doesNotMatch(src, /<small>\$\{\s*row\.location_name\b/, '生の row.location_name を <small> へ差し込んでいる（XSS 退行）');
+});
+
+test('日付の形式が不正でもトレンドのHTMLは実行可能な要素を作らず通常の日付を保つ', () => {
+  const payload = '<img src="data:image/png,broken" onerror="document.body.dataset.xss=1">';
+  const encode = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[char]));
+  function render(value) {
+    const context = {
+      state: {dashboardRows: [{record_type: 'TREND', date_key: value, inbound_quantity: 4, outbound_quantity: 2}], dashboardDrilldowns: {}},
+      elements: {'kpi-grid': {}, 'trend-chart': {}},
+      config: {analytics: {trendWindowDays: 7, dormantThresholdDays: 30}},
+      number: new Intl.NumberFormat('ja-JP'),
+      escapeHtml: encode, escapeAttribute: encode,
+      filterDashboardRows: (rows) => rows, renderDashboardPanel: () => {},
+      dashboardEmpty: (markup) => markup, emptyHtml: () => '',
+      renderAiNotes: () => {}, scheduleDashboardEqualize: () => {},
+    };
+    vm.runInNewContext(['formatDisplayDate', 'formatShortDate', 'renderDashboard'].map(extractFunction).join('\n') + '\nrenderDashboard();', context);
+    return context.elements['trend-chart'].innerHTML;
+  }
+  const hostile = render(payload);
+  if (process.env.INV_TREND_RENDER_OUT) fs.writeFileSync(process.env.INV_TREND_RENDER_OUT, '<!doctype html><html lang="ja"><body>' + hostile + '</body></html>');
+  assert.doesNotMatch(hostile, /<img\b/i);
+  assert.ok(hostile.includes('<small>' + encode(payload) + '</small>'));
+  assert.match(render('2026-10-15'), /<small>10\/15<\/small>/);
 });
 
 test('renderRecent は直近の登録行で item_name/location_name を escapeHtml、aria-label を escapeAttribute 経由で差し込む', () => {

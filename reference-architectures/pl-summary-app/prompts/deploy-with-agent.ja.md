@@ -66,6 +66,7 @@ domo --version      # 再確認
 
 ```bash
 export DOMO_INSTANCE=<YOUR_INSTANCE>   # 例: export DOMO_INSTANCE=acme.domo.com
+export PL_SANDBOX_SUFFIX='検証・<あなたの氏名>'   # 初回検証の隔離コピー
 ```
 
 ## 2. 認証（トークンの扱い）
@@ -151,3 +152,8 @@ python3 scripts/provision_domo.py verify   # → ok: true
 - `maintenance-instance.domo.com` は配布元の保守用インスタンスです。顧客インスタンスへは `DOMO_INSTANCE` で必ず差し替え、
   ハードコードされた ID はスクリプト（`sync-manifest`／`app-studio`）に張り替えさせます。
 - メール宛先など環境依存の値は環境変数（`PL_EMAIL_PERSON_RECIPIENTS` 等）で与え、ソースへ残しません。
+
+
+配布版は未接続です。デザインIDの省略・空の接続IDは正常で、配備とalias同期の前にpublishしません。
+名札なしの書込みは全インスタンスで `PL_ALLOW_PRODUCTION=1` が必要です。
+保存先コレクションはCE配備時に固定します。接続先と保存先を保守用のIDで補完しません。

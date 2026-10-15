@@ -285,6 +285,22 @@ class RawUploadContractTests(unittest.TestCase):
         self.assertIn(("GET", "api/apps/v1/designs/design-1?parts=versions", None), client.calls)
 
 
+class UploadErrorPrivacyTests(unittest.TestCase):
+    def test_error_log_does_not_include_raw_response(self):
+        import contextlib
+        import io
+        import urllib.error
+
+        def fail(request, timeout=None):
+            raise urllib.error.HTTPError(request.full_url, 403, "Forbidden", {}, io.BytesIO(b"private-response-value"))
+
+        output = io.StringIO()
+        with contextlib.redirect_stderr(output), self.assertRaises(urllib.error.HTTPError):
+            REST.upload_asset(_FakeClient(), "design-test", "1.0.0", "app.js", b"//", opener=fail)
+        self.assertIn("HTTP 403", output.getvalue())
+        self.assertNotIn("private-response-value", output.getvalue())
+
+
 class ConstantsTests(unittest.TestCase):
     def test_endpoint_and_default_ignore_match_ryuu(self):
         self.assertEqual(REST.DESIGNS_BASE_PATH, "api/apps/v1/designs")

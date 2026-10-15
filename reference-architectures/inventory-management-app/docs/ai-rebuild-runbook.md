@@ -227,7 +227,7 @@ python3 scripts/provision_domo.py sync-manifest
 名称で発見したIDをID欄へ入れるだけのべき等処理。
 
 - **ゲート**: `git diff pro-code/manifest.json` を見て、alias配線IDが対象インスタンスのIDへ
-  更新されている（または既に一致）こと。`sync-manifest` は4つのID欄だけを書き、版フィールド
+  更新されている（または既に一致）こと。`sync-manifest` は4つの接続ID・版だけを書き、版フィールド
   （`packagesMapping[0].version`／`workflowsMapping[0].version`）は触れない。版の突き合わせは
   STEP 4 と §2 の `verify` で行う。
 
@@ -283,7 +283,7 @@ API で新規作成**し、ランディングページに STEP 4 のPro Codeカ�
 `app-studio` のガードは解決後の対象名で判定するため、名札（`INVENTORY_SANDBOX_SUFFIX`）を付ければ
 App Studioアプリ／カードも名札付きの隔離コピーになる。
 
-- 配布時の [domo-assets.json](../domo-assets.json) の `appStudio.appId` には参照インスタンスのIDが入っているが、
+- 配布版に `domo-assets.json` は含めない。ローカルに台帳があっても、
   対象インスタンスにそのIDが**在れば再利用**、**無ければ**（GETが404）停止せず**名称による発見／作成へ
   自動フォールバック**する（重複は作らない）。IDを手で書き換える必要はない。
 - 解決した実ID（appId／viewId／cardId／proxyId／contextId とページ2の各ID）は `app-studio` が
@@ -324,7 +324,7 @@ python3 scripts/provision_domo.py verify
 | 変数 | 既定 | 用途 |
 |---|---|---|
 | `DOMO_INSTANCE` | `maintenance-instance.domo.com` | 対象インスタンス。顧客インスタンスへ必ず差し替える |
-| `INVENTORY_SANDBOX_SUFFIX` | （未設定） | 設定すると全Domoオブジェクト名へ全角括弧の名札（例「（検証・田中）」）を付け、バックエンド（AppDB datastore＋collection／Code Engine／DataFlow／出力DataSet／通知Workflowモデル）とApp Studioアプリ／カードまで**自分専用の隔離コピー**を作る。共有インスタンスでのハンズオン・検証用。解決IDは `~/.config/domo-utils/<instance>-deploy/inventory-management-app/sandbox-<slug>/` へ（コミット済み `domo-assets.json` を汚さない）。未設定＝本番と byte 一致の従来挙動 |
+| `INVENTORY_SANDBOX_SUFFIX` | （未設定） | 設定すると全Domoオブジェクト名へ全角括弧の名札（例「（検証・田中）」）を付け、バックエンド（AppDB datastore＋collection／Code Engine／DataFlow／出力DataSet／通知Workflowモデル）とApp Studioアプリ／カードまで**自分専用の隔離コピー**を作る。共有インスタンスでのハンズオン・検証用。解決IDは `~/.config/domo-utils/<instance>-deploy/inventory-management-app/sandbox-<slug>/` へ（ローカル生成の `domo-assets.json` を汚さない）。未設定＝本番と byte 一致の従来挙動 |
 | `INVENTORY_ALLOW_PRODUCTION` | （未設定） | `1`／`true`／`yes` で本番保護ガードを明示解除し、本番名のまま書込み系（`apply`／`app-studio`／`workflow`／`cleanup-legacy`）を実行する。**本番名の正規コピーを配備する本番メンテナのみ**。名札（`INVENTORY_SANDBOX_SUFFIX`）を付ける場合は不要 |
 | `DOMO_WORKFLOW_MODEL_ID` | （未設定） | **任意**。未設定なら `apply` が通知Workflowモデルを名称で発見/作成する（推奨）。設定したときだけ、そのモデルにpin（発見/作成せず尊重）。**インスタンス個別** |
 | `DOMO_AI_SUMMARY_MODEL_ID` | `domo.domo_ai.domogpt-medium-v2.2:anthropic` | TextGenタイルのDomoGPTモデル。無効なら差し替え |

@@ -1,6 +1,6 @@
 # App Studio snapshot
 
-`app-studio.json` は、参照インスタンスの既存App StudioアプリをDomo Product APIから取得した再配置用スナップショットです。App／Page／Pro Code card／design／outer proxy／inner context の実IDと export 時の実効design versionは `app-studio.json` と [domo-assets.json](../domo-assets.json) を正とし（`export-app-studio` のたびに更新。本書に固定IDを書きません）、別インスタンスでは新しいIDが採番されます。構成の要点は次の通り。
+`app-studio.json` はApp Studioの構造・配置を参照するスナップショットです。公開版のIDは例示用で、移植先へ貼り付けません。配備先の実IDと版は、配備後のmanifest・対象API・ローカル生成の `domo-assets.json` で確認します。構成の要点は次の通り。
 
 - Card version mode: `FOLLOW_LATEST`（context `designVersion: null`）
 - Intrinsic card metadata: `1×1`, `fullpage: false`（Manifestでは参照アプリ同様にキー省略）

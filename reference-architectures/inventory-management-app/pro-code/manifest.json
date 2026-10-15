@@ -1,6 +1,6 @@
 {
   "name": "在庫入出庫管理",
-  "version": "2.4.105",
+  "version": "2.4.107",
   "size": {
     "width": 1,
     "height": 1
@@ -11,14 +11,14 @@
   ],
   "datasetsMapping": [
     {
-      "dataSetId": "6f407387-7980-44b4-b1fd-3e4b12ec3d34",
+      "dataSetId": "",
       "alias": "inventoryDashboard",
       "fields": []
     }
   ],
   "collectionsMapping": [
     {
-      "id": "b76a1233-038d-4f99-aa19-1705469b7f7e",
+      "id": "",
       "name": "inventory_management_records",
       "syncEnabled": true,
       "schema": {
@@ -211,7 +211,7 @@
     {
       "name": "inventoryService",
       "alias": "inventoryApi",
-      "packageId": "ba587df4-66a1-41e4-abe9-7af3e4a474d3",
+      "packageId": "",
       "version": "1.0.38",
       "functionName": "inventory_api",
       "parameters": [
@@ -255,12 +255,11 @@
     {
       "startName": "不足通知を開始",
       "alias": "lowStockNotification",
-      "modelId": "0c61146c-9e04-4a9b-bc5e-7c43384d06d6",
+      "modelId": "",
       "parameters": [],
-      "version": "1.0.11"
+      "version": "1.0.17"
     }
   ],
   "proxyId": [],
-  "fileName": "manifest.json",
-  "id": "3c156897-8ddb-4761-9664-9073a9f2aa90"
+  "fileName": "manifest.json"
 }

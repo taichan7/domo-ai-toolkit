@@ -7,7 +7,6 @@
   },
   "fileName": "manifest.json",
   "datasetsMapping": [],
-  "id": "aeb6e8d5-2548-4636-a7c2-7e1eeadd4ce1",
   "ignore": [
     "vendor/ryuu.js-4.6.0.LICENSE"
   ]

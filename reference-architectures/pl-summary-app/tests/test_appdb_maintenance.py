@@ -104,7 +104,9 @@ class DedupeAppdbDocumentsTest(unittest.TestCase):
         if delete_chunk is not None:
             apm._DELETE_CHUNK = delete_chunk
         fake = _FakeCE(pages, delete_fail_on)
-        sys.modules["codeengine"].send_request = fake.send_request
+        # Bind the fake to the imported module, not a process-global runtime
+        # object another app's test collection may have replaced.
+        apm.codeengine = types.SimpleNamespace(send_request=fake.send_request)
         return fake
 
     def test_pristine_constants(self):

@@ -1,6 +1,6 @@
 # Reference Architectures
 
-Two complete, production-shaped Domo apps. Each is **self-contained** and can
+Two deployable teaching references with synthetic seed data. Each is **self-contained** and can
 be deployed to your own Domo instance — the provisioning scripts discover
 target-instance object IDs **by name**, so no manual ID edits are needed.
 
@@ -21,7 +21,7 @@ Pro Code (PC + Domo Mobile, QR scanning)
   + AI notification Workflow triggered server-side by Code Engine
 ```
 
-Highlights: request-ID idempotency, negative-stock prevention, master-data
+Highlights: request-ID duplicate checks, negative-stock validation, master-data
 CRUD with cascading deletes, sandbox namespacing for safe side-by-side
 deploys.
 
@@ -41,7 +41,7 @@ Magic ETL (detail + summary datasets)
 ```
 
 Highlights: layout-math workflow provisioning (no canvas drift), dedupe folded
-into the save path, instance-aware production-write guards.
+into the save path, explicit base-name write guards on every instance.
 
 Start here: [pl-summary-app/README.md](pl-summary-app/README.md)
 
@@ -51,3 +51,16 @@ Each app ships a prompt you can hand to an AI coding agent
 (`prompts/deploy-with-agent.ja.md`) plus a canonical runbook under `docs/`.
 The agent authenticates with the Domo CLI, provisions the assets, and verifies
 the deploy. Set `DOMO_INSTANCE=your-instance.domo.com` first.
+
+## Distribution and production limits
+
+Distributed manifests have no design ID and no tenant bindings. Select your target,
+provision an isolated stack, synchronize aliases, then publish and verify. Local
+registries and credentials are never shipped. Snapshot IDs are illustrative.
+
+- [Inventory readiness](inventory-management-app/docs/distribution-readiness.md):
+  balance projection is not an atomic stock reservation or distributed lock.
+- [P/L readiness](pl-summary-app/docs/distribution-readiness.md): verify accounting
+  semantics, report completeness, permissions, concurrency and delivery on your instance.
+
+A passing offline suite establishes reference behavior, not production acceptance.

@@ -1,0 +1,7 @@
+# Per-instance generated deployment state and credentials are never distribution inputs.
+.DS_Store
+config/secrets.env
+domo-assets.json
+sandbox-*/
+__pycache__/
+*.pyc

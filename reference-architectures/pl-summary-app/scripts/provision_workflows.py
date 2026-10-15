@@ -48,9 +48,9 @@ import uuid
 from typing import Any, Dict, List, Optional, Tuple
 
 
-INSTANCE = (os.environ.get("INSTANCE") or os.environ.get("DOMO_INSTANCE") or "maintenance-instance.domo.com").strip()
+INSTANCE = (os.environ.get("DOMO_INSTANCE") or os.environ.get("INSTANCE") or "").strip().lower()
 SID = (os.environ.get("SID") or "").strip()
-TOKEN = (os.environ.get("DOMO_DEVELOPER_TOKEN") or "").strip()
+TOKEN = (os.environ.get("DOMO_DEVELOPER_TOKEN") or os.environ.get("DOMO_TOKEN") or "").strip()
 
 
 # --------------------------------------------------------------------------- #
@@ -62,7 +62,6 @@ TOKEN = (os.environ.get("DOMO_DEVELOPER_TOKEN") or "").strip()
 # なら従来挙動を一切変えない。公開関数名 pl_report_api・report_type・doc_key・データセット alias
 # （summary/detail/trend/dept）・WF内部変数IDは契約として不変（_sx で包まない）。
 # --------------------------------------------------------------------------- #
-MAINTENANCE_INSTANCE = "maintenance-instance.domo.com"   # 配布元の保守・検証用共有インスタンス（顧客環境ではない）
 
 
 def _sandbox_suffix() -> str:
@@ -84,44 +83,36 @@ def _slugify(text: str) -> str:
     return out or "unknown"
 
 
-def _norm_instance() -> str:
-    return INSTANCE.lower().rstrip("/")
-
-
 def _allow_production() -> bool:
     return os.environ.get("PL_ALLOW_PRODUCTION", "").strip().lower() in ("1", "true", "yes")
 
 
 def _guard_provision_write() -> None:
-    """provision --apply（名称ベース・サンドボックス対応）用の本番保護ガード。
-
-    保守用共有インスタンス（maintenance-instance）で名札なしに本番名のワークフロー層を作成/更新するのを防ぐ。
-    名札（PL_SANDBOX_SUFFIX）を付ければ全オブジェクト名が一意化され安全に通る。顧客が自分の
-    インスタンスへ配備する場合（INSTANCE != maintenance-instance）は対象外＝従来どおり動く。"""
-    if _norm_instance() == MAINTENANCE_INSTANCE and not SANDBOX and not _allow_production():
+    """Shared base-name writes require an explicit opt-in on every instance."""
+    if not INSTANCE:
+        raise SystemExit("Set DOMO_INSTANCE explicitly before deployment.")
+    if not SANDBOX and not _allow_production():
         raise SystemExit(
-            "PL_SANDBOX_SUFFIX が未設定のまま保守用インスタンス（maintenance-instance）の本番ワークフロー層を"
+            "PL_SANDBOX_SUFFIX が未設定のまま対象インスタンスの本番ワークフロー層を"
             "配備しようとしています。ハンズオンでは名札を付けてください（本番や他参加者と別名になり衝突しません）:\n"
             "  export PL_SANDBOX_SUFFIX='検証・<あなたの氏名>'\n"
             "顧客が自分の環境へ配備する場合は、まず自分のインスタンスを指定してください"
-            "（export DOMO_INSTANCE=<your-instance>.domo.com・既定の maintenance-instance は配布元の保守用）。\n"
+            "（export DOMO_INSTANCE=<your-instance>.domo.com）。\n"
             "⚠本番メンテナが本番名のまま配備する場合のみ PL_ALLOW_PRODUCTION=1 を明示してください（本番を上書きします）。")
 
 
 def _guard_maintenance_write(cmd: str) -> None:
-    """ce/subflow/mainflow/delete-wf03（固定の本番モデルID対象）用のガード。
-
-    これらは `PL_WF01_MODEL_ID` 等で固定した既存モデルを直接書き換えるためサンドボックスで隔離できない。
-    よって名札運用では `provision`（名称で自分専用の CE/WF を発見/作成）へ誘導し、maintenance-instance では
-    本番メンテナのみ `PL_ALLOW_PRODUCTION=1` で許可する。"""
+    """Fixed-model maintenance is unavailable in sandbox mode; require explicit opt-in."""
+    if not INSTANCE:
+        raise SystemExit("Set DOMO_INSTANCE explicitly before deployment.")
     if SANDBOX:
         raise SystemExit(
             f"`{cmd}` は固定の本番モデルID（WF-01／統合サブWF／保存CE）を対象にするため、サンドボックスでは使えません。\n"
             f"PL_SANDBOX_SUFFIX を設定したサンドボックス運用では `provision` を使ってください"
             f"（CE・統合サブWF・WF-01 を名称で発見/新規作成し、自分専用のスタックを配備します）。")
-    if _norm_instance() == MAINTENANCE_INSTANCE and not _allow_production():
+    if not _allow_production():
         raise SystemExit(
-            f"保守用インスタンス（maintenance-instance）の本番ワークフロー層を `{cmd}` で書き換えます。\n"
+            f"対象インスタンスの本番ワークフロー層を `{cmd}` で書き換えます。\n"
             f"⚠本番メンテナのみ PL_ALLOW_PRODUCTION=1 を明示してください。")
 
 
@@ -133,9 +124,9 @@ SEND_EMAIL_TOOL_PATH = ROOT / "workflow" / "send_email_tool.json"
 MANIFEST_PATH = ROOT / "pro-code" / "manifest.json"
 
 # --- 既存のライブ資産 ID（maintenance-instance の現行デモ）。別インスタンスでは env で差し替える。 ---
-WF01_MODEL_ID = os.environ.get("PL_WF01_MODEL_ID", "d60ac21b-e1c7-4e6d-bffd-e904e39ac27d")
-SUBFLOW_MODEL_ID = os.environ.get("PL_SUBFLOW_MODEL_ID", "cf3b78c2-eed1-4f55-a7d5-8004a36fbe39")  # 旧 WF-02 を再利用
-WF03_MODEL_ID = os.environ.get("PL_WF03_MODEL_ID", "d35c9b64-af04-478a-84e3-bd6bd63644c9")  # 削除対象
+WF01_MODEL_ID = os.environ.get("PL_WF01_MODEL_ID", "").strip()
+SUBFLOW_MODEL_ID = os.environ.get("PL_SUBFLOW_MODEL_ID", "").strip()  # 旧 WF-02 を再利用
+WF03_MODEL_ID = os.environ.get("PL_WF03_MODEL_ID", "").strip()  # 削除対象
 SUBFLOW_NAME = _sx(os.environ.get("PL_SUBFLOW_NAME", "WF-02｜店舗損益AIレポート生成（店舗/全社）"))
 WF01_MODEL_NAME = _sx(os.environ.get("PL_WF01_MODEL_NAME", "WF-01｜店舗損益AIメイン (Loop→Sub)"))
 BUSINESS_COLLECTION_NAME = _sx(os.environ.get("PL_BUSINESS_COLLECTION", "店舗別損益AI要約"))
@@ -164,7 +155,7 @@ CONTEXT_DATASET_ALIASES: Tuple[str, ...] = ("summary", "detail")
 
 # 旧 WF-01 の先頭に組み込まれていた重複除去 CE（撤去対象）の識別子。別インスタンスでは env で差替、
 # 一致ノードが無ければ撤去は no-op（新規/撤去済みインスタンスでも安全）。
-DEDUPE_CE_PACKAGE_ID = os.environ.get("PL_DEDUPE_CE_PACKAGE_ID", "4c3f8e59-5fe7-4bb2-b0cd-0959b5efae25")
+DEDUPE_CE_PACKAGE_ID = os.environ.get("PL_DEDUPE_CE_PACKAGE_ID", "").strip()
 # 全社ブランチのメール宛先（カンマ区切りの Domo person ID）。配布物には焼き込まず env で注入する。
 EMAIL_PERSON_RECIPIENTS = os.environ.get("PL_EMAIL_PERSON_RECIPIENTS", "").strip()
 
@@ -173,10 +164,17 @@ EMAIL_PERSON_RECIPIENTS = os.environ.get("PL_EMAIL_PERSON_RECIPIENTS", "").strip
 # HTTP
 # --------------------------------------------------------------------------- #
 def request(method: str, path: str, body: Any = None) -> Any:
-    url = path if path.startswith("http") else f"https://{INSTANCE}/{path.lstrip('/')}"
+    if not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.domo\.com", INSTANCE):
+        raise SystemExit("DOMO_INSTANCE must explicitly name your instance (example.domo.com).")
+    url = path if urllib.parse.urlsplit(path).scheme else f"https://{INSTANCE}/{path.lstrip('/')}"
+    parsed = urllib.parse.urlsplit(url)
+    if parsed.scheme != "https" or parsed.netloc != INSTANCE or parsed.fragment:
+        raise ValueError("Refusing to send Domo credentials outside the selected instance.")
     if TOKEN:
         headers = {"X-DOMO-Developer-Token": TOKEN, "Accept": "application/json"}
     elif SID:
+        if (os.environ.get("INSTANCE") or INSTANCE).strip().lower() != INSTANCE:
+            raise SystemExit("SID belongs to a different INSTANCE; authenticate for DOMO_INSTANCE.")
         headers = {"X-Domo-Authentication": SID, "Accept": "application/json"}
     else:
         raise SystemExit("認証情報がありません。DOMO_DEVELOPER_TOKEN または SID を環境変数で設定してください（取得は docs/setup-guide.md 参照）。")
@@ -186,7 +184,10 @@ def request(method: str, path: str, body: Any = None) -> Any:
         headers["Content-Type"] = "application/json"
     req = urllib.request.Request(url, data=data, method=method.upper(), headers=headers)
     try:
-        with urllib.request.urlopen(req, timeout=180) as response:
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, req, fp, code, msg, headers, newurl):
+                return None
+        with urllib.request.build_opener(NoRedirect()).open(req, timeout=180) as response:
             raw = response.read()
             if not raw:
                 return None
@@ -195,7 +196,7 @@ def request(method: str, path: str, body: Any = None) -> Any:
             return raw.decode(errors="replace")
     except urllib.error.HTTPError as error:
         detail = error.read().decode(errors="replace")
-        raise RuntimeError(f"{method.upper()} {urllib.parse.urlsplit(url).path} -> HTTP {error.code}: {detail[:500]}") from error
+        raise RuntimeError(f"{method.upper()} {urllib.parse.urlsplit(url).path} -> HTTP {error.code}") from error
 
 
 def items(value: Any, *keys: str) -> List[Dict[str, Any]]:
@@ -348,6 +349,11 @@ def ensure_report_api_package(apply: bool, model_id: str = "", subflow_id: str =
                          for mid in (model_id, subflow_id)):
         raise RuntimeError("親/サブWorkflowが見つかりません。先に provision でモデルを確保してください。")
     source = CE_PATH.read_text(encoding="utf-8")
+    collection_id = resolve_collection_id()
+    if apply and not re.fullmatch(r"[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}", collection_id):
+        raise RuntimeError("AppDB保存先が解決できません。先にデータ層を配備してください。")
+    if collection_id:
+        source = source.replace("__REPORT_COLLECTION_ID__", collection_id)
     if model_id:
         source = source.replace("__MAIN_WORKFLOW_MODEL_ID__", model_id)
     if subflow_id:
@@ -394,14 +400,15 @@ def ensure_report_api_package(apply: bool, model_id: str = "", subflow_id: str =
 def sync_workflow_manifest() -> Dict[str, Any]:
     model_id, _ = ensure_model(WF01_MODEL_NAME, "", False)
     subflow_id, _ = ensure_model(SUBFLOW_NAME, "", False)
+    collection_id = resolve_collection_id()
     package = next((r for r in items(request("GET", "api/codeengine/v2/packages?limit=1000&offset=0"), "packages")
                     if r.get("name") == REPORT_API_PACKAGE_NAME), {})
     package_id = asset_id(package)
-    if not model_id or not subflow_id or not package_id:
+    if not model_id or not subflow_id or not package_id or not collection_id:
         raise RuntimeError("Workflow/Code Engineが未配備です。先に provision --apply --release を実行してください。")
     latest = request("GET", f"api/codeengine/v2/packages/{package_id}/versions/latest?parts=code,functions") or {}
-    if not all(mid in str(latest.get("code") or "") for mid in (model_id, subflow_id)) or any(
-            marker in str(latest.get("code") or "") for marker in ("__MAIN_WORKFLOW_MODEL_ID__", "__SUB_WORKFLOW_MODEL_ID__")):
+    if not all(mid in str(latest.get("code") or "") for mid in (model_id, subflow_id, collection_id)) or any(
+            marker in str(latest.get("code") or "") for marker in ("__MAIN_WORKFLOW_MODEL_ID__", "__SUB_WORKFLOW_MODEL_ID__", "__REPORT_COLLECTION_ID__")):
         raise RuntimeError("Code EngineのWorkflow配線が一致しません。ce --apply で更新してください。")
     inputs = copy.deepcopy(function_manifest()[0]["inputs"])
     for entry in inputs:
@@ -1271,7 +1278,7 @@ def cmd_verify() -> Dict[str, Any]:
                        "scheduleCount": len([r for r in model_triggers(WF01_MODEL_ID)
                                              if r.get("type") == "TIMER" and not r.get("deletedAt")])}
     try:
-        wf03 = request("GET", f"api/workflow/v1/models/{WF03_MODEL_ID}") or {}
+        wf03 = request("GET", f"api/workflow/v1/models/{WF03_MODEL_ID}") if WF03_MODEL_ID else {}
         out["wf03"] = {"name": wf03.get("name"), "deletedAt": wf03.get("deletedAt"), "versions": len(wf03.get("versions") or [])}
     except RuntimeError as error:
         out["wf03"] = {"status": "deleted (404)"} if "404" in str(error) else {"status": f"error: {error}"}
@@ -1289,6 +1296,17 @@ def main() -> int:
     args = parser.parse_args()
     dry_dir = pathlib.Path(args.dry_dir)
     dry_dir.mkdir(parents=True, exist_ok=True)
+
+    global WF01_MODEL_ID, SUBFLOW_MODEL_ID
+    if args.command in ("subflow", "mainflow", "verify", "all", "delete-wf03"):
+        if not WF01_MODEL_ID:
+            WF01_MODEL_ID, _ = ensure_model(WF01_MODEL_NAME, "", False)
+        if not SUBFLOW_MODEL_ID:
+            SUBFLOW_MODEL_ID, _ = ensure_model(SUBFLOW_NAME, "", False)
+        if not WF01_MODEL_ID or not SUBFLOW_MODEL_ID:
+            raise RuntimeError("Named Workflow models are missing; run provision first.")
+    if args.command in ("delete-wf03", "all") and not WF03_MODEL_ID:
+        raise SystemExit("Legacy deletion requires an explicit PL_WF03_MODEL_ID; use provision for normal deployments.")
 
     if args.command == "manual-only":
         if args.apply:

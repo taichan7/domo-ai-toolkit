@@ -197,7 +197,7 @@ test('PCでは画面幅いっぱいに広げず中央寄せの列に収める', 
   assert.doesNotMatch(css, /\.sidebar\s*\{[^}]*inset:\s*var\(--header\)\s+auto\s+0\s+0/s);
 });
 
-test('ManifestはCode EngineとWorkflowの実在バージョンを明示マッピングする', () => {
+test('Manifestは配備先の接続、または配布前の未接続状態を一貫して表す', () => {
   // 版番号は manifest.json / asset.json が一次情報。テストに固定値を焼き込むと版上げの
   // たびに書き換えが必要になり（Cycle 16 で解消したはずの陳腐化源）、実害を捕まえないまま
   // 保守負債だけが残る。ここでは「形式が妥当か」「配線が実在リリースへ整合しているか」の
@@ -213,7 +213,16 @@ test('ManifestはCode EngineとWorkflowの実在バージョンを明示マッ�
   assert.equal(manifest.packagesMapping[0].version, codeEngineAsset.version);
   assert.equal(manifest.workflowsMapping.length, 1);
   assert.equal(manifest.workflowsMapping[0].alias, 'lowStockNotification');
-  assert.equal(manifest.workflowsMapping[0].modelId, '0c61146c-9e04-4a9b-bc5e-7c43384d06d6');
+  const bindings = [manifest.packagesMapping[0].packageId, manifest.workflowsMapping[0].modelId,
+    ...manifest.datasetsMapping.map((entry) => entry.dataSetId),
+    ...manifest.collectionsMapping.map((entry) => entry.id)];
+  if (bindings.some(Boolean)) {
+    for (const id of bindings) assert.match(id, /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i);
+    assert.equal(manifest.packagesMapping[0].packageId, codeEngineAsset.packageId);
+  } else {
+    assert.ok(!Object.hasOwn(manifest, 'id'), '配布前はデザインIDも省略する');
+    for (const id of bindings) assert.equal(id, '', '配布前の接続はすべて未設定にする');
+  }
   assert.match(manifest.workflowsMapping[0].version, /^\d+\.\d+\.\d+$/);
   // 通知Workflowの起動は Code Engine がサーバー側で行う（フロントに起動経路を持たない）。
   // これにより Workflow を改版してもカードの再配線・再埋め込みが不要になる。

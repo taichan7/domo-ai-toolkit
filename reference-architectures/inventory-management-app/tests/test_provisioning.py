@@ -4,6 +4,8 @@ import io
 import json
 import pathlib
 import unittest
+import tempfile
+from unittest.mock import patch
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -29,8 +31,31 @@ class FakeClient:
 
 
 class AppStudioProvisioningTests(unittest.TestCase):
+    def _enter(self, context):
+        value = context.__enter__()
+        self.addCleanup(context.__exit__, None, None, None)
+        return value
+
     def setUp(self):
-        self.registry = json.loads(PROVISION.IN_REPO_REGISTRY_PATH.read_text(encoding="utf-8"))["appStudio"]
+        # Test data is synthetic and independent of a maintainer's local registry.
+        tmp = self._enter(tempfile.TemporaryDirectory())
+        base = pathlib.Path(tmp)
+        self.registry = {
+            "appId": "900001", "viewId": "900002", "cardId": "900003",
+            "proxyId": "proxy-test", "contextId": "context-test",
+            "page2": {"viewId": "900004", "cardId": "900005", "contextId": ""},
+        }
+        registry = base / "domo-assets.json"
+        registry.write_text(json.dumps({"instance": PROVISION.INSTANCE,
+            "appStudio": self.registry, "proCode": {"designId": "design-test"}}))
+        self._enter(patch.object(PROVISION, "IN_REPO_REGISTRY_PATH", registry))
+        for attribute in ("MANIFEST_PATH", "DEV_GUIDE_MANIFEST_PATH"):
+            source = getattr(PROVISION, attribute)
+            manifest = json.loads(source.read_text(encoding="utf-8"))
+            manifest.setdefault("id", "design-test-" + attribute.lower())
+            target = base / (attribute.lower() + ".json")
+            target.write_text(json.dumps(manifest, ensure_ascii=False))
+            self._enter(patch.object(PROVISION, attribute, target))
 
     def _stub_write_back(self):
         """write_back_app_studio_ids を記録スタブへ差し替え、実 domo-assets.json への書込を防ぐ。
@@ -935,14 +960,27 @@ class WorkflowModelAutomationTests(unittest.TestCase):
     def test_resolve_id_falls_back_to_manifest_over_stale_default(self):
         # 名称で発見できないとき、モジュール既定（保守用ID）でなく manifest 宣言値を返す。
         # ＝顧客 manifest へ保守用IDを焼き込む事故を防ぐ安全なフォールバック。
-        manifest = json.loads((ROOT / "pro-code" / "manifest.json").read_text(encoding="utf-8"))
-        declared = str(manifest["workflowsMapping"][0]["modelId"])
+        declared = "published-workflow-on-selected-instance"
         PROVISION.WORKFLOW_MODEL_ID = "SENTINEL-must-not-be-returned"
         PROVISION.WORKFLOW_MODEL_ID_PINNED = False
         client = FakeClient({("GET", "api/workflow/v1/models"): []})
-        resolved = PROVISION.resolve_workflow_model_id(client)
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = pathlib.Path(tmp) / "manifest.json"
+            manifest.write_text(json.dumps({"workflowsMapping": [{"modelId": declared}]}))
+            with patch.object(PROVISION, "MANIFEST_PATH", manifest):
+                resolved = PROVISION.resolve_workflow_model_id(client)
         self.assertEqual(resolved, declared)
         self.assertNotEqual(resolved, "SENTINEL-must-not-be-returned")
+
+    def test_unbound_manifest_does_not_reuse_stale_module_state(self):
+        PROVISION.WORKFLOW_MODEL_ID = "stale-other-instance"
+        PROVISION.WORKFLOW_MODEL_ID_PINNED = False
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = pathlib.Path(tmp) / "manifest.json"
+            manifest.write_text('{"workflowsMapping": [{"modelId": ""}]}')
+            with patch.object(PROVISION, "MANIFEST_PATH", manifest):
+                resolved = PROVISION.resolve_workflow_model_id(FakeClient({}))
+        self.assertEqual(resolved, "")
 
 
 class _FakeClock:

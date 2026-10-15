@@ -49,16 +49,16 @@ cp config/secrets.env.example config/secrets.env
 #   macOS / Git Bash
 set -a; . config/secrets.env; set +a
 #   Windows PowerShell（都度 env へ）
-#   $env:DOMO_INSTANCE="maintenance-instance.domo.com"; $env:DOMO_DEVELOPER_TOKEN="<発行したトークン>"
+#   $env:DOMO_INSTANCE="<your-instance>.domo.com"; $env:DOMO_DEVELOPER_TOKEN="<発行したトークン>"
 ```
 
 ## 2. デプロイ先インスタンス（不明なら必ず聞く）
 
 **エージェントへ：** デプロイ先の Domo ドメインが会話で示されていなければ、勝手に進めず**一度たずねる**。
-ハンズオンの共有検証環境は `maintenance-instance.domo.com`。`https://` やパスが付いていればドメイン部分だけを使う。
+接続先は主催者が指定した自分のインスタンス。`https://` やパスが付いていればドメイン部分だけを使う。
 
 ```bash
-domo login -i maintenance-instance.domo.com   # ブラウザ SSO
+domo login -i "$DOMO_INSTANCE"   # ブラウザ SSO
 ```
 
 > **再開チェック（休憩後・ターミナルを開き直したら必ず）**：先に ① `domo login`（SID は約 1 時間で失効）
@@ -90,7 +90,7 @@ $env:PL_SANDBOX_SUFFIX="検証・<あなたの氏名>"
 
 - **名札（最重要）**：`PL_SANDBOX_SUFFIX` を設定すると、以降の全スクリプトで DataFlow / 4出力 / CE / 統合サブWF /
   WF-01 / AppDB / DataApp 名に `（検証・氏名）` が付き、本番・他参加者と自動で分離する。未設定だと本番名のまま＝
-  `apply` / `provision --apply` は保守用 `maintenance-instance` で**拒否**される（本番保護ガード）。
+  `apply` / `provision --apply` は全インスタンスで**拒否**される（本番保護ガード）。
 - コピーしたら **VS Code で `~/handson-pl` を開き直す**（ファイル → フォルダーを開く）。以降のターミナルと
   エージェントは必ずこのフォルダで動かす（本番フォルダのまま publish する事故を防ぐ）。
 - **`pro-code/manifest.json` の `"id": "…"` 行をキーごと削除する**（`domo publish` が新しい design を採番＝本番と別物。
@@ -150,7 +150,7 @@ python3 scripts/provision_domo.py verify              # ok: true
   DataFlow / 4出力 / CE / 統合サブWF / WF-01 / AppDB / DataApp すべてが自分専用名になり、**本番や他参加者を
   上書きしない**（本番インスタンス上に複数のサンドボックスが同居しても安全）。
 - `provision_domo.py apply` と `provision_workflows.py provision --apply` は、**名札付きなら自分のサンドボックスに
-  実行してよい**。**名札なし（本番名のまま）では保守用 `maintenance-instance` でスクリプトが拒否する**（本番上書き防止）。
+  実行してよい**。**名札なし（本番名のまま）では全インスタンスでスクリプトが拒否する**（本番上書き防止）。
   本番名で配備するのは本番メンテナのみ（`PL_ALLOW_PRODUCTION=1`）。保守/移行用の `ce`/`subflow`/`mainflow` は
   固定の本番モデルID対象なのでサンドボックスでは使えない（名札運用は `provision`）。
 - WF-01 の手動実行・DataFlow 実行は **AI クレジットを使う**。名札はオブジェクト名を分けるだけで、**インスタンスの

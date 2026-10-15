@@ -22,6 +22,9 @@ jobs:
       - name: Secret scan
         run: bash scripts/check-secrets.sh
 
+      - name: Public distribution check
+        run: python3 scripts/check-public-distribution.py
+
       - name: Markdown link check
         run: python3 scripts/check-links.py
 
@@ -43,9 +46,8 @@ jobs:
 
       - name: Python tests (offline)
         run: |
-          pip install pytest
-          python -m pytest reference-architectures/pl-summary-app/tests -q
-          python -m pytest reference-architectures/inventory-management-app/tests -q
+          python -m pip install pytest -r reference-architectures/inventory-management-app/tests/requirements.txt
+          python -m pytest --import-mode=importlib reference-architectures/pl-summary-app/tests reference-architectures/inventory-management-app/tests -q
 
       - name: Node tests (offline)
         run: |

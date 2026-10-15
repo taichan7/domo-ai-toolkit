@@ -55,6 +55,8 @@ npm i -g ryuu       # domo コマンド（Domo Apps CLI）を提供。既に入�
 
 ```bash
 export DOMO_INSTANCE=<your-instance>.domo.com   # 例: export DOMO_INSTANCE=acme.domo.com
+export PL_SANDBOX_SUFFIX='検証・<あなたの氏名>'   # 初回検証は隔離コピー
+# 本番名で配備する担当者のみ、名札の代わりに PL_ALLOW_PRODUCTION=1 を明示する
 ```
 
 - 以降のコマンドの `${DOMO_INSTANCE}` はこの値を使う。
@@ -98,15 +100,16 @@ python3 scripts/provision_domo.py apply
 
 1. **seed DataSet**（`pl_summary_seed`）— Magic ETL の入力に使う最小の AppDB 標準同期 DataSet。
    ETL の Python タイルが P/L データを合成するため、入力行自体は内容を問わない。
-2. **Code Engine**（`appdb_maintenance.py` の公開1関数 `dedupe_appdb_documents`）— AppDB の一括 dedupe
-   ユーティリティ。`collection_id` は必須引数＝**インスタンス非依存**。
+2. **保存Code EngineはWorkflow層で配備**する。旧 `appdb_maintenance.py` は手動保守互換で残すが、
+   データ層のapplyでは未使用のdedupeパッケージを新規作成しない。
+
 3. **AppDB コレクション**（`店舗別損益AI要約`・`syncEnabled:false`）— AI 長文レポート（`analysis_html`）の
    保存先。書き込みは STEP 6 のワークフロー層が担う。Pro-Code のサマリータブが読む。
 4. **DataFlow**（`DF｜店舗別損益データフロー`・Magic ETL v2）— `dataflow/2042.json` から再構築。
    出力 DataSet（`OUT｜P/L明細` / `OUT｜P/L要約` ＋ トレンド／事業部別）を生成し、2枚の TextGeneration
    タイルが**店舗／全社の短文 AI サマリー**を出力する。これが Pro-Code の KPI・チャート・短文の供給源。
 
-- **ゲート**: 出力の `ASSET_RESULT` に seed DataSet / Code Engine / AppDB コレクション / DataFlow の
+- **ゲート**: 出力の `ASSET_RESULT` に seed DataSet / AppDB コレクション / DataFlow の
   各 ID が並ぶこと。DataFlow 実行が長引く場合でも、サーバ側で継続するので**キャンセル・再トリガーしない**。
 - 配線だけ更新して DataFlow 実行を省きたいときは `--skip-dataflow-run` を付ける。
 - DataSet API へ直接書き込まない。AppDB のデータ移送は Domo 標準同期だけが担当する。
@@ -213,8 +216,7 @@ AI 長文レポート（AppDB `analysis_html`。Pro-Code の**サマリータブ
 次の3資産からなる**ワークフロー層**が生成する:
 
 - **保存 Code Engine**（`code-engine/report_api.py` の `pl_report_api`）— AI の結果を AppDB へ保存し、
-  同一 `doc_key` の旧版だけを削除（重複除去を保存に内包）。`collection_id` は GUID 形状のみ検証＝
-  インスタンス非依存。
+  同一 `doc_key` の旧版だけを削除（重複除去を保存に内包）。`collection_id` は配備時に解決した保存先と照合し、未設定・別コレクションは通信前に拒否する。
 - **統合サブWF（WF-02）**（`workflow/WF-02_report_ai.json`）— 開始→待機→レポート種別ゲートウェイ→
   店舗AI／全社AI→保存。両 AI が `pl_report_api(save)` で保存し、全社 AI は `Send Email` も保持。
 - **メイン WF（WF-01）**（`workflow/WF-01_main_loop.json`）— reference-app 流の
@@ -333,7 +335,7 @@ DataFlow `DF｜店舗別損益データフロー`・4出力データセット・
 `summary/detail/trend/dept`・`report_type`・`doc_key`）は**不変**なので FE/CE/WF の配線は壊れない。
 
 ```bash
-export DOMO_INSTANCE=maintenance-instance.domo.com
+export DOMO_INSTANCE="<your-instance>.domo.com"
 export PL_SANDBOX_SUFFIX="検証・<あなたの氏名>"     # ← これ1個で全スタック（データ層＋WF層＋FE）が自分専用になる
 set -a; . config/secrets.env; set +a               # 開発者トークン（CE/AppDB/WF の配備に必要）
 
@@ -347,13 +349,12 @@ python3 scripts/provision_domo.py embed-guide       # 自分の DataApp のペ�
 python3 scripts/provision_domo.py verify            # ok: true
 ```
 
-**本番保護ガード**: 保守用インスタンス（`maintenance-instance`）で**名札なし**に本番オブジェクトを作成/更新しようと
-すると、`provision_domo.py`（apply / app-studio / embed-guide）と `provision_workflows.py`（provision）は
-**実行を拒否**する（他参加者・本番の無言上書きを防ぐ）。本番メンテナが本番名のまま反映する時だけ
-`PL_ALLOW_PRODUCTION=1` を明示する。**顧客が自分のインスタンス（`maintenance-instance` 以外）へ配備する場合は
-名札なしでも通常どおり動く**（ガードは maintenance-instance の本番だけを守る＝STEP 1〜7 はそのまま）。保守/移行用の
-`ce`/`subflow`/`mainflow`/`delete-wf03` は固定の本番モデルID対象なのでサンドボックスでは使えない
-（名札運用は `provision` を使う＝名称で自分専用の CE/WF を発見・作成する）。
+**本番保護ガード**: 名札なしの書込みは**全インスタンスで拒否**します。ハンズオンでは
+`PL_SANDBOX_SUFFIX` を付け、本番名で配備する担当者だけ `PL_ALLOW_PRODUCTION=1` を明示します。
+`DOMO_INSTANCE` は必須で、未指定時の保守環境への自動接続はありません。保守用
+`ce`/`subflow`/`mainflow` は対象のモデルを名称または明示IDで解決し、サンドボックスでは使いません。
+旧WF削除は追加で `PL_WF03_MODEL_ID` が必要です。通常の配備は `provision` を使います。
+保存CEは対象コレクションへ固定され、AIの引数で他コレクションへ変更できません。
 
 > ⚠ 名札はオブジェクト名を分けるだけで、**インスタンスの AI/クレジット消費枠は分離しない**（同じ
 > インスタンスの枠を共有する）。DataFlow 実行・WF-01 手動実行は AI クレジットを消費する点に注意。
@@ -375,7 +376,7 @@ python3 scripts/provision_domo.py verify            # ok: true
 | トレンドが空表示・事業部タブが出ない | 埋込カードの context mapping が未同期（`trend`/`dept` alias が proxy で解決不可） | `python3 scripts/provision_domo.py app-studio` で context mapping を同期 |
 | `provision_workflows.py` が「認証情報がありません」で停止 | ワークフロー層は configstore を読まない | `config/secrets.env` に `DOMO_DEVELOPER_TOKEN` を置いて `set -a; . config/secrets.env; set +a`、または `SID` を環境変数で設定 |
 | `embed-guide` が「開発ガイド design … 未公開」で停止 | 開発ガイド design が未 publish、または manifest の `id` が未反映 | `cd dev-guide-app && domo publish` → 払い出された id を `dev-guide-app/manifest.json` に反映 → 再実行 |
-| `apply`／`provision`／`embed-guide` が「`PL_SANDBOX_SUFFIX` が未設定…」で停止 | 保守用 `maintenance-instance` で名札なしの本番書込みをガードが拒否 | ハンズオンは `export PL_SANDBOX_SUFFIX='検証・氏名'`。本番メンテナは `PL_ALLOW_PRODUCTION=1`。顧客自身のインスタンス（`maintenance-instance` 以外）では起きない |
+| `apply`／`provision`／`embed-guide` が「`PL_SANDBOX_SUFFIX` が未設定…」で停止 | 名札なしの本番書込みを全インスタンスで拒否 | ハンズオンは `export PL_SANDBOX_SUFFIX='検証・氏名'`。本番メンテナは `PL_ALLOW_PRODUCTION=1`。配備先にかかわらず必要 |
 | `ce`／`subflow`／`mainflow` がサンドボックスで拒否 | 固定の本番モデルID対象ゆえ名札で隔離できない | 名札運用は `provision`（名称で自分専用の CE/WF を発見・作成）を使う |
 
 ---
@@ -391,8 +392,16 @@ python3 scripts/provision_domo.py verify            # ok: true
   App Studio の**ページ2「開発ガイド」**に埋め込む（STEP 7・ページ1＝本体カードは不変）。
 - ✅ **ハンズオンはバックエンドごと隔離できる**: `PL_SANDBOX_SUFFIX='検証・氏名'` 1個で、データ層・WF層・FE の
   全オブジェクト名を参加者ごとに一意化（同一インスタンス上で本番/他参加者と非衝突）。本番保護ガード付き
-  （`maintenance-instance` の本番だけを守り、顧客自身のインスタンスは素通し）。受講者への入口は
+  （全インスタンスで本番名への無言の書込みを拒否）。受講者への入口は
   [prompts/handson-with-agent.ja.md](../prompts/handson-with-agent.ja.md)。
 
 AI エージェント（Claude Code 等）にこのフォルダを渡してデプロイさせる場合は、
 [prompts/deploy-with-agent.ja.md](../prompts/deploy-with-agent.ja.md) を入口プロンプトとして渡す。
+
+
+### 現行verifyの対象
+
+`verify` はmanifestの `plReportApi` に接続した**現役の保存APIの指定版**・固定保存先と、
+4出力（summary/detail/trend/dept）の存在/件数/alias一致を検証します。旧dedupe CEの有無は合格条件ではありません。
+従来配備に専用seedコレクションがない場合、生成タイルが参照する既存DataFlowの1入力を確認し、
+`seedMode=existing-flow-input` と明示します。新規配備ではAppDB標準同期の専用seedを作ります。

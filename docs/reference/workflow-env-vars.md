@@ -1,6 +1,6 @@
 # Workflow JSON & Environment Variables Reference
 
-Originally reverse-engineered against modocorp on 2026-05-11 from workflow `0d3f2c48-1428-413d-85f4-3f3dd03061d4` ("AI Facility Management", version 2.0.7). Write-path endpoints captured + verified during the PE Ops clone on 2026-05-12.
+Originally reverse-engineered against source-instance on 2026-05-11 from workflow `a80ff1b3-5a8a-5476-8a11-7b85d01fd8e9` ("AI Facility Management", version 2.0.7). Write-path endpoints captured + verified during the PE Ops clone on 2026-05-12.
 
 ## Auth — admin PAT required for source reads
 
@@ -151,7 +151,7 @@ If a `dataType: "text"` entry's `paramName` matches `/(?i)(secret|password|token
       "tools": [
         {
           "functionName": "IMAGE_TO_TEXT",
-          "packageId": "030b06a3-874e-4943-a317-874f69a0020b",
+          "packageId": "3881a4a3-fc8d-5309-8182-995a71f2051c",
           "packageVersion": "1.0.0",
           "inputs":  [ /* parameter slots */ ],
           "output":  { /* parameter slot */ }

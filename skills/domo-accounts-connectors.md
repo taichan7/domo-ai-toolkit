@@ -55,7 +55,7 @@ Reproduced **verbatim from OpenAPI YAML** (so these endpoint *sets* are `[DOC]`)
 | **OAuth CLIENT** | `client_id`+`client_secret` minted at *Manage Clients*, used for `grant_type=client_credentials` to get a Bearer token. | `domo-identity-access.md` | `[DOC]` |
 | **`account` SCOPE** | An OAuth token scope (a token permission, not an object). The token page's enum lists six (`account`/`audit`/`buzz`/`dashboard`/`data`/`user`); `workflow` is a **real seventh**, absent from that enum — see `domo-identity-access.md`. | `domo-identity-access.md` | `[DOC]` |
 | **service account** | A *convention* (a normal user / integration owner used as a machine identity), **not** a distinct Domo object type. | `domo-identity-access.md` (+ `domo-magic-etl.md` for Snowflake pass-through owner) | `[KB]` |
-| **broker / trading account (口座)** | External broker state (marketdata `account_id`, Tachibana margin/nisa/specific) — **zero** relation to any Domo account; same word, opposite meaning. | marketdata / brokerage app `AGENT.md` | `[REPO]` |
+| **broker / trading account (口座)** | External broker state (marketdata `account_id`, brokerage margin/nisa/specific) — **zero** relation to any Domo account; same word, opposite meaning. | marketdata / brokerage app `AGENT.md` | `[REPO]` |
 | **Workflow "Account" DATA TYPE** | A workflow step input typed `Account`, mapped to an Account object shared-with/created-by the running user; the account service injects creds over HTTPS. | `domo-workflow.md` | `[KB]` |
 | **connector** (data connector) | A prebuilt cloud connector that pulls a 3rd-party system and lands a DataSet; its configured creds become an Account object. | **THIS skill** (catalog orphan); resulting DataSet/stream → `domo-datasets.md` | `[KB]` |
 | **custom connector** | A connector authored in the browser Connector Dev Studio / IDE — ES5 JS (docs disagree on the engine: GraalVM vs Nashorn — unresolved); **five** documented auth schemes incl. a no-auth option; distinct from prebuilt connectors and DDX. | `domo-custom-connector-authoring.md` | `[KB]` |
@@ -217,7 +217,7 @@ Tie-breaker: if the object being CRUD'd is a **credential**, it's this skill; if
 If you grep this workspace for `account`/`connector`/`connection`, most hits are unrelated. All of the following are `[REPO]` and touch **no** platform Account/connector API:
 
 - **`gl_account_id` / `GL_ACCOUNTS`** — general-ledger accounts in a `pl-summary-app` demo data generator.
-- **Broker/trading "口座"** — marketdata `account_id`, Tachibana margin/nisa/specific state; external broker objects, opposite meaning of a Domo account.
+- **Broker/trading "口座"** — marketdata `account_id`, brokerage margin/nisa/specific state; external broker objects, opposite meaning of a Domo account.
 - **`connection status` FE flags** — `connected`/`demo`/`error` data-source UI state in inventory-management / safety-command-center / asset-lifecycle apps; a display flag, not a connector account.
 - **`ryuu` / `domo publish`** — the Pro Code **publish** CLI (biggest false friend). `ryuu.js` (browser SDK for filters/variables) is yet another distinct thing.
 - **DDX / Domo Bricks** — **Domo Bricks (formerly DDX Bricks)** code-app / viz objects (the in-product **Brick editor** *or* the local-bundle **Pro Code app**), not the connector IDE.

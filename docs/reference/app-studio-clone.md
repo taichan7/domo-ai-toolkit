@@ -1,6 +1,6 @@
 # App Studio Clone Reference
 
-Captured during the PE Ops clone 2026-05-12 through 2026-05-14 against `modocorp.domo.com`. Covers the cross-instance write paths for App Studio dataapps that the original clone-content skill marked "UNVERIFIED".
+Captured during the PE Ops clone 2026-05-12 through 2026-05-14 against `source-instance.domo.com`. Covers the cross-instance write paths for App Studio dataapps that the original clone-content skill marked "UNVERIFIED".
 
 ## Endpoint cheatsheet
 
@@ -181,7 +181,7 @@ finally:
     DELETE("/api/content/v4/pages/layouts/<layoutId>/writelock")
 ```
 
-Writelock enforcement differs by instance/version. The earlier `modocorp` capture accepted the layout PUT without a lock and `POST .../writelock` returned 405. On `maintenance-instance`, `PUT .../writelock` with `{}` returns `{layoutId,userId,lockTimestamp,lockHeartbeat}` and is required; omitting it returns 403 `WL003`. Use `PUT`, never `POST`, and always release with `DELETE` in a `finally` block.
+Writelock enforcement differs by instance/version. The earlier `source-instance` capture accepted the layout PUT without a lock and `POST .../writelock` returned 405. On `maintenance-instance`, `PUT .../writelock` with `{}` returns `{layoutId,userId,lockTimestamp,lockHeartbeat}` and is required; omitting it returns 403 `WL003`. Use `PUT`, never `POST`, and always release with `DELETE` in a `finally` block.
 
 ### TABS surgical-append (gap #5 resolution)
 
@@ -297,7 +297,7 @@ See [SKILL.md Section 11](../../skills/domo-cross-instance-clone.md#section-11--
 
 The original clone-content skill explicitly refused to write App Studio bodies because the POST/PUT shapes hadn't been sniffed yet. Two reasons that's now resolved:
 
-1. The user captured the App Studio "Save with new tab" PUT against modocorp during the PE Ops clone (the body in §Unified dataapp PUT body shape).
+1. The user captured the App Studio "Save with new tab" PUT against source-instance during the PE Ops clone (the body in §Unified dataapp PUT body shape).
 2. The layout PUT was tried empirically — first attempts failed with rebuilt bodies (which is what the prior skill version implied was correct), then succeeded with surgical mutation.
 
 The lesson: refuse-without-capture is the wrong default when the cost of trial-and-error is bounded and reversible. The new default in clone-content is "try surgical mutation first, fall back to manual task only when the endpoint genuinely requires session state".

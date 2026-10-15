@@ -5,6 +5,46 @@ kept in sync with the authors' working toolkit; versions follow
 [Semantic Versioning](https://semver.org/) loosely (MINOR = new
 skills/apps/docs, PATCH = fixes and content refreshes).
 
+## [1.1.1] - 2026-10-15
+
+### Public distribution safety
+- Ship unbound manifests and omit both design IDs. Deployment resolves IDs and
+  Code Engine/Workflow versions on the selected instance, including fresh stacks.
+- Exclude instance registries, credentials, sandbox state and caches even when
+  accidentally tracked. Replace tenant UUIDs and numeric asset metadata with
+  examples; remove customer/staff identifiers and private paths.
+- Strip non-rendering PNG EXIF/text/time while retaining pixel and color data.
+- Add a CI distribution gate for hostnames, deployment state, bindings, image
+  metadata and managed content hashes. Sync rejects traversal/symlinks and preserves
+  independently edited public files. ZIPs use the same release transformation.
+
+### Reference architecture corrections
+- Fix stored HTML injection in inventory trend labels when a date formatter
+  falls back to an untrusted value. Confirm execution before the fix and rejection
+  after it in local headless Chrome, while preserving valid date labels.
+- Inventory v2.4.107: synchronize destination package and active Workflow versions;
+  fail before writing bindings when a version is unresolved. Remove the shipped
+  instance registry; test with synthetic local state. Scope saved state to the
+  explicit instance and sandbox tag; never inherit a base registry in a sandbox.
+- P/L v0.3.3 / CE v1.0.4: bind saving to the deployment's report collection and
+  reject foreign/unconfigured targets before AppDB I/O. Guide v0.3.2 explains the
+  current write guards and storage boundary.
+- Require an explicit target, reject cross-origin credential forwarding/redirects,
+  protect shared base-name writes on every instance, and suppress raw error bodies.
+- Verify the active report API and all four P/L outputs rather than unused legacy
+  assets. Fresh data provisioning no longer creates the obsolete dedupe package.
+- Consolidate setup guidance and document reference/production limits, including
+  stock concurrency and AppDB record authorization. Isolate test runtime stubs so
+  both apps' Python suites can execute together.
+
+### Verification
+- Source and portable app suites, release-boundary regressions, Node/guide checks,
+  live maintenance bindings and asset byte comparisons, and extracted ZIP checks.
+- History/current-tree credential scans reviewed; generated SHA256 hashes and a
+  synthetic store-period test key were confirmed false positives.
+- Destination email delivery, physical mobile operation, fresh-instance integration
+  and production load/authorization acceptance remain deployment-specific checks.
+
 ## [1.1.0] - 2026-10-15
 
 ### Reference architectures

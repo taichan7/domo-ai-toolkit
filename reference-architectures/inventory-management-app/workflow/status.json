@@ -1,7 +1,7 @@
 {
   "description": "在庫不足通知に使う3タイルWorkflowのトポロジ・スナップショット（Start → AI Agent → End）。しきい値割れの確定遷移でのみ Code Engine が起動する（CEが最新の有効版を実行時に解決して instances/message で開始するため、Workflowを改版してもカードの再配線・再埋め込みは不要）。AI Agent はダッシュボードDataSetを文脈に参照し、状況・分析・推奨アクション・確認のセクションを含む通知メールを生成して送信ツールで送る。",
   "runtimeWiringEnabled": true,
-  "modelId": "0c61146c-9e04-4a9b-bc5e-7c43384d06d6",
+  "modelId": "b12307e6-633d-58df-b9f6-dba60fafdaab",
   "versionSource": "pro-code/manifest.json (workflowsMapping[].version) — released 版の実値はここを正とする",
   "tileCount": 3,
   "aiAgentCount": 1,
@@ -9,7 +9,11 @@
   "aiAgentDatasetContextCount": 1,
   "aiAgentDatasetContext": {
     "name": "Inventory Management | Dashboard",
-    "id": "6f407387-7980-44b4-b1fd-3e4b12ec3d34"
+    "id": "f8f146f7-b46e-514e-bfdf-1b4c9dca1107"
   },
-  "path": ["Start", "AI Agent (Dashboard DataSet + Send Email tool)", "End"]
+  "path": [
+    "Start",
+    "AI Agent (Dashboard DataSet + Send Email tool)",
+    "End"
+  ]
 }

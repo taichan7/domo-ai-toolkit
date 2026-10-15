@@ -6,6 +6,12 @@ Lead with findings. Focus on bugs, regressions, broken contracts, missing valida
 
 ## Review Priorities
 
+- Date/number labels are not automatically safe HTML. Trace invalid-value
+  branches: a date formatter may return its original input. Keep plain-text
+  formatting separate and escape the value at the HTML boundary. Exercise the
+  actual renderer with both a malformed executable-markup date and a valid date;
+  a column name or declared DATE schema is not an escaping guarantee.
+
 - Existing behavior: Does the change contradict the current README, manifest, prompt, workflow, or public function contract?
 - Public API: Are function names, signatures, return keys, manifest aliases, Dataset names, AppDB names, FileSet names, or Workflow names changed unexpectedly?
 - Domo safety: Could the change write, delete, deploy, publish, or mutate production data without explicit confirmation?

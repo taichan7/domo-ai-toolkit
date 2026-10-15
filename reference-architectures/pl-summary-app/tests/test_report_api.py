@@ -25,6 +25,7 @@ import os
 import sys
 import types
 import unittest
+from unittest.mock import patch
 
 sys.modules.setdefault("codeengine", types.ModuleType("codeengine"))
 
@@ -35,7 +36,8 @@ ra = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = ra  # importlib 読込の定石
 _spec.loader.exec_module(ra)
 
-GUID = "ca132957-d14d-4fa0-9c69-3e6721d27141"
+GUID = "11111111-2222-4333-8444-555555555555"
+ra.REPORT_COLLECTION_ID = GUID
 
 
 class _FakeAppDB:
@@ -208,6 +210,24 @@ class ValidateTest(unittest.TestCase):
 
     def test_validate_missing_doc_key(self):
         self.assertEqual(ra.pl_report_api("validate", {"collection_id": GUID})["error"]["code"], "MISSING_DOC_KEY")
+
+    def test_foreign_collection_never_reaches_appdb(self):
+        for operation in ("validate", "save"):
+            with self.subTest(operation=operation), patch.object(sys.modules["codeengine"], "send_request") as send:
+                result = ra.pl_report_api(operation, {
+                    "collection_id": "99999999-2222-4333-8444-555555555555",
+                    "doc_key": "other", "document": _full(),
+                })
+                self.assertEqual(result["error"]["code"], "COLLECTION_NOT_ALLOWED")
+                send.assert_not_called()
+
+    def test_unconfigured_collection_fails_before_io(self):
+        with patch.object(ra, "REPORT_COLLECTION_ID", "__REPORT_COLLECTION_ID__"), \
+             patch.object(sys.modules["codeengine"], "send_request") as send:
+            result = ra.pl_report_api("save", {"collection_id": GUID, "document": _full()})
+            self.assertEqual(result["error"]["code"], "COLLECTION_NOT_CONFIGURED")
+            send.assert_not_called()
+
 
 
 class SaveDedupeTest(unittest.TestCase):

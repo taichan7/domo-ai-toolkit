@@ -314,7 +314,7 @@ target via the app manifest's `datasetsMapping[]`. Grep for the *token* to find 
 copy a literal id.
 
 - **`asset-lifecycle-app` reads ONE derived Dataflow output**, not the connector reports directly. That
-  output DataSet id is `fcadcd24-e5bc-4347-a371-0aac9b509e0f` (~8,642 rows × ~29–30 cols on the reference
+  output DataSet id is `ce05d371-cea5-5ffe-88de-ee8d0972912e` (~8,642 rows × ~29–30 cols on the reference
   instance) — a Magic ETL dataflow named "Dataset Inventory" (dataflows ~2279–2282) merges roughly ten
   DomoStats/Governance inputs into it. "~ten inputs" is a **handoff label, not enumerated in the repo**; the
   merge design lives in `domo-magic-etl.md` territory.

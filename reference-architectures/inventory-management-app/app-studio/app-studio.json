@@ -1,25 +1,24 @@
 {
   "schemaVersion": 1,
-  "exportedAt": "2026-10-10T15:56:41+00:00",
   "source": {
     "instance": "maintenance-instance.domo.com",
     "url": "https://maintenance-instance.domo.com/app-studio/1468477910/pages/1828849038",
-    "appId": "1468477910",
-    "viewId": "1828849038",
-    "cardId": "2109675257",
-    "contextId": "7a9386a2-d8fa-4dbc-99cb-0a9ab25f502b",
-    "designId": "3c156897-8ddb-4761-9664-9073a9f2aa90",
+    "appId": "866116684",
+    "viewId": "865205513",
+    "cardId": "819858668",
+    "contextId": "5aed87c8-cf34-59be-bbce-f2a3f4195ad4",
+    "designId": "e4e7b1d1-5c98-5cad-bd3c-ae902908a2af",
     "cardVersionMode": "FOLLOW_LATEST",
     "contextDesignVersion": null,
     "effectiveDesignVersion": "2.4.104"
   },
   "dataApp": {
-    "dataAppId": 1468477910,
+    "dataAppId": 866116684,
     "title": "在庫入出庫管理",
     "description": "Domo-native inventory operations and analytics hands-on application.",
-    "iconDataFileId": 14839,
+    "iconDataFileId": 866041551,
     "navIconDataFileId": null,
-    "landingViewId": 1828849038,
+    "landingViewId": 865205513,
     "enabled": true,
     "isVirtualized": false,
     "showNavigation": true,
@@ -29,7 +28,7 @@
     "navOrientation": "TOP",
     "views": [
       {
-        "viewId": 1828849038,
+        "viewId": 865205513,
         "title": "在庫入出庫管理",
         "parentViewId": 0,
         "viewOrder": 1,
@@ -40,7 +39,7 @@
         "children": []
       },
       {
-        "viewId": 41450484,
+        "viewId": 872011744,
         "title": "開発ガイド",
         "parentViewId": 0,
         "viewOrder": 2,
@@ -3393,7 +3392,7 @@
     },
     "navigations": [
       {
-        "dataAppId": 1468477910,
+        "dataAppId": 866116684,
         "entity": "HOME",
         "entityId": "home",
         "title": "Home",
@@ -3409,7 +3408,7 @@
         "style": null
       },
       {
-        "dataAppId": 1468477910,
+        "dataAppId": 866116684,
         "entity": "VIEW",
         "entityId": "1828849038",
         "title": "在庫入出庫管理",
@@ -3425,7 +3424,7 @@
         "style": null
       },
       {
-        "dataAppId": 1468477910,
+        "dataAppId": 866116684,
         "entity": "VIEW",
         "entityId": "41450484",
         "title": "開発ガイド",
@@ -3441,7 +3440,7 @@
         "style": null
       },
       {
-        "dataAppId": 1468477910,
+        "dataAppId": 866116684,
         "entity": "AI_ASSISTANT",
         "entityId": "ai_assistant",
         "title": "Domo.AI",
@@ -3457,7 +3456,7 @@
         "style": null
       },
       {
-        "dataAppId": 1468477910,
+        "dataAppId": 866116684,
         "entity": "CONTROLS",
         "entityId": "controls",
         "title": "Controls",
@@ -3473,7 +3472,7 @@
         "style": null
       },
       {
-        "dataAppId": 1468477910,
+        "dataAppId": 866116684,
         "entity": "DISTRIBUTE",
         "entityId": "distribute",
         "title": "Distribute",
@@ -3489,7 +3488,7 @@
         "style": null
       },
       {
-        "dataAppId": 1468477910,
+        "dataAppId": 866116684,
         "entity": "MORE",
         "entityId": "more",
         "title": "More",
@@ -3506,7 +3505,7 @@
       }
     ],
     "persistSettings": {
-      "dataAppId": 1468477910,
+      "dataAppId": 866116684,
       "persistFiltersEnabled": false,
       "persistInteractionsEnabled": false,
       "persistDateEnabled": false,
@@ -3533,9 +3532,9 @@
   },
   "pages": [
     {
-      "viewId": "1828849038",
+      "viewId": "865205513",
       "stack": {
-        "id": "1828849038",
+        "id": "865205513",
         "page": {
           "pageId": 1828849038,
           "type": "dataappview",
@@ -3550,22 +3549,22 @@
         "title": "在庫入出庫管理",
         "sizes": [
           {
-            "id": "2109675257",
+            "id": "819858668",
             "size": ""
           }
         ],
         "cards": [],
         "collections": [],
         "pageLayoutV4": {
-          "layoutId": 381523384,
-          "pageUrn": "1828849038",
+          "layoutId": 884452599,
+          "pageUrn": "865205513",
           "printFriendly": false,
           "enabled": true,
           "isDynamic": false,
           "hasPageBreaks": false,
           "content": [
             {
-              "id": 115443,
+              "id": 832469363,
               "contentKey": 1,
               "compactInteractionDefault": true,
               "hideTitle": true,
@@ -3582,8 +3581,8 @@
               "acceptFilters": true,
               "acceptDateFilter": true,
               "acceptSegments": true,
-              "cardId": 2109675257,
-              "cardUrn": "2109675257",
+              "cardId": 819858668,
+              "cardUrn": "819858668",
               "editInAppViewer": true,
               "showMoreContent": false,
               "chartStyles": false,
@@ -3668,7 +3667,7 @@
       "cards": [
         {
           "urn": "2109675257",
-          "id": 2109675257,
+          "id": 819858668,
           "type": "domoapp",
           "badgeUpdated": 1786419787000,
           "title": "在庫入出庫管理",
@@ -3677,15 +3676,15 @@
         }
       ],
       "layout": {
-        "layoutId": 381523384,
-        "pageUrn": "1828849038",
+        "layoutId": 884452599,
+        "pageUrn": "865205513",
         "printFriendly": false,
         "enabled": true,
         "isDynamic": false,
         "hasPageBreaks": false,
         "content": [
           {
-            "id": 115443,
+            "id": 832469363,
             "contentKey": 1,
             "compactInteractionDefault": true,
             "hideTitle": true,
@@ -3702,8 +3701,8 @@
             "acceptFilters": true,
             "acceptDateFilter": true,
             "acceptSegments": true,
-            "cardId": 2109675257,
-            "cardUrn": "2109675257",
+            "cardId": 819858668,
+            "cardUrn": "819858668",
             "editInAppViewer": true,
             "showMoreContent": false,
             "chartStyles": false,
@@ -3776,14 +3775,14 @@
         "style": null
       },
       "proCodeContext": {
-        "id": "7a9386a2-d8fa-4dbc-99cb-0a9ab25f502b",
-        "designId": "3c156897-8ddb-4761-9664-9073a9f2aa90",
+        "id": "5aed87c8-cf34-59be-bbce-f2a3f4195ad4",
+        "designId": "e4e7b1d1-5c98-5cad-bd3c-ae902908a2af",
         "designVersion": null,
         "mapping": [],
         "collections": [
           {
             "name": "inventory_management_records",
-            "id": "b76a1233-038d-4f99-aa19-1705469b7f7e"
+            "id": "c50ae835-011f-5afa-bd6b-0f44e6ca5ff0"
           }
         ],
         "accountMapping": [],
@@ -3791,10 +3790,10 @@
         "workflowMapping": [
           {
             "alias": "lowStockNotification",
-            "modelId": "0c61146c-9e04-4a9b-bc5e-7c43384d06d6",
+            "modelId": "b12307e6-633d-58df-b9f6-dba60fafdaab",
             "version": "1.0.11",
             "startName": "不足通知を開始",
-            "triggerId": "b96b4359-ad65-4827-bf18-f5345c9e9e04",
+            "triggerId": "e0e2dbd4-9690-5e97-a1a1-25bd4e16cdd8",
             "parameters": []
           }
         ],
@@ -3803,9 +3802,9 @@
       }
     },
     {
-      "viewId": "41450484",
+      "viewId": "872011744",
       "stack": {
-        "id": "41450484",
+        "id": "872011744",
         "page": {
           "pageId": 41450484,
           "type": "dataappview",
@@ -3820,22 +3819,22 @@
         "title": "開発ガイド",
         "sizes": [
           {
-            "id": "417954969",
+            "id": "870303677",
             "size": ""
           }
         ],
         "cards": [],
         "collections": [],
         "pageLayoutV4": {
-          "layoutId": 69282970,
-          "pageUrn": "41450484",
+          "layoutId": 886335617,
+          "pageUrn": "872011744",
           "printFriendly": false,
           "enabled": true,
           "isDynamic": false,
           "hasPageBreaks": false,
           "content": [
             {
-              "id": 115444,
+              "id": 889951797,
               "contentKey": 1,
               "compactInteractionDefault": true,
               "hideTitle": true,
@@ -3852,8 +3851,8 @@
               "acceptFilters": true,
               "acceptDateFilter": true,
               "acceptSegments": true,
-              "cardId": 417954969,
-              "cardUrn": "417954969",
+              "cardId": 870303677,
+              "cardUrn": "870303677",
               "editInAppViewer": true,
               "showMoreContent": false,
               "chartStyles": false,
@@ -3938,7 +3937,7 @@
       "cards": [
         {
           "urn": "417954969",
-          "id": 417954969,
+          "id": 870303677,
           "type": "domoapp",
           "badgeUpdated": 1786792293000,
           "title": "在庫管理リファレンス ガイド",
@@ -3947,15 +3946,15 @@
         }
       ],
       "layout": {
-        "layoutId": 69282970,
-        "pageUrn": "41450484",
+        "layoutId": 886335617,
+        "pageUrn": "872011744",
         "printFriendly": false,
         "enabled": true,
         "isDynamic": false,
         "hasPageBreaks": false,
         "content": [
           {
-            "id": 115444,
+            "id": 889951797,
             "contentKey": 1,
             "compactInteractionDefault": true,
             "hideTitle": true,
@@ -3972,8 +3971,8 @@
             "acceptFilters": true,
             "acceptDateFilter": true,
             "acceptSegments": true,
-            "cardId": 417954969,
-            "cardUrn": "417954969",
+            "cardId": 870303677,
+            "cardUrn": "870303677",
             "editInAppViewer": true,
             "showMoreContent": false,
             "chartStyles": false,
@@ -4049,14 +4048,14 @@
     }
   ],
   "proCodeContext": {
-    "id": "7a9386a2-d8fa-4dbc-99cb-0a9ab25f502b",
-    "designId": "3c156897-8ddb-4761-9664-9073a9f2aa90",
+    "id": "5aed87c8-cf34-59be-bbce-f2a3f4195ad4",
+    "designId": "e4e7b1d1-5c98-5cad-bd3c-ae902908a2af",
     "designVersion": null,
     "mapping": [],
     "collections": [
       {
         "name": "inventory_management_records",
-        "id": "b76a1233-038d-4f99-aa19-1705469b7f7e"
+        "id": "c50ae835-011f-5afa-bd6b-0f44e6ca5ff0"
       }
     ],
     "accountMapping": [],
@@ -4064,10 +4063,10 @@
     "workflowMapping": [
       {
         "alias": "lowStockNotification",
-        "modelId": "0c61146c-9e04-4a9b-bc5e-7c43384d06d6",
+        "modelId": "b12307e6-633d-58df-b9f6-dba60fafdaab",
         "version": "1.0.11",
         "startName": "不足通知を開始",
-        "triggerId": "b96b4359-ad65-4827-bf18-f5345c9e9e04",
+        "triggerId": "e0e2dbd4-9690-5e97-a1a1-25bd4e16cdd8",
         "parameters": []
       }
     ],
@@ -4076,17 +4075,17 @@
   },
   "proCodeContexts": [
     {
-      "viewId": "1828849038",
-      "contextId": "7a9386a2-d8fa-4dbc-99cb-0a9ab25f502b",
+      "viewId": "865205513",
+      "contextId": "5aed87c8-cf34-59be-bbce-f2a3f4195ad4",
       "context": {
-        "id": "7a9386a2-d8fa-4dbc-99cb-0a9ab25f502b",
-        "designId": "3c156897-8ddb-4761-9664-9073a9f2aa90",
+        "id": "5aed87c8-cf34-59be-bbce-f2a3f4195ad4",
+        "designId": "e4e7b1d1-5c98-5cad-bd3c-ae902908a2af",
         "designVersion": null,
         "mapping": [],
         "collections": [
           {
             "name": "inventory_management_records",
-            "id": "b76a1233-038d-4f99-aa19-1705469b7f7e"
+            "id": "c50ae835-011f-5afa-bd6b-0f44e6ca5ff0"
           }
         ],
         "accountMapping": [],
@@ -4094,10 +4093,10 @@
         "workflowMapping": [
           {
             "alias": "lowStockNotification",
-            "modelId": "0c61146c-9e04-4a9b-bc5e-7c43384d06d6",
+            "modelId": "b12307e6-633d-58df-b9f6-dba60fafdaab",
             "version": "1.0.11",
             "startName": "不足通知を開始",
-            "triggerId": "b96b4359-ad65-4827-bf18-f5345c9e9e04",
+            "triggerId": "e0e2dbd4-9690-5e97-a1a1-25bd4e16cdd8",
             "parameters": []
           }
         ],

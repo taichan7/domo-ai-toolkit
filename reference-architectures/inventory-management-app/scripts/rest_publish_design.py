@@ -62,8 +62,8 @@ PROVISION_PATH = SCRIPT_DIR / "provision_domo.py"
 # から publish して自分専用デザインを採番する」（dev-guide §7）ため、名札付きでこれらを指す publish は
 # --confirm / INVENTORY_ALLOW_PRODUCTION 無しでは拒否する（input-based の抜け穴を塞ぐ result-based 判定）。
 REFERENCE_DESIGN_IDS = {
-    "3c156897-8ddb-4761-9664-9073a9f2aa90",  # pro-code 業務アプリ本体（在庫入出庫管理）
-    "aeb6e8d5-2548-4636-a7c2-7e1eeadd4ce1",  # dev-guide 開発ガイド
+    "e4e7b1d1-5c98-5cad-bd3c-ae902908a2af",  # pro-code 業務アプリ本体（在庫入出庫管理）
+    "bbf6886d-f16e-564d-92a4-b8d94ffa7101",  # dev-guide 開発ガイド
 }
 
 # DESIGNS_BASE_URL from ryuu models/constants/endpoints.js (leading slash dropped
@@ -246,12 +246,12 @@ def upload_asset(
 
     URL/headers mirror ryuu ``uploadAsset``. ``opener`` defaults to
     ``urllib.request.urlopen`` and is injectable for offline tests. Spaces in the
-    path are rejected (like ryuu). On HTTP error the response body is printed and
-    the error re-raised so the caller can exit non-zero.
+    path are rejected (like ryuu). On HTTP error print status without the raw
+    response body, then re-raise so the caller can exit non-zero.
     """
     if " " in relpath:
         raise ValueError(f"Spaces in file names not allowed. Please rename {relpath}")
-    opener = opener or urllib.request.urlopen
+    opener = opener or getattr(client, "_open", urllib.request.urlopen)
     headers = dict(auth_header(client))
     content_type = content_type_for(relpath)
     if content_type:
@@ -265,9 +265,9 @@ def upload_asset(
         with opener(request, timeout=120) as response:
             return response.read()
     except urllib.error.HTTPError as error:
-        body = error.read().decode(errors="replace")
+        error.read()  # discard potentially sensitive server content
         print(
-            f"ERROR uploading {relpath}: HTTP {error.code}\n{body}",
+            f"ERROR uploading {relpath}: HTTP {error.code}",
             file=sys.stderr,
             flush=True,
         )
@@ -408,7 +408,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         content_type = content_type_for(relpath) or "(no content-type -> 0-byte live!)"
         print(f"  {relpath}  [{content_type}]")
 
-    client = PROVISION.DomoClient()  # defaults to maintenance-instance; honors DOMO_INSTANCE
+    client = PROVISION.DomoClient()  # requires an explicit target instance
     auth_mode = "developer-token" if getattr(client, "dev_token", "") else "SID (ryuu refresh token)"
     print(f"auth:       {auth_mode}")
 

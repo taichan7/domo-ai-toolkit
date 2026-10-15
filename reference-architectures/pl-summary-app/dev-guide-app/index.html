@@ -83,7 +83,7 @@
       <div><dt>文書種別</dt><dd>ハンズオン教材（手を動かす）</dd></div>
       <div><dt>所要</dt><dd>約 3 時間・ステップ順</dd></div>
       <div><dt>対象</dt><dd>店舗別損益AIデモ 開発者</dd></div>
-      <div><dt>版</dt><dd>v0.3.0（2026-10-15）</dd></div>
+      <div><dt>版</dt><dd>v0.3.2（2026-10-15）</dd></div>
     </dl>
 
     <div class="abstract">
@@ -615,7 +615,7 @@ set -a; . config/secrets.env; set +a</pre>
     </figure>
     <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-lock"/></svg><b>トークンの厳禁事項（必ず守る）</b>：① <b>echo・表示・チャットへ貼り付け・コミットをしない</b>（値を会話に残さない）。② 書き込む前に <code>config/secrets.env</code> が <code>.gitignore</code> に載っていることを確認（配布キットは設定済み）。③ <b><code>git add -A</code>／<code>git add -a</code> を使わず、明示パスだけ stage</b>する。④ プロンプト本文にトークンを貼って渡してしまったら、<b>まず <code>config/secrets.env</code> へ退避し、会話に残る本文からは消す</b>。</p>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-refresh"/></svg><b>再開チェック（休憩後・ターミナルを開き直したら必ず）</b>：資格情報と名札はセッションに紐づくので、続きを始める前に <b>① <code>domo login</code>（SID は約 1 時間で失効）→ ② <code>set -a; . config/secrets.env; set +a</code>（トークン）→ ③ 名札（<code>PL_SANDBOX_SUFFIX</code>）</b>の順で入れ直す。これを飛ばすと「さっきまで動いていたのに急に認証エラー」になりやすい。</p>
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg>同じインスタンスで複数人が進める回は、名札 <code>PL_SANDBOX_SUFFIX</code>（例「検証・氏名」）を設定すると、DataFlow・4 出力・保存CE・統合サブWF・WF-01・AppDB・DataApp がすべて自分専用名になり、本番や他参加者と衝突しない。<b>保守用インスタンス（<code>maintenance-instance</code>）では名札が未設定だと本番オブジェクトの作成・更新が拒否される</b>（本番保護・詳細は §8）。本番メンテナが本番を更新する時だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示する。</p>
+    <p class="sec__note">本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</p>
     <div class="callouts callouts--2">
       <div class="callout callout--accent"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-user"/></svg></span><h4>ひとりで進めるとき（講師・運営なし）</h4><p>開発者トークンが無くても、<b>編集 → <code>node --check</code> → <code>node tests/test_drill_helpers.js</code> → <code>domo dev</code> プレビュー → <code>domo publish</code> → データ層配備（<code>provision_domo.py</code>）→ App Studio 埋め込み</b>まで、すべて <code>domo login</code> だけで一人で回せる。<b>ソロで唯一塞がるのは ワークフロー層（<code>provision_workflows.py</code>＝AI 長文レポート・開発者トークン/SID が要る）</b>だけ。概要／事業部別タブ（KPI・チャート・短文サマリー）は長文が無くても動く。</p></div>
       <div class="callout"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg></span><h4>詰まったら</h4><p>ネットワーク／権限で詰んだら、運営（いなければ<b>自社の Domo 管理者／情シス</b>）へ。共有 AppDB を誤操作したら再実行・削除せず、そのまま管理者へ。</p></div>
@@ -1385,7 +1385,7 @@ node tests/test_drill_helpers.js</pre>
       </div>
       <figcaption>AI 生成レポートは プロンプト → 保存 → 表示 の 3 層で品質を守る。表示（<code>stripReportTitle</code>／<code>markReportMeta</code>）は<b>内容を変えずスタイルだけ</b>整え、保存門番は不完全保存で既存の正レポートを巻き添え削除しない</figcaption>
     </figure>
-    <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg><b>保存CE の門番がチェックする 4 つの必須フィールド</b>＝<code>doc_key</code>・<code>store_id</code>・<code>location_name</code>・<code>analysis_html</code>。<code>save</code> は<b>破壊的</b>（同一 <code>doc_key</code> の旧版を削除する）ため、これらが欠けた不完全ドキュメントで<b>既存の正レポートを上書き削除しない</b>よう POST 前に弾く。<code>doc_key</code> 欠落は <code>MISSING_DOC_KEY</code> で返し、1 件の不備が Workflow ステップ全体を止めない（AI は理由を受け取って終了）。<code>collection_id</code> は<b>GUID 形状のみ検証＝インスタンス非依存</b>（移植先では WF-01 の CollectionId 変数だけ差し替える）。文書は約 200KB 上限、一括削除は URL 長を抑えるため 100 件ずつに分割する。</p>
+    <p class="sec__note sec__note--strong">保存CEは <code>pl_report_api(operation, request)</code> の単一入口です。<code>save</code>／<code>validate</code>／<code>start</code>／<code>status</code> を扱います。保存先は配備時に解決したコレクションへ固定し、未設定や別コレクションの指定は通信前に拒否します。保存の必須項目は <code>doc_key</code>・<code>store_id</code>・<code>location_name</code>・<code>analysis_html</code>。認証はDomoランタイムが注入し、秘密をコードへ埋め込みません。</p>
 
     <h3 class="sub">部品ごとの「よくある誤解」</h3>
     <p class="sec__lead">分解したあとに最も混乱しやすい 4 点を先に潰しておく。どれも「どの部品が何を担うか」を 1 枚ずらすと起こる誤解で、系譜（上の出どころ地図）に戻れば必ず解ける。</p>
@@ -1441,11 +1441,11 @@ node tests/test_drill_helpers.js</pre>
         <dt>状態ラベル／リスクレベル（決定的な列）</dt><dd><code>summary</code> が持つ<b>機械確定の列</b>。<code>状態ラベル</code>は SQL <code>CASE</code> が利益率と <code>前月比利益変化率</code> から 5 値（全社は 4 値）で確定する<b>単一の真実</b>で、短文・長文の AI は転記するだけ。<code>リスクレベル</code>・<code>予算達成度</code>・<code>前年同月比売上変化率</code> も同じく事前計算済みの列で、画面はそのまま表示に使う（画面側で判定し直さない）。</dd>
         <dt>TextGeneration タイル（短文 AI）</dt><dd>DataFlow 内の AI。<b>2 本</b>＝①<code>店舗別AIサマリー生成</code>（<code>prompt_dataflow_store_summary.md</code>・<code>店舗別AIサマリー</code> 列）②<code>全社AIサマリー生成</code>（<code>prompt_dataflow_company_summary.md</code>・<code>全社AIサマリー</code> 列・全行同一視点）。<b>状態ラベルは再判定せず転記</b>。行ごと実行のため全社列は僅かなバリアントが混在しうるが、画面が最頻値を決定的に選ぶ。全社分をバッチで作り置きし即時表示する。数値は計算させず解釈のみ。</dd>
         <dt>AppDB（レポート保存）</dt><dd>アプリ専用の JSON 文書 DB。「<code>店舗別損益AI要約</code>」コレクション（<b>名前でなく UUID</b> で呼ぶ）。<b>店舗別＋全社の長文レポート</b>（<code>analysis_html</code>）。<code>doc_key</code>＝<code>{store_id}-{period}-{scenario}</code>（全社は <code>ALL-…</code>）。書けるのは <code>content</code> だけ。保存は保存CE 経由。表示は <code>generated_at</code> 降順の最新 1 件を選ぶ。</dd>
-        <dt>Code Engine（サーバー関数）</dt><dd>公開 <b>1 関数 <code>pl_report_api(operation, request)</code></b>（非公開ヘルパは publish で消える）。<code>operation</code> は <b>2 つ</b>＝<code>save</code>（AppDB 保存＋<b>同一 <code>doc_key</code> の厳密に古い旧版だけ削除</b>＝重複除去を保存に内包・必須フィールド欠落は POST 前に弾く門番付き）／<code>validate</code>（保存前の軽い識別子検証・任意）。<code>collection_id</code> は GUID 形状のみ検証＝<b>インスタンス非依存</b>。認証トークン不要（<code>codeengine</code> ランタイムが注入）。レガシー <code>appdb_maintenance.py</code>（<code>dedupe_appdb_documents</code>・フロー非配線の手動バッチ用）も残置。</dd>
+        <dt>Code Engine（サーバー関数）</dt><dd>保存CEは <code>pl_report_api(operation, request)</code> の単一入口です。<code>save</code>／<code>validate</code>／<code>start</code>／<code>status</code> を扱います。保存先は配備時に解決したコレクションへ固定し、未設定や別コレクションの指定は通信前に拒否します。保存の必須項目は <code>doc_key</code>・<code>store_id</code>・<code>location_name</code>・<code>analysis_html</code>。認証はDomoランタイムが注入し、秘密をコードへ埋め込みません。</dd>
         <dt>メイン WF（WF-01）</dt><dd><b>並列サイドブランチ＋終了 2 つ</b>。開始→店舗別SQL から、本線（店舗ループ：単一店舗→整形→<b>15 秒待機タイマー</b>→統合サブWF(<code>store</code>)→次店舗?→終了#1）と、フォークした全社ブランチ（全店舗SQL→整形→統合サブWF(<code>company</code>)→終了#2）を並走。15 秒は <code>company</code> を <code>wait:False</code> で非同期投入する際の同時実行を抑え、AI 書込みの一時失敗を平準化する（従来 2 回連続実行で収束）。先頭の dedupe ノードは撤去済み（保存CE に内包）。座標・経路は <code>provision_workflows.py</code> の<b>数学的レイアウトエンジン</b>が算出し、PUT 前に <code>validate_layout</code> が重なり 0・経路貫通 0 をゲートする＝再デプロイで崩れない。</dd>
         <dt>統合サブWF</dt><dd>開始→<b>5 秒待機</b>→レポート種別? ゲートウェイ（<code>report_type</code> で分岐）→店舗AI／全社AI→保存→終了。両 AI が <code>pl_report_api(save)</code> で AppDB 保存、全社 AI は <code>Send Email</code> も保持（宛先は env <code>PL_EMAIL_PERSON_RECIPIENTS</code>。未設定なら宛先ゼロで配備され配備時に警告が出る＝実行時は AI が宛先を創作せず送信をスキップする。保存は実施されるので成功を偽装しない）。<b>旧 WF-02（店舗）／WF-03（全社）を 1 本に統合済み</b>（プロンプトのファイル名 <code>prompt_wf02_store.md</code>／<code>prompt_wf03_summary.md</code> の <code>wf02</code>／<code>wf03</code> はその名残）。</dd>
         <dt>AI Agent（2 つ）</dt><dd>統合サブWF 内の自律ノード。①<b>店舗ブランチ</b>（<code>prompt_wf02_store.md</code>）＝店舗長文。②<b>全社ブランチ</b>（<code>prompt_wf03_summary.md</code>）＝全社長文（純利益ワースト視点）。両方 <b>context＝<code>summary</code>＋<code>detail</code></b>、<b>tool＝<code>pl_report_api</code></b>、指示＝プロンプト。計算させず解釈だけ、<b>状態ラベルは転記</b>、成果は<b>ツール引数（構造化 JSON）</b>で受け取る。</dd>
-        <dt>名札（PL_SANDBOX_SUFFIX）とデプロイ入口</dt><dd>データ層は <code>provision_domo.py</code>（seed／CE／AppDB／DataFlow／4 出力）、ワークフロー層は <code>provision_workflows.py</code>（保存CE・統合サブWF・WF-01）が配備する。<b><code>PL_SANDBOX_SUFFIX</code> を 1 個設定</b>すると両層が読み、全オブジェクト名が一意化されて<b>本番や他参加者と衝突しない</b>。保守用インスタンス（<code>maintenance-instance</code>）の本番名のまま配備するのは<b>本番メンテナが <code>PL_ALLOW_PRODUCTION=1</code> を明示したときだけ</b>（既定は fail-closed で止まる）。</dd>
+        <dt>名札（PL_SANDBOX_SUFFIX）とデプロイ入口</dt><dd>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</dd>
       </dl>
       <figcaption>部品ごとの具体仕様 ― 種データ・画面・集計・決定的列・短文 AI・保存・サーバー関数・親子 WF・長文 AI・名札。正本は各フォルダのコード</figcaption>
     </figure>
@@ -1595,10 +1595,10 @@ node tests/test_drill_helpers.js</pre>
       <figcaption>配布は 2 層 ― データ層は SSO で名称発見→張り替え、ワークフロー層だけ開発者トークンが要る。<b>ゼロからの正順は §5</b></figcaption>
     </figure>
     <div class="callouts callouts--2">
-      <div class="callout callout--accent"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg></span><h4>名札で安全に試す</h4><p>共有の検証インスタンス（<code>maintenance-instance</code>）でも、<code>PL_SANDBOX_SUFFIX</code> を 1 つ設定すれば<b>全オブジェクト名が一意化</b>され、本番や他の参加者と衝突しない。</p></div>
+      <div class="callout callout--accent"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg></span><h4>名札で安全に試す</h4><p>共有の検証インスタンス（<code>example.domo.com</code>）でも、<code>PL_SANDBOX_SUFFIX</code> を 1 つ設定すれば<b>全オブジェクト名が一意化</b>され、本番や他の参加者と衝突しない。</p></div>
       <div class="callout"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-lock"/></svg></span><h4>本番は明示ゲート</h4><p>名札なしで本番名のまま配備しようとすると<b>止まる</b>。本番メンテナが <code>PL_ALLOW_PRODUCTION=1</code> を明示したときだけ通る（＝事故で本番を上書きしない）。</p></div>
     </div>
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-info"/></svg>名称発見の肝：ソースに埋まった保守用インスタンスの ID は、<code>sync-manifest</code>（データ・コレクション）と <code>app-studio</code>（埋込カードの context mapping）が<b>対象インスタンスの実 ID へ名称で張り替える</b>＝手編集は不要。移植で手で触るのは WF-01 の <code>CollectionId</code> 変数くらい（CE は <code>collection_id</code> の GUID 形状だけ検証＝インスタンス非依存）。</p>
+    <p class="sec__note">保存CEは <code>pl_report_api(operation, request)</code> の単一入口です。<code>save</code>／<code>validate</code>／<code>start</code>／<code>status</code> を扱います。保存先は配備時に解決したコレクションへ固定し、未設定や別コレクションの指定は通信前に拒否します。保存の必須項目は <code>doc_key</code>・<code>store_id</code>・<code>location_name</code>・<code>analysis_html</code>。認証はDomoランタイムが注入し、秘密をコードへ埋め込みません。</p>
 
     <h3 class="sub">画面から長文レポートを手動更新する</h3>
     <p class="sec__lead">ヘッダーの<b>「AIレポートを更新」</b>→全店舗・全社が対象であることとAI利用・通知の確認→<code>pl_report_api(start)</code>→親Workflowの最新有効版を起動する。取消・Esc・×では起動しない。実行中も既存レポートを閲覧でき、<b>「実行状況 ↗」</b>はサブWorkflowの一覧を相対パス<code>/workflows/instances/&lt;sub-model-id&gt;/</code>と<code>domo.navigate(path, true)</code>で別タブに開く。ホストやモデルIDをフロントへ固定しない。</p>
@@ -1706,14 +1706,14 @@ node tests/test_drill_helpers.js</pre>
         <dt>作り方</dt><dd>パッケージに公開関数を定義（<b>関数マニフェストは配備スクリプト <code>provision_workflows.py</code> が生成</b>・<code>asset.json</code> は使わない）＋ <b>API（開発者トークン）</b>で <code>provision_workflows.py ce --apply</code> 配備。ここでの「publish」は CE パッケージの版リリースの意味で、<code>domo publish</code>（ryuu＝Pro Code 専用）とは別物。</dd>
         <dt>公開 / 私有</dt><dd><b>公開関数だけが残る</b>。<code>_</code> 始まりの private は publish で消える→関数数で検証。</dd>
         <dt>権限</dt><dd>トークン無し（tokenless）で呼ばれた関数は、<b>呼び出した人の権限</b>で動く。</dd>
-        <dt>認証はどこから</dt><dd>シークレット不要。Domo 提供の <code>import codeengine</code> モジュールで<b>ランタイムが認証を注入</b>する（旧 <code>DOMO_TOKEN</code> シークレットは不要）。<code>collection_id</code> は <b>GUID 形状だけ</b>検証＝<b>インスタンス非依存</b>（移植先では WF-01 の <code>CollectionId</code> 変数だけ差し替える）。</dd>
-        <dt>このアプリ</dt><dd>公開 1 関数：<code>pl_report_api(operation, request)</code>。<code>operation</code> は <b>2 つ</b>＝<code>save</code>（AppDB 保存＋同一 <code>doc_key</code> の厳密に古い旧版だけ削除＝重複除去を保存に内包・必須フィールド欠落は POST 前に弾く門番付き）／<code>validate</code>（保存前の軽い識別子検証・任意）。<code>collection_id</code> は GUID 形状のみ検証＝<b>インスタンス非依存</b>。レガシー <code>appdb_maintenance.py</code>（dedupe・フロー非配線）も残置。</dd>
+        <dt>認証はどこから</dt><dd>保存CEは <code>pl_report_api(operation, request)</code> の単一入口です。<code>save</code>／<code>validate</code>／<code>start</code>／<code>status</code> を扱います。保存先は配備時に解決したコレクションへ固定し、未設定や別コレクションの指定は通信前に拒否します。保存の必須項目は <code>doc_key</code>・<code>store_id</code>・<code>location_name</code>・<code>analysis_html</code>。認証はDomoランタイムが注入し、秘密をコードへ埋め込みません。</dd>
+        <dt>このアプリ</dt><dd>保存CEは <code>pl_report_api(operation, request)</code> の単一入口です。<code>save</code>／<code>validate</code>／<code>start</code>／<code>status</code> を扱います。保存先は配備時に解決したコレクションへ固定し、未設定や別コレクションの指定は通信前に拒否します。保存の必須項目は <code>doc_key</code>・<code>store_id</code>・<code>location_name</code>・<code>analysis_html</code>。認証はDomoランタイムが注入し、秘密をコードへ埋め込みません。</dd>
         <dt>保存門番の中身</dt><dd><code>save</code> は <b><code>doc_key</code>／<code>store_id</code>／<code>location_name</code>／<code>analysis_html</code> の 4 必須</b>が揃っているかを <b>POST の前</b>に確かめ、欠けていれば弾く＝不完全なレポートを AppDB に入れない。削除は<b>厳密に古い同一 <code>doc_key</code> だけ</b>なので、別実行の正レポートは残る。</dd>
         <dt>使われ方</dt><dd><code>save</code>／<code>validate</code> は統合サブWF の AI Agent の<b>ツール</b>として呼ばれる（→ 詳細③）。<b>画面からは CE を呼ばず</b>、DataSet と AppDB を直読するだけ（§3 の 3 経路）。</dd>
       </dl>
       <figcaption>Code Engine の勘所 ― 公開関数だけ残る・権限は呼び出しユーザー・AI の道具になる</figcaption>
     </figure>
-    <div class="callout callout--accent"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-key"/></svg></span><h4>なぜ「シークレット無し」で動くのか</h4><p>CE はコードに資格情報を書かない。<code>import codeengine</code> がランタイムで認証を注入し、tokenless 呼び出しは<b>呼んだ人の権限</b>で実行される。だから保存CE は<b>どのインスタンスへ運んでも手直し不要</b>で、面の違いは <code>collection_id</code>（GUID 形状チェックのみ）に閉じる。</p></div>
+    <div class="callout callout--accent"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-key"/></svg></span><h4>なぜ「シークレット無し」で動くのか</h4><p>保存CEは <code>pl_report_api(operation, request)</code> の単一入口です。<code>save</code>／<code>validate</code>／<code>start</code>／<code>status</code> を扱います。保存先は配備時に解決したコレクションへ固定し、未設定や別コレクションの指定は通信前に拒否します。保存の必須項目は <code>doc_key</code>・<code>store_id</code>・<code>location_name</code>・<code>analysis_html</code>。認証はDomoランタイムが注入し、秘密をコードへ埋め込みません。</p></div>
 
     <h3 class="sub">詳細③：AI Agent（Workflow 内で自律実行）</h3>
     <p class="sec__lead">知識・道具・指示を与えると自分で手順を踏む AI。<b>知識＝context DataSet／道具＝Code Engine 関数／指示＝プロンプト</b>の 3 点で性格が決まる。</p>
@@ -1808,7 +1808,7 @@ node tests/test_drill_helpers.js</pre>
       </div>
       <figcaption>埋め込みは「alias → 実 DataSet」の対応表（context mapping）を持つ。<b>コードは FOLLOW_LATEST で版追従するが、この対応表は manifest 変更に自動追随しない</b></figcaption>
     </figure>
-    <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-alert"/></svg><b>alias を増やしたら必ず <code>provision_domo.py app-studio</code> で mapping を同期</b>する。しないと未マッピングの alias は <code>DA0004 ... not be found in the mapping section</code> で 400 になる。要注意なのは<b>空の mapping は manifest がフォールバックされる</b>（maintenance-instance の現行カードはこれ＝同期不要）が、<b>非空の mapping は manifest を上書きする</b>ので、その環境では<b>全 alias（trend/dept 含む）を同期しないと新 alias が使えない</b>こと。カード本体のコードは <code>versionMode=FOLLOW_LATEST</code> で最新 Pro Code 版へ自動追従する（再 publish で反映）＝<b>版は追うが mapping は追わない</b>、と覚える（→ §5）。</p>
+    <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-alert"/></svg><b>alias を増やしたら必ず <code>provision_domo.py app-studio</code> で mapping を同期</b>する。しないと未マッピングの alias は <code>DA0004 ... not be found in the mapping section</code> で 400 になる。要注意なのは<b>空の mapping は manifest がフォールバックされる</b>（example.domo.com の現行カードはこれ＝同期不要）が、<b>非空の mapping は manifest を上書きする</b>ので、その環境では<b>全 alias（trend/dept 含む）を同期しないと新 alias が使えない</b>こと。カード本体のコードは <code>versionMode=FOLLOW_LATEST</code> で最新 Pro Code 版へ自動追従する（再 publish で反映）＝<b>版は追うが mapping は追わない</b>、と覚える（→ §5）。</p>
 
     <h3 class="sub">エージェントへのプロンプト例（コピーして使う）</h3>
     <p class="sec__lead">「<b>どう頼むか</b>」で成果が変わる。下の例は<b>そのままコピー</b>してエージェントのチャットに貼れる。安全な順に <b>①・⑤・⑧＝読取（今すぐ可）</b>／<b>⑥・⑦＝提案・相談だけ（変更しない）</b>／<b>②・③・④＝ファイルを編集</b>（＝<b>§7 の検証コピー <code>~/handson-pl</code> を VS&nbsp;Code で開いた状態で</b>・パスはそのフォルダ基準で実行）。迷ったら ⑦。</p>
@@ -2020,7 +2020,7 @@ python3 scripts/provision_workflows.py verify</pre>
             <tr><th scope="row" class="role">初回 publish が <b>design 不在</b>で失敗</th><td><code>manifest.json</code> の <code>id</code> が別インスタンスの design ID のまま</td><td class="memo"><code>id</code> を空にして publish → 払い出された design ID を <code>id</code> に反映</td></tr>
             <tr><th scope="row" class="role"><b>トレンドが空表示</b>・事業部タブが出ない</th><td>埋込カードの context mapping 未同期＝<code>trend</code>／<code>dept</code> alias が proxy で <code>400（DA0004）</code></td><td class="memo"><code>provision_domo.py app-studio</code> で context mapping を同期（FE は graceful degrade 済み）</td></tr>
             <tr><th scope="row" class="role"><b>サマリータブが常に「準備中」</b></th><td>ワークフロー層（長文 AI）未配備で AppDB の <code>analysis_html</code> が未生成</td><td class="memo"><code>provision_workflows.py provision --apply --release</code> → WF-01 を手動実行。長文不要なら放置可</td></tr>
-            <tr><th scope="row" class="role"><code>apply</code>／<code>provision</code>／<code>embed-guide</code> が<b>「名札が未設定」で停止</b></th><td>保守用 <code>maintenance-instance</code> で名札なしの本番書込みをガードが拒否</td><td class="memo">ハンズオンは <code>PL_SANDBOX_SUFFIX='検証・氏名'</code>。本番メンテナのみ <code>PL_ALLOW_PRODUCTION=1</code>（→ §8）</td></tr>
+            <tr><th scope="row" class="role"><code>apply</code>／<code>provision</code>／<code>embed-guide</code> が<b>「名札が未設定」で停止</b></th><td>保守用 <code>example.domo.com</code> で名札なしの本番書込みをガードが拒否</td><td class="memo">ハンズオンは <code>PL_SANDBOX_SUFFIX='検証・氏名'</code>。本番メンテナのみ <code>PL_ALLOW_PRODUCTION=1</code>（→ §8）</td></tr>
             <tr><th scope="row" class="role"><code>provision_workflows.py</code> が<b>認証なし</b>で停止</th><td>ワークフロー層は <code>domo login</code> の configstore を読まない</td><td class="memo"><code>config/secrets.env</code> に <code>DOMO_DEVELOPER_TOKEN</code> を置き <code>set -a; . config/secrets.env; set +a</code>、または <code>SID</code> を設定</td></tr>
           </tbody>
         </table>
@@ -2085,9 +2085,9 @@ python3 scripts/provision_workflows.py verify</pre>
         <div class="vs__panel">
           <div class="vs__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg>名札なし ― 本番保護ガード</div>
           <ul class="vs__list">
-            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-alert"/></svg>保守用 <code>maintenance-instance</code> で名札なしに本番オブジェクトを作成／更新しようとすると、<code>provision_domo.py</code>（apply／app-studio／embed-guide）と <code>provision_workflows.py</code>（provision）が<b>実行を拒否</b></li>
+            <li>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</li>
             <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-key"/></svg>本番メンテナが本番名のまま反映する時だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示</li>
-            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-check"/></svg>顧客が<b>自分のインスタンス（<code>maintenance-instance</code> 以外）</b>へ配備する場合は名札なしでも通常どおり動く（ガードは maintenance-instance の本番だけを守る）</li>
+            <li>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</li>
           </ul>
         </div>
       </div>
@@ -2105,7 +2105,7 @@ python3 scripts/provision_workflows.py verify</pre>
       <dt><code>DA0004</code></dt><dd>未マッピング alias を proxy が解決できない時の 400。FE はトレンド空・事業部タブ非表示へ graceful degrade する（白画面にしない）。</dd>
       <dt><code>domo-assets.json</code></dt><dd>解決済みの App／Page／Card／context 実 ID の控え。<b>gitignore 済みで配布されない</b>ため、新規インスタンスでは名称で発見／作成になる。</dd>
       <dt><code>--skip-dataflow-run</code></dt><dd><code>apply</code> で配線だけ更新し、重い DataFlow 実行（＝短文 AI 生成）を飛ばすフラグ。</dd>
-      <dt><code>PL_ALLOW_PRODUCTION</code></dt><dd>保守用 <code>maintenance-instance</code> で本番名のまま反映する時だけ <code>=1</code> を立てる本番メンテナ専用スイッチ（→ §8）。</dd>
+      <dt><code>PL_ALLOW_PRODUCTION</code></dt><dd>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</dd>
     </dl>
 
     <div class="try">
@@ -2302,7 +2302,7 @@ git restore pro-code/index.html</pre>
         <dt>長い対話は定期的に区切る</dt><dd>3 時間の対話でエージェントは<b>文脈を失う</b>ことがある（同じ説明の繰り返し・前の決定を忘れる）。おかしいと感じたら新しいチャット（<code>/clear</code> 等）で<b>起点プロンプトを貼り直す</b>・<code>AGENT.md</code> を読み直させる。</dd>
         <dt>レビューを往復する</dt><dd>一発で仕上げさせない。<b>変更の要点・影響範囲・自信のない箇所</b>を言わせ、人が是非を決めてから次へ。往復のたびに差分は小さく保つ。</dd>
         <dt>完了報告に中身を求める</dt><dd>「できました」だけで終わらせない。<b>何を・どのファイルで変え・どの検証を通したか</b>（緑か赤か）を必ず報告させる。未検証なら「未検証」と明記させる。</dd>
-        <dt>本番名のまま配備させない</dt><dd>保守用 <code>maintenance-instance</code> では、名札 <code>PL_SANDBOX_SUFFIX</code> なしの本番書込みをスクリプトが<b>拒否</b>する。エージェントには<b>自分のサンドボックス名札</b>を付けさせる（名札運用は §8 に従う）。</dd>
+        <dt>本番名のまま配備させない</dt><dd>保守用 <code>example.domo.com</code> では、名札 <code>PL_SANDBOX_SUFFIX</code> なしの本番書込みをスクリプトが<b>拒否</b>する。エージェントには<b>自分のサンドボックス名札</b>を付けさせる（名札運用は §8 に従う）。</dd>
       </dl>
       <figcaption>どの面・どのエージェントでも効く心得 ― 要は「<b>人が関門を握り、小さく回し、裏を取る</b>」</figcaption>
     </figure>
@@ -2441,7 +2441,7 @@ AGENT.md・docs/setup-guide.md・prompts/deploy-with-agent.ja.md に従うこと
   ※ WF-01 実行は約100店舗の短文＋長文 AI を走らせ、同じインスタンスのクレジットと時間を使う（約25分）。
     まず規模・概算コスト・所要時間を私に説明し、確認を取ってから実行して。
 - apply・publish・provision・WF-01 実行は私の確認後に。完了したら /app-studio/&lt;id&gt; の URL を教えて
-- ⛔保守用インスタンス（maintenance-instance）の本番オブジェクト・他参加者の名札付き資産には絶対に触れない。
+- ⛔保守用インスタンス（example.domo.com）の本番オブジェクト・他参加者の名札付き資産には絶対に触れない。
   PL_SANDBOX_SUFFIX 未設定で保守用の本番を書き換えようとするとスクリプトが拒否する（本番メンテナのみ PL_ALLOW_PRODUCTION=1）</pre>
     </div>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg>これで各自が<b>自分専用のサンドボックス</b>を持てる。<b>名札（<code>PL_SANDBOX_SUFFIX</code>）</b>で DataFlow・4 出力・保存CE・統合サブWF・WF-01・AppDB・seed・DataApp すべてが本番や他参加者と<b>別名</b>になり、互いに上書きしない。だからサンドボックス内では <code>provision_domo.py apply</code>／<code>provision_workflows.py provision</code> を<b>自分の資産に対して実行してよい</b>（§5・§8 の「本番では実行しない」は、<b>名札を付けずに保守用インスタンスの本番へ流す</b>場合の禁止）。以後の編集 → 公開ループはこのサンドボックスで回す。</p>
@@ -2463,7 +2463,7 @@ AGENT.md・docs/setup-guide.md・prompts/deploy-with-agent.ja.md に従うこと
       </div>
       <figcaption id="tblcap-s7-cmds"><code>provision_domo.py</code> のサブコマンド早見 ― データ層・埋め込みは SSO で届く（ワークフロー層だけ <code>provision_workflows.py provision --apply --release</code> ＋ 開発者トークン）</figcaption>
     </figure>
-    <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-lock"/></svg><b>保守／移行用のコマンド（<code>ce</code>／<code>subflow</code>／<code>mainflow</code>／<code>delete-wf03</code>）はサンドボックスでは使えない</b>。これらは<b>固定の本番モデル ID が対象</b>なので名札で隔離できず、保守用 <code>maintenance-instance</code> ではガードが拒否する。<b>名札運用では必ず <code>provision</code></b>（名称で自分専用の CE／WF を発見・作成）を使う。本番名でそのまま配備してよいのは本番メンテナだけ（<code>PL_ALLOW_PRODUCTION=1</code> を明示したとき）。<b>顧客が自分のインスタンス（<code>maintenance-instance</code> 以外）へ配備する場合は名札なしでも通る</b>（ガードは <code>maintenance-instance</code> の本番だけを守る）。</p>
+    <p class="sec__note sec__note--strong">本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</p>
     <figure class="fig">
       <div class="callouts callouts--2">
         <div class="callout callout--accent"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-database"/></svg></span><h4>外部データは要らない（seed が合成）</h4><p>バックエンドまで作っても<b>外部の入力データセット ID は不要</b>。DataFlow の Python タイルが<b>ダミーの P/L を合成</b>し、集計 SQL と AI タイルが <code>summary</code>／<code>detail</code>／<code>trend</code>／<code>dept</code> の 4 出力まで作る。<b>空のインスタンスでも 1 本で完結</b>するので、小さく試して仕組みを掴める。</p></div>
@@ -2796,7 +2796,7 @@ WF-01／統合サブWF / 他参加者（別の名札）の資産
       <div class="callout callout--accent">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-database"/></svg></span>
         <h4>本番は名札（PL_SANDBOX_SUFFIX）で守る</h4>
-        <p>書込みは <b>① <code>provision_domo.py apply</code>（データ層）</b>／<b>② <code>provision_workflows.py provision</code>（ワークフロー層）</b>／<b>③ WF-01 の手動実行</b>＋<b>埋め込み（<code>provision_domo.py app-studio</code>）</b>。<b>名札（<code>PL_SANDBOX_SUFFIX</code>）を付ければ自分のサンドボックスに作用</b>し本番・他参加者に触れない。<b>名札なしで保守用インスタンス（maintenance-instance）の本番を書き換えようとすると provisioner が拒否</b>する（本番メンテナのみ <code>PL_ALLOW_PRODUCTION=1</code>）。<b>配布元の本番 design</b>と<b>他参加者の名札付き資産</b>には触れない。</p>
+        <p>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</p>
       </div>
       <div class="callout">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-grid"/></svg></span>
@@ -2820,8 +2820,8 @@ WF-01／統合サブWF / 他参加者（別の名札）の資産
       </div>
       <div class="callout">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg></span>
-        <h4>守るのは maintenance-instance だけ</h4>
-        <p>ガードは<b>配布元の保守・検証用インスタンス（maintenance-instance）だけ</b>を守る。顧客が<b>自分のインスタンス</b>（例 <code>your-company.domo.com</code>）へ配備する既定フローは、<b>名札なしでもそのまま通る</b>（従来挙動に無影響）。</p>
+        <h4>守るのは example.domo.com だけ</h4>
+        <p>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</p>
       </div>
       <div class="callout">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-alert"/></svg></span>
@@ -2847,18 +2847,18 @@ WF-01／統合サブWF / 他参加者（別の名札）の資産
         <table class="demotable demotable--sm demotable--wrap" aria-labelledby="tblcap-s8guard">
           <thead><tr><th scope="col">状況</th><th scope="col">インスタンス</th><th scope="col">PL_SANDBOX_SUFFIX</th><th scope="col">PL_ALLOW_PRODUCTION</th><th scope="col">判定</th></tr></thead>
           <tbody>
-            <tr><th scope="row" class="role">名札なしで保守用へ</th><td>maintenance-instance</td><td class="memo">（なし）</td><td class="memo">（なし）</td><td><b>拒否</b> ― 本番を守る</td></tr>
-            <tr><th scope="row" class="role">名札を付けて配備<br>（ハンズオン既定）</th><td>maintenance-instance</td><td class="memo">検証・氏名</td><td class="memo">（なし）</td><td><b>通る</b> ― 自分のサンドボックス</td></tr>
-            <tr><th scope="row" class="role">本番メンテナが本番更新</th><td>maintenance-instance</td><td class="memo">（なし）</td><td class="memo">1</td><td><b>通る</b> ― 本番を上書き（明示のみ）</td></tr>
-            <tr><th scope="row" class="role">顧客が自分の環境へ</th><td>自社ドメイン</td><td class="memo">（なし）</td><td class="memo">（なし）</td><td><b>通る</b> ― 保守用でなく対象外</td></tr>
-            <tr><th scope="row" class="role">インスタンス未指定の既定</th><td class="memo">未設定＝maintenance-instance</td><td class="memo">（なし）</td><td class="memo">（なし）</td><td><b>拒否</b> ― 既定先が保守用</td></tr>
-            <tr><th scope="row" class="role">固定モデル操作<br>（ce／subflow／mainflow）</th><td>maintenance-instance</td><td class="memo">検証・氏名</td><td class="memo">—</td><td><b>拒否</b> ― サンドボックス不可（<code>provision</code> へ）</td></tr>
+            <tr><th scope="row" class="role">名札なしで保守用へ</th><td>example.domo.com</td><td class="memo">（なし）</td><td class="memo">（なし）</td><td><b>拒否</b> ― 本番を守る</td></tr>
+            <tr><th scope="row" class="role">名札を付けて配備<br>（ハンズオン既定）</th><td>example.domo.com</td><td class="memo">検証・氏名</td><td class="memo">（なし）</td><td><b>通る</b> ― 自分のサンドボックス</td></tr>
+            <tr><th scope="row" class="role">本番メンテナが本番更新</th><td>example.domo.com</td><td class="memo">（なし）</td><td class="memo">1</td><td><b>通る</b> ― 本番を上書き（明示のみ）</td></tr>
+            <tr><th scope="row" class="role">顧客が自分の環境へ</th><td>自社ドメイン</td><td class="memo">（なし）</td><td class="memo">（なし）</td><td><b>拒否</b> ― 自社環境でも名札または明示フラグが必要</td></tr>
+            <tr><th scope="row" class="role">インスタンス未指定の既定</th><td class="memo">未設定（既定先なし）</td><td class="memo">（なし）</td><td class="memo">（なし）</td><td><b>拒否</b> ― 接続先の明示が必要</td></tr>
+            <tr><th scope="row" class="role">固定モデル操作<br>（ce／subflow／mainflow）</th><td>example.domo.com</td><td class="memo">検証・氏名</td><td class="memo">—</td><td><b>拒否</b> ― サンドボックス不可（<code>provision</code> へ）</td></tr>
           </tbody>
         </table>
       </div>
-      <figcaption id="tblcap-s8guard">本番保護ガードの判定 ― <b>保守用（maintenance-instance）で名札も明示フラグも無いときだけ止める</b>。顧客自身のインスタンスは素通し（既定挙動に無影響）</figcaption>
+      <figcaption id="tblcap-s8guard">本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</figcaption>
     </figure>
-    <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg><b>覚え方</b>：ガードが止めるのは<b>「保守用インスタンス（maintenance-instance）＋名札なし＋明示フラグなし」の一点だけ</b>。ハンズオン受講者は<b>名札を付ければ必ず通る</b>し、顧客は<b>自分の環境なら何もしなくても通る</b>。だから<b>うっかり本番を書き換える経路が無い</b>のが肝。</p>
+    <p class="sec__note sec__note--strong">本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</p>
 
     <h3 class="sub">名札あり ⇄ 名札なし（何が変わる？）</h3>
     <figure class="fig">
@@ -2915,7 +2915,7 @@ export PL_SANDBOX_SUFFIX='検証・&lt;あなたの氏名&gt;'</pre>
     <figure class="fig">
       <dl class="defs">
         <dt>本番 publish の前</dt><dd><b>「コピーの <code>manifest.json</code> から id を外したか？」</b> ― 外していなければ本番 design を上書きする。</dd>
-        <dt>データ層の書込み（<code>apply</code>／<code>provision</code>）の前</dt><dd><b>「<code>PL_SANDBOX_SUFFIX</code> は自分の氏名で入っているか？」</b> ― 名札が無いと maintenance-instance では拒否、顧客環境では本番に効く。</dd>
+        <dt>データ層の書込み（<code>apply</code>／<code>provision</code>）の前</dt><dd><b>「<code>PL_SANDBOX_SUFFIX</code> は自分の氏名で入っているか？」</b> ― 名札が無いと example.domo.com では拒否、顧客環境では本番に効く。</dd>
         <dt>画面の「レポート作成／再作成」</dt><dd><b>「共有 AppDB を上書きし、Domo AI の課金が走る ― 本当に今か？」</b> ― 旧版は <code>pl_report_api</code> の save が同じ doc_key で消す。</dd>
         <dt>削除の前</dt><dd><b>「これは自分が作った氏名入りの資産か？」</b> ― 他参加者・本番のものには触れない。</dd>
       </dl>
@@ -2925,7 +2925,7 @@ export PL_SANDBOX_SUFFIX='検証・&lt;あなたの氏名&gt;'</pre>
       <span class="try__tag"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-list"/></svg>迷ったらこの順で</span>
       <h4>承認の前に 4 つだけ確かめる</h4>
       <ol>
-        <li><b>どこへ効く？</b> ― ローカルだけか、Domo（maintenance-instance か自社）か。<b>Domo に効くなら名札を確認</b>。</li>
+        <li><b>どこへ効く？</b> ― ローカルだけか、Domo（example.domo.com か自社）か。<b>Domo に効くなら名札を確認</b>。</li>
         <li><b>戻せる？</b> ― publish・データ変更・削除は<b>戻しにくい</b>。読取・小さな編集は気軽に許可してよい。</li>
         <li><b>誰のもの？</b> ― 対象は<b>自分の氏名入り</b>か。他人・本番なら拒否。</li>
         <li><b>その指示は読んだ？</b> ― データや AI 出力に紛れた指示でないか。<b>提案コマンドは実行前に自分で読む</b>。</li>
@@ -2938,12 +2938,12 @@ export PL_SANDBOX_SUFFIX='検証・&lt;あなたの氏名&gt;'</pre>
     <h3 class="sub">この節の用語</h3>
     <figure class="fig">
       <dl class="defs">
-        <dt>PL_SANDBOX_SUFFIX</dt><dd>名札。全オブジェクト名に（検証・氏名）を付けて一意化する。<b>両スクリプトが同じ値を読む</b>。設定すれば maintenance-instance でもガードを通り、自分専用のサンドボックスに作用する。</dd>
-        <dt>PL_ALLOW_PRODUCTION</dt><dd>本番メンテナ専用の明示フラグ（<code>1</code>/<code>true</code>/<code>yes</code>）。maintenance-instance で<b>名札なしに本番を更新できる唯一の経路</b>。ハンズオンでは使わない。</dd>
-        <dt>maintenance-instance</dt><dd>配布元の<b>保守・検証用の共有インスタンス</b>（顧客環境ではない）。本番保護ガードは<b>ここだけ</b>を守る。</dd>
+        <dt>PL_SANDBOX_SUFFIX</dt><dd>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</dd>
+        <dt>PL_ALLOW_PRODUCTION</dt><dd>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</dd>
+        <dt>DOMO_INSTANCE</dt><dd>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</dd>
         <dt><code>provision</code> と <code>apply</code></dt><dd><code>provision_workflows.py provision</code>＝名称で<b>自分専用の CE／WF を発見・作成</b>（サンドボックス向き）。<code>provision_domo.py apply</code>＝<b>データ層</b>（seed→DataFlow→4 出力）を配備。</dd>
       </dl>
-      <figcaption>安全ガードまわりの要語 ― <b>名札で守り、フラグはメンテナ専用、ガードは maintenance-instance 限定</b></figcaption>
+      <figcaption>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</figcaption>
     </figure>
 
     <h3 class="sub">この節のチェックリスト</h3>
@@ -3300,14 +3300,14 @@ python3 scripts/provision_domo.py apply</pre>
         <dt>同梱／CDN 禁止</dt><dd>使う JS・CSS・SDK をアプリに<b>同梱</b>し外部 CDN から読まない原則。理由＝①CDN 障害や版違いで壊れない（可用性）②外部の第三者コードを実行しない（安全）。フォントは代替指定つきなら外部可（詳細は §3）。</dd>
         <dt>サンドボックス</dt><dd>参加者ごとに隔離した<b>自分専用の練習環境</b>（FE＋DataFlow＋WF＋CE＋AppDB）。自由に改良でき、本番や他参加者には触れない（§7）。</dd>
         <dt><code>PL_SANDBOX_SUFFIX</code></dt><dd>サンドボックスの<b>名札</b>（例「検証・氏名」）。設定すると全オブジェクト名に付き本番・他参加者と一意に分離。<b>未設定だと本番名のまま＝保守用インスタンスの本番書換を provisioner が拒否する</b>（本番メンテナのみ <code>PL_ALLOW_PRODUCTION=1</code>）。</dd>
-        <dt><code>PL_ALLOW_PRODUCTION</code></dt><dd>保守用インスタンス（<code>maintenance-instance</code>）の<b>本番オブジェクトを名札なしで更新する解除フラグ</b>（<code>=1</code>）。本番メンテナ専用で、受講者は使わない。顧客が自分のインスタンスへ配備する通常フローは、このフラグ無しで素通しする。</dd>
+        <dt><code>PL_ALLOW_PRODUCTION</code></dt><dd>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</dd>
         <dt>店舗別損益（P/L）</dt><dd>本アプリの題材。店舗×勘定科目×月の損益を集計し、売上・利益率・費用構成・純利益ランキングを見る。元データは DataFlow の Python タイルが実名店舗にアーキタイプ（スター店／苦戦店／回復基調 等）を付けて合成する。</dd>
         <dt>Store PL AI Insights</dt><dd>本アプリの<b>Pro-Code カード名</b>。概要／事業部別／サマリーの 3 タブを 1 枚で持つ完全自己完結カード（App Studio の外部フィルターに非依存）。</dd>
         <dt>DF-2042（DataFlow）</dt><dd>集計・整形の中核 Magic ETL。入力整形 → Python 損益合成 → 集計 SQL → 2 枚の TextGeneration（店舗／全社短文）を経て、<b>4 出力</b>（明細 <code>detail</code>／要約 <code>summary</code>／トレンド <code>trend</code>／事業部別 <code>dept</code>）を生む。</dd>
         <dt>4 出力（summary/detail/trend/dept）</dt><dd>DF-2042 が出す配信用データセット。<code>summary</code>＝現在期間の約 100 店舗要約（短文 AI 列を含む）／<code>detail</code>＝24 ヶ月明細／<code>trend</code>＝店舗×月トレンド（約 2,400 行）／<code>dept</code>＝部門×月（48 行・事業部別タブ用）。Pro-Code は alias で参照する。</dd>
         <dt>WF-01（メイン WF）</dt><dd>自動化の親。開始 → 店舗別 SQL から<b>フォーク</b>し、本線＝店舗ループ（1 件ずつ・15 秒待機）／並列＝全社ブランチの 2 系統を走らせ、<b>終了ノードは 2 つ</b>。先頭に独立 dedupe ノードは置かない（重複除去は保存CEに内包）。</dd>
         <dt>統合サブWF</dt><dd>1 件ぶんのレポートを作る子。先頭に 5 秒待機 → <code>report_type</code> ゲートウェイで<b>店舗 AI／全社 AI</b> に分岐し、両方が保存CEで AppDB に書く（全社 AI は加えて Send Email を保持）。旧 WF-02（店舗）／WF-03（全社）を 1 本に統合したもの。</dd>
-        <dt><code>pl_report_api</code>（保存CE）</dt><dd>統合サブWFの両 AI が呼ぶ<b>単一ディスパッチャ</b>の公開関数。<code>operation="save"</code> で AppDB 保存＋同一 <code>doc_key</code> の旧版削除、<code>operation="validate"</code> で保存前の軽い識別子検証（<code>collection_id</code> の GUID 形状 ＋ <code>doc_key</code> の有無を見るだけ・接続はしない）。シークレット不要（<code>import codeengine</code> がランタイム認証を注入）＝インスタンス非依存。</dd>
+        <dt><code>pl_report_api</code>（保存CE）</dt><dd>保存CEは <code>pl_report_api(operation, request)</code> の単一入口です。<code>save</code>／<code>validate</code>／<code>start</code>／<code>status</code> を扱います。保存先は配備時に解決したコレクションへ固定し、未設定や別コレクションの指定は通信前に拒否します。保存の必須項目は <code>doc_key</code>・<code>store_id</code>・<code>location_name</code>・<code>analysis_html</code>。認証はDomoランタイムが注入し、秘密をコードへ埋め込みません。</dd>
         <dt><code>report_type</code></dt><dd>統合サブWFの分岐キー。<code>"store"</code>＝個別店舗の長文、<code>"company"</code>＝全社（経営層向け・問題店舗は純利益ワースト視点）。WF-01 がフォークの各系統からこの値を付けて呼ぶ。</dd>
         <dt><code>doc_key</code></dt><dd>AppDB で 1 レポートを一意に指すキー。個別店舗＝<code>{store_id}-{period}-{scenario}</code>（例 <code>S001-2024-11-Actual</code>）、全社＝<code>ALL-{period}-{scenario}</code>。保存時の重複除去はこのキー単位で行う。</dd>
         <dt>状態ラベル（5 値）</dt><dd>店舗の健全性を表す決定的ラベル：<b>好調／堅調／要注意／回復基調／不振</b>。ETL の集計 SQL が <code>CASE</code> 式で確定し <code>状態ラベル</code> 列に出す（好調 利益率≥8%／堅調 5-8%／要注意 0-5%／回復基調 利益率&lt;0 かつ前月比利益改善／不振 それ以外）。短文も長文も<b>再判定せず転記</b>。全社は 4 値（回復基調なし）。</dd>
@@ -3468,7 +3468,7 @@ git config --global http.proxy http://proxy.example.co.jp:8080</pre>
 </main>
 
 <footer class="sitefoot">
-  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>店舗別損益 ・ 開発ガイド ― 店舗別損益AI分析 ・ v0.3.0
+  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>店舗別損益 ・ 開発ガイド ― 店舗別損益AI分析 ・ v0.3.2
 </footer>
 
 <!-- トースト（コピー等のフィードバック） -->

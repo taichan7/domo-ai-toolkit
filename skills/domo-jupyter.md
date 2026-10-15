@@ -47,7 +47,7 @@ On disagreement, take the **more conservative** tier. The single guarded failure
 ### 1. Author and run notebooks
 
 - **JupyterLab interface**; kernels are **Python or R**; cells are code/markdown/raw; Run All; File Browser; integrated terminal (`File > New > Terminal`) (`[KB]`).
-- **Persistent home directory** (`/home/domo` appears in Domo's GitHub article); notebooks and files survive stops; **multiple notebooks per workspace** (`[KB]`).
+- **Persistent home directory** (`/path/to/home` appears in Domo's GitHub article); notebooks and files survive stops; **multiple notebooks per workspace** (`[KB]`).
 - **Libraries**: install with `conda install <pkg> -y` (or pip/cran fallbacks) from the terminal; Domo's base env does not guarantee every third-party lib; no JupyterLab plugins; no code copilot (`[KB]`).
 - **Kernel snapshots** capture the customized conda env (used to make model hosting match the dev env); restore-to-base-env (Manage Kernel Snapshots) and "Restore Kernel Defaults" are UI actions — the latter requires all instances stopped (`[KB]`).
 - **Workspace stop/start**: workspace runs while you use it; **Timeout** (inactivity) auto-stops it (default **8 hours**) (`[KB]`).

@@ -23,6 +23,26 @@
 
 ---
 
+## Current portable release gate (inventory / P-L)
+
+For the bundled inventory and P/L references, the current distribution contract
+supersedes older examples below that retain a production design ID or limit guards
+to a maintenance host:
+
+- Omit both design IDs and clear tenant mapping IDs before distribution.
+- Exclude deployment registries, credentials and sandbox state even if tracked.
+- Require an explicit target and a sandbox name tag; base-name writes need a
+  deliberate production opt-in on every instance.
+- Use the maintained shared ZIP/sync pipeline, never a raw folder archive.
+- Run `../scripts/check-public-distribution.py` in the public checkout alongside
+  the secret scan. Audit PNG metadata as well as text.
+- Validate an extracted release without a parent workspace or local registry.
+  Test doubles must bind to the imported module rather than a mutable global SDK
+  stub shared with other apps.
+- Teaching-reference validation does not prove atomic stock writes or AppDB row
+  authorization. Read each app's distribution-readiness document before adoption.
+
+
 ## 0. 30秒で全体像
 
 ```
@@ -362,7 +382,7 @@ bash ../scripts/make-handson-zip.sh [出力.zip]          # 省略時 $ROOT/hand
 
 - **変えない（型）**: 純静的 Pro Code（datasetsMapping 空）、版の単一ソース＋`check.mjs` の正規表現検査（Chrome 不要で CI 安全）、
   番号は CSS カウンタ、5観点のコンテンツ設計、`--brand-primary` 1色からの color-mix 導出。
-- **変える（顧客固有）**: `--brand-primary`（現 Daiwa 深紅 `#741826`）、ブランド文言、保護対象 design id、
+- **変える（顧客固有）**: `--brand-primary`（現 REDACTED 深紅 `#741826`）、ブランド文言、保護対象 design id、
   §3/§4 の具体値（タイル数・出力本数・15面の面構成）、§7 の作業パス（`~/handson-ci`）・スクリプト名・実インスタンス名。
 
 ---
@@ -552,7 +572,7 @@ clean な discovery/verification pass も valid な outcome。
 同じ増分で更新する（§8.2 の「コードと doc は同時に動かす」をこの文書自身にも適用）。事実（定数・行番号・id）は時間で陳腐化しうるので、
 横展開前に参照ファイルで裏取りすること。
 
-**第2の適用例（2026-10-06）**: 本パターンを `production-priority-app`（ヤマハ 鄭さんチーム・生産優先度分析）へ移植した。
+**第2の適用例（2026-10-06）**: 本パターンを `production-priority-app`（サンプル企業 担当者チーム・生産優先度分析）へ移植した。
 このアプリは Code Engine／Workflow／AppDB を持たない **2 層（Magic ETL DataFlow 3063 ＋ Pro Code FE）** のため、
 名札隔離・本番保護ガードの対象は **FE（`scripts/app_studio.py` の DataApp／カード・名札＋`CI_ALLOW_PRODUCTION` ガード、
 `--embed-guide` でページ2）** と **DataFlow（`dataflow/deploy_3063.py` に名札サンドボックス新規作成＋本番保護ガードを追加）** の

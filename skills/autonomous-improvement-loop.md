@@ -95,10 +95,10 @@ Autonomy is not a license to bypass the workspace's safety rules. All of `AGENTS
 
 ## Convergence check — 「価値ある作業が無い」を客観判定する（工事を捏造しない）
 
-上の「truly nothing valuable → idle」と runaway backstop は、**収束をどう客観判定するか**を各エージェントの主観に委ねている。the original workspace は同一 git identity「Taichi Katoh」で複数エージェント（Codex / 別 Claude / Copilot …）が同時に働くため、判定を誤ると **churn（無価値コミット）か peer collision（並行編集・重複作業）** のどちらかを生む。増分を選ぶ**前**に次を実行して飽和を客観化する:
+上の「truly nothing valuable → idle」と runaway backstop は、**収束をどう客観判定するか**を各エージェントの主観に委ねている。the original workspace は同一 git identity「Example Developer」で複数エージェント（Codex / 別 Claude / Copilot …）が同時に働くため、判定を誤ると **churn（無価値コミット）か peer collision（並行編集・重複作業）** のどちらかを生む。増分を選ぶ**前**に次を実行して飽和を客観化する:
 
 1. **owned dir の recency scan** — `for d in <owned dirs>; do git log -1 --format='%cr %h %s' -- "$d"; done | sort`。**全 owned が ~24h 以内 touch（多くは 1-3h）＝ readily-takeable 面は fleet に飽和**。最古の dir が数時間内なら「まだ手つかずの地面」は無い。
-2. **同一 identity 確認** — `git log --since='3 hours ago' --format='%an'` が全て同じ「Taichi Katoh」＝実体は並行 peer。Monitor の「PEER PUSH」通知や自分の push echo と混同しない。
+2. **同一 identity 確認** — `git log --since='3 hours ago' --format='%an'` が全て同じ「Example Developer」＝実体は並行 peer。Monitor の「PEER PUSH」通知や自分の push echo と混同しない。
 3. **lane 確認** — `tasks/in-progress.md` と `tasks/shared-notices.md` で明示レーン（例: README衛生 / 特性化テスト重複防止 / API-surface skillization / marketdata / PPA）を読む。狙う軸が既にレーン化＝ in-flight。
 4. **false-idle を避ける** — 「直近 3h は README のみ touch」で早合点しない。7 日窓（`git log --since='7 days ago' -- <proj>`）で comprehensively swept か確認する。
 5. **判定** — 飽和なら repo 変更を**捏造しない**。収束は handoff に**一度だけ**記録する（handoff/skill は共有ファイル＝二重編集の collision 源。記録済みなら再編集もしない）。verify-and-idle の "verify" は `check-secrets.sh` + `validate-workspace.sh` の green 確認まで。あとは正直に status を述べてターンを閉じ、backstop に委ねる。**clean discovery/verification pass は valid outcome**。zero-collision な価値作業（private memory 追記、実際に空いた lane の作業）だけ可。

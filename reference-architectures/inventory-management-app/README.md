@@ -14,6 +14,17 @@ Domoの機能をどのように分担・接続するかを学ぶ、ソフトウ�
 > をコーディングエージェント（Claude Code / Cursor 等）へそのまま渡すと、「認証 → デプロイ → 検証」まで
 > 案内します。手順の本体は [AI再構築ランブック](docs/ai-rebuild-runbook.md) が正です。
 
+## 配布品質と適用範囲
+
+配布には公開toolkitの参照アプリまたは検証済みZIPを使います。保守フォルダをそのまま圧縮しません。
+配布版のデザインIDと接続IDは未設定で、対象インスタンスで `apply`・`sync-manifest` により解決します。Code EngineとWorkflowの版も、保守環境の値を流用せず配備先で同期します。
+`domo-assets.json` はローカル生成物です。Git・配布物には含めません。
+接続先 `DOMO_INSTANCE` を必ず明示し、ハンズオンでは `INVENTORY_SANDBOX_SUFFIX` を付けます。
+
+[配布判定と本番適用の条件](docs/distribution-readiness.ja.md)も確認してください。
+在庫の残高更新・request_idの重複チェックは、分散トランザクションや原子的な在庫引当を保証しません。
+同一在庫への同時更新、共有範囲・権限、負荷、実機QRと通知メールは顧客環境での検証が必要です。
+
 ## 現在の最小構成
 
 ```text
@@ -127,7 +138,7 @@ WiringはManifestの次の4点です。Code Engineは実在するreleased versio
 ## 検証状態
 
 - ManifestのPro Code／Code Engine（`inventory_api`）の各バージョン、通知Workflowモデルの**modelId 一致**と**Code Engineソースへの起動先modelIdの焼き込み**（`codeEngineWorkflowModelEmbedded`）、Domo API、AppDB標準同期、DataFlow、分析DataSet、App Studio配置を `verify` で照合し、`ok: true` を確認しています。各バージョンの実値は改修のたびに変わるため、README本文に固定値は書かず `manifest.json` と `verify` 出力を正とします。通知Workflowの**版**はインスタンス依存で動くため（新規インスタンスは seed 1.0.0 から実 DataSet／実 sendEmail 版へ接地して 1.0.1 以降へ作り直し・`sync-manifest` は版欄を書き戻さない）`ok` の条件には含めず、宣言版と live 版の乖離は `workflowWarnings` に可視化するに留めます（CEが起動時に最新の有効版を解決するため、版の一致は動作条件ではありません）。
-- App Studioカードはdesignの最新公開版追従（`designVersion: null`）で、外側instance/proxyと内側contextは標準どおり分離されています。参照インスタンスの実ID（カード／design／proxy／context）は [Domoアセット台帳](docs/domo-assets.md)・[domo-assets.json](domo-assets.json)・[app-studio/app-studio.json](app-studio/app-studio.json) を正とし、インスタンスごとに採番されます（本文に固定IDを書きません）。
+- App Studioカードはdesignの最新公開版追従（`designVersion: null`）で、外側instance/proxyと内側contextは標準どおり分離されています。実IDは配備後のmanifest・対象API・ローカル生成の `domo-assets.json` で確認します。[アセットと配線](docs/domo-assets.md)は名称契約、App Studioスナップショットは構造の参考です。
 - App Studioは2ページ構成です。ページ1が在庫入出庫管理（このPro Code）、ページ2が開発ガイド（`dev-guide-app/` の純静的Pro Code文書）で、各ページにカードを1枚ずつ埋め込みます。ページ2のスロットは旧「開発者リファレンス」から**同じdesign ID（`dev-guide-app/manifest.json` の `id`）を再利用して開発ガイドへ中身を差し替えた**もので、`dev-guide-app` を `domo publish` すると同一designの新版が出て、ページ2は `FOLLOW_LATEST` で**再埋め込みなし・孤児カードなし**に更新されます（新しいdesignを採番したり旧ページ2を削除したりはしません）。**アプリ本体・カード・layout・ページ2のすべてを `app-studio` サブコマンドが冪等に発見または作成する**ため、Domo UIでの手作業はありません（`domo-assets.json` の登録appIdが対象インスタンスに無ければ404を自己修復して名称で発見／作成し、解決した実IDを書き戻します）。ページ2のタブ名は、新規インスタンスでは「開発ガイド」で自動作成されますが、既にプロビジョニング済みのインスタンス（`maintenance-instance`）では既存ビューを強制改名しない（統合dataappのPUTを避けるため）ので現行タブ名のまま残ります。改名したい場合はApp Studioで一度だけ手で変える任意の作業です。`verify` は `domo-assets.json` に `appStudio.page2` が登録されているときだけページ2のカード存在と最新版追従を確認し、未デプロイ環境では素通りします。ページ2は自己フィットのスクロール文書のため、layout寸法には過剰適合させません。
 - 正常表示する参考designに合わせ、Manifestは1×1で`fullpage`／`allowFullPage`を省略しました。App Studioはカード1枚、静的layout（`isDynamic: false`）、standard 60×82、compact 12×29、終端PAGE_BREAK、`fitToFrame: false`です。現行版ではiframe内の`main`を唯一の縦スクロール領域（100dvhビューポート固定）とします。PC操作を最優先し、カードの`interaction`は既定（未設定＝操作許可）に戻しています。**実機検証（2026-08-08）で、`interaction: DISABLED`はモバイルの青い選択枠を消す一方でPCのクリックも殺す（`editInAppViewer: true`でもPC操作不能）ことが判明したため、v2.4.22の`DISABLED`はv2.4.23で撤回しました。**Domo Mobileでタップ時に出る青い選択枠とスクロールロックは、`interaction`ではなく、iframeを実ビューポート（100dvh）へ固定するCSS＋静的layout＋終端PAGE_BREAKで抑えます。加えて、Web側で無効化できるWebKitのタップハイライト（`-webkit-tap-highlight-color: transparent`）と長押しコールアウト（`-webkit-touch-callout: none`）をbaseで切り、カード内タップ時に青い外枠が描画されるのを抑えます（残るカード選択枠はDomo Mobileホスト側の挙動です）。PC操作確保のため`editInAppViewer: true`（＝ビューアで中身が生きたまま操作可能）を維持します（2.4.19/2.4.20のPCフリーズは`editInAppViewer: false`が原因でした）。QRはライブ映像を全端末（PC／Android／iPhone）の既定にします。ライブ映像は属性版`playsinline`だけでなくIDLプロパティ（`playsInline`／`muted`／`defaultMuted`）も`srcObject`代入前に確定させ、属性版`playsinline`を無視するWKWebViewビルドでもインライン再生を優先します。iPhoneのDomo Mobile（WKWebViewの`allowsInlineMediaPlayback`が無効）ではライブ映像がホスト側で全画面化されますが、全画面のまま読み取りを継続し、成功時は全画面を抜けてこのアプリ画面へ自動で戻ります（`webkitExitFullscreen`＋`dialog.close`）。ホストが全画面を抜けても（`webkitendfullscreen`）、ライブ映像が生きている端末（インライン再生に対応したビルド）では走査をそのまま継続し、動作中の映像の上に［ライブ映像を再開］ボタンを重ねません。インライン再生を続けられず映像が一時停止した端末（利用者が読み取り前に全画面を自分で閉じた等）でだけ、［ライブ映像を再開］ボタンを表示します。端末カメラで1枚撮影する導線（`capture="environment"`）は、ライブ映像を開始できない端末（権限拒否・非セキュアコンテキスト等）でのみ控えとして露出させ、保存画像（写真から選ぶ）と手入力はいずれの端末でも切り替えられます（端末に旧バンドルがキャッシュされていると挙動が変わるため、挙動が古いと感じたらDomoアプリを再起動して最新バンドルを取得してください）。
 - スマホアプリ（Domo Mobileホスト）とPCは別ペルソナとして扱います。ハンディ端末での片手操作を想定し、Domo Mobileホスト（`data-domo-platform="mobile"`）では現場作業に不要な導線（管理メニュー）を隠してコアの入出庫だけに絞り、上部タブをタイル状の大きなボタンに、主要ボタン・数量コントロール・選択カード・文字を大きくします。PCは全機能（管理を含む）と高密度レイアウトを維持します。判定はホスト属性のみに依存させ、幅ドリブンの`@media`とは独立させています（同期は`syncRuntimeLayout()`→`applyMobilePersona()`）。品のある小綺麗なUIは共通で維持します。

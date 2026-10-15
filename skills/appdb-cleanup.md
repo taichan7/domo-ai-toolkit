@@ -17,7 +17,7 @@ Use this path when the user asks to keep only the most recent records, for examp
 
 ```bash
 python3 ../scripts/appdb-prune-latest.py \
-  --collection-url "https://maintenance-instance.domo.com/appDb/3671e809-a3c3-4dcf-b401-09db2d1cd36a/dataexplorer" \
+  --collection-url "https://maintenance-instance.domo.com/appDb/5cd3224e-d440-5b80-9128-d47825799db6/dataexplorer" \
   --collection-name "【PROD】marketdata AI自動売買実行ログ" \
   --keep 10 \
   --concurrency 10
@@ -37,7 +37,7 @@ Show those counts to the user. If delete count is over 100, the collection is hi
 
 ```bash
 python3 ../scripts/appdb-prune-latest.py \
-  --collection-url "https://maintenance-instance.domo.com/appDb/3671e809-a3c3-4dcf-b401-09db2d1cd36a/dataexplorer" \
+  --collection-url "https://maintenance-instance.domo.com/appDb/5cd3224e-d440-5b80-9128-d47825799db6/dataexplorer" \
   --collection-name "【PROD】marketdata AI自動売買実行ログ" \
   --keep 10 \
   --concurrency 10 \
@@ -75,7 +75,7 @@ execution log) and the requirement is "keep the last N days", not "keep the last
 ```bash
 # Dry-run first (default). Shows total / keep / delete counts and the cutoff.
 python3 ../scripts/appdb-prune-latest.py \
-  --collection-url "https://maintenance-instance.domo.com/appDb/3671e809-a3c3-4dcf-b401-09db2d1cd36a/dataexplorer" \
+  --collection-url "https://maintenance-instance.domo.com/appDb/5cd3224e-d440-5b80-9128-d47825799db6/dataexplorer" \
   --collection-name "【PROD】marketdata AI自動売買実行ログ" \
   --keep-days 60 \
   --concurrency 10
