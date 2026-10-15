@@ -27,7 +27,6 @@ The surface is a **single-world, fully-documented OpenAPI island**. Everything l
 
 On disagreement, take the **more conservative** tier. The single guarded failure mode is **over-claiming** — presenting a repo convenience, an untested runtime behavior, or an inference-from-absence as a documented contract. This entire skill is `[DOC]`/`[INFER]` with **zero `[REPO]`**: no working code in this repo calls this API, and **no request was ever executed against it** — every claim is read from the spec, so treat all request/response *behavior* (auth acceptance, PUT merge-vs-replace, path routing, pagination) as **documented-but-untested**.
 
-**Verification provenance.** Written after verification Workflow `wf_e1ccdbc0-b42` (15 agents: 6 spec-reading clusters → adversarial refute of the top over-claim-risk claims, each default-refuted-if-uncertain → completeness critic + island verdict → synthesizer), corroborated by **direct raw-YAML fetches** of `openapi/platform/projects.yaml` (1626 lines) and the portal `Projects-And-Tasks-API.yaml` mirror (curl+grep against the raw bytes, not only the WebFetch summarizer). The refute pass **changed the draft**: it demoted "List type is a closed enum" and "no product-side board API" to `[INFER]`, corrected "no POST on any task URL" (add-attachment is a POST), flagged the pagination param-name swap, and established the mirror pair is *not* byte-identical (the security-scheme label diverges). 鉄則 satisfied (doc-cross-check + adversarial-verify **before** writing).
 
 ## The naming-trap table — read this first
 

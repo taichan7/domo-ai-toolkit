@@ -1,7 +1,7 @@
 # INSTRUCTOR.md — 講師ノート（3 時間ハンズオン運用）
 
 対象: 在庫入出庫管理アプリを配布された開発者向け / VS Code × コーディングエージェントで Domo を開発。
-教材本体: `dev-guide-app/`（App Studio ページ2「開発ガイド」）。配布: `inventory-management-app/` を ZIP で各自へ。
+教材本体: `dev-guide-app/`（App Studio ページ2「開発ガイド」）。取得: 公開toolkitの `reference-architectures/inventory-management-app/`。
 土台スターターキット: `domo-ai-toolkit`。
 
 > 表記約束: 本ノートの `<自社>` は教材 `index.html` のインスタンス名プレースホルダ（各自の Domo インスタンス名）と同じ。
@@ -12,7 +12,7 @@
 
 ```
 【事前課題（当日までに 15〜30 分）】当日はすぐ実習に入れるよう、家で「緑」にしておいてください。
-0) 配布された inventory-management-app（ZIP）を展開し、分かる場所に置く（以降すべての前提）
+0) 公開toolkitをcloneし、`reference-architectures/inventory-management-app/` を開く（以降すべての前提）
 1) VS Code を入れて、コーディングエージェント拡張（Claude Code / Codex / GitHub Copilot のどれか）にサインイン
 2) Node・Python・Git と Domo CLI（npm install -g ryuu）を入れ、`domo login -i <自社>.domo.com` まで通す
 3) domo-ai-toolkit を clone（dev-guide §1「土台を置く」、または starter リポジトリの README）
@@ -99,27 +99,18 @@
 - 詰まった人・早く終わった人には dev-guide §10「理解度セルフチェック」(1 分) を回させ、理解を自己確認させる（講師の口頭確認の代替）。
 - デプロイの正順（dev-guide §5）は **`provision_domo.py apply` →（別インスタンスのみ）`sync-manifest` →（`cd pro-code && domo publish`）→（`cd dev-guide-app && domo publish`）→ `provision_domo.py app-studio` → `verify`（ok:true）**。`domo publish` は design を配るだけで開ける URL は作らない＝`app-studio` の埋め込みで初めて開ける、を強調する。
 
-## 8. 配布 ZIP の構成（本番 id の扱い・受領物の確認）
+## 8. 公開ソースの取得と接続確認
 
-この配布物（`inventory-management-app` の ZIP）は配布元（Domo SE）が整えた状態で届く。作成は配布元メンテナが
-親リポジトリ直下で **`bash make-handson-zip.sh（非公開メンテナツール）`** を実行して行う（内部で `git archive HEAD` を
-一時領域へ展開＝作業ツリーを汚さず・`pytest_cache` / `__pycache__` / `.DS_Store` を含めない。配布ルール適用後に
-5項目の配布前検証を自動実行し、1つでも失敗すれば `exit 1`）。手で `git archive` するだけでは下記の id 除去は行われない。
-
-- `dev-guide-app/manifest.json` の `id` はビルダーが**外す**（受講者が誤って `cd dev-guide-app && domo publish` しても
-  本番ガイド design `aeb6e8d5` を上書きせず、使い捨ての新 design が採番されるだけ）。
-- `pro-code/manifest.json` の本番 design id は、受講者が dev-guide §7 で**自分の手で id を外し、新しい design を採番する**学習ステップのため意図的に残す（cwd 事故の防止は dev-guide §7 の手順説明と dev-guide §5 のコールアウトに依存）。
-
-受領した配布 ZIP を念のため確認するなら（いずれも期待どおりなら安全）:
+公開 `domo-ai-toolkit` をcloneし、`reference-architectures/inventory-management-app/` を開く。
+公開ソースの本体・ガイドmanifestには保守用design IDを含めず、接続IDも未設定。
+対象インスタンスと名札を指定してprovisionし、`sync-manifest` 後にpublishする。
+保守用ワークスペースや他参加者の `domo-assets.json` をコピーしない。
 
 ```bash
-unzip -l <配布>.zip | grep -E 'pytest_cache|__pycache__|DS_Store'                                  # 何も出ない
-unzip -p <配布>.zip inventory-management-app/dev-guide-app/manifest.json | grep -c '"id"'           # 0（dev-guide の id は除去済み）
-unzip -p <配布>.zip inventory-management-app/pro-code/manifest.json     | grep -c '"id"'            # 1 以上（業務アプリ本体の design id は学習用に意図的保持）
+git clone https://github.com/taichan7/domo-ai-toolkit.git
+cd domo-ai-toolkit/reference-architectures/inventory-management-app
+node dev-guide-app/tests/check.mjs
 ```
-
-> 展開後の ZIP は親リポジトリ無しで `node tests/layout/shoot.mjs`（PNG 目視）が動く（vendor 同梱 SDK を含む）
-> ＝「配布 ZIP だけでセルフ完遂」を実機確認する。詳しい読み解きは `docs/handson-guide.md`、配布の入口プロンプトは `prompts/deploy-with-agent.ja.md`。
 
 ## 9. 版同期（版の単一ソース）
 

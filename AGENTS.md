@@ -71,11 +71,15 @@ node --check <app>/pro-code/app.js
 Each reference app also carries its own test suite under `tests/` — see the
 app's README for how to run it.
 
+## Publication
+
+Publish source updates on `main`. Do not create or push version tags, create GitHub
+Releases, or build/upload distribution ZIPs unless the user explicitly requests them.
+Routine source maintenance and commit/push instructions do not imply that request.
+
 ## Conventions
 
-- `handoffs/` — dated handoff notes between agents/sessions
-  (template: [handoffs/HANDOFF_TEMPLATE.md](handoffs/HANDOFF_TEMPLATE.md)).
-- `tasks/shared-notices.md` and `tasks/in-progress.md` — lightweight
-  cross-agent coordination conventions. Adopt them if you run multiple agents.
+- Keep private work logs, deployment state and internal coordination notes out
+  of this public repository.
 - Japanese documentation is welcome for human readers; keep command names,
   paths, Domo object names, and API terms in English.

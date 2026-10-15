@@ -4,22 +4,28 @@
 
 **AI コーディングエージェントと一緒に Domo 開発を進めるための、実戦検証済みツールキット。**
 
-このリポジトリの内容はすべて、実際の Domo インスタンス上で本番アプリを作りながら
-開発・検証されたものです。そのノウハウを、AI エージェント（Claude Code、Cursor、
+公開ドキュメントと Domo アプリ開発で得たノウハウを、AI エージェント（Claude Code、Cursor、
 Copilot、Codex などシェルアクセスを持つもの）が読めばすぐに「認証・クエリ・
-診断・構築」の方法が分かる形でパッケージしています。
+診断・構築」の方法が分かる形でまとめています。各スキルで、ドキュメント・コード・
+推論を区別しています。配備先の権限や機能、本番での動作は別途検証してください。
+
+リポジトリを clone して、`main` のソースを利用してください。
+
+```bash
+git clone https://github.com/taichan7/domo-ai-toolkit.git
+cd domo-ai-toolkit
+```
 
 3つの層で構成されています：
 
 | 層 | パス | 内容 |
 |---|---|---|
 | **スターターキット** | [`docs/`](docs/), [`scripts/`](scripts/), [`templates/`](templates/) | 認証フロー、API リファレンス、実行可能なシェル/Python ヘルパー、Pro Code アプリ雛形 |
-| **スキルライブラリ** | [`skills/`](skills/) | 55 件の作業メモ — Domo の各機能面（DataSets、Magic ETL、Workflows、Code Engine、Pro Code、AppDB、App Studio、AI Services 等）＋汎用エージェント作業スキル |
+| **スキルライブラリ** | [`skills/`](skills/) | Domo の各機能面（DataSets、Magic ETL、Workflows、Code Engine、Pro Code、AppDB、App Studio、AI Services 等）と実装・レビュー・テストの作業ガイド |
 | **リファレンスアーキテクチャ** | [`reference-architectures/`](reference-architectures/) | Pro Code + Code Engine + AppDB + Magic ETL + Workflows + App Studio の接続方法を示す、デプロイ可能な2つの完成アプリ |
 | **依頼テンプレート** | [`prompts/`](prompts/) | AI エージェントに実装・レビュー・プロンプト改訂を依頼するときのコピペ用テンプレート |
 
 
-顧客配布には最新版を使用してください。旧版には除去済みの参照環境メタデータが残る場合があります。
 参照アプリは合成データを使う教材です。配布版の接続IDは未設定で、配備先で解決します。
 本番利用前に、各アプリの `docs/distribution-readiness.ja.md` にある並行更新・権限・負荷・
 会計定義・通知の検証条件を確認してください。資料中の過去の検証は配備先の合格を意味しません。
@@ -70,7 +76,7 @@ bash scripts/list-datasets.sh
 
 ## リファレンスアーキテクチャ
 
-本番品質の2アプリ。どちらも自己完結しており、AI エージェントの案内で
+2つの参照アプリです。どちらも自己完結しており、AI エージェントの案内で
 自分のインスタンスにデプロイできます：
 
 - **[inventory-management-app](reference-architectures/inventory-management-app/)** —
@@ -86,8 +92,8 @@ bash scripts/list-datasets.sh
 ## FAQ
 
 **Q: 更新はどう追えばよいですか？**
-[CHANGELOG.md](CHANGELOG.md) と [Releases](https://github.com/taichan7/domo-ai-toolkit/releases)
-を参照してください。バージョン管理されているので、手元のコピーが最新かどうか分かります。
+[コミット履歴](https://github.com/taichan7/domo-ai-toolkit/commits/main/) を参照してください。
+clone済みのコピーは `git pull` で更新できます。
 
 **Q: Domo 公式プロダクトですか？**
 いいえ。Domo SE が作ったフィールドキットです。使われている API は Domo プラットフォーム

@@ -4,7 +4,7 @@ Use this when changing code, scripts, Pro Code assets, Code Engine functions, pr
 
 ## Checklist
 
-- Read `AGENTS.md`, `README.md`, `TOOLS.md` or `tools.json`, `tasks/shared-notices.md`, `tasks/in-progress.md`, relevant handoffs, and the target project README if it exists.
+- Read `AGENTS.md`, `README.md`, the relevant skill and the target app's README and agent contract.
 - Read the relevant entrypoint before changing behavior: manifest, app script, Code Engine function, dataflow script, prompt, or workflow JSON.
 - Keep the change scoped to the user's request and the smallest practical set of files.
 - For a large file (full Pro Code `app.js` / `index.html`, long prompt, big dataflow JSON), write a minimal version with unique placeholders first, then fill it with a few small edits — never one giant single-shot write, which can truncate mid-write and leave the file partial. See `AGENTS.md` → "Writing Large Files". This is separate from the file-count point above: that is about how *many* files you touch; this is about not writing one large file in a single shot.

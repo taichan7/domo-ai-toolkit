@@ -320,7 +320,7 @@ python3 scripts/provision_domo.py embed-guide
 - 開発ガイドは `datasetsMapping` 空の純静的 Pro Code。context mapping の同期は不要（カード作成＋レイアウト整形のみ）。
 - ローカル検証（Chrome 不要の決定的関門）: `node dev-guide-app/tests/check.mjs`。版は4箇所
   （manifest／colophon／footer／thumbnail）を揃える（詳細は [dev-guide-app/README.md](../dev-guide-app/README.md)）。
-- **配布時**は `make-handson-zip.sh`（非公開メンテナツール） が dev-guide の design id を外す（受講者の誤 publish から本番ガイドを守る）。
+- **公開ソース**のdev-guideのdesign IDは未設定。保守環境のmanifestを流用せず、配備先で新規採番する。
 
 ---
 

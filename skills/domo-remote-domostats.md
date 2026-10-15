@@ -21,25 +21,6 @@ Every claim below carries a tier. Do not silently upgrade a tier.
 
 Rules: a fetch FAILURE (405 / JS-gated / login-wall / 404 / timeout) is MISSING evidence, NOT proof of absence. Universal negatives ("no other ops exist", "the enum is closed") are `[INFER]` unless a doc positively says so. Prefer positive phrasing. The single guarded failure mode is **over-claiming** — presenting a spec quirk or an unverified assumption as documented Domo fact.
 
-Claim-level tier census for this skill: **`[DOC]` 27 / `[KB]` 1 / `[REPO]` 5 (all "none/false-friend") / `[INFER]` 23.** The high `[INFER]` share is the point: the spec is well-formed and portal-rendered, but its auth, base path, list-response shape, and error surface are all genuinely unresolved.
-
-## Verification provenance
-
-Verified before authoring via the Workflow tool, run `wf_d64a89ba-263` (14 agents, 13 succeeded / 1 errored on the base-path refutation — its finding was recovered from the cross-check clusters + the synthesizer, so no coverage gap): 5 spec-reading cross-check clusters (ops/paths/versions, doc-corroboration+repo, auth+base-path+codes, schemas+quirks, semantics+naming-traps) → adversarial refutation of the 8 highest over-claim-risk claims (each default-refuted-if-uncertain) → a synthesizer/island-verdict. Primary sources: the raw candidate YAML (`/tmp/cand-remote-datastats-api.yaml`, 410 lines, read line-by-line), `domo.com/docs/llms.txt` (lists `remote-datastats-api.yaml` under the Product bucket — first-party catalog corroboration), and the dev-portal API-Reference section pages that render the same per-op version prefixes. **No HTTP request was executed against the live surface; documentation-only.**
-
-The seven returned adversarial verdicts (2 REFUTED, 5 PARTIAL, 0 CONFIRMED — all folded into the hedge list below):
-
-| claim | verdict | encoded as |
-|---|---|---|
-| `X-DOMO-Developer-Token` is the documented/required auth for THIS API | **PARTIAL → [INFER]** | header is [DOC] only as Domo's *general* convention; here it is spec-declared and self-contradicted by `session_token` (hedge #1) |
-| `session_token` is a general/API-wide required param | **PARTIAL → [INFER]** | declared required on `getApplications` ONLY; a single-op artifact (hedge #2) |
-| the GET "list" ops return a single object | **REFUTED → [INFER]** | 200 schema is singular but "list" wording + `offset` imply an array/envelope (hedge #3) |
-| the v1/v2/v1 split is intentional/authoritative design | **PARTIAL → [DOC] (URLs) / [INFER] (intent)** | portal renders the split; no rationale given (hedge #4) |
-| path params are named `Application_Id`/`Job_Id` | **PARTIAL → [DOC] observation / [INFER] casing** | those are non-conformant labels; templates say `{applicationId}`/`{jobId}` (hedge #5) |
-| 200 is the only outcome / code set is closed | **REFUTED → [INFER]** | only 200 is [DOC]; error codes uncharted, not absent (hedge #6) |
-| Remote DomoStats is a wholly distinct API with no overlap | **PARTIAL → [INFER]** | own API-Reference section [DOC], but payload vocab overlaps Publish/Governance-DomoStats (hedge #7) |
-
-The 8th refutation (BASE PATH) errored; its conclusion — **base path UNRESOLVED, do not assert bare or `/api/...`** — is carried by hedge #8 from the cross-check + synthesizer.
 
 ## Naming traps (read first)
 

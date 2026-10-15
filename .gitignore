@@ -21,3 +21,7 @@ node_modules/
 # Generated Domo bundles / exports
 *.zip
 dataflow.json
+
+# Private coordination belongs outside the public source repository
+handoffs/
+tasks/

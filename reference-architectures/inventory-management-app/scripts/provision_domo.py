@@ -1258,7 +1258,7 @@ def sync_manifest(client: DomoClient) -> Dict[str, Any]:
     # 新規採番”し、名札バックエンド（上で再束縛した collection/dashboard DataSet/CE package/
     # Workflow）へ束縛された FE を作る。publish がライブ採番 id を manifest へ書き戻し、後続の
     # app-studio がその id を読んで参加者のデザインを埋め込む＝FE も含めた完全隔離が成立する。
-    # （参加者は各自の配布 ZIP を持つので pro-code/manifest.json を直接書いてよい。解決済み ID 台帳
+    # （参加者は各自のソースコピーを持つので pro-code/manifest.json を直接書いてよい。解決済み ID 台帳
     # domo-assets.json は従来どおり参加者ごとの state ディレクトリに分離＝共有台帳は汚さない。）
     # ⚠ryuu は id を「省略」したときのみ新規採番する（空文字 "" は失敗）ため、キーごと pop する。
     # 本番（名札なし）は id を保持したまま従来どおり pro-code へ書く（design は初回publishで採番済）。

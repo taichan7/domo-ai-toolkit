@@ -24,11 +24,6 @@ before you depend on it.
         plausible, not first-party documented.
 ```
 
-(Verified 2026-09-05 by a 22-agent doc-cross-check + adversarial-verify workflow against Domo public
-docs, OpenAPI specs, and this repo: **11 claims, each independently re-verified**. The single failure
-mode this skill guards against is **over-claiming** — presenting a single-instance observation, or a
-behavior documented for *one* endpoint, as a documented portable contract. Where the first pass and the
-refute pass disagreed on tier, the more conservative tier is used below and the split is called out.)
 
 (2026-09-06 — a 7-agent re-fetch + adversarial-refute workflow folded in **13 further `[DOC]` facts**
 transcribed from the `platform/dataset.yaml` (55410 B) and `platform/stream.yaml` (31488 B) OpenAPI

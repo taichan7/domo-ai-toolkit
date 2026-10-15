@@ -32,10 +32,6 @@
 
 **⚠ Whole-surface tier = `[KB]`, NOT `[DOC]`.** The Connector Dev Studio is a **browser-IDE scripting SDK with no mutating REST API of its own** — you author by typing JS into the builder, not by calling an endpoint. It is **absent from the `domo.com/docs/llms.txt` OpenAPI catalog**. Every SDK signature below is transcribed from the doc-hub prose/examples (`[KB]`); **none has been execution-verified** (zero connector runs were performed). A programmatic *create/edit-a-connector-definition* API is **not documented** — treat it as `[INFER]`, not "does not exist". A 404/405 while fetching a doc page is **MISSING evidence, never proof of absence**.
 
-## Verification provenance
-
-Doc-cross-check + 8-agent adversarial-refute workflow (`wf_46b0bbed-103`; six refute lenses — fold-into-owner, not-net-new, exclude, evidence-over-claim, boundary, publish-gate — plus a planted negative control). Verdict: **SKILL**, net-new confirmed (no existing `*` owned the authoring SDK; `domo-accounts-connectors.md` only charted the periphery's *existence*), negative control correctly rejected. 鉄則 satisfied: doc-cross-check + adversarial refute + per-token both-tree grep ran **before** this write. Sources: the doc-hub pages under `/docs/portal/Connectors/Custom-Connectors/` and `/Writeback-Connectors/` (overview, connector-dev-studio, configure-authentication, configure-reports, process-data, reference, examples, ide-limitations, publish-connector, help-and-support, writeback), fetched with a browser UA + `Accept: text/markdown` (plain curl 405s).
-
 ## Naming traps — READ FIRST
 
 Four collisions send authoring tasks to the wrong surface. Resolve the term before reaching for a mechanism.

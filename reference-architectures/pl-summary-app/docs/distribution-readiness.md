@@ -8,7 +8,7 @@ deploys and verifies an independent stack in their own Domo instance.
 
 ## Release contract
 
-- Use the public toolkit or a ZIP produced by the maintained release builder.
+- Use the current public toolkit source checkout.
 - Manifests omit design IDs and leave tenant bindings empty. Provision data,
   Workflows and CE, synchronize aliases, then publish and reconcile card context.
 - Snapshot UUIDs are consistently replaced examples; Domo shared utility package

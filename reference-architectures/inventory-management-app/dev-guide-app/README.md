@@ -44,7 +44,7 @@ domo publish
 - **更新（同一インスタンス・通常運用）**：`manifest.json` の `id` はそのまま残して publish。
 - **初回（別インスタンスへ複製）**：`manifest.json` の `id` を省略して publish すると新規 design が
   採番され、`id` が manifest へ書き戻る。その後 `sync-manifest` で確定 ID を定着させる。
-- `tests/` はリポジトリ／配布 ZIP には残すがアプリの実行資産ではない。CLI の MJS 配信が 0 バイトに
+- `tests/` はリポジトリ には残すがアプリの実行資産ではない。CLI の MJS 配信が 0 バイトに
   なる実測を踏まえ、publish 物は HTML/CSS/JS/画像・Markdown・SDK の照合可能なファイルに限定する。
 
 publish 後、この design を在庫入出庫管理 DataApp の**ページ2「開発ガイド」**へ埋め込む

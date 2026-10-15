@@ -21,28 +21,6 @@ Every claim below carries a tier. Do not silently upgrade a tier.
 
 Rules: a fetch FAILURE (405 / JS-gated / login-wall / 404 / timeout) is MISSING evidence, NOT proof of absence. Universal negatives ("no other ops exist", "the enum is closed") are `[INFER]` unless a doc positively says so. Prefer positive phrasing. The single guarded failure mode is **over-claiming** — presenting a spec quirk or an unverified assumption (auth, host, enum, error codes, credential model) as documented Domo fact.
 
-Claim-level tier census for this skill: **`[DOC]` 31 (pre-rank-76) + ~8 portal-delta `[DOC]` (rank-76 re-fetch, see § portal deltas) / `[KB]` 3 / `[REPO]` 5 (all "none / false-friend") / `[INFER]` 29.** The surface SHAPE is unusually well-attested (doubly-documented — see below), but its auth, host, `exportStatus` enum, error surface, and credential model are all cross-spec-contested `[INFER]`.
-
-## Verification provenance
-
-Verified before authoring via the Workflow tool, run `wf_b82e957d-b03` (14 agents, **14 succeeded / 0 errored**): 5 spec-reading cross-check clusters (ops/paths, schemas, auth/codes/shapes, doc-corroboration+repo, semantics/naming-traps) → adversarial refutation of the 8 highest over-claim-risk claims (each default-refuted-if-uncertain) → a synthesizer/island-verdict. Primary sources: the raw candidate YAML (`/tmp/cand-export.yaml`, 258 lines, read line-by-line); **Domo's published product spec `domo.com/docs/openapi/product/export.yaml`** (the candidate is **byte-identical** to it, SHA256 `f72aba39…` — a first-party `[DOC]` artifact, NOT a third-party reverse-engineering); a **second, independently-authored first-party spec** (dev-portal `S3-Export-API.yaml`, OpenAPI 3.1.0, Stoplight); and `domo.com/docs/llms.txt` (lists `product/export.yaml` under the Product bucket). **No HTTP request was executed against the live surface; documentation-only.**
-
-The eight returned adversarial verdicts (3 REFUTED, 3 PARTIAL, **2 CONFIRMED** — folded into the hedge list below). Note the two CONFIRMED claims (base path + 2-op exhaustiveness) are the strongest `[DOC]` facts on this surface — rare for this cycle, earned because **two independent first-party specs enumerate the same single path + same 2 verbs**:
-
-| # | claim | verdict | encoded as |
-|---|---|---|---|
-| 1 | `exportStatus` is a documented CLOSED enum `[none,success,running,failed]` | **REFUTED → [INFER]** | product enum is flagged `# Added potential values`; portal spec lists a DIFFERENT set — value set contested, closedness inferred (hedge #1) |
-| 2 | the per-op 4xx/5xx error codes are documented Domo behavior | **REFUTED → [DOC/INFER]** | only POST 200 is corroborated by BOTH specs; the authoritative portal spec documents ZERO error codes (hedge #2) |
-| 3 | `X-DOMO-Developer-Token` is the verified-live auth for this path | **PARTIAL → [DOC/INFER]** | spec-declared `[DOC]` but zero executed calls, and the portal spec declares BEARER — contested, unverified-live (hedge #3) |
-| 4 | the base path `/api/query/v1/export/{DATASOURCE_ID}` is authoritative | **CONFIRMED → [DOC]** | positively corroborated by BOTH first-party specs — no discrepancy (hedge #11 boundary) |
-| 5 | POST + GET are the ONLY ops (2-op set is exhaustive) | **CONFIRMED → [DOC]** | two independent first-party enumerations agree on exactly 1 path / 2 verbs (hedge #11) |
-| 6 | raw AWS creds go literally in the body (no account indirection) | **PARTIAL → [DOC/INFER]** | true for THIS body `[DOC]`; do not generalize — product-level S3 export DOES use stored-credential indirection `[KB]` (hedge #4) |
-| 7 | "one active export per DataSet" / "returns prior export if unchanged" are reliable guarantees | **PARTIAL → [DOC/INFER]** | spec-prose only, no corroboration, zero live exercise — treat as hints (hedge #5) |
-| 8 | `exprType` is closed to `[COLUMN]` / `queryRequest` is fully specified | **REFUTED → [DOC/INFER]** | `# Based on example`; `groupByColumns`/`orderByColumns` items explicitly `# Type not specified` (hedge #6) |
-
-鉄則 satisfied (doc-cross-check + adversarial-verify **before** writing).
-
-**rank-76 addendum (2026-09-07):** the portal `S3-Export-API.yaml` (WAF-gated 405 at authoring) was **re-fetched HTTP 200**, exposing its field-level prose directly. Its deltas were re-verified via Workflow `wf_d830cc41-686` (8 agents, 0 errors, negative-control refuted ×4, over-claim guarded both directions) → disposition **APPLY**, folded into § "Portal spec `S3-Export-API.yaml` — field-level deltas" plus pointer/correction annotations (2 corrective: `compression`/`gzip`, and the one-time-cred model). The GET stub / empty schemas / empty XML body were EXCLUDED as non-substantive. **portal_frontier_state = CLOSED** (all 14 dev-portal API-Reference specs in `docs/llms.txt` now dispositioned; S3-Export was the last un-mined).
 
 ## Naming traps (read first)
 

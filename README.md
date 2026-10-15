@@ -10,15 +10,19 @@ features and production behavior still require validation. The reference apps
 are teaching examples with synthetic data. Read their distribution and production
 limits before deploying them.
 
-Use the latest release for customer distribution. Earlier revisions may retain
-reference-instance metadata that has since been removed.
+Clone this repository and use the source on `main`:
+
+```bash
+git clone https://github.com/taichan7/domo-ai-toolkit.git
+cd domo-ai-toolkit
+```
 
 It contains three layers:
 
 | Layer | Path | What you get |
 |---|---|---|
 | **Starter kit** | [`docs/`](docs/), [`scripts/`](scripts/), [`templates/`](templates/) | Auth flow, API reference, runnable shell/Python helpers, a Pro Code app template |
-| **Skills library** | [`skills/`](skills/) | 55 operating notes — one per Domo surface (DataSets, Magic ETL, Workflows, Code Engine, Pro Code, AppDB, App Studio, AI Services, …) plus platform-agnostic agent-workflow skills |
+| **Skills library** | [`skills/`](skills/) | Operating notes for Domo surfaces (DataSets, Magic ETL, Workflows, Code Engine, Pro Code, AppDB, App Studio, AI Services, …) and implementation, review and testing |
 | **Reference architectures** | [`reference-architectures/`](reference-architectures/) | Two complete, deployable Domo apps showing how Pro Code + Code Engine + AppDB + Magic ETL + Workflows + App Studio fit together |
 | **Request templates** | [`prompts/`](prompts/) | Copy-paste request templates for asking an AI agent to implement / review / revise a prompt |
 
@@ -71,8 +75,8 @@ automatically. Then just ask, e.g.:
 
 ## The reference architectures
 
-Two production-grade apps, each self-contained and deployable to your own
-instance with an AI agent guiding you:
+Two reference apps, each self-contained and deployable to your own instance
+with an AI agent guiding you:
 
 - **[inventory-management-app](reference-architectures/inventory-management-app/)** —
   inventory in/out management: Pro Code UI (PC + Domo Mobile, QR scanning),
@@ -99,9 +103,8 @@ This repo is designed so an agent can read it whole and immediately know how to:
 ## FAQ
 
 **Q: How do I know what changed?**
-See [CHANGELOG.md](CHANGELOG.md) and the
-[Releases](https://github.com/taichan7/domo-ai-toolkit/releases) page — the
-toolkit is versioned so you can tell whether your copy is current.
+See the [commit history](https://github.com/taichan7/domo-ai-toolkit/commits/main/).
+Use `git pull` to update an existing clone.
 
 **Q: Is this an official Domo product?**
 No. It is a field kit built by a Domo SE. The APIs used are the same ones the

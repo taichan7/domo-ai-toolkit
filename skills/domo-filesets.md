@@ -33,9 +33,6 @@ before you depend on it.
         sources — plausible, not first-party documented.
 ```
 
-(Verified 2026-09-05 by a 17-agent research + adversarial-verify workflow against Domo public docs:
-**6 claims CONFIRMED, 2 DOC-ADDS, 1 DOC-SILENT, 2 REFUTED**. The two REFUTED items are called out
-explicitly below so they never get written as fact.)
 
 ## What a FileSet is
 

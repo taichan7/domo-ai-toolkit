@@ -59,16 +59,6 @@ reference.
         below; it is listed only for consistency with the sibling skills.)
 ```
 
-(Verified 2026-09-05 by a 12-agent doc-cross-check + adversarial-verify workflow — 6 claim clusters
-(embed host/auth/token; card public-vs-private; page/app embed; programmatic filters + PDP;
-publish/jobs/subscribers; governance over-claim traps), each independently refuted — against Domo public
-docs, the embed code-examples page, KB articles (notably **360043437993** and App Studio embed article
-**000005295**), and the Domo Everywhere OpenAPI. Where the first pass and the refute pass disagreed on
-tier, the **more conservative** tier is used and the split is called out. The single failure mode this
-skill guards against is **over-claiming**: presenting a KB/marketing statement, a single example's scope
-string, or an inference-from-absence as a documented, portable contract. The refute pass caught and
-downgraded several — most importantly a *governance* over-claim about what a public dashboard embed
-exposes, forced to `[INFER]` because the cited article says the opposite for cards.)
 
 ## The headline: two documented embed-token endpoints in a large [KB]/[INFER] sea
 

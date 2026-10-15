@@ -46,22 +46,11 @@ Domo's documentation.
         ABSENCE of a documented endpoint — plausible, not first-party. Verify live.
 ```
 
-Verified 2026-09-05 by a 12-agent doc-cross-check + adversarial-verify workflow (`wf_2a57b385-c20`): 6
-clusters (OAuth users/groups, instance-host identity + roles, roles/grants KB, PDP↔identity linkage, the
-in-repo `content/v2` surface, SCIM/SSO) each run through a verify stage and an adversarial refute stage,
-with **the more conservative tier chosen on any disagreement** and the refute agent instructed to downgrade
-over-claimed tiers. The guarded failure mode is **over-claiming** — presenting a single-instance / internal
-/ UI-only / marketing / inferred-from-absence observation as a documented portable contract. Two Product
-APIs below (instance-host Identity Users, Roles Governance) were only recently added to Domo's public
-doc-hub (the roles page as recently as 2026-09-04) — treat their exact request/response shapes as
-**freshly-documented and drift-prone**, and re-check the live docs. Everything the *repo itself* executes is
-tier `[REPO]` (undocumented `content/v2` **reads**), never promoted above that on the strength of "it works
-here".
 
 _Provenance — Activity Log fold (rank-65, 2026-09-06):_ the two audit lines above (World-1 OAuth
 `/v1/audit` params + 15-field single-object 200; World-2 dev-token `/api/audit/v1/user-audits` +
 `/objectTypes`) were folded from the rank-29 REPORT_ONLY cluster after a fresh 12-agent adversarial-verify
-workflow (`wf_89574e8d-324`) re-fetched both specs byte-identical to rank-29 and returned **APPLY_ALL
+workflow (`<verification-run>`) re-fetched both specs byte-identical to rank-29 and returned **APPLY_ALL
 (F1–F5)** — 5 `[DOC]` folds confirmed, 4 negative controls all refuted, no over/under-claim. The
 load-bearing distinctions the panel enforced: OAuth `time`=STRING vs product `time`=int64-ms; OAuth
 limit/offset defaults are **description-only** vs product's real `default: 0`/`300`; `objectType` is
@@ -70,7 +59,7 @@ limit/offset defaults are **description-only** vs product's real `default: 0`/`3
 
 _Provenance — groups/avatar fold (rank-66, 2026-09-06):_ the `content/v2/groups` management block and the
 `{instance}.domo.com/domo/*` App-Framework block in surface #2 were folded from the rank-45 REPORT_ONLY
-report after a fresh adversarial-refute workflow (`wf_ef5aa3fb-1e2`) re-fetched the four owned specs
+report after a fresh adversarial-refute workflow (`<verification-run>`) re-fetched the four owned specs
 (`product/groups-api`, `framework/groups`, `framework/user`, plus `platform/group` as a negative control)
 all http-200, and returned **APPLY_ALL (5/5 — F-alpha as APPLY-CORRECTED)** with all 6 negative controls
 refuted. The panel caught **one over-claim of my own** — an invented `?parts` selector on the group-fetch
@@ -88,7 +77,7 @@ REPORT_ONLY** auth-family report (`Client-API` + `Instance-Authentication` + `AP
 disposition — fold here, ship **no** standalone skill — stands (this is not a re-adjudication). Trigger: a
 WAF-gate lift. All three portal bodies, WAF-blocked when rank-25 could read them only via cross-check agents,
 now re-fetch **HTTP-200**, so a Method-1 line-by-line read of the live bodies directly confirmed every rank-25
-claim; a 13-agent triage workflow (`wf_d547d38f`, NC-passed / GraphQL-absent) independently re-flagged the same
+claim; a 13-agent triage workflow (`<verification-run>`, NC-passed / GraphQL-absent) independently re-flagged the same
 absentees; and a repo-wide `git grep` confirmed the fold-ins were never previously applied
 (`content/v2/authentication` / `sessionToken` / `jti` / `/clients` = 0 pre-fold hits). All example values
 (access-token blobs, `jti` / `client_id` / `client_secret` GUIDs, `sessionToken` base64, passwords) were
@@ -102,7 +91,7 @@ were folded from the dev-portal **`Group-API.yaml`** (WAF-lifted 405→**200**, 
 @ `api.domo.com`) — the same field-level re-mine as rank-76/77, applied because rank-34 only
 **domain-adjudicated** the portal Group spec and never field-folded it (verified never-applied: the specifics
 above were absent pre-fold). Verified by a Method-1 line-by-line read of the live 200 body + a 6-agent
-adversarial workflow (`wf_908a1bd7`: extract → 4 refute lenses + one planted negative control → adjudicate) →
+adversarial workflow (`<verification-run>`: extract → 4 refute lenses + one planted negative control → adjudicate) →
 **APPLY all 6**, unanimous `CONFIRM_NETNEW`, zero drops, all survive at `[DOC]` (the `deleted` edge graded
 prose-only), and the false NC refuted by **every** lens. No example values (group ids/names, `creatorId`
 strings, member userIds) reproduced.
@@ -115,7 +104,7 @@ correcting "only in update args"), and the misspelled **`roled`** write param we
 **`User-API.yaml`** (WAF-lifted 405→**200**, 4 ops, `bearerAuth` @ `api.domo.com`; ⚠ **no `DELETE` op present in
 this spec body** — the charted user-DELETE now flags that discrepancy) — the same field-level re-mine as
 rank-76/77/78, applied because rank-34 only **domain-adjudicated** the portal User spec. Verified by a Method-1
-line-by-line read of the live 200 body + a 5-agent adversarial workflow (`wf_bd7a863e`: 4 refute lenses + one
+line-by-line read of the live 200 body + a 5-agent adversarial workflow (`<verification-run>`: 4 refute lenses + one
 planted negative control → adjudicate) → **APPLY 5 of 6**, `nc_all_refuted` (the fabricated "POST returns 201 +
 `Location` header" refuted by every lens and by spec — POST returns **200**, no `Location`), one candidate
 dropped as TRIVIA (a lone weak-prose `locale` `date-time` typo, `string` everywhere authoritative). No example

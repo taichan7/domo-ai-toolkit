@@ -35,10 +35,6 @@ Conflation is the #1 hazard on this surface. Match the phrase in front of you to
 - `[REPO]` — verified against working code in THIS repo. **For this surface there is NONE**: no file calls these endpoints and the yaml is not vendored here.
 - `[INFER]` — reasoned, including inferred-from-absence. A fetch failure (405 / JS-gate / login-wall) is MISSING evidence, never proof of absence.
 
-## Verification provenance
-
-Skill-ized after a 13-agent doc-cross-check + adversarial-verify workflow (6 clusters × verify+refute, a completeness critic, an island verdict), plus two targeted YAML fetches — one to extract the read-models the summarizer had left uncharted, one to enumerate all 27 paths / 31 operations exhaustively. **Island verdict: a LARGE / BROAD but FULLY-INVENTORIED-ONLY documented island** — the operation *catalog* is complete and trustworthy; per-operation *behavior* mostly is not. Everything below is `[DOC]` unless tagged otherwise. The spec was reachable ONLY via WebFetch (it is not vendored in the repo), so treat field-level detail as spec-accurate but **verify live before depending on any behavior the spec does not state**.
-
 ## The documented island: host, auth, base path
 
 - **Spec** `[DOC]`: `scheduled-reports-api.yaml`, OpenAPI 3.1.0, title *"Scheduled Reports API"*, version 1.0.0 (~39.7 KB). URL: `https://www.domo.com/docs/openapi/product/scheduled-reports-api.yaml`.

@@ -16,7 +16,7 @@ Domoの機能をどのように分担・接続するかを学ぶ、ソフトウ�
 
 ## 配布品質と適用範囲
 
-配布には公開toolkitの参照アプリまたは検証済みZIPを使います。保守フォルダをそのまま圧縮しません。
+配布には公開 `domo-ai-toolkit` の `reference-architectures/inventory-management-app/` のソースを使います。
 配布版のデザインIDと接続IDは未設定で、対象インスタンスで `apply`・`sync-manifest` により解決します。Code EngineとWorkflowの版も、保守環境の値を流用せず配備先で同期します。
 `domo-assets.json` はローカル生成物です。Git・配布物には含めません。
 接続先 `DOMO_INSTANCE` を必ず明示し、ハンズオンでは `INVENTORY_SANDBOX_SUFFIX` を付けます。

@@ -20,7 +20,7 @@ When editing or reviewing docs with internal links or a Contents/TOC block, veri
 - **Backtick paths are NOT link assertions — triage by section context.** A backtick-quoted `path` in prose merely *names* a path; existence-checking it is not a valid defect signal on its own (a broad sweep hit ~25% false positives). Refs under **Skill Candidates**, **Open items**, **Files touched (deleted…)**, or inside bug-description prose are aspirational / historical / documented-nonexistent **by design** — pre-exclude those sections before flagging anything.
 - **Denominator-backed claims only.** Enumerate the target set first (`git ls-files`), then report `N audited → M broken → K fixed` with every false positive and out-of-scope item triaged explicitly. A "clean" / "exhausted" claim with no denominator is over-claim.
 
-The runnable resolution auditor (all tracked `*.md`, containing-file-relative, anchor-aware) lives in `handoffs/2026-09-06-link-resolution-audit-and-hygiene-clean-records.md`.
+Run `python3 scripts/check-links.py` from the repository root to check relative file links; also check anchors when changing headings.
 
 ## Objective-claim drift audit
 

@@ -31,10 +31,6 @@
 
 **⚠ Whole-surface tier = `[KB]`, NOT `[DOC]`.** Domo Sandbox is an **admin UI feature documented only in Salesforce KB articles** (`domo.com/docs/s/article/<id>`). **No REST API for it is documented in Domo's public OpenAPI catalog** (72 specs enumerated in `domo.com/docs/llms.txt`, checked 2026-09), **in the official SDKs** (which cover only DataSets/Streams/Users/Groups/PDP), **or in the developer portal**. That is a *scope-bounded* negative — **NOT** "Sandbox has no API." Any REST endpoint / verb / payload for Sandbox is **`[INFER]`**, never `[DOC]`. A 404/405 while fetching a KB page is **MISSING evidence, never proof of absence**. **Fetch pattern** (KB is UA-gated; plain curl 405s): `curl -s -A 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36' -H 'Accept: text/markdown' https://www.domo.com/docs/s/article/<id>.md`.
 
-## Verification provenance
-
-Doc-cross-check + 7-agent adversarial-refute workflow (`wf_f2b6f42c-177`; six refute lenses — fold-into-owner, not-net-new, exclude, evidence-over-claim, naming-trap, transactionality — plus a planted negative control that Sandbox is a duplicate of the runtime/VM "sandbox"). Verdict: **SKILL**, net-new confirmed (no existing `*` owned content-promotion — every "sandbox" hit in the tree is a runtime-isolation sense; capital-S content-promotion Sandbox = 0), negative control correctly rejected by all six lenses. 鉄則 satisfied: doc-cross-check + adversarial refute + per-token both-tree grep (owners + siblings + committed handoffs) ran **before** this write, and the owner-collision grep was re-run immediately before writing. Sources (read in full): KB `4403367344023` "Domo Sandbox" (main) + KB `000005059` "Domo Sandbox: Linked Repositories", fetched with the browser-UA pattern above.
-
 ## Naming traps — READ FIRST
 
 Four collisions send promotion tasks to the wrong surface. Resolve the term before reaching for a mechanism.

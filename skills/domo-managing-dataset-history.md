@@ -21,27 +21,6 @@ Every claim below carries a tier. Do not silently upgrade a tier.
 
 Rules: a fetch FAILURE (405 / JS-gated / login-wall / 404 / timeout) is MISSING evidence, NOT proof of absence. Universal negatives ("no other ops exist", "the enum is closed", "SID is rejected") are `[INFER]` unless a doc positively says so. Prefer positive phrasing. The single guarded failure mode is **over-claiming** — presenting a spec quirk or an unverified assumption (the DELETE-body id-type, enum closedness, error codes, `index` semantics, auth exclusivity) as documented Domo fact.
 
-Claim-level tier census for this skill: **`[DOC]` 22 / `[KB]` 4 / `[REPO]` 7 (all "none / false-friend") / `[INFER]` 13.** Distinctively for this cycle this is the **best-documented island so far**: the candidate is byte-identical to Domo's published product YAML AND rendered on two consistent first-party HTML pages, so base path, both ops, all 7 GET fields, the enum values, auth, and host are all `[DOC]`-confirmed. The residual `[INFER]` concentrates on the **DELETE-body identifier**, the error surface, enum closedness, and paging completeness.
-
-## Verification provenance
-
-Verified before authoring via the Workflow tool, run `wf_73f82001-cb0` (**15 agents, all 15 succeeded / 0 errored**, ~1.29M tokens): 5 spec-reading cross-check clusters (ops/paths/shape, doc-corroboration+mirror-pair, auth/host/base-path/error-codes, schemas/quirks/delete-semantics, semantics/traps/repo-precedent) → adversarial refutation of the 9 highest over-claim-risk claims (each default-refuted-if-uncertain) → a synthesizer/island-verdict. Primary sources: the raw candidate YAML (`/tmp/cand-managing-dataset-history-api.yaml`, 135 lines, read line-by-line); **Domo's published product spec `www.domo.com/docs/openapi/product/managing-dataset-history-api.yaml`** (the candidate is **byte-identical** to it, 4726 bytes, SHA-256 `31f5d47a…796dd402` — a first-party `[DOC]` artifact, live-diffed to ZERO lines); and the **two live dev-portal HTML reference pages** (`.../docs/api-reference/managing-dataset-history-api/{listing,deleting}-dataset-versions`, both HTTP 200, both citing that same YAML as source). **No HTTP request was executed against the live surface — DOCUMENTATION-ONLY; the DELETE is destructive, so zero calls were made.**
-
-The nine returned adversarial verdicts (**3 REFUTED, 4 PARTIAL, 2 CONFIRMED** — all folded into the Do-NOT list below). The two CONFIRMED are the base path and the single-world/byte-identical-mirror characterization:
-
-| # | claim | verdict | encoded as |
-|---|---|---|---|
-| 1 | `X-DOMO-Developer-Token` is the definitive/ONLY auth (no SID) | **PARTIAL → [DOC/INFER]** | dev-token IS the documented auth `[DOC]`; exclusivity is an unsupported universal negative + family precedent leans toward SID also working → claim NEITHER (Do-NOT #5) |
-| 2 | `uploadStatus` is a CLOSED enum `[success,error,processing]` | **PARTIAL → [DOC/INFER]** | the 3 values are documented (enum keyword + prose) `[DOC]`; closedness rests on one source + 0 GETs → `[INFER]` (Do-NOT #2) |
-| 3 | the DELETE-body integers ARE `dataId` (identity documented) | **REFUTED → [INFER]** | identity is UNSPECIFIED (both pages decline to map it); example `[2]` matches neither GET `dataId`(3,4) nor `schemaId`(5,7) → do NOT hard-code (Do-NOT #1) |
-| 4 | `index=true` purge is guaranteed + omission on active data is safe | **REFUTED → [DOC/INFER]** | the `index=true` EFFECT is `[DOC]`; the omission outcome is explicitly undocumented + leans UNSAFE `[INFER]` (Do-NOT #3) |
-| 5 | base path is authoritative + no Export/Files/query collision | **CONFIRMED → [DOC]** | 3 independent first-party renderings agree; siblings share only the `/api/data/` ROOT, ZERO literal collision |
-| 6 | `{GET,DELETE}` is exhaustive for dataset-version HISTORY | **PARTIAL → [DOC/INFER]** | exhaustive ON THIS EXACT PATH `[DOC]`; "for the history domain" is `[INFER]` (create/hydrate/detail ops live on OTHER paths) |
-| 7 | GET returns ALL versions, no truncation | **PARTIAL → [DOC/INFER]** | "no paging params, bare array" is `[DOC]`; "returns ALL / no server cap" is `[INFER]` (sources decline the assurance) |
-| 8 | single-world, NO divergent mirror (unlike rank-20) | **CONFIRMED → [DOC]** | byte-identical convergent mirror; the absolute "exists nowhere" fringe stays `[INFER]` (legacy Stoplight 405) |
-| 9 | the response set is fully documented (only 200, nothing to hedge) | **REFUTED → [DOC/INFER]** | "only 200 documented" is `[DOC]`; that ≠ "no failures" — the 4xx/5xx surface is UNCHARTED `[INFER]`, hedging HEIGHTENED for the destructive DELETE (Do-NOT #7) |
-
-鉄則 satisfied (doc-cross-check + adversarial-verify **before** writing).
 
 ## Naming traps (read first)
 

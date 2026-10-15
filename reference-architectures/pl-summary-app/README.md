@@ -7,8 +7,8 @@ Domo の Pro Code、AppDB、Magic ETL、Code Engine、Workflows、App Studio を
 
 ## 配布とセットアップ
 
-複数顧客への配布は、公開 `domo-ai-toolkit` の参照アプリまたは検証済みの配布ZIPを使います。
-保守用の作業フォルダをそのまま圧縮しないでください。配布版ではデザインIDと接続IDを空にし、
+複数顧客への配布は、公開 `domo-ai-toolkit` の `reference-architectures/pl-summary-app/` のソースを使います。
+配布版ではデザインIDと接続IDを空にし、
 対象インスタンスで再解決します。`domo-assets.json`・認証情報・sandbox state は同梱しません。
 
 1. [配布品質と適用範囲](docs/distribution-readiness.ja.md)を確認する。

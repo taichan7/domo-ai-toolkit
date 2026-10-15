@@ -108,13 +108,13 @@
 
     <figure class="fig">
       <div class="flow">
-        <div class="tile tile--input"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-download"/></svg>配布 ZIP<br>一式を手元に</div>
+        <div class="tile tile--input"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-download"/></svg>公開ソース<br>cloneで手元に</div>
         <div class="flow__arrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></div>
         <div class="tile tile--step"><span class="tile__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-grid"/></svg><b>検証 DataApp</b></span><span>氏名入りの自分のコピー</span></div>
         <div class="flow__arrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></div>
         <div class="tile tile--output"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-eye"/></svg>1 変更が映った画面<br>公開して確認</div>
       </div>
-      <figcaption>今日のゴール ― 配布 ZIP から自分の検証コピーを作り、1 変更を公開して画面で確かめる（ここまで来れば 1 周完了・→ §7・§10）</figcaption>
+      <figcaption>今日のゴール ― 公開ソースから自分の検証コピーを作り、1 変更を公開して画面で確かめる（ここまで来れば 1 周完了・→ §7・§10）</figcaption>
     </figure>
 
     <div class="frontgrid">
@@ -173,7 +173,7 @@
       <p>「<b>緑</b>」＝<b>準備 OK</b>（信号の緑＝進んでよい）の状態。下の項目がすべて済めば緑で、これは §1 末尾の<b>やってみよう①</b>（6 つの点検）を家で先に済ませておくもの。</p>
       <p><b>はじめに確認：</b>当日使う端末に<b>ソフトを入れられるか</b>（会社管理 PC は <code>winget</code> や <code>npm install -g</code> が禁止のことがある）。入れられないときは、事前に情シスへ申請するか、貸与端末・管理者権限ターミナルを手配する（迷ったら運営へ）。</p>
       <ol>
-        <li><b>アプリ一式（配布 ZIP）</b>を受け取って展開し、<code>pl-summary-app</code> フォルダを分かる場所に置く（§1「そろえる 6 つ」STEP 1）。</li>
+        <li><b>公開toolkit</b>をcloneし、<code>reference-architectures/</code> 内の<code>pl-summary-app</code> フォルダを分かる場所に置く（§1「そろえる 6 つ」STEP 1）。</li>
         <li>VS&nbsp;Code とエージェント拡張を入れて、サインインできる（§1「VS&nbsp;Code を入れて、フォルダを開く」「エージェント拡張を入れる」）。</li>
         <li>Node・Python・Git・Domo CLI を入れて、<code>domo login</code> まで通す（§1「Node・Python・Git を入れる」「Domo CLI を入れて、ログインする」）。</li>
         <li><code>domo-ai-toolkit</code> を clone して、疎通スクリプトが通る（§1「土台を置く」）。</li>
@@ -201,8 +201,8 @@
         <li class="step">
           <span class="step__icon"><svg class="ic ic--lg" aria-hidden="true" focusable="false"><use href="#ic-download"/></svg></span>
           <span class="step__num">STEP 1</span>
-          <h4>アプリ一式（ZIP）</h4>
-          <p>配布 ZIP を展開（右クリック→すべて展開／mac はダブルクリック）し、<code>pl-summary-app</code> フォルダを分かる場所に置く（直下に <code>pro-code</code>/<code>dataflow</code>/… が並ぶ階層を使う）。</p>
+          <h4>アプリのソースコード</h4>
+          <p><code>git clone https://github.com/taichan7/domo-ai-toolkit.git</code> で取得し、<code>reference-architectures/pl-summary-app</code> フォルダを開く（直下に <code>pro-code</code>/<code>dataflow</code>/… が並ぶ階層を使う）。</p>
         </li>
         <li class="step">
           <span class="step__icon"><svg class="ic ic--lg" aria-hidden="true" focusable="false"><use href="#ic-vscode"/></svg></span>
@@ -242,7 +242,7 @@
         <table class="demotable demotable--sm demotable--wrap" aria-labelledby="tblcap-steptime">
           <thead><tr><th scope="col">STEP</th><th scope="col">内容</th><th scope="col">目安（初回）</th></tr></thead>
           <tbody>
-            <tr><th scope="row" class="role">STEP 1</th><td>配布 ZIP を展開</td><td class="memo">1〜2 分</td></tr>
+            <tr><th scope="row" class="role">STEP 1</th><td>公開toolkitをclone</td><td class="memo">1〜2 分</td></tr>
             <tr><th scope="row" class="role">STEP 2</th><td>VS&nbsp;Code を入れる</td><td class="memo">約 5 分</td></tr>
             <tr><th scope="row" class="role">STEP 3</th><td>エージェント拡張＋サインイン</td><td class="memo">2〜3 分</td></tr>
             <tr><th scope="row" class="role">STEP 4</th><td>Node・Python・Git</td><td class="memo">5〜10 分（導入待ち）</td></tr>
@@ -260,7 +260,7 @@
     <ol class="proc">
       <li><span class="ph">入れる</span>公式サイト <code>code.visualstudio.com</code> からダウンロードし、インストーラの既定のまま入れる（<b>Windows は User Installer の <code>.exe</code></b> が簡単／macOS は <code>.dmg</code> をアプリへドラッグ）。<b>Pro Code の画面内では外部リンクを新しいタブで開けない</b>ため、本書の URL は下のボタンでコピーして使う。</li>
       <li><span class="ph">日本語化</span>（任意）左の拡張機能ビュー（<code>⌘/Ctrl+Shift+X</code>）で <b>Japanese Language Pack</b> を検索 → インストール → 再起動。</li>
-      <li><span class="ph">開く</span><b>ファイル → フォルダーを開く</b> で、配布 ZIP を展開した <code>pl-summary-app</code> フォルダを選ぶ。</li>
+      <li><span class="ph">開く</span><b>ファイル → フォルダーを開く</b> で、公開ソースから取得した <code>pl-summary-app</code> フォルダを選ぶ。</li>
       <li><span class="ph">ターミナル</span><b>表示 → ターミナル</b>（<code>⌘/Ctrl+J</code>）で VS&nbsp;Code 内にターミナルを開く。以降のコマンドはここで実行する。</li>
     </ol>
     <div class="cmd">
@@ -277,7 +277,7 @@
       <div class="callout callout--accent">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-ai"/></svg></span>
         <h4>Claude&nbsp;Code（Anthropic）</h4>
-        <p><b>Claude Code</b> を検索 → インストール → Anthropic アカウントでサインイン。この ZIP の規約 <code>AGENT.md</code> を入口に読む。</p>
+        <p><b>Claude Code</b> を検索 → インストール → Anthropic アカウントでサインイン。このソースの規約 <code>AGENT.md</code> を入口に読む。</p>
       </div>
       <div class="callout">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-spark"/></svg></span>
@@ -301,7 +301,7 @@
           </tbody>
         </table>
       </div>
-      <figcaption id="tblcap-2">エージェント別の入口ファイル ― この ZIP では 3 つとも <code>AGENT.md</code> が共通の入口（どれも同じ規約へ合流・→ §6）</figcaption>
+      <figcaption id="tblcap-2">エージェント別の入口ファイル ― このソースでは 3 つとも <code>AGENT.md</code> が共通の入口（どれも同じ規約へ合流・→ §6）</figcaption>
     </figure>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-key"/></svg><b>ライセンスの注意</b>：Claude&nbsp;Code／Codex は有料プランまたは API キーが必要な場合がある。GitHub&nbsp;Copilot は無料枠がある。当日サインインできない場合は、運営が用意した共有アカウントか、使える別のエージェントに切り替えて進めてよい（どの道 §6 の規約は同じ）。</p>
 
@@ -1004,7 +1004,7 @@ domo dev</pre>
       </div>
     </div>
 
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg><b>エージェントへの渡し物</b>＝<code>AGENT.md</code>（この ZIP に同梱）で「やること／やらないこと／境界」を渡し、土台にスターターキット <code>domo-ai-toolkit</code>（API リファレンス＋規約）を置く。<b>認証</b>＝CLI の認証情報はユーザー設定領域に保存し、トークンはリポジトリに書かない。<b>ローカル確認は 2 通り</b>＝ロジックの回帰＝<b>Node テスト（<code>node tests/test_drill_helpers.js</code>）</b>／対話的な見た目プレビュー＝<code>domo dev</code>。</p>
+    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg><b>エージェントへの渡し物</b>＝<code>AGENT.md</code>（このソースに同梱）で「やること／やらないこと／境界」を渡し、土台にスターターキット <code>domo-ai-toolkit</code>（API リファレンス＋規約）を置く。<b>認証</b>＝CLI の認証情報はユーザー設定領域に保存し、トークンはリポジトリに書かない。<b>ローカル確認は 2 通り</b>＝ロジックの回帰＝<b>Node テスト（<code>node tests/test_drill_helpers.js</code>）</b>／対話的な見た目プレビュー＝<code>domo dev</code>。</p>
 
     <div class="try">
       <span class="try__tag"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-flask"/></svg>ローカルの砂場で先に回す</span>
@@ -2709,9 +2709,9 @@ python3 scripts/provision_domo.py verify
     </div>
 
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-user"/></svg><b>ひとりで進める場合</b>：<code>domo login</code>（SSO）だけで <code>domo publish</code>・データ層（<code>provision_domo.py apply</code>）・App Studio 埋め込み（<code>provision_domo.py app-studio</code>）まで通せる＝〈やってみよう④〉の <code>/app-studio</code> URL も自分で作れる。<b>開発者トークンが無くて唯一塞がるのは ワークフロー層（AI 長文レポート）</b>だけで、その時サマリータブは「準備中」のまま（概要／事業部別タブは動く）。見た目は <code>domo dev</code>、ロジックは <code>node tests/test_drill_helpers.js</code> で確認できる（→ §1「ひとりで進めるとき」）。</p>
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-info"/></svg><b>この検証コピーでの「元に戻す」</b>：§6「小さく刻む（1 変更＝1 コミット・いつでも戻せる）」は<b>実プロジェクト（Git 管理下）での習慣</b>。本日の配布コピー <code>~/handson-pl</code> は<b>Git 管理外</b>（配布 ZIP を展開したもの）で、<code>git</code> のコミットや巻き戻しは効かない。ハンズオン中の取り消しは、<b>VS&nbsp;Code のタイムライン</b>（ファイルを前の状態へ戻す）か<b>元フォルダからの再コピー</b>で行う（手順は §10「困ったとき」）。</p>
+    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-info"/></svg><b>この検証コピーでの「元に戻す」</b>：§6「小さく刻む（1 変更＝1 コミット・いつでも戻せる）」は<b>実プロジェクト（Git 管理下）での習慣</b>。本日の配布コピー <code>~/handson-pl</code> は<b>Git 管理外</b>（公開ソースから取得したもの）で、<code>git</code> のコミットや巻き戻しは効かない。ハンズオン中の取り消しは、<b>VS&nbsp;Code のタイムライン</b>（ファイルを前の状態へ戻す）か<b>元フォルダからの再コピー</b>で行う（手順は §10「困ったとき」）。</p>
     <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-speed"/></svg>速い反復ループが説得力の肝：<b>初回だけ</b> publish → <code>provision_domo.py app-studio</code> の 2 段。以後は <b><code>domo publish</code> ＋ ブラウザ更新</b>だけで反映される（この<b>自動追従＝FOLLOW_LATEST</b>・仕組みは §5／映らない時の対処は §10）。「編集 → 公開 → 確認」の体感速度を味わう。</p>
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-doc"/></svg><b>開発ガイドのタブも自分の DataApp に並べたいとき</b>（任意）：この開発ガイド（<code>dev-guide-app</code>）を初回だけ <code>cd dev-guide-app &amp;&amp; domo publish &amp;&amp; cd -</code>（manifest の <code>id</code> を外してから）で公開し、<code>python3 scripts/provision_domo.py embed-guide</code> で自分の DataApp に足せる。<b>実習の必須ではない</b>（ガイドは配布 ZIP の HTML を見れば足りる）＝自分の DataApp にガイドまで揃えたい人向けのおまけ。</p>
+    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-doc"/></svg><b>開発ガイドのタブも自分の DataApp に並べたいとき</b>（任意）：この開発ガイド（<code>dev-guide-app</code>）を初回だけ <code>cd dev-guide-app &amp;&amp; domo publish &amp;&amp; cd -</code>（manifest の <code>id</code> を外してから）で公開し、<code>python3 scripts/provision_domo.py embed-guide</code> で自分の DataApp に足せる。<b>実習の必須ではない</b>（ガイドはソース内の HTML を見れば足りる）＝自分の DataApp にガイドまで揃えたい人向けのおまけ。</p>
 
     <h3 class="sub">後片付け：自分の検証コピーだけを消す（任意・推奨）</h3>
     <p class="sec__lead">実習で作ったのは<b>自分専用の検証コピー</b>だけ。終わったら片付ければ、顧客インスタンスに検証アプリが残らない。<b>消す前に、対象の名前と id を読み上げて確認</b>（承認ゲート）。</p>
@@ -2987,7 +2987,7 @@ export PL_SANDBOX_SUFFIX='検証・&lt;あなたの氏名&gt;'</pre>
 まず内容を見せて。私が OK を出したらファイルに保存して（勝手に publish はしない）。</pre>
     </div>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-refresh"/></svg>こうして貯めた知見が、次のハンズオンや実プロジェクトの<b>チームの資産</b>になる。エージェントは賢さより「<b>正しい文脈（手順）を渡すこと</b>」で成果が決まる（→ §6）。</p>
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-git"/></svg><b>スキルは配布物の中に貯める</b>のがこのアプリの流儀。この ZIP では <code>AGENT.md</code>（規約）と <code>prompts/</code>（AI への指示文の正本）がすでにチームのスキル置き場になっている。たとえば「集計 SQL の直し方」を解いたら、同じ手口を <code>AGENT.md</code> の一節か <code>prompts/</code> の新しい md に残す。次の担当者とエージェントが<b>同じ ZIP を開くだけ</b>で同じ手順を再現できる。</p>
+    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-git"/></svg><b>スキルはソースの中に貯める</b>のがこのアプリの流儀。このソースでは <code>AGENT.md</code>（規約）と <code>prompts/</code>（AI への指示文の正本）がすでにチームのスキル置き場になっている。たとえば「集計 SQL の直し方」を解いたら、同じ手口を <code>AGENT.md</code> の一節か <code>prompts/</code> の新しい md に残す。次の担当者とエージェントが<b>同じソースを開くだけ</b>で同じ手順を再現できる。</p>
 
     <h3 class="sub">次に触る面（＋初学者がハマる点）</h3>
     <div class="callouts callouts--2">
@@ -3186,11 +3186,11 @@ node --check pro-code/app.js と node tests/test_drill_helpers.js を通し、�
         <dt>引き継ぎノート</dt><dd><code>AGENT.md</code>（重要 ID 一覧・データフロー／AppDB スキーマ・ワークフロー操作）＝<b>エージェントに最初に読ませる</b>一冊</dd>
         <dt>AI の指示文（正本）</dt><dd><code>prompts/</code>（店舗／全社の DataFlow サマリー・統合サブWF の店舗／全社ブランチ・共通規約）。<b>AI の挙動を変えるときはここ</b></dd>
         <dt>決定的ゲート</dt><dd><code>dev-guide-app/tests/check.mjs</code>（この開発ガイドの参照整合チェック）／アプリ本体は <code>tests/</code>（<code>test_report_api.py</code>・<code>test_sandbox_isolation.py</code> ほか）。トークン雛形は <code>config/secrets.env.example</code></dd>
-        <dt>この ZIP 内</dt><dd><code>AGENT.md</code>（規約）／<code>README.md</code>（全体像）／<code>prompts/</code>／この開発ガイド</dd>
+        <dt>このソース内</dt><dd><code>AGENT.md</code>（規約）／<code>README.md</code>（全体像）／<code>prompts/</code>／この開発ガイド</dd>
         <dt>スターターキット</dt><dd><code>github.com/taichan7/domo-ai-toolkit</code>（規約 <code>AGENTS.md</code>／<code>CLAUDE.md</code>・API リファレンス・55 のスキル集・診断スクリプト・Pro Code 雛形・参照アプリ 2 本。MIT・英/日。URL のコピーは §1「土台を置く」）</dd>
         <dt>公式</dt><dd>Domo Developer Portal（Apps CLI・API）／各製品ドキュメント</dd>
       </dl>
-      <figcaption>深掘りの入口 ― まず ZIP 内の資料（正典 <code>docs/setup-guide.md</code>・引き継ぎ <code>AGENT.md</code>）、次にスターターキット、最後に公式</figcaption>
+      <figcaption>深掘りの入口 ― まずソース内の資料（正典 <code>docs/setup-guide.md</code>・引き継ぎ <code>AGENT.md</code>）、次にスターターキット、最後に公式</figcaption>
     </figure>
 
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-rocket"/></svg>広げ方は 1 つ：<b>小さく頼み、ローカルで確かめ、公開して確認する</b>。面が変わってもループは同じ。</p>

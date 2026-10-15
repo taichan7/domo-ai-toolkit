@@ -21,26 +21,6 @@ Every claim below carries a tier. Do not silently upgrade a tier.
 
 Rules: a fetch FAILURE (405 / JS-gated / login-wall / 404 / timeout) is MISSING evidence, NOT proof of absence. Universal negatives ("no other op exists", "the enum is closed", "SID is rejected", "no divergent mirror anywhere") are `[INFER]` unless a doc positively says so. Prefer positive phrasing. The single guarded failure mode is **over-claiming** — presenting a spec quirk or an unverified assumption (the `urn` id-scheme, enum closedness, the response array's positional meaning, the open body's contract, error codes, auth exclusivity) as documented Domo fact.
 
-Claim-level tier census for this skill: **`[DOC]` 24 / `[KB]` 0 / `[REPO]` 7 (all "none / false-friend") / `[INFER]` 17.** Distinctively this is a **doc-convergent single-world island whose mirror is found-and-convergent but NOT byte-verified**: auth/host/path/the 15-value enum/the body all AGREE across a published OpenAPI YAML (WebFetch HTTP 200), the HTML dev-portal API-reference page "Render KPI Card Chart or Table", and a first-party Pro-Code **PDF-export tutorial that actually executes this endpoint** — but the candidate is only **semantically EQUIVALENT** (byte-identity UNVERIFIED because WebFetch normalizes YAML→markdown, so `[INFER]`, NOT a SHA match — a rung weaker than the rank-21 byte-identical mirror). **ZERO verdicts came back CONFIRMED** (all PARTIAL/REFUTED); the residual `[INFER]` concentrates on the **OPEN request body**, the **untyped response** whose shape the sole consumer contradicts, the `urn` id-scheme, enum closedness, the error surface, and single-world-ness.
-
-## Verification provenance
-
-Verified before authoring via the Workflow tool, run `wf_de2b5742-b36` (**14 agents, all 14 succeeded / 0 errored**, ~1.19M tokens): 5 spec-reading cross-check clusters (ops/parts-enum, doc-corroboration+mirror, auth/host/error-codes, schemas/opacity, semantics/traps/repo-precedent) → adversarial refutation of the 8 highest over-claim-risk claims (each default-refuted-if-uncertain) → a synthesizer/island-verdict. Primary sources: the raw candidate YAML (`/tmp/cand-get-kpi-card-image-api.yaml`, 137 lines, read line-by-line); **Domo's published OpenAPI YAML** (WebFetch HTTP 200 ×2 — semantically identical, but **byte-identity NOT confirmed** because WebFetch markdown-normalizes → `[INFER]`, unlike the rank-21 hash match); the **HTML dev-portal API-reference page "Render KPI Card Chart or Table"**; and a **first-party Pro-Code PDF-export TUTORIAL that executes this endpoint** — the ONLY first-party CONSUMER located, and the one that surfaces the load-bearing response-shape tension. **No HTTP request was executed against a live instance — DOCUMENTATION-ONLY.**
-
-The eight returned adversarial verdicts (**0 CONFIRMED, 6 PARTIAL, 2 REFUTED** — all folded into the Do-NOT list). No claim earned CONFIRMED (contrast rank-21's 2) — the convergent mirror is semantic, not hash-identical, and every structural claim carries a live-untested residue:
-
-| # | claim | verdict | encoded as |
-|---|---|---|---|
-| 1 | `{urn}` IS the numeric card id (hard-code a card id as `urn`) | **PARTIAL → [DOC/INFER]** | `urn` is a REQUIRED opaque string, NO `format` constraint `[DOC]`; "urn ≡ card id" is `[INFER]` (URN vocabulary implies an opaque resource name) → Do-NOT #1 |
-| 2 | the 15-value `parts` enum is a documented CLOSED set | **PARTIAL → [DOC/INFER]** | the 15 values are documented `[DOC]`; closedness rests on one convergent source + 0 calls → `[INFER]` (Do-NOT #2) |
-| 3 | response `data[i]` positionally aligns with requested `parts[i]` | **REFUTED → [DOC/INFER]** | the sole first-party consumer reads NAMED keys (`pdf.title`/`pdf.image`) and decodes ONLY the image part — positional alignment is not merely undocumented but actively CONTRADICTED (Do-NOT #3) |
-| 4 | every requested part comes back as a base64 IMAGE | **PARTIAL → [DOC/INFER]** | `format:byte` (base64) is the declared item type `[DOC]`; that non-image parts (`data`/`table`/`summary`/`chartType`…) are base64 IMAGES is `[INFER]` — they are structured/metadata payloads (Do-NOT #4) |
-| 5 | `X-DOMO-Developer-Token` is the ONLY auth (SID rejected) | **PARTIAL → [DOC/INFER]** | dev-token IS the documented scheme `[DOC]`; exclusivity + "SID rejected" are unsupported universal negatives (content-API family precedent leans toward SID also working) → claim NEITHER (Do-NOT #5) |
-| 6 | the failure surface is exhaustively 200/403/409 | **REFUTED → [DOC/INFER]** | those three are the DOCUMENTED codes `[DOC]`; "complete failure set" is refuted — 401/404/400 near-certain but UNCHARTED `[INFER]` (Do-NOT #6) |
-| 7 | single-world, NO divergent App-Framework twin + base path authoritative | **PARTIAL → [DOC/INFER]** | path-authority + zero-literal-collision `[DOC]`; "no divergent mirror exists anywhere" is `[INFER]` from a fetch-limited search (render is NESTED in the cards namespace, not orthogonal) (Do-NOT #7) |
-| 8 | render works on KPI cards ONLY | **PARTIAL → [DOC/INFER]** | the path segment is literally `/cards/kpi/` `[DOC]`; "no analogous render for non-KPI card types" is `[INFER]` (unexamined) (Do-NOT #8) |
-
-鉄則 satisfied (doc-cross-check + adversarial-verify **before** writing).
 
 ## Naming traps (read first)
 

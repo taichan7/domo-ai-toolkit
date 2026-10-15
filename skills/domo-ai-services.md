@@ -51,20 +51,6 @@ providers, credit rates, and per-endpoint body fields are instance-config-, plan
         ABSENCE of a documented endpoint — plausible, not first-party. Verify live.
 ```
 
-Verified 2026-09-05 by a 12-agent doc-cross-check + adversarial-verify workflow (`wf_817c0a93-e4d`): 6
-clusters (text API + response shape, host/auth worlds, modalities/embeddings, models & governance, Agent
-Catalyst, repo precedent) each run through a verify stage and an adversarial refute stage, **more
-conservative tier chosen on any disagreement**, refute agent instructed to downgrade over-claims. The
-workflow's spine — *is this surface documented at all* — was then **re-confirmed directly** (two independent
-`WebFetch` reads of `domo.com/docs/llms.txt` and the `AI-Services.yaml` OpenAPI) because two of the six
-clusters had reached only `developer.domo.com` (JS-gated, 405) and wrongly concluded "nothing is `[DOC]`."
-That direct read settled it: the AI Services REST API **is** `[DOC]` and its endpoint set is *larger* than the
-doc-blocked clusters saw. The one guarded failure mode is **over-claiming** — presenting a single-instance /
-internal / marketing / inferred-from-absence observation as a documented portable contract. Caveat carried
-forward: the OpenAPI was read via WebFetch's summarizer, not byte-for-byte — treat **per-endpoint request/
-response field minutiae** (which body fields are required, exact nested shapes) as **"re-confirm against the
-live YAML"**, even though the endpoint list, host, auth scheme, and top-level `TextAIResponse` fields are
-`[DOC]`-solid.
 
 **Amended 2026-09-06 (rank-64 — pending-fold application, `[DOC]`).** The four AI-Service-family *subset*
 specs (`product/service.yaml` 540ln, `framework/service.yaml` 337ln, `product/aiservices.yaml` +

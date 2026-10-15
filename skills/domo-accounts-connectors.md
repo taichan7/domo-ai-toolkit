@@ -38,12 +38,6 @@ The one genuinely **orphaned** first-class object charted here is the **Account 
 
 **On disagreement, choose the more conservative claim.** A **fetch failure** (`developer.domo.com` 405 / JS-gated / 404 landing page) is **MISSING evidence, never proof of absence** — resolve it by fetching the machine-readable spec, not by declaring the feature nonexistent. (The `api.domo.com` Account API is confirmed via `accounts.yaml`, *not* via the reference pages that 405'd.)
 
-## Verification provenance
-
-Doc-cross-check + adversarial-verify workflow (`wf_7ede0b13-162`, 13 agents: 6 verify clusters — openapi-catalog, accounts-api, connector-framework, boundary-datasets/CE, naming-traps, repo-precedent — each with an adversarial refute pass, then a completeness critic). 鉄則 satisfied (verify **before** writing).
-
-Reproduced **verbatim from OpenAPI YAML** (so these endpoint *sets* are `[DOC]`): `platform/accounts.yaml`, `platform/stream.yaml`, `platform/dataset.yaml`, `product/connectors.yaml`, `product/data-accounts.yaml`, `product/data-sets.yaml` (all reachable from `domo.com/docs/llms.txt`). Present in the catalog but **body never fetched** (endpoint sets uncharted): `dataschema.yaml`, `managing-dataset-history-api.yaml`, `query-dataset-api.yaml`, `framework/data.yaml`, the portal DataSet/Stream duplicates, `S3-Export-API.yaml`, and the files/filesets/export/framework specs. Pages that 405'd / JS-gated: the `developer.domo.com` account & connector reference pages, and the `docs/portal/Connectors/connectors` category landing (404). The **account** create/update/share request-body **envelopes** ARE machine-readable in `platform/accounts.yaml` — so their envelope shapes (`{name, type:{id, properties}}`, share `{user:{id}}`) are `[DOC]`; what stays `[KB]`/re-verify-live is the **connector-stream config body** and the **inner per-connector `type.properties` key set** (per-Account-Type, not portable).
-
 ## Naming-trap table — READ FIRST
 
 "Account"/"connector"/"connection" collide across ~18 senses; conflation is the #1 hazard. Resolve the term **before** reaching for a mechanism.

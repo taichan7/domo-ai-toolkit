@@ -9,7 +9,7 @@ DataApp のページ2**に載る、純静的な Domo Pro Code アプリ。VS Cod
 
 - design 名: `店舗別損益｜開発ガイド`（manifest 版 **0.3.0**）
 - design id: `531a3c0f-bf42-500c-a4ce-87b60c743414`（**保守用 `maintenance-instance` 固有の実 id**・リポジトリに保持）。
-  配布 ZIP では builder が除去し、別インスタンスへ複製する時も `id` を外して採番し直す（下記「publish 方法」「注意」）。
+  公開ソースには含めない。別インスタンスへ複製する時も `id` を外して採番し直す（下記「publish 方法」「注意」）。
 - 種別: Pro Code（純静的・`datasetsMapping` 空＝データに紐づかない）
 - 配色: 本体アプリと揃えた臙脂（enji）系。`app.css` の `--brand-primary`（`#7F1D2D`）**1行**から
   全濃淡を `color-mix()` で機械導出する（手で hex を置かない＝ブランド替えは1トークンの差し替えで済む）。
@@ -120,18 +120,15 @@ DataSet〔summary/detail/trend/dept〕・統合サブWF・WF-01・App Studio Dat
   `manifest.json` の `ignore` に `vendor/ryuu.js-4.6.0.LICENSE` を入れている（読める版は `.md` 版を同梱）。
   `index.html`／`app.css`／`app.js`／`vendor/domo.js`／`thumbnail.png` は無傷。
 - **doc／script／test だけの変更は再 publish 不要。** `tests/` やドキュメントを直しても
-  **`index.html` と公開ランタイム資産（css/js/vendor/thumbnail/manifest）が不変**なら、ライブ design は変わらない（必要なのは配布 ZIP の作り直しだけ）。
+  **`index.html` と公開ランタイム資産（css/js/vendor/thumbnail/manifest）が不変**なら、ライブ design は変わらない。
 
 ## 注意
 
 - 本番の**開発ガイド design（`8b61c346-…`）を上書きしない**（参加者は自分のサンドボックスで扱う）。
   ページ1＝本体カードにも触れない（`embed-guide` はページ2専用・冪等）。
 - 生トークン・SID をコード／コミット／ドキュメントに残さない。
-- 配布 ZIP は dev-guide design id を**外して**配る（ビルダー `make-handson-zip.sh`（非公開メンテナツール）＝
-  `git archive HEAD` で作業ツリーを汚さず → dev-guide の `id` を除去 → **6点検証**〔id 除去・pro-code 本番 id 保持・
-  junk 無し・トークン/秘密鍵 無し・サンドボックス state 無し・他案件データ 無し〕→ zip）。
-  **リポジトリ側は maintenance-instance の実 id `8b61c346-…` を保持**し、ZIP だけが外す（本番ガイドの誤上書きを防ぐ・
-  `pro-code` の本番 design id は学習用に意図的保持）。
+- 公開ソースでは本体・ガイドのdesign IDと接続IDは未設定。対象インスタンスで
+  provision・`sync-manifest` を行ってからpublishする。保守用のmanifestを流用しない。
 
 ## 関連ドキュメント
 

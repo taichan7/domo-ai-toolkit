@@ -1,8 +1,7 @@
 # INSTRUCTOR.md — 講師ノート（3 時間ハンズオン運用）
 
 対象: Domo 開発の初学者（SE／顧客開発者）/ VS Code × コーディングエージェントで Domo を開発。
-教材本体: `dev-guide-app/`（App Studio ページ2・全10節）。配布: `pl-summary-app/` を ZIP
-（`handson-pl.zip`）で各自へ。題材アプリは「Store PL AI Insights」（店舗別損益 AIインサイト）。
+教材本体: `dev-guide-app/`（App Studio ページ2・全10節）。取得: 公開toolkitの `reference-architectures/pl-summary-app/`。題材アプリは「Store PL AI Insights」（店舗別損益 AIインサイト）。
 
 > 表記約束: 本ノートの `<自社>` は教材 `index.html` の `your-company` と同じ（各自の Domo インスタンス名）。
 > §参照の約束: 教材（dev-guide-app）の節は `dev-guide §N`、このファイル自身の節は `本ノート §N`。無印の `§N` は教材（dev-guide）を指す。小節は番号でなく**小節名**で指す（教材は小節番号を表示しないため）。
@@ -12,7 +11,7 @@
 
 ```
 【事前課題（当日までに 15〜30 分）】当日はすぐ実習に入れるよう、家で「緑」にしておいてください。
-0) 配布された pl-summary-app（ZIP）を展開し、分かる場所に置く（以降すべての前提）
+0) 公開toolkitをcloneし、`reference-architectures/pl-summary-app/` を開く（以降すべての前提）
 1) VS Code を入れて、コーディングエージェント拡張（Claude Code / Codex / GitHub Copilot のどれか）にサインイン
 2) Node・Python 3.9+・Git と Domo CLI（npm i -g ryuu）を入れ、`domo login -i <自社>.domo.com` まで通す
 3) 自分の名札を決める: export PL_SANDBOX_SUFFIX="検証・<氏名>"（これで全オブジェクトが自分専用名になる）
@@ -56,7 +55,7 @@
 - [ ] **開発者トークン**を発行できるか（WF 層＝長文 AI を触る回のみ必要。不可なら本ノート §3「トークン無し運用」へ）
 - [ ] 社内プロキシの値（npm / git / Domo への到達）
 - [ ] **当日端末のソフト導入可否**（会社管理 PC は winget / `npm i -g` が禁止のことがある。不可なら事前に情シス申請、または事前キッティング済みの貸与端末を手配）
-- [ ] **会場ネットワークで実機 1 台の事前疎通**（前日までに `npm i -g ryuu` / unzip / `domo login` / `cd pro-code && domo publish` まで通す＝false green 対策。失敗時は許可ドメイン `github.com` / `*.domo.com` を IT へ申請）
+- [ ] **会場ネットワークで実機 1 台の事前疎通**（前日までに `npm i -g ryuu` / git clone / `domo login` / `cd pro-code && domo publish` まで通す＝false green 対策。失敗時は許可ドメイン `github.com` / `*.domo.com` を IT へ申請）
 - [ ] **後方支援比率**（受講者 6〜8 名ごとに巡回 TA 1 名。環境点検ゲート 0:10-0:30 に人員を厚く）
 - [ ] 共有エージェントアカウント（有料枠が無い人のため。**同時実行/利用量に上限**。目安 1 アカウント数名まで。**一斉利用で 429／上限に達し全員同時停止のリスク**→主エージェントは各自の GitHub Copilot 無料枠を既定にし、共有 Claude/Codex は副へ。詰まったら時間差実行）
 - [ ] インスタンス名の案内文（`<自社>.domo.com`）
@@ -122,26 +121,18 @@ SID を要求する `scripts/deploy_dataflow_prompt.py`。WF 層は `domo login`
 - 各節の所要が押したら、dev-guide §4（開発サーフェス網羅）の詳解を飛ばして dev-guide §7（実習）を優先（実習が本体）。
 - 詰まった人・早く終わった人には dev-guide §10「理解度セルフチェック」(1 分) を回させ、理解を自己確認させる（講師の口頭確認の代替）。ハンズオンを丸ごとエージェントに任せる入口プロンプトは `prompts/handson-with-agent.ja.md`（ゼロからのデプロイ正典に任せるなら `prompts/deploy-with-agent.ja.md`）。
 
-## 8. 配布 ZIP の構成（本番 id の扱い・受領物の確認）
+## 8. 公開ソースの取得と接続確認
 
-この配布物（`pl-summary-app` の ZIP＝`handson-pl.zip`）は配布元（Domo SE）が
-`make-handson-zip.sh`（非公開メンテナツール） で整えて届く。`dev-guide-app/manifest.json` の `id` は
-**外してある**（受講者が誤って `cd dev-guide-app && domo publish` しても本番ガイドを上書きしない）。
-一方 `pro-code/manifest.json` の本番 design id（`08463c98`）は**意図的に残してある**：受講者が
-dev-guide §7 で自分の手で id を外し、新しい design を採番する学習ステップのため。cwd 事故
-（本番フォルダのまま publish）の防止は dev-guide §5 のコールアウトと §7 の手順説明に依存する。
-
-受領した配布 ZIP を念のため確認するなら（いずれも期待どおりなら安全）:
+公開 `domo-ai-toolkit` をcloneし、`reference-architectures/pl-summary-app/` を開く。
+公開ソースの本体・ガイドmanifestには保守用design IDを含めず、接続IDも未設定。
+対象インスタンスと名札を指定してprovisionし、`sync-manifest` 後にpublishする。
+保守用ワークスペースや他参加者の `domo-assets.json` をコピーしない。
 
 ```bash
-unzip -l <配布>.zip | grep -E 'pytest_cache|__pycache__|DS_Store'                 # 何も出ない
-unzip -p <配布>.zip pl-summary-app/dev-guide-app/manifest.json | grep -c '"id"'    # 0（dev-guide の id は除去済み）
-unzip -p <配布>.zip pl-summary-app/pro-code/manifest.json | grep -c '08463c98'      # 1（pro-code の本番 design id は学習用に意図的保持）
+git clone https://github.com/taichan7/domo-ai-toolkit.git
+cd domo-ai-toolkit/reference-architectures/pl-summary-app
+node dev-guide-app/tests/check.mjs
 ```
-
-> 展開後の ZIP は親リポジトリ無しで `node dev-guide-app/tests/check.mjs`（版・参照の決定的チェック）が
-> 通る（vendor 同梱 SDK を含む）＝「配布 ZIP だけでセルフ完遂」を実機確認済み。ZIP の作成自体は
-> 配布元メンテナが親リポジトリで行う。
 
 ## 9. AI クレジットを使う操作・誤操作の復旧
 

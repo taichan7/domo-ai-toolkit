@@ -18,12 +18,6 @@ instance before you depend on it.
 [INFER] Reasoned from documented facts plus HTTP/product semantics; not stated verbatim.
 ```
 
-(Verified 2026-09-05 by a 17-agent doc-cross-check + adversarial-verify workflow over 8 repo-derived auth
-claims against Domo public docs: **3 CONFIRMED, 1 DOC-ADDS, 4 DOC-SILENT, 0 REFUTED.** Nothing here was
-contradicted by the docs — the failure mode this section guards against is **over-claiming**: presenting a
-repo-observed convenience as a documented platform contract. FileSet-specific and Beast Mode-specific auth
-slices live in [`domo-filesets.md`](domo-filesets.md) and [`domo-beast-mode.md`](domo-beast-mode.md); this is
-the general rule they both defer to.)
 
 **The one rule.** For calls to Domo's **own internal APIs**, use the tokenless CE client
 (`sendRequest` / `send_request`) and author **no** credentials — the call runs as the invoking user. `[DOC]`

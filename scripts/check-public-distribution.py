@@ -60,6 +60,8 @@ def violations(rel, data):
             or (p.name.startswith(".env") and not p.name.endswith(".example"))
             or p.suffix.lower() in {".token", ".key", ".pem", ".p12", ".pfx", ".pyc", ".zip"}):
         problems.append(f"{rel}: deployment state or credential-like path")
+    if p.parts[0] in {"handoffs", "tasks"}:
+        problems.append(f"{rel}: internal coordination file is not public toolkit content")
     try:
         text = data.decode("utf-8")
     except UnicodeDecodeError:

@@ -204,8 +204,6 @@ From the notebook via `domojupyter` (`import domojupyter as domo`):
 | `internal-apps/j-quants_v2/*` | Same ML/registration pattern; `register_model()` wraps `ml.create_model` with snapshot reuse |
 | `fileset-pdf-to-jpeg-manager/fileset_pdf_to_long_jpeg.py` | Jupyter + Workflow dual-runtime script (workflow payload → Jupyter mode fallback) |
 | `production-priority-app/jupyter-workspace/` (retired) | A Jupyter optimizer later superseded by Magic ETL DF3063 — historical example only |
-| `handoffs/2026-07-25-marketdata-domo-model-registration-compat-fix.md` | The model-registration 500 compatibility lesson (§8) |
-| `tasks/shared-notices.md` (2026-09-06) | "lone `.py` == standalone CLI == freely editable" is a trap: a README saying the script runs in the `domojupyter`/Workflow context marks it **GATED** live production source |
 
 **Deployment practice in this repo**: Jupyter sources are deployed by **manual upload/git sync inside the workspace**, treated as human-gated; there is no `domo publish` equivalent for Jupyter. Keep repo sources canonical and note when workspace and repo may drift.
 
@@ -257,5 +255,4 @@ From the notebook via `domojupyter` (`import domojupyter as domo`):
 - **Portal/OpenAPI**: `domo.com/docs/portal/data-science/jupyter`, `/docs/portal/API-Reference/overview` (Product API scope), `openapi/product/workflows-api.yaml` (names Jupyter-Workspace scripts as API consumers).
 - **SDK**: official `domojupyter` **1.1.43** package fetched from the public Domo conda channel (`domo-conda-prod.s3.amazonaws.com/domo/noarch/domojupyter-1.1.43-py_142.tar.bz2`, plus `repodata.json` version history 1.1.15→1.1.43); modules `io.py`, `domo.py`, `app_db.py`, `execution.py`, `snapshot.py`, `jupyterhub.py`, `ai/ai.py`, `ai/model.py`, models, `__init__.py`, `update.py` read directly on 2026-09-13.
 - **Catalog check**: `domo.com/docs/llms.txt` + `llms-full.txt` (18,423,763 bytes) grepped 2026-09-13 — no Jupyter/DataScience OpenAPI spec; zero `/api/datascience` occurrences.
-- **Repo**: `handoffs/2026-07-25-marketdata-domo-model-registration-compat-fix.md`, `2026-07-25-marketdata-jupyter-ml-feature-accuracy.md`, `2026-09-07-u2s-processed-at-nonutc-offset-flag.md`; `internal-apps/{marketdata,j-quants_v2}` READMEs; `jupyter-workspace/`, `u2s-doc-summary-app/`, `fileset-pdf-to-jpeg-manager/` code and tests.
 - **Execution**: documentation-only. No workspace was created/started, no notebook was uploaded or run, no internal endpoint was called, and no credentials were read. The `[SDK]` endpoint map is source-derived, not live-verified.

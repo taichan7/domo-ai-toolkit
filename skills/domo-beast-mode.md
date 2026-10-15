@@ -32,9 +32,6 @@ live instance before you depend on it.
         429 backoff, the `notvariable` filter effect); not stated verbatim. Flag as inference.
 ```
 
-(Verified 2026-09-05 by a 19-agent research + adversarial-verify workflow cross-checking 14 repo-derived
-claims against Domo public docs: **7 CONFIRMED, 3 REFUTED, 3 DOC-SILENT, 1 DOC-ADDS**. The 3 REFUTED items
-are called out in the hedge list so they never get written as fact.)
 
 ## What a Beast Mode is
 

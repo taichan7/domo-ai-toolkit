@@ -7,7 +7,7 @@
 
 ## 配布の契約
 
-- 公開toolkitまたは正規ビルダーのZIPを使います。作業フォルダをそのまま圧縮しません。
+- 公開toolkitの `main` にあるソースコードを使います。
 - 配布manifestはデザインIDを省略し、接続IDを空にします。配備・`sync-manifest` 後にpublishします。
 - スナップショットのUUIDは一貫した例示用IDへ置換します。Domo共通ユーティリティのpackage IDは維持します。
 - `domo-assets.json`・sandbox state・認証情報・セッション・キャッシュ・生のエクスポートは除外します。

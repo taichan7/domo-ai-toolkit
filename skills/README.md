@@ -8,6 +8,8 @@ Each file is a self-contained skill: read the one matching your task before you 
 > those paths (internal project folders) are not bundled here. Treat them as
 > provenance for *how a fact was verified*, not as files you can open. Everything
 > tagged `[DOC]` cites Domo's published documentation.
+> Internal review transcripts and coordination workflows are not included.
+> A documentation review is not live verification on your instance.
 
 ## Domo platform skills
 
@@ -57,7 +59,6 @@ Each file is a self-contained skill: read the one matching your task before you 
 | Get KPI Card Image | [domo-get-kpi-card-image.md](domo-get-kpi-card-image.md) |
 | Config backup (mirror assets locally) | [domo-config-backup.md](domo-config-backup.md) |
 | Cross-instance clone workflow | [domo-cross-instance-clone.md](domo-cross-instance-clone.md) |
-| Hands-on + sandbox distribution pattern | [handson-sandbox-distribution-pattern.md](handson-sandbox-distribution-pattern.md) |
 
 ## Agent workflow skills (platform-agnostic)
 
@@ -68,8 +69,4 @@ Each file is a self-contained skill: read the one matching your task before you 
 | Testing | [testing.md](testing.md) |
 | Refactoring | [refactoring.md](refactoring.md) |
 | Documentation | [documentation.md](documentation.md) |
-| Handoff | [handoff.md](handoff.md) |
-| Multi-agent collaboration | [multi-agent-collaboration.md](multi-agent-collaboration.md) |
 | AI agent prompt review | [ai-agent-prompt-review.md](ai-agent-prompt-review.md) |
-| Autonomous improvement loop | [autonomous-improvement-loop.md](autonomous-improvement-loop.md) |
-| Learning & handoff enforcement | [learning-and-handoff-enforcement.md](learning-and-handoff-enforcement.md) |

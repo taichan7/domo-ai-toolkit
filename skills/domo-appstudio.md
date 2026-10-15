@@ -37,14 +37,6 @@ target instance before you depend on it — App Studio's write surface drifts by
 [INFER] Reasoned from the documented model or community sources — plausible, not first-party.
 ```
 
-(Verified 2026-09-05 by a 14-agent doc-cross-check + adversarial-verify workflow — 7 claim clusters,
-each independently refuted — against Domo public docs, the App Studio API page, KB articles, and this
-repo's provisioning/clone code. Where the first pass and the refute pass disagreed on tier, the **more
-conservative** tier is used and the split is called out. The single failure mode this skill guards
-against is **over-claiming**: presenting a single-instance capture, or a behavior seen on one version,
-as a documented portable contract. App Studio is the surface where that mistake is easiest to make,
-because a write body captured off one instance's editor usually *works* on that instance — which feels
-like proof and is not.)
 
 ## The headline: one small documented island in a large [REPO] sea
 

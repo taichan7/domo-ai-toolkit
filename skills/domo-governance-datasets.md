@@ -58,20 +58,6 @@ report catalogs, column schemas, and admin gating are all **connector-version- a
         ABSENCE of a documented endpoint. Plausible, not first-party. Verify live.
 ```
 
-Verified 2026-09-05 by a 12-agent doc-cross-check + adversarial-refute workflow (`wf_b791426c-236`): 6
-clusters (api-boundary, connectors-catalog, schemas-and-activitylog, credits-consumption, access-admin-model,
-repo-precedent) each run through a verify stage and an adversarial refute stage, **the more conservative tier
-chosen on any disagreement**, and the refute agent tasked to downgrade over-claims. The refute pass did real
-work: it downgraded most connector claims **`[DOC]` → `[KB]`** (their evidence is Salesforce-KB help articles
-in the `docs/s/article/<12-digit>` format, not the developer API reference), downgraded every universal
-negative ("there is no governance endpoint", "the connector cannot surface X") **to `[INFER]`** (inference
-from an authoritative-but-non-exhaustive catalog or from absence-within-a-list), and kept the repo anchors at
-`[REPO]`. The guarded failure mode is **over-claiming** — presenting a connector help-article fact, a
-single-instance repo artifact, or an argument-from-absence as a documented portable API contract. Two caveats
-the workflow itself flagged: `developer.domo.com/portal` returned HTTP 405 (blocked) so the developer
-catalog's **exhaustiveness is unverified** — "absent from the `llms.txt` OpenAPI index" is not proof "no such
-API exists"; and several KB pages were reached only via search snippets or an AI-extracted mirror, so treat
-exact report counts, column casing, and report names as **verify-in-product**.
 
 ## The headline: no governance API — a connector that materializes DataSets
 

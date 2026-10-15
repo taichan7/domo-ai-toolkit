@@ -9,7 +9,7 @@ maintainer's deployment state or credentials.
 
 ## Release contract
 
-- Use the public toolkit checkout or a ZIP produced by the maintained release builder.
+- Use the current public toolkit source checkout.
 - Distributed manifests omit design IDs and leave tenant bindings empty. Run
   provisioning and `sync-manifest` before publishing either bundle.
 - Snapshot UUIDs are illustrative, consistently replaced identifiers. Snapshot

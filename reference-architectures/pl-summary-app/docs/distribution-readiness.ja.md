@@ -7,7 +7,7 @@
 
 ## 配布の契約
 
-- 公開toolkitまたは正規ビルダーのZIPを使います。保守フォルダをそのまま圧縮しません。
+- 公開toolkitの `reference-architectures/pl-summary-app/` のソースを使います。保守フォルダやローカル台帳は配布しません。
 - 配布manifestはデザインIDを省略し、接続IDを空にします。データ層→Workflow/CE→alias同期→publish→
   埋込context同期の順に配備します。
 - スナップショットのUUIDは例示用IDへ一貫置換します。Domo共通package IDは維持します。
