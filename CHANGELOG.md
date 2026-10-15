@@ -5,6 +5,31 @@ kept in sync with the authors' working toolkit; versions follow
 [Semantic Versioning](https://semver.org/) loosely (MINOR = new
 skills/apps/docs, PATCH = fixes and content refreshes).
 
+## [1.1.0] - 2026-10-15
+
+### Reference architectures
+- P/L app v0.3.2 adds cancel-first confirmation before manually updating all
+  store/company reports through Code Engine. The server resolves the latest
+  released parent Workflow; scheduled parent triggers are removed.
+- Preserve the understated enji UI. A discreet progress link opens the child
+  Workflow execution list in a new tab using an instance-relative SDK path.
+- Document all 15 DataFlow tiles and organize five pipeline sections using the
+  bundled shared geometry engine, strict forward-edge checks and logic-equality
+  round-trip validation. Cosmetic edits do not rerun the DataFlow.
+- Fix stored XSS in report rendering: preserve headings, tables and prose while
+  rejecting active markup, event handlers, external resources and DOM-clobbering IDs.
+- Update guide v0.3.0 and deployment order: create/bind the Workflow Code Engine
+  before publishing the frontend; reconcile the exact embedded card's context.
+
+### Safety and validation
+- Whole-tree secret/private-identifier/forbidden-file scan: 256 files, zero
+  violations. Sanitized source sync and Markdown links pass.
+- Both reference architectures: 420 Python tests passed; P/L Node suite:
+  41 tests passed. Offline browser checks cover desktop/tablet/phone, confirmation
+  cancellation, relative new-tab navigation and hostile report HTML rejection.
+- Live maintenance verification: parent completed, all 100 stores plus company
+  report saved; frontend/CE wiring and zero scheduled parent timers confirmed.
+
 ## [1.0.1] - 2026-10-15
 
 ### Reference architectures

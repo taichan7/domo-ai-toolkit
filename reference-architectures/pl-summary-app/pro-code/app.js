@@ -100,6 +100,7 @@
     els.titleTrend = document.getElementById("title-trend");
     els.titleDonut = document.getElementById("title-donut");
     els.legendRank = document.getElementById("legend-rank");
+    window.addEventListener("pl-workflow-completed", function () { if (state.view) render(state.sel); });
 
     // 事業部別損益セクション（全社ビューのみ表示）
     els.deptSection = document.getElementById("dept-section");
@@ -368,7 +369,13 @@
     queryAppDb(lookup).then(function (content) {
       if (myReq !== state.reqSeq) return; // a newer selection superseded this request
       if (content && content.analysis_html) {
-        els.analysis.innerHTML = decodeHtml(content.analysis_html);
+        try {
+          els.analysis.innerHTML = sanitizeReportHtml(content.analysis_html);
+        } catch (error) {
+          els.analysis.innerHTML = '<div class="ai-pending" role="alert"><p>' + esc(error.message) + '</p></div>';
+          els.insightNote.textContent = "";
+          return;
+        }
         stripReportTitle(els.analysis);
         markReportMeta(els.analysis);
         els.analysis.classList.add("ready");
@@ -1760,13 +1767,34 @@
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
-  function decodeHtml(s) {
-    var t = document.createElement("textarea");
-    t.innerHTML = s;
-    var decoded = t.value;
-    if (/<[a-z][\s\S]*>/i.test(decoded)) return decoded;
-    if (/<[a-z][\s\S]*>/i.test(s)) return s;
-    return "<p>" + esc(s) + "</p>";
+  function sanitizeReportHtml(s) {
+    if (typeof s !== "string" || s.length > 200000) throw new Error("レポート本文の形式またはサイズが不正です。");
+    var template = document.createElement("template");
+    template.innerHTML = s;
+    if (!template.content.children.length && /<[a-z][\s\S]*>/i.test(template.content.textContent)) {
+      template.innerHTML = template.content.textContent;
+    }
+    var allowed = new Set("h1 h2 h3 h4 h5 h6 p div span section article header footer table thead tbody tfoot tr th td caption colgroup col ul ol li b strong em i u s small blockquote pre code hr br a details summary".split(" "));
+    var blocked = new Set("script style iframe object embed link meta base svg math template img video audio form input button textarea select option noscript".split(" "));
+    var attributes = new Set(["class", "title", "colspan", "rowspan", "scope", "aria-label"]);
+    var removed = 0;
+    Array.from(template.content.querySelectorAll("*")).forEach(function (element) {
+      var tag = element.localName;
+      if (blocked.has(tag)) { element.remove(); removed++; return; }
+      if (!allowed.has(tag)) {
+        element.replaceWith.apply(element, Array.from(element.childNodes));
+        removed++;
+        return;
+      }
+      Array.from(element.attributes).forEach(function (attribute) {
+        if (!attributes.has(attribute.name) || ((attribute.name === "colspan" || attribute.name === "rowspan") && !/^\d{1,3}$/.test(attribute.value))) {
+          element.removeAttribute(attribute.name); removed++;
+        }
+      });
+    });
+    if (!template.content.textContent.trim()) throw new Error("安全に表示できるレポート本文がありません。");
+    if (removed) console.warn("Unsafe report markup removed", {count: removed});
+    return template.innerHTML;
   }
 
   function showMessage(m) { els.message.textContent = m; els.message.style.display = "block"; }

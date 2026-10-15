@@ -327,7 +327,7 @@ def function_manifest() -> List[Dict[str, Any]]:
                      "nullable": True, "isList": False, "children": [], "entitySubType": None}
     return [{
         "name": FUNCTION_NAME, "displayName": FUNCTION_NAME,
-        "description": "店舗別損益AIレポートの検証(validate)・保存(save)の単一入口。save は AppDB 保存＋同一 doc_key の旧版削除を内包する。",
+        "description": "レポートの検証・保存と、メインWorkflowの手動開始(start)・状況確認(status)の単一入口。",
         "isPrivate": False,
         "inputs": [
             {"name": "operation", "displayName": "operation", "type": "text", "value": None,
@@ -339,8 +339,19 @@ def function_manifest() -> List[Dict[str, Any]]:
     }]
 
 
-def ensure_report_api_package(apply: bool) -> Tuple[str, str]:
+def ensure_report_api_package(apply: bool, model_id: str = "", subflow_id: str = "") -> Tuple[str, str]:
+    if not model_id:
+        model_id, _ = ensure_model(WF01_MODEL_NAME, "店舗損益AIメイン", False)
+    if not subflow_id:
+        subflow_id, _ = ensure_model(SUBFLOW_NAME, "店舗損益AIレポート生成", False)
+    if apply and not all(re.fullmatch(r"[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}", mid)
+                         for mid in (model_id, subflow_id)):
+        raise RuntimeError("親/サブWorkflowが見つかりません。先に provision でモデルを確保してください。")
     source = CE_PATH.read_text(encoding="utf-8")
+    if model_id:
+        source = source.replace("__MAIN_WORKFLOW_MODEL_ID__", model_id)
+    if subflow_id:
+        source = source.replace("__SUB_WORKFLOW_MODEL_ID__", subflow_id)
     packages = items(request("GET", "api/codeengine/v2/packages?limit=1000&offset=0"), "packages")
     package = next((r for r in packages if r.get("name") == REPORT_API_PACKAGE_NAME), None)
     if not package:
@@ -378,6 +389,61 @@ def ensure_report_api_package(apply: bool) -> Tuple[str, str]:
     request("POST", f"api/codeengine/v2/packages/{package_id}/versions/{version}/release", {})
     print(f"released Code Engine: {REPORT_API_PACKAGE_NAME} v{version}", flush=True)
     return package_id, version
+
+
+def sync_workflow_manifest() -> Dict[str, Any]:
+    model_id, _ = ensure_model(WF01_MODEL_NAME, "", False)
+    subflow_id, _ = ensure_model(SUBFLOW_NAME, "", False)
+    package = next((r for r in items(request("GET", "api/codeengine/v2/packages?limit=1000&offset=0"), "packages")
+                    if r.get("name") == REPORT_API_PACKAGE_NAME), {})
+    package_id = asset_id(package)
+    if not model_id or not subflow_id or not package_id:
+        raise RuntimeError("Workflow/Code Engineが未配備です。先に provision --apply --release を実行してください。")
+    latest = request("GET", f"api/codeengine/v2/packages/{package_id}/versions/latest?parts=code,functions") or {}
+    if not all(mid in str(latest.get("code") or "") for mid in (model_id, subflow_id)) or any(
+            marker in str(latest.get("code") or "") for marker in ("__MAIN_WORKFLOW_MODEL_ID__", "__SUB_WORKFLOW_MODEL_ID__")):
+        raise RuntimeError("Code EngineのWorkflow配線が一致しません。ce --apply で更新してください。")
+    inputs = copy.deepcopy(function_manifest()[0]["inputs"])
+    for entry in inputs:
+        entry["alias"] = entry["name"]
+    output = copy.deepcopy(function_manifest()[0]["output"])
+    output["alias"] = "result"
+    binding = {"name": "plReportService", "alias": "plReportApi", "packageId": package_id,
+               "version": str(latest["version"]), "functionName": FUNCTION_NAME,
+               "parameters": inputs, "output": output}
+    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    existing = manifest.get("packagesMapping") or []
+    desired = [r for r in existing if r.get("alias") != "plReportApi"] + [binding]
+    changed = existing != desired
+    if changed:
+        manifest["packagesMapping"] = desired
+        MANIFEST_PATH.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return {"changed": changed, "packageId": package_id, "version": binding["version"], "modelId": model_id}
+
+def model_triggers(model_id: str) -> List[Dict[str, Any]]:
+    rows = request("GET", f"api/workflow/v2/triggers/model/{model_id}")
+    if not isinstance(rows, list) or any(not isinstance(r, dict) or r.get("modelId") != model_id for r in rows):
+        raise RuntimeError("Workflowのトリガー一覧を対象モデルに限定して確認できません。")
+    return rows
+
+
+def ensure_manual_only(model_id: str, apply: bool) -> Dict[str, Any]:
+    timers = [r for r in model_triggers(model_id) if r.get("type") == "TIMER" and not r.get("deletedAt")]
+    removed = []
+    for trigger in timers:
+        trigger_id = asset_id(trigger)
+        if not trigger_id:
+            raise RuntimeError("定期トリガーにIDがありません。削除しません。")
+        if apply:
+            request("DELETE", f"api/workflow/v2/triggers/{trigger_id}")
+            retired = request("GET", f"api/workflow/v2/triggers/{trigger_id}") or {}
+            if retired.get("modelId") != model_id or not retired.get("deletedAt"):
+                raise RuntimeError("定期トリガーの削除確認に失敗しました。")
+            removed.append(trigger_id)
+    remaining = [r for r in model_triggers(model_id) if r.get("type") == "TIMER" and not r.get("deletedAt")]
+    if apply and remaining:
+        raise RuntimeError("メインWorkflowの定期トリガーが残っています。")
+    return {"modelId": model_id, "removedCount": len(removed), "scheduleCount": len(remaining), "applied": apply}
 
 
 # --------------------------------------------------------------------------- #
@@ -1093,11 +1159,6 @@ def cmd_provision(apply: bool, release: bool, dry_dir: Optional[pathlib.Path]) -
     if apply:
         _guard_provision_write()
 
-    # 1) Code Engine パッケージ（名前で発見/作成は ensure_report_api_package が担う）
-    pkg_id, pkg_ver = ensure_report_api_package(apply)
-    pkg_id = pkg_id or "__PACKAGE_ID__"
-    pkg_ver = pkg_ver or "__PACKAGE_VERSION__"
-
     # 2) インスタンス固有の束縛を解決（apply 時は欠落を loud に失敗＝保守用GUIDを焼き込まない）
     collection_id = resolve_collection_id()
     summary_ds_id = dataset_ids().get("summary", "")
@@ -1110,11 +1171,18 @@ def cmd_provision(apply: bool, release: bool, dry_dir: Optional[pathlib.Path]) -
             "manifest.json に summary データセットIDがありません。"
             " 先に scripts/provision_domo.py sync-manifest を実行してください。")
 
-    # 3) 統合サブWF モデル（発見/作成）→ 定義 PUT（新規は版 1.0.0・既存は次 patch）
+    wf01_id, wf01_found = ensure_model(WF01_MODEL_NAME, "店舗損益AIメイン（手動実行）", apply)
+    if wf01_id:
+        WF01_MODEL_ID = wf01_id
     sub_id, sub_found = ensure_model(
         SUBFLOW_NAME, "店舗/全社の損益AIレポートを生成（report_type 分岐・保存は pl_report_api）", apply)
     if sub_id:
         SUBFLOW_MODEL_ID = sub_id
+    pkg_id, pkg_ver = ensure_report_api_package(apply, wf01_id, sub_id)
+    pkg_id = pkg_id or "__PACKAGE_ID__"
+    pkg_ver = pkg_ver or "__PACKAGE_VERSION__"
+
+    # 3) 統合サブWF モデル（発見/作成）→ 定義 PUT（新規は版 1.0.0・既存は次 patch）
     sub_def = subflow_definition(pkg_id, pkg_ver)
     if dry_dir:
         (dry_dir / "provision_subflow.json").write_text(json.dumps(sub_def, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -1128,10 +1196,6 @@ def cmd_provision(apply: bool, release: bool, dry_dir: Optional[pathlib.Path]) -
         print(f"  [dry-run] 統合サブWF 定義を組立（PUT せず・pin 想定版 v{sub_version}）", flush=True)
 
     # 4) WF-01 モデル（発見/作成）→ 子WF/束縛を再構築 → レイアウト検証 → PUT
-    wf01_id, wf01_found = ensure_model(
-        WF01_MODEL_NAME, "店舗損益AIメイン（店舗ループ→統合サブWFを report_type で呼び分け）", apply)
-    if wf01_id:
-        WF01_MODEL_ID = wf01_id
     definition = build_wf01_definition(SUBFLOW_MODEL_ID, sub_version, collection_id, summary_ds_id, not wf01_found)
     problems = validate_layout(definition)
     if problems:
@@ -1142,6 +1206,9 @@ def cmd_provision(apply: bool, release: bool, dry_dir: Optional[pathlib.Path]) -
         print(f"  wrote {dry_dir/'provision_wf01.json'}", flush=True)
     if apply:
         wf01_version = put_version_create_aware(WF01_MODEL_ID, definition, "WF-01", apply, release, not wf01_found)
+        if release:
+            ensure_manual_only(WF01_MODEL_ID, True)
+            sync_workflow_manifest()
     else:
         wf01_version = "1.0.0" if not wf01_found else next_patch(highest_version(WF01_MODEL_ID))
         print("  [dry-run] WF-01 定義を組立（PUT せず）", flush=True)
@@ -1200,7 +1267,9 @@ def cmd_verify() -> Dict[str, Any]:
                        "endNodes": sum(1 for e in mels if e.get("type") == "endNode"),
                        "timers": sum(1 for e in mels if e.get("type") == "intermediateCatchEventNode"),
                        "subflowRefs": sub_refs,
-                       "layoutProblems": validate_layout(main_def)}
+                       "layoutProblems": validate_layout(main_def),
+                       "scheduleCount": len([r for r in model_triggers(WF01_MODEL_ID)
+                                             if r.get("type") == "TIMER" and not r.get("deletedAt")])}
     try:
         wf03 = request("GET", f"api/workflow/v1/models/{WF03_MODEL_ID}") or {}
         out["wf03"] = {"name": wf03.get("name"), "deletedAt": wf03.get("deletedAt"), "versions": len(wf03.get("versions") or [])}
@@ -1212,7 +1281,7 @@ def cmd_verify() -> Dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("ce", "subflow", "mainflow", "delete-wf03", "verify", "all", "provision"))
+    parser.add_argument("command", choices=("ce", "subflow", "mainflow", "delete-wf03", "verify", "all", "provision", "sync-manifest", "manual-only"))
     parser.add_argument("--apply", action="store_true", help="実際に作成/PUT する（無指定は dry-run）")
     parser.add_argument("--release", action="store_true", help="PUT 後に release まで行う")
     parser.add_argument("--dry-dir", default="/tmp/plwf", help="dry-run で組み立てた定義の出力先")
@@ -1221,7 +1290,16 @@ def main() -> int:
     dry_dir = pathlib.Path(args.dry_dir)
     dry_dir.mkdir(parents=True, exist_ok=True)
 
-    if args.command == "ce":
+    if args.command == "manual-only":
+        if args.apply:
+            _guard_provision_write()
+        model_id, _ = ensure_model(WF01_MODEL_NAME, "", False)
+        if not model_id:
+            raise RuntimeError("対象メインWorkflowが見つかりません。")
+        print(json.dumps(ensure_manual_only(model_id, args.apply), ensure_ascii=False))
+    elif args.command == "sync-manifest":
+        print(json.dumps(sync_workflow_manifest(), ensure_ascii=False))
+    elif args.command == "ce":
         cmd_ce(args.apply, dry_dir)
     elif args.command == "subflow":
         cmd_subflow(args.apply, args.release, dry_dir)

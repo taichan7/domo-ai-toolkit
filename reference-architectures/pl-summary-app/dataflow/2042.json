@@ -10,122 +10,172 @@
         },
         "elements": [
           {
+            "id": "Section-pl-prepare",
+            "type": "Section",
+            "name": "① 準備｜入力・生成・明細出力",
+            "x": 16,
+            "y": 16,
+            "width": 932,
+            "height": 232,
+            "backgroundColor": "var(--colorChartBlue6)"
+          },
+          {
             "id": "LoadFromVault-2a654779-e073-4b77-9c10-a6cca0b24126",
             "type": "Tile",
-            "x": 128,
-            "y": 128,
+            "x": 64,
+            "y": 88,
             "color": null,
             "colorSource": null
           },
           {
             "id": "3fdc212f-32f5-4e25-88fb-01335509fb82",
             "type": "Tile",
-            "x": 256,
-            "y": 128,
-            "color": null,
-            "colorSource": null
-          },
-          {
-            "id": "dab1e13b-54a4-4833-9c77-f247dc84fa62",
-            "type": "Tile",
-            "x": 512,
-            "y": 128,
-            "color": null,
-            "colorSource": null
-          },
-          {
-            "id": "364a005d-742b-455c-a33f-3afbfb2fc32a",
-            "type": "Tile",
-            "x": 1280,
-            "y": 288,
-            "color": null,
-            "colorSource": null
-          },
-          {
-            "id": "SQL-2aad9739-d14d-4039-a06d-9a959b14e530",
-            "type": "Tile",
-            "x": 512,
-            "y": 288,
+            "x": 284,
+            "y": 88,
             "color": null,
             "colorSource": null
           },
           {
             "id": "Metadata-d7194316-533a-4367-bbc6-fa114e880e23",
             "type": "Tile",
-            "x": 384,
-            "y": 128,
+            "x": 504,
+            "y": 88,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "dab1e13b-54a4-4833-9c77-f247dc84fa62",
+            "type": "Tile",
+            "x": 724,
+            "y": 88,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "Section-pl-store-ai",
+            "type": "Section",
+            "name": "② 店舗｜月次集計・短文AI",
+            "x": 676,
+            "y": 304,
+            "width": 932,
+            "height": 232,
+            "backgroundColor": "var(--colorChartPurple6)"
+          },
+          {
+            "id": "SQL-2aad9739-d14d-4039-a06d-9a959b14e530",
+            "type": "Tile",
+            "x": 724,
+            "y": 376,
             "color": null,
             "colorSource": null
           },
           {
             "id": "PythonEngineAction-71dc1c5e-6baf-48d5-b3a1-daf8be58f17b",
             "type": "Tile",
-            "x": 640,
-            "y": 288,
+            "x": 944,
+            "y": 376,
             "color": null,
             "colorSource": null
           },
           {
             "id": "TextGeneration-fac0a778-db80-4e93-96e3-0f20b591bc4e",
             "type": "Tile",
-            "x": 768,
-            "y": 288,
-            "color": null,
-            "colorSource": null
-          },
-          {
-            "id": "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061",
-            "type": "Tile",
-            "x": 1152,
-            "y": 288,
+            "x": 1164,
+            "y": 376,
             "color": null,
             "colorSource": null
           },
           {
             "id": "Metadata-fdcee276-52f4-4d27-a127-6ab367bd0be8",
             "type": "Tile",
-            "x": 896,
-            "y": 288,
+            "x": 1384,
+            "y": 376,
             "color": null,
             "colorSource": null
+          },
+          {
+            "id": "Section-pl-company-ai",
+            "type": "Section",
+            "name": "③ 全社｜短文AI・要約出力",
+            "x": 1664,
+            "y": 304,
+            "width": 712,
+            "height": 232,
+            "backgroundColor": "var(--colorChartYellow6)"
           },
           {
             "id": "TextGeneration-0fa8df6c-10d9-4d28-8d8d-93dbd625a395",
             "type": "Tile",
-            "x": 1024,
-            "y": 288,
+            "x": 1712,
+            "y": 376,
             "color": null,
             "colorSource": null
           },
           {
+            "id": "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061",
+            "type": "Tile",
+            "x": 1932,
+            "y": 376,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "364a005d-742b-455c-a33f-3afbfb2fc32a",
+            "type": "Tile",
+            "x": 2152,
+            "y": 376,
+            "color": null,
+            "colorSource": null
+          },
+          {
+            "id": "Section-pl-trend",
+            "type": "Section",
+            "name": "④ トレンド｜月次集計・出力",
+            "x": 676,
+            "y": 592,
+            "width": 492,
+            "height": 232,
+            "backgroundColor": "var(--colorChartBlue6)"
+          },
+          {
             "id": "SQL-c4bdc5d5-9e9c-5d81-a817-0816308570fc",
             "type": "Tile",
-            "x": 512,
-            "y": 448,
+            "x": 724,
+            "y": 664,
             "color": null,
             "colorSource": null
           },
           {
             "id": "0e861cea-7c34-53a2-8f3f-d2f3653290be",
             "type": "Tile",
-            "x": 704,
-            "y": 448,
+            "x": 944,
+            "y": 664,
             "color": null,
             "colorSource": null
           },
           {
+            "id": "Section-pl-department",
+            "type": "Section",
+            "name": "⑤ 事業部｜集計・出力",
+            "x": 676,
+            "y": 880,
+            "width": 492,
+            "height": 232,
+            "backgroundColor": "var(--colorChartGreen6)"
+          },
+          {
             "id": "SQL-bfb09e1d-af6d-5506-add0-99d81e326683",
             "type": "Tile",
-            "x": 512,
-            "y": 608,
+            "x": 724,
+            "y": 952,
             "color": null,
             "colorSource": null
           },
           {
             "id": "b351222a-8c12-5e6c-b687-849d36c538cd",
             "type": "Tile",
-            "x": 704,
-            "y": 608,
+            "x": 944,
+            "y": 952,
             "color": null,
             "colorSource": null
           }
@@ -135,122 +185,172 @@
     },
     "elements": [
       {
+        "id": "Section-pl-prepare",
+        "type": "Section",
+        "name": "① 準備｜入力・生成・明細出力",
+        "x": 16,
+        "y": 16,
+        "width": 932,
+        "height": 232,
+        "backgroundColor": "var(--colorChartBlue6)"
+      },
+      {
         "id": "LoadFromVault-2a654779-e073-4b77-9c10-a6cca0b24126",
         "type": "Tile",
-        "x": 128,
-        "y": 128,
+        "x": 64,
+        "y": 88,
         "color": null,
         "colorSource": null
       },
       {
         "id": "3fdc212f-32f5-4e25-88fb-01335509fb82",
         "type": "Tile",
-        "x": 256,
-        "y": 128,
-        "color": null,
-        "colorSource": null
-      },
-      {
-        "id": "dab1e13b-54a4-4833-9c77-f247dc84fa62",
-        "type": "Tile",
-        "x": 512,
-        "y": 128,
-        "color": null,
-        "colorSource": null
-      },
-      {
-        "id": "364a005d-742b-455c-a33f-3afbfb2fc32a",
-        "type": "Tile",
-        "x": 1280,
-        "y": 288,
-        "color": null,
-        "colorSource": null
-      },
-      {
-        "id": "SQL-2aad9739-d14d-4039-a06d-9a959b14e530",
-        "type": "Tile",
-        "x": 512,
-        "y": 288,
+        "x": 284,
+        "y": 88,
         "color": null,
         "colorSource": null
       },
       {
         "id": "Metadata-d7194316-533a-4367-bbc6-fa114e880e23",
         "type": "Tile",
-        "x": 384,
-        "y": 128,
+        "x": 504,
+        "y": 88,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "dab1e13b-54a4-4833-9c77-f247dc84fa62",
+        "type": "Tile",
+        "x": 724,
+        "y": 88,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "Section-pl-store-ai",
+        "type": "Section",
+        "name": "② 店舗｜月次集計・短文AI",
+        "x": 676,
+        "y": 304,
+        "width": 932,
+        "height": 232,
+        "backgroundColor": "var(--colorChartPurple6)"
+      },
+      {
+        "id": "SQL-2aad9739-d14d-4039-a06d-9a959b14e530",
+        "type": "Tile",
+        "x": 724,
+        "y": 376,
         "color": null,
         "colorSource": null
       },
       {
         "id": "PythonEngineAction-71dc1c5e-6baf-48d5-b3a1-daf8be58f17b",
         "type": "Tile",
-        "x": 640,
-        "y": 288,
+        "x": 944,
+        "y": 376,
         "color": null,
         "colorSource": null
       },
       {
         "id": "TextGeneration-fac0a778-db80-4e93-96e3-0f20b591bc4e",
         "type": "Tile",
-        "x": 768,
-        "y": 288,
-        "color": null,
-        "colorSource": null
-      },
-      {
-        "id": "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061",
-        "type": "Tile",
-        "x": 1152,
-        "y": 288,
+        "x": 1164,
+        "y": 376,
         "color": null,
         "colorSource": null
       },
       {
         "id": "Metadata-fdcee276-52f4-4d27-a127-6ab367bd0be8",
         "type": "Tile",
-        "x": 896,
-        "y": 288,
+        "x": 1384,
+        "y": 376,
         "color": null,
         "colorSource": null
+      },
+      {
+        "id": "Section-pl-company-ai",
+        "type": "Section",
+        "name": "③ 全社｜短文AI・要約出力",
+        "x": 1664,
+        "y": 304,
+        "width": 712,
+        "height": 232,
+        "backgroundColor": "var(--colorChartYellow6)"
       },
       {
         "id": "TextGeneration-0fa8df6c-10d9-4d28-8d8d-93dbd625a395",
         "type": "Tile",
-        "x": 1024,
-        "y": 288,
+        "x": 1712,
+        "y": 376,
         "color": null,
         "colorSource": null
       },
       {
+        "id": "Metadata-fc556c20-61ae-4310-91cf-3de7e7343061",
+        "type": "Tile",
+        "x": 1932,
+        "y": 376,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "364a005d-742b-455c-a33f-3afbfb2fc32a",
+        "type": "Tile",
+        "x": 2152,
+        "y": 376,
+        "color": null,
+        "colorSource": null
+      },
+      {
+        "id": "Section-pl-trend",
+        "type": "Section",
+        "name": "④ トレンド｜月次集計・出力",
+        "x": 676,
+        "y": 592,
+        "width": 492,
+        "height": 232,
+        "backgroundColor": "var(--colorChartBlue6)"
+      },
+      {
         "id": "SQL-c4bdc5d5-9e9c-5d81-a817-0816308570fc",
         "type": "Tile",
-        "x": 512,
-        "y": 448,
+        "x": 724,
+        "y": 664,
         "color": null,
         "colorSource": null
       },
       {
         "id": "0e861cea-7c34-53a2-8f3f-d2f3653290be",
         "type": "Tile",
-        "x": 704,
-        "y": 448,
+        "x": 944,
+        "y": 664,
         "color": null,
         "colorSource": null
       },
       {
+        "id": "Section-pl-department",
+        "type": "Section",
+        "name": "⑤ 事業部｜集計・出力",
+        "x": 676,
+        "y": 880,
+        "width": 492,
+        "height": 232,
+        "backgroundColor": "var(--colorChartGreen6)"
+      },
+      {
         "id": "SQL-bfb09e1d-af6d-5506-add0-99d81e326683",
         "type": "Tile",
-        "x": 512,
-        "y": 608,
+        "x": 724,
+        "y": 952,
         "color": null,
         "colorSource": null
       },
       {
         "id": "b351222a-8c12-5e6c-b687-849d36c538cd",
         "type": "Tile",
-        "x": 704,
-        "y": 608,
+        "x": 944,
+        "y": 952,
         "color": null,
         "colorSource": null
       }
@@ -269,8 +369,8 @@
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
       "gui": {
-        "x": 128,
-        "y": 128,
+        "x": 64,
+        "y": 88,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -288,6 +388,15 @@
       "recentVersionCutoffMs": 0,
       "tables": [
         {}
+      ],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "① 準備｜DataFlowの入力依存を1本に保つ最小seed。実損益の取得ではなく、後段のデモデータ生成を開始するための入力です。"
+        }
       ]
     },
     {
@@ -301,8 +410,8 @@
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
       "gui": {
-        "x": 256,
-        "y": 128,
+        "x": 284,
+        "y": 88,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -457,6 +566,15 @@
       },
       "tables": [
         {}
+      ],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "① 準備｜店舗・勘定・月のデモ損益を決定的に合成します。店舗ごとの費用構造や季節性を学ぶ教材です。実顧客データへの接続時はこの生成処理を置き換えます。"
+        }
       ]
     },
     {
@@ -470,8 +588,8 @@
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
       "gui": {
-        "x": 384,
-        "y": 128,
+        "x": 504,
+        "y": 88,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -489,6 +607,15 @@
       ],
       "tables": [
         {}
+      ],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "① 準備｜期間の型を明細・月次集計で揃え、日付の並びや比較期間の解釈が下流で食い違わないようにします。"
+        }
       ]
     },
     {
@@ -502,8 +629,8 @@
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
       "gui": {
-        "x": 512,
-        "y": 128,
+        "x": 724,
+        "y": 88,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -523,6 +650,15 @@
       "partitioned": false,
       "tables": [
         {}
+      ],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "① 準備｜勘定レベルの明細をREPLACEで公開。長文AIレポートの根拠データとしてsummaryとは別の粒度を保ちます。入力/出力IDと列名を変えないでください。"
+        }
       ]
     },
     {
@@ -536,10 +672,18 @@
         "sqlDialect": "MAGIC",
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
-      "notes": [],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "② 店舗｜勘定レベルの明細を店舗×月へ集計。売上・費用・利益・比率・状態ラベルを数値側で確定し、画面とAIが同じ基準を参照します。"
+        }
+      ],
       "gui": {
-        "x": 512,
-        "y": 288,
+        "x": 724,
+        "y": 376,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -566,8 +710,8 @@
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
       "gui": {
-        "x": 640,
-        "y": 288,
+        "x": 944,
+        "y": 376,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -778,6 +922,15 @@
       },
       "tables": [
         {}
+      ],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "② 店舗｜確定済みの損益指標をAI入力文へ整えます。店舗用テキストと全社合算テキストを作り、AIに数値の再計算を任せないための境界です。"
+        }
       ]
     },
     {
@@ -790,10 +943,18 @@
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
-      "notes": [],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "② 店舗｜店舗の損益・予算差異を短文で説明するTextGeneration。概要タブの店舗別AIサマリーに使用し、長文レポートのWorkflowとは別の処理です。"
+        }
+      ],
       "gui": {
-        "x": 768,
-        "y": 288,
+        "x": 1164,
+        "y": 376,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -835,8 +996,8 @@
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
       "gui": {
-        "x": 896,
-        "y": 288,
+        "x": 1384,
+        "y": 376,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -854,6 +1015,15 @@
       ],
       "tables": [
         {}
+      ],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "② 店舗｜店舗AIが付加するDOMO_AI_BATCH_ERROR列を除去し、次の全社AIで同名の補助列が衝突しないようにします。損益指標の列は保持します。"
+        }
       ]
     },
     {
@@ -866,10 +1036,18 @@
       "settings": {
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
-      "notes": [],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "③ 全社｜全店舗の合算テキストから全社の短文経営サマリーを生成。各行に共通の全社視点を持たせ、全社表示の概要タブで利用します。"
+        }
+      ],
       "gui": {
-        "x": 1024,
-        "y": 288,
+        "x": 1712,
+        "y": 376,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -911,8 +1089,8 @@
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
       "gui": {
-        "x": 896,
-        "y": 288,
+        "x": 1932,
+        "y": 376,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -946,6 +1124,15 @@
       ],
       "tables": [
         {}
+      ],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "③ 全社｜中間のAI入力文とエラー補助列を公開出力から外します。UI・Workflowが依存する損益指標と店舗別/全社AIサマリーの列契約を維持します。"
+        }
       ]
     },
     {
@@ -959,8 +1146,8 @@
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
       "gui": {
-        "x": 1024,
-        "y": 288,
+        "x": 2152,
+        "y": 376,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -980,6 +1167,15 @@
       "partitioned": false,
       "tables": [
         {}
+      ],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "③ 全社｜店舗×月の損益・状態ラベル・短文AIをREPLACEで公開。UIのsummary aliasと親/子Workflowの共通ハブです。長文レポートの保存先はAppDBです。"
+        }
       ]
     },
     {
@@ -996,10 +1192,18 @@
         "sqlDialect": "MAGIC",
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
-      "notes": [],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "④ トレンド｜店舗×月の売上・純利益を集計してトレンド描画用に実体化。Pro Code側の集計API制限を避け、24か月比較・ランキングの共通データを提供します。"
+        }
+      ],
       "gui": {
-        "x": 512,
-        "y": 448,
+        "x": 724,
+        "y": 664,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -1035,14 +1239,23 @@
       "schemaSource": "DATAFLOW",
       "partitioned": false,
       "gui": {
-        "x": 704,
-        "y": 448,
+        "x": 944,
+        "y": 664,
         "color": null,
         "colorSource": null,
         "sampleJson": null
       },
       "tables": [
         {}
+      ],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "④ トレンド｜店舗×月のトレンド集計をREPLACEで公開。UIのtrend aliasから読み、店舗選択・月次比較・ランキングのドリルダウンに使用します。"
+        }
       ]
     },
     {
@@ -1059,10 +1272,18 @@
         "sqlDialect": "MAGIC",
         "preferredDatabaseEntityType": "TEMP_VIEW"
       },
-      "notes": [],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "⑤ 事業部｜収益事業部の売上・売上原価・予算差異を部門×月へ集計。全社の事業部別タブで使い、売上のない間接部門や未配賦の共通費を混在させません。"
+        }
+      ],
       "gui": {
-        "x": 512,
-        "y": 608,
+        "x": 724,
+        "y": 952,
         "color": null,
         "colorSource": null,
         "sampleJson": null
@@ -1098,14 +1319,23 @@
       "schemaSource": "DATAFLOW",
       "partitioned": false,
       "gui": {
-        "x": 704,
-        "y": 608,
+        "x": 944,
+        "y": 952,
         "color": null,
         "colorSource": null,
         "sampleJson": null
       },
       "tables": [
         {}
+      ],
+      "notes": [
+        {
+          "x1": null,
+          "y1": null,
+          "x2": null,
+          "y2": null,
+          "body": "⑤ 事業部｜部門×月の集計をREPLACEで公開。UIのdept aliasが参照します。利益と粗利益を混同せず、共通費を勝手に事業部へ配賦しない契約を維持します。"
+        }
       ]
     }
   ],

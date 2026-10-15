@@ -53,4 +53,4 @@ jobs:
           node reference-architectures/inventory-management-app/dev-guide-app/tests/check.mjs
           node reference-architectures/pl-summary-app/dev-guide-app/tests/check.mjs
           node --test reference-architectures/inventory-management-app/tests/test_*.js
-          node reference-architectures/pl-summary-app/tests/test_drill_helpers.js
+          node --test reference-architectures/pl-summary-app/tests/test_*.js

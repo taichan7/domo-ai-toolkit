@@ -114,12 +114,13 @@ set -a; . config/secrets.env; set +a
      構築。ダミーの P/L データと ETL 短文 AI サマリーを自動生成。
    - **STEP 2** `python3 scripts/provision_domo.py sync-manifest` — 対象インスタンスの DataSet／コレクション ID を
      `pro-code/manifest.json` へ張り替え。
-   - **STEP 3** `cd pro-code && domo publish && cd ..` — Pro-Code 公開（`vendor/domo.js` 同梱＝CDN 非依存）。
+   - **STEP 3** `python3 scripts/provision_workflows.py provision --apply --release` →同 `sync-manifest`→
+     `cd pro-code && domo publish && cd ..` — 手動実行に使うCE/親子Workflowを先に配備・配線してからPro-Codeを公開（CDN非依存）。
      初回は `manifest.json` の `id` を空にして publish し、払い出された design ID を反映。必ず `pro-code/` 直下で実行。
    - **STEP 4** `python3 scripts/provision_domo.py app-studio` — App Studio アプリ＋カードを名称で発見/作成し、
      埋込カードの context mapping（`summary`/`detail`/`trend`/`dept`）を同期。
    - **STEP 5** `python3 scripts/provision_domo.py verify` — `ok: true` を確認。
-3. **AI 長文レポートが必要なら STEP 6（ワークフロー層）** を実施する。新規インスタンスは
+3. **STEP 6（ワークフロー層）の詳細** を読む。初回配備はSTEP 3で済ませ、希望するときだけ再配備する。新規インスタンスは
    `python3 scripts/provision_workflows.py provision --apply --release`（保存 CE・統合サブWF・WF-01 を名称で
    発見/新規作成し、束縛〔AppDB コレクション・クエリ対象データセット・子WF参照〕を実 ID へ再束縛してゼロから配備）。
    既存 maintenance-instance デモの保守/移行だけ `ce` → `subflow` → `mainflow` を使う。認証は `DOMO_DEVELOPER_TOKEN`

@@ -52,6 +52,24 @@ class FakeClient:
 
 
 class ReconcileAppStudioContextTest(unittest.TestCase):
+    def test_server_normalized_package_binding_is_equivalent(self):
+        parameter = {"name": "operation", "alias": "operation", "type": "text", "value": None,
+                     "nullable": True, "isList": False, "children": [], "displayName": "operation"}
+        binding = {"name": "service", "alias": "plReportApi", "packageId": "pkg-1", "version": "1.0.1",
+                   "functionName": "pl_report_api", "parameters": [parameter], "output": {}}
+        context = {"mapping": [{"alias": "summary", "dataSetId": "ds-summary", "fields": []},
+                               {"alias": "trend", "dataSetId": "ds-trend", "fields": []}],
+                   "collections": [{"name": "店舗別損益AI要約", "id": "col-1"}],
+                   "packageMapping": [{k: v for k, v in binding.items() if k != "name"}]}
+        context["packageMapping"][0]["parameters"] = [{k: v for k, v in parameter.items() if k != "displayName"}]
+        client = FakeClient(context)
+        result = provision_domo.reconcile_app_studio_context(client, CONTEXT_ID, {**MANIFEST, "packagesMapping": [binding]})
+        self.assertFalse(result["changed"])
+
+    def test_missing_context_is_a_blocker_when_ce_is_mapped(self):
+        with self.assertRaises(RuntimeError):
+            provision_domo.reconcile_app_studio_context(FakeClient({}), "", {**MANIFEST, "packagesMapping": [{"alias": "plReportApi"}]})
+
     def test_no_diff_does_not_put(self):
         context = {
             "id": CONTEXT_ID,
@@ -111,6 +129,19 @@ class ReconcileAppStudioContextTest(unittest.TestCase):
         result = provision_domo.reconcile_app_studio_context(client, "", MANIFEST)
         self.assertFalse(result["changed"])
         self.assertEqual(client.calls, [])
+
+
+class AppIdentityTest(unittest.TestCase):
+    def test_recovers_only_the_exact_card_not_a_same_design_preview(self):
+        class Client:
+            def request(self, method, path, body=None):
+                if path.startswith("api/apps"):
+                    return {"referencingCards": [{"id": "other-card", "domoapp": {"id": "preview"}},
+                                                {"id": "card-1", "domoapp": {"id": "proxy-1"}}]}
+                assert path == "domoapps/apps/v2/proxy-1"
+                return {"designId": "design-1", "context": {"id": "ctx-1", "designId": "design-1"}}
+        self.assertEqual(provision_domo.resolve_app_studio_identity(Client(), {"id": "design-1"}, "card-1"),
+                         {"proxyId": "proxy-1", "contextId": "ctx-1"})
 
 
 if __name__ == "__main__":

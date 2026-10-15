@@ -46,6 +46,38 @@ body{
 .brand-sub{ font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-muted); }
 
 .selector{ display: flex; align-items: center; gap: 10px; }
+.header-actions{ display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.workflow-button, .workflow-check{ font: inherit; cursor: pointer; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; min-height: 44px; background: var(--surface); color: var(--accent); }
+.workflow-button{ font-weight: 600; font-size: 13px; }
+.workflow-button:disabled, .workflow-check:disabled{ cursor: default; opacity: .55; }
+.workflow-button:focus-visible, .workflow-check:focus-visible, .workflow-close:focus-visible{ outline: 2px solid var(--accent); outline-offset: 3px; }
+.workflow-actions{ display: flex; align-items: center; gap: 12px; }
+.workflow-progress{ padding: 8px 0; border: 0; background: transparent; color: var(--ink-muted); cursor: pointer; font: inherit; font-size: 13px; white-space: nowrap; }
+.workflow-progress:hover{ color: var(--accent); }
+.workflow-progress:disabled{ cursor: default; opacity: .55; }
+.workflow-progress:focus-visible{ outline: 2px solid var(--accent); outline-offset: 3px; }
+.workflow-status{ position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.workflow-status.workflow-error{ position: static; width: auto; height: auto; margin: 0 0 18px; padding: 12px 14px; clip-path: none; white-space: normal; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-muted); font-size: 13px; }
+.workflow-check{ font-size: 13px; flex-shrink: 0; }
+.workflow-confirm{ width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 24px; border: 1px solid var(--border); border-radius: var(--radius); color: var(--ink); box-shadow: var(--shadow-md); overflow-y: auto; }
+.workflow-confirm::backdrop{ background: rgba(46,46,42,.45); }
+.workflow-confirm-head{ display: flex; align-items: flex-start; gap: 16px; }
+.workflow-kicker{ margin: 0 0 8px; font-size: 13px; color: var(--accent); font-weight: 600; }
+.workflow-confirm h2{ margin: 0; font-size: 21px; line-height: 1.6; }
+.workflow-close{ flex-shrink: 0; width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 8px; color: var(--ink-muted); background: var(--surface); font: inherit; font-size: 24px; cursor: pointer; }
+.workflow-scope{ margin: 20px 0 14px; padding: 12px 14px; background: var(--bg); font-size: 14px; line-height: 1.8; }
+#workflow-confirm-note{ margin: 0; font-size: 14px; line-height: 1.9; color: var(--ink-muted); }
+.workflow-confirm-actions{ display: grid; grid-template-columns: 1fr 1.6fr; gap: 12px; margin-top: 24px; }
+.workflow-confirm-actions button{ min-height: 48px; font-size: 14px; }
+.workflow-confirm-actions .workflow-button{ background: var(--accent); color: var(--surface); }
+@media (max-width: 600px){
+  .header-actions{ width: 100%; gap: 10px; flex-direction: column; align-items: stretch; }
+  .header-actions .selector{ width: 100%; min-width: 0; }
+  .header-actions .select-shell{ flex: 1; min-width: 0; }
+  .header-actions #store-select{ width: 100%; min-width: 0; max-width: none; }
+  .workflow-actions{ justify-content: flex-end; }
+  .workflow-confirm{ padding: 18px; }
+}
 .selector-label{ font-size: 13px; color: var(--ink-muted); }
 .select-shell{ position: relative; }
 .select-shell::after{

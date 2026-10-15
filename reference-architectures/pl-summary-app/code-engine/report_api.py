@@ -38,6 +38,9 @@ DELETE_CHUNK_SIZE = 100
 # 削除する）ため、これらが欠けた不完全ドキュメントで既存の正レポートを上書き削除しないための門番。
 # reference-app の _validate_document が持つ安全性質を軽量版で踏襲する。
 REQUIRED_SAVE_FIELDS = ("doc_key", "store_id", "location_name", "analysis_html")
+MAIN_WORKFLOW_MODEL_ID = "__MAIN_WORKFLOW_MODEL_ID__"
+SUB_WORKFLOW_MODEL_ID = "__SUB_WORKFLOW_MODEL_ID__"
+RUNNING_STATUSES = {"IN_PROGRESS", "RUNNING", "PENDING", "STARTED"}
 
 # 【信頼境界メモ（意図的設計）】collection_id は呼び出し側（Workflow 変数経由で AI ツール引数）から
 # 受け取り、GUID 形状のみ検証する。reference-app はコレクションIDを配備時に
@@ -52,6 +55,77 @@ def _service() -> dict:
     全ヘルパーをこのファクトリ内に定義して top-level から外し、公開 ``def`` を
     ``pl_report_api`` の1つに保つ（reference-app の ``report_api`` と同じ構成）。
     """
+
+    def _workflow_model() -> str:
+        if not GUID_PATTERN.fullmatch(MAIN_WORKFLOW_MODEL_ID) or not GUID_PATTERN.fullmatch(SUB_WORKFLOW_MODEL_ID):
+            raise Exception({"code": "WORKFLOW_NOT_CONFIGURED",
+                             "message": "Workflowの接続先が未設定です。管理者へ確認してください。",
+                             "details": {}})
+        return MAIN_WORKFLOW_MODEL_ID
+
+    def _workflow_status(request: Dict[str, Any]) -> Dict[str, Any]:
+        import codeengine
+        model_id = _workflow_model()
+        instance_id = str(request.get("instance_id") or "").strip()
+        if instance_id:
+            if not GUID_PATTERN.fullmatch(instance_id):
+                raise Exception({"code": "INVALID_INSTANCE_ID", "message": "実行IDが不正です。", "details": {}})
+            row = codeengine.send_request("get", f"api/workflow/v1/instances/{instance_id}")
+            if not isinstance(row, dict) or row.get("modelId") != model_id:
+                raise Exception({"code": "INVALID_INSTANCE_ID", "message": "このアプリの実行ではありません。", "details": {}})
+        else:
+            rows = codeengine.send_request(
+                "get", f"api/workflow/v1/instances?modelId={model_id}&limit=100&offset=0")
+            if not isinstance(rows, list):
+                raise Exception({"code": "WORKFLOW_STATUS_ERROR", "message": "実行状況を確認できません。", "details": {}})
+            owned = [r for r in rows if isinstance(r, dict) and r.get("modelId") == model_id]
+            running = [r for r in owned if str(r.get("status") or "").upper() in RUNNING_STATUSES]
+            row = max(running or owned, key=lambda r: str(r.get("createdOn") or ""), default={})
+        status = str(row.get("status") or ("IDLE" if not row else "")).upper()
+        if not status:
+            raise Exception({"code": "WORKFLOW_STATUS_ERROR", "message": "実行状況を確認できません。", "details": {}})
+        return {"ok": True, "instance_id": str(row.get("id") or ""), "status": status,
+                "progress_path": f"/workflows/instances/{SUB_WORKFLOW_MODEL_ID}/",
+                "model_version": str(row.get("modelVersion") or ""),
+                "created_on": str(row.get("createdOn") or ""),
+                "completed_on": str(row.get("completedOn") or ""),
+                "running": status in RUNNING_STATUSES}
+
+    def _workflow_start(request: Dict[str, Any]) -> Dict[str, Any]:
+        import codeengine
+        if request:
+            raise Exception({"code": "INVALID_REQUEST",
+                             "message": "実行対象・入力はサーバー側で固定されています。空のrequestを指定してください。",
+                             "details": {}})
+        current = _workflow_status({})
+        if current["running"]:
+            return dict(current, already_running=True)
+        model_id = _workflow_model()
+        model = codeengine.send_request("get", f"api/workflow/v1/models/{model_id}")
+        active = [v for v in (model.get("versions") or []) if isinstance(v, dict) and v.get("active") is True]
+        if not active:
+            raise Exception({"code": "WORKFLOW_NOT_RELEASED", "message": "公開済みのWorkflowがありません。", "details": {}})
+        version = str(max(active, key=lambda v: tuple(int(p) for p in str(v.get("version") or "0.0.0").split(".")))["version"])
+        definition = codeengine.send_request("get", f"api/workflow/v1/models/{model_id}/versions/{version}") or {}
+        if isinstance(definition.get("savedJson"), str):
+            definition = json.loads(definition["savedJson"])
+        starts = [e for e in definition.get("designElements") or [] if e.get("type") == "rootNode"]
+        message_name = str((starts[0].get("data") or {}).get("title") or "") if len(starts) == 1 else ""
+        if not message_name:
+            raise Exception({"code": "WORKFLOW_START_ERROR", "message": "Workflowの開始設定を確認してください。", "details": {}})
+        try:
+            started = codeengine.send_request("post", "api/workflow/v1/instances/message",
+                                             {"messageName": message_name, "modelId": model_id,
+                                              "version": version, "data": {}})
+            if not isinstance(started, dict) or not GUID_PATTERN.fullmatch(str(started.get("id") or "")):
+                raise ValueError("missing workflow instance id")
+        except Exception as error:
+            raise Exception({"code": "START_UNCONFIRMED",
+                             "message": "開始結果を確認できませんでした。再実行せず「実行状況を確認」で状態を確認してください。",
+                             "details": {}}) from error
+        return {"ok": True, "instance_id": str(started["id"]), "status": str(started.get("status") or "IN_PROGRESS"),
+                "progress_path": f"/workflows/instances/{SUB_WORKFLOW_MODEL_ID}/",
+                "model_version": version, "running": True, "already_running": False}
 
     def _valid_iso_timestamp(value: str) -> bool:
         """generated_at が ISO8601 として解釈できるか（不正値を画面の日時降順ソートへ流さない）。"""
@@ -219,7 +293,7 @@ def _service() -> dict:
                 # read-after-write 即時整合でない場合、直後照会に新版が無いことがある（計数は参考値）。
                 "consistency_pending": not observed_now}
 
-    return {"validate": _validate, "save": _save}
+    return {"validate": _validate, "save": _save, "start": _workflow_start, "status": _workflow_status}
 
 
 def pl_report_api(operation: str = "save", request: Any = None) -> Dict[str, Any]:
@@ -259,10 +333,10 @@ def pl_report_api(operation: str = "save", request: Any = None) -> Dict[str, Any
             raise Exception({"code": "INVALID_REQUEST",
                              "message": "request はJSONオブジェクトで指定してください。", "details": {}})
 
-        if action not in ("validate", "save"):
+        if action not in svc:
             if action:
                 raise Exception({"code": "INVALID_OPERATION",
-                                 "message": "operation は validate / save のいずれかを指定してください。",
+                                 "message": "operation は validate / save / start / status のいずれかを指定してください。",
                                  "details": {}})
             # operation が空のときだけ request の形から推定する（AI ツールの固定値未指定対策）。
             # 本体シグナル（document キー、または collection_id/doc_key/operation 以外の実データ項目）が

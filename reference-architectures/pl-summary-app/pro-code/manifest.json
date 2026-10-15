@@ -1,11 +1,15 @@
 {
   "id": "08463c98-38a9-4caa-a762-b857a37e2826",
   "name": "Store PL AI Insights",
-  "version": "0.2.1",
+  "version": "0.3.2",
   "size": {
     "width": 1,
     "height": 1
   },
+  "ignore": [
+    "vendor/*.LICENSE",
+    "vendor/README.md"
+  ],
   "datasetsMapping": [
     {
       "dataSetId": "e05581f1-d70a-474d-91f3-f5a2080c9d05",
@@ -39,5 +43,49 @@
       "syncEnabled": false
     }
   ],
-  "fileName": "manifest.json"
+  "fileName": "manifest.json",
+  "packagesMapping": [
+    {
+      "name": "plReportService",
+      "alias": "plReportApi",
+      "packageId": "43e0a52b-83df-4f52-a2bf-1a3634898215",
+      "version": "1.0.3",
+      "functionName": "pl_report_api",
+      "parameters": [
+        {
+          "name": "operation",
+          "displayName": "operation",
+          "type": "text",
+          "value": null,
+          "nullable": true,
+          "isList": false,
+          "children": [],
+          "entitySubType": null,
+          "alias": "operation"
+        },
+        {
+          "name": "request",
+          "displayName": "request",
+          "type": "object",
+          "value": null,
+          "nullable": true,
+          "isList": false,
+          "children": [],
+          "entitySubType": null,
+          "alias": "request"
+        }
+      ],
+      "output": {
+        "name": "result",
+        "displayName": "result",
+        "type": "object",
+        "value": null,
+        "nullable": true,
+        "isList": false,
+        "children": [],
+        "entitySubType": null,
+        "alias": "result"
+      }
+    }
+  ]
 }

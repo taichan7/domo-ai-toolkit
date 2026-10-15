@@ -6,10 +6,11 @@
 
 > **このガイドが扱う範囲**
 > - **データ層＋ Pro-Code ＋ ETL 短文 AI サマリー**は、このフォルダのスクリプトだけで**きれいに**
->   デプロイできる（STEP 1〜5）。`apply` → `sync-manifest` → `domo publish` → `app-studio` → `verify`。
+>   デプロイできる（STEP 1〜5）。`apply` →データの`sync-manifest`→Workflow配備・CE配線→
+`domo publish`→`app-studio`→`verify`。
 > - **AI 長文レポート（AppDB `analysis_html`）**は**ワークフロー層**（WF-01 メイン＋統合サブWF＋保存CE）が
 >   必要で、これも `scripts/provision_workflows.py provision` が**まっさらなインスタンスへゼロから配備**できる
->   （STEP 6）。CE・統合サブWF・WF-01 を**名称で発見または新規作成**し、保守用インスタンスの GUID を
+>   （初回はSTEP 3、詳細はSTEP 6）。CE・統合サブWF・WF-01 を**名称で発見または新規作成**し、保守用インスタンスの GUID を
 >   焼き込まないよう束縛を対象環境の実 ID へ張り替える。
 > - ワークフロー層が未配備でも、Pro-Code カードの**サマリータブ**が「準備中」フォールバックになるだけで、
 >   概要／事業部別タブ（KPI・チャート・ETL 短文サマリー）はデータ層だけで動作する。
@@ -131,11 +132,19 @@ STEP 1 で確定した対象インスタンスの ID へ書き込む。名称で
 
 ---
 
-## STEP 3 — Pro Code の公開（`domo publish`）
+## STEP 3 — Workflow・CEの配線とPro Codeの公開
 
 ```bash
+python3 scripts/provision_workflows.py provision --apply --release
+python3 scripts/provision_workflows.py sync-manifest
 cd pro-code && domo publish && cd ..
 ```
+
+手動実行ボタンが参照する`plReportApi`を、**先に対象インスタンスへ配備・配線**する。
+Workflow層の認証とメール宛先はSTEP 6を読む。`provision`は親/子のモデルを先に確保してから
+CEソースへ両IDを焼き込み、保存・手動起動・実行状況の1公開関数をreleaseする。
+親のTIMERは作成せず、既存の定期TIMERがあれば対象モデルだけ削除する。
+これにより配布元のCE GUIDを別インスタンスへ持ち込まない。
 
 - Pro-Code は**ランタイムで外部 CDN を一切読まない**（inventory-management-app と同基準）: Domo SDK は
   `vendor/domo.js`（ryuu.js 4.6.0）をローカル同梱、チャートは手書き SVG、日本語書体は `app.css` の
@@ -164,7 +173,7 @@ python3 scripts/provision_domo.py app-studio
 `app-studio` は App Studio アプリ本体を**名称（`店舗別損益AIインサイト`）で発見または新規作成**し、
 Pro-Code カードを 1 枚 embed（または既存を再利用）し、カード metadata を検証して layout を整え、
 埋込カードの App Framework context mapping（`summary`／`detail`／`trend`／`dept` alias→DataSet ID と
-AppDB コレクション）を `manifest.json` へ**冪等に同期**する。解決した実 ID（App／Page／Card／proxy／
+AppDB コレクションと`plReportApi`のCode Engine配線）を `manifest.json` へ**冪等に同期**する。解決した実 ID（App／Page／Card／proxy／
 context）は `domo-assets.json`（gitignore 済み・配布されない）へ**書き戻す**ので、再実行や `verify` が
 そのまま通る。
 
@@ -198,7 +207,7 @@ KPI・チャート・短文サマリーが表示される。AI 長文レポー�
 
 ---
 
-## STEP 6 — ワークフロー層（AI 長文レポート）— 現状と手順
+## STEP 6 — Workflow層の詳細・再配備・手動実行（初回配備はSTEP 3）
 
 AI 長文レポート（AppDB `analysis_html`。Pro-Code の**サマリータブ**に出る経営インサイト HTML）は、
 次の3資産からなる**ワークフロー層**が生成する:
@@ -228,8 +237,11 @@ set -a; . config/secrets.env; set +a   # DOMO_INSTANCE ＋ DOMO_DEVELOPER_TOKEN�
 python3 scripts/provision_workflows.py provision                   # /tmp/plwf に subflow/WF-01 定義を書き出す
 # 問題なければ適用（CE→統合サブWF→WF-01 を発見/作成し release まで）:
 python3 scripts/provision_workflows.py provision --apply --release
-python3 scripts/provision_workflows.py verify                      # ワークフロー層の構造チェック
-# 配備後、WF-01 を手動実行して AppDB に analysis_html が生成されるか確認（手順は AGENT.md）
+python3 scripts/provision_workflows.py sync-manifest               # plReportApiの実ID・公開版を更新
+(cd pro-code && domo publish)
+python3 scripts/provision_domo.py app-studio                       # 実カードのCE配線を同期
+python3 scripts/provision_workflows.py verify                      # scheduleCount: 0 を含む構造チェック
+# 実行はアプリの「AIレポートを更新」→確認→実行。取消だけではCE/Workflowを呼ばない
 ```
 
 - **前提**: STEP 1〜2（データ層・`sync-manifest`）を先に済ませること。`provision --apply` は AppDB
@@ -241,7 +253,7 @@ python3 scripts/provision_workflows.py verify                      # ワーク�
   レポート生成は正常）。「成功したのにメールが来ない」を避けるため、メールを使うなら必ず設定する。
   - **person ID の調べ方**: Domo 管理画面 **Admin → People** で対象ユーザーを開くと URL 末尾が person ID（数値）。
     または API `GET https://${DOMO_INSTANCE}/api/content/v2/users`（開発者トークン/SID 認証）で `email` → `id` を
-    引く。複数人へ送るならカンマ区切り（例 `1549238191,1345973144`）。宛先はメールアドレスではなく **person ID**。
+    引く。複数人へ送るならカンマ区切り（例 `<person-id-1>,<person-id-2>`）。宛先はメールアドレスではなく **person ID**。
   - 設定の有無は `provision` のログ（「personRecipients に N 件を束縛」／「未設定 — …送信されません」）で確認できる。
 - `workflow/*.json`（WF-01／WF-02／`send_email_tool.json`）は**バージョン定義のスナップショット**。
   `provision` はモデルが未存在のとき WF-01 をこのスナップショットから seed し、束縛を張り替える。
@@ -261,9 +273,27 @@ python3 scripts/provision_workflows.py delete-wf03 --apply          # 旧 WF-03�
 既存モデル GUID を上書きしたいときは env で差し替え可（`PL_WF01_MODEL_ID` / `PL_SUBFLOW_MODEL_ID` /
 `PL_WF03_MODEL_ID` / `PL_DEDUPE_CE_PACKAGE_ID`）。重複除去ノードが無いインスタンスでは撤去は no-op。
 
-> サブコマンド一覧: `provision`（ゼロから）/ `ce` / `subflow` / `mainflow` / `delete-wf03` / `verify` / `all`。
+> サブコマンド一覧: `provision`（ゼロから）/ `ce` / `subflow` / `mainflow` / `delete-wf03` /
+> `sync-manifest`（CE配線）/ `manual-only`（対象親の定期TIMERだけを削除）/ `verify` / `all`。
 > ワークフロー層の認証は `DOMO_DEVELOPER_TOKEN`（推奨）または `SID` 環境変数で、`domo login` の
 > configstore は読まない。開発者トークンを `config/secrets.env` に置いて読み込むのが自己完結で確実。
+
+「実行状況 ↗」はCode Engineが解決したサブモデルの相対UIパス
+`/workflows/instances/<sub-model-id>/` を別タブに開く。フロントへホスト名やモデルIDを固定しない。
+起動は利用者自身のDomo権限で行うため、親WorkflowのREAD/EXECUTEとCEの実行権限を確認する。
+メインWorkflowの完了と非同期の個別レポート反映は同義ではない。初回の動作確認では
+親の終端状態、子の実行結果、全店舗＋全社のAppDB保存まで照合する。
+
+### DataFlowの付箋・セクションを保守する
+
+```bash
+python3 scripts/polish_dataflow.py          # 読み取り・ローカルの幾何/ロジック不変検証だけ
+python3 scripts/polish_dataflow.py --apply  # 全オブジェクトGET→付箋/GUIだけ更新→PUT→再GET照合
+```
+
+15タイルすべてに`notes[].body`、5つの処理単位にSectionを持たせる。
+同梱した共通エンジンとラッパで枠・ラベル余白、全エッジの前進、座標3コピーの一致を検証する。
+ロジック・入出力GUID・SQL/Python・AIプロンプト・スケジュールは保持し、装飾だけの変更ではRUNしない。
 
 ---
 

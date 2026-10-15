@@ -36,6 +36,19 @@ Auth: `X-Domo-Authentication: <SID>` was observed to authenticate both reads and
 - `GET /api/workflow/v1/models/{id}` — one model + its versions.
 - `GET /api/workflow/v1/models/{id}/versions/{ver}` — a version's full definition (copy shapes from here).
 
+**Model-scoped trigger and execution reads** `[REPO — verified 2026-10-15]`:
+
+- `GET /api/workflow/v2/triggers/model/{modelId}` returns that model's triggers across versions.
+  The literal segment is **singular `model`**; root `GET /triggers?modelId=` returned 405.
+- To remove scheduling only, select non-deleted `type:"TIMER"` rows, assert each `modelId` matches,
+  `DELETE /api/workflow/v2/triggers/{triggerId}`, then GET the same id and require `deletedAt`.
+  Re-list and require zero remaining timers. Preserve MANUAL/TEST/MCP; in-flow Timer nodes are not schedules.
+- `GET /api/workflow/v1/instances?modelId={id}&limit=100&offset=0` and
+  `GET /api/workflow/v1/instances/{executionId}` were verified for monitoring.
+- For a Pro Code progress link, the UI route `/workflows/instances/{modelId}/` lists that model's
+  executions (distinct from the API's execution-id detail route). Use `domo.navigate(relativePath, true)`
+  to open a new tab; resolve the model in the deployment configuration, not a hardcoded frontend UUID/host.
+
 **Create / edit / release (v2)** `[REPO]` — undocumented internal endpoints observed to run end-to-end on **one** instance (maintenance-instance); the sequence may change or differ across instances/versions. Re-verify before relying on it:
 
 1. **Shell:** `POST /api/workflow/v2/models` with `{name, description, versions:[{version:"1.0.0"}]}` → returns the model `id`.

@@ -133,9 +133,10 @@ python3 scripts/provision_domo.py app-studio
 set -a; . config/secrets.env; set +a                 # 開発者トークン
 python3 scripts/provision_domo.py apply               # seed/CE/AppDB/DataFlow（すべて名札付き）
 python3 scripts/provision_domo.py sync-manifest       # 自分の実IDを manifest へ
+python3 scripts/provision_workflows.py provision --apply --release   # 親子WF確保→保存/手動起動CE→WF release（名札付き）
+python3 scripts/provision_workflows.py sync-manifest   # plReportApiを対象インスタンスへ配線
 cd pro-code && domo publish && cd -                   # Pro-Code 公開（§5(3) と同じ・id は外してある）
 python3 scripts/provision_domo.py app-studio          # 自分専用 DataApp にカード埋め込み
-python3 scripts/provision_workflows.py provision --apply --release   # 保存CE・統合サブWF・WF-01（名札付き）
 python3 scripts/provision_domo.py verify              # ok: true
 # AI 長文レポートを出すには WF-01 を手動実行（手順は AGENT.md「ワークフロー操作」）→ 約25分で AppDB に生成
 ```

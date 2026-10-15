@@ -147,15 +147,24 @@ done
 
 ### WF-01 を手動実行（全店舗 AI 生成トリガー）
 
-手動トリガーは `instances/message` エンドポイントで行う（検証済み。`messageName` は `"manual"`）:
+通常はアプリの「AIレポートを更新」→確認→実行を使う。フロントは `plReportApi` aliasを呼び、
+Code Engineが配備済みの親モデルID・最新有効版・開始タイル名を解決して `instances/message` へ送る。
+開始後も旧レポートを閲覧でき、「実行状況 ↗」は相対パス
+`/workflows/instances/<サブモデルID>/` を `domo.navigate(path, true)` で別タブへ開く。
+親の定期TIMERは削除済み。再作成しない。ループ内の待機タイマーは負荷平準化であり、定期トリガーとは別物。
 
-```bash
-set -a; . config/secrets.env; set +a   # DOMO_INSTANCE ＋ DOMO_DEVELOPER_TOKEN
-curl -s -X POST -H "X-DOMO-Developer-Token: $DOMO_DEVELOPER_TOKEN" -H "Content-Type: application/json" \
-  "https://$DOMO_INSTANCE/api/workflow/v1/instances/message" \
-  -d '{"messageName":"manual","modelId":"d60ac21b-e1c7-4e6d-bffd-e904e39ac27d"}' \
-  | python3 -m json.tool   # -> 起動した instance {id, modelVersion} を返す
-```
+CEを改修した保守時は `provision_workflows.py ce --apply` →同 `sync-manifest`→Pro Code公開→
+`provision_domo.py app-studio` を実行し、実カードのpackageMappingまで照合する。
+新規配布先ではデータ層のsync後、**初回Pro Code公開より前に**Workflowの`provision --apply --release`を済ませる。
+`manual-only --apply` は対象親モデルのTIMERだけを削除し、MANUAL・TEST・MCPを保持する。
+
+### DataFlowの付箋・セクション
+
+`scripts/polish_dataflow.py` は名称で対象を発見し、15タイルの注釈と5セクションを更新する。
+`scripts/graph_ui_layout.py` は共通エンジンの同梱版で、単体配布でも他プロジェクトへ依存しない。
+共通エンジンの平均depth検証だけではセクション間の逆行線を見逃すため、ラッパが**全dependsOnエッジ**
+のx単調増加も検証する。ロジック／入出力ID／SQL／Python／AIプロンプト／トリガーは一切変更しない。
+注釈・座標だけならDataFlowのRUNは不要。
 
 ### 実行ステータス確認
 

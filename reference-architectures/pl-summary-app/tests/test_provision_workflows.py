@@ -180,5 +180,47 @@ class DiscoverOrCreate(unittest.TestCase):
         self.assertEqual(pw.resolve_collection_id(), "", "未存在は空文字（cmd_provision が apply 時に loud fail する）")
 
 
+class ManualTriggerSafety(unittest.TestCase):
+    def setUp(self):
+        self.old_request = pw.request
+        self.calls = []
+        self.rows = [{"id": "timer-1", "modelId": NEW_SUB_MODEL, "type": "TIMER", "deletedAt": None},
+                     {"id": "manual-1", "modelId": NEW_SUB_MODEL, "type": "MANUAL", "deletedAt": None},
+                     {"id": "test-1", "modelId": NEW_SUB_MODEL, "type": "TEST", "deletedAt": None}]
+        def request(method, path, body=None):
+            self.calls.append((method, path))
+            if method == "DELETE":
+                self.rows[0]["deletedAt"] = "2026-10-15"
+                return None
+            if "/triggers/model/" in path:
+                return self.rows
+            return self.rows[0]
+        pw.request = request
+
+    def tearDown(self):
+        pw.request = self.old_request
+
+    def test_deletes_only_timer_and_verifies_it_is_gone(self):
+        result = pw.ensure_manual_only(NEW_SUB_MODEL, True)
+        self.assertEqual(result["removedCount"], 1)
+        self.assertEqual(result["scheduleCount"], 0)
+        self.assertEqual([p for m, p in self.calls if m == "DELETE"], ["api/workflow/v2/triggers/timer-1"])
+
+    def test_dry_run_does_not_delete(self):
+        self.assertEqual(pw.ensure_manual_only(NEW_SUB_MODEL, False)["scheduleCount"], 1)
+        self.assertFalse(any(m == "DELETE" for m, _ in self.calls))
+
+    def test_foreign_trigger_aborts_without_writes(self):
+        self.rows[0]["modelId"] = "foreign-model"
+        with self.assertRaises(RuntimeError):
+            pw.ensure_manual_only(NEW_SUB_MODEL, True)
+        self.assertFalse(any(m == "DELETE" for m, _ in self.calls))
+
+    def test_missing_deleted_marker_is_not_a_success(self):
+        pw.request = lambda method, path, body=None: self.rows if "/model/" in path else self.rows[0]
+        with self.assertRaises(RuntimeError):
+            pw.ensure_manual_only(NEW_SUB_MODEL, True)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

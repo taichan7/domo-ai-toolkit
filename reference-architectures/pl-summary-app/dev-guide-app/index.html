@@ -83,7 +83,7 @@
       <div><dt>文書種別</dt><dd>ハンズオン教材（手を動かす）</dd></div>
       <div><dt>所要</dt><dd>約 3 時間・ステップ順</dd></div>
       <div><dt>対象</dt><dd>店舗別損益AIデモ 開発者</dd></div>
-      <div><dt>版</dt><dd>v0.2.0（2026-10-15）</dd></div>
+      <div><dt>版</dt><dd>v0.3.0（2026-10-15）</dd></div>
     </dl>
 
     <div class="abstract">
@@ -1600,6 +1600,11 @@ node tests/test_drill_helpers.js</pre>
     </div>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-info"/></svg>名称発見の肝：ソースに埋まった保守用インスタンスの ID は、<code>sync-manifest</code>（データ・コレクション）と <code>app-studio</code>（埋込カードの context mapping）が<b>対象インスタンスの実 ID へ名称で張り替える</b>＝手編集は不要。移植で手で触るのは WF-01 の <code>CollectionId</code> 変数くらい（CE は <code>collection_id</code> の GUID 形状だけ検証＝インスタンス非依存）。</p>
 
+    <h3 class="sub">画面から長文レポートを手動更新する</h3>
+    <p class="sec__lead">ヘッダーの<b>「AIレポートを更新」</b>→全店舗・全社が対象であることとAI利用・通知の確認→<code>pl_report_api(start)</code>→親Workflowの最新有効版を起動する。取消・Esc・×では起動しない。実行中も既存レポートを閲覧でき、<b>「実行状況 ↗」</b>はサブWorkflowの一覧を相対パス<code>/workflows/instances/&lt;sub-model-id&gt;/</code>と<code>domo.navigate(path, true)</code>で別タブに開く。ホストやモデルIDをフロントへ固定しない。</p>
+    <p class="sec__note"><b>運用は手動のみ</b>：親の定期TIMERは使わない。ループ内の待機タイマーは負荷平準化で、定期トリガーとは別。<code>workflow-run.js</code>が確認と状況を扱い、既存の<code>app.js</code>は分析表示を担う。長文HTMLは見出し・表・本文の許可リストで描画し、スクリプトや外部リソースを持ち込まない。</p>
+    <p class="sec__note"><b>DataFlowも読める教材に</b>：15タイルすべてに目的を説明する付箋を付け、準備・店舗AI・全社AI/要約・トレンド・事業部の5セクションへ整理。<code>scripts/polish_dataflow.py</code>は同梱の共通幾何エンジンで3箇所の座標を揃え、全エッジの左→右・重なり0・ロジック不変を検証する。注釈・座標だけならRUNしない。</p>
+
     <h3 class="sub">詳細①：AppDB（アプリ専用の文書 DB）</h3>
     <p class="sec__lead">アプリが所有する NoSQL の JSON 文書ストア。登録してすぐ読む<b>小さな即時 CRUD</b> に向く。<b>DataStore ▸ Collection ▸ Document</b> の 3 階層。</p>
     <figure class="fig">
@@ -1926,7 +1931,7 @@ provision_domo.py app-studio で同期する手順（空マッピングは manif
         <div class="flow__arrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></div>
         <div class="tile tile--output"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-check"/></svg><b>verify</b><br>ok: true<br>（成功ゲート）</div>
       </div>
-      <figcaption><code>apply → sync-manifest → domo publish → app-studio → verify</code>（この 5 本でデータ層＋ Pro Code ＋短文サマリーが開く）。長文 AI の<b>ワークフロー層（<code>provision</code>）</b>と<b>開発ガイド埋め込み（<code>embed-guide</code>）</b>は、この後に続く<b>任意</b>の段。各段には必ずゲート（成否判定）があり、緑になってから次へ進む</figcaption>
+      <figcaption><code>apply → データのsync-manifest → Workflow配備・CEのsync-manifest → publish → app-studio → verify</code>。初回は手動更新に使うCE/親子Workflowを<b>Pro Code公開より前</b>に確保する。開発ガイド埋め込み（<code>embed-guide</code>）は任意。各段には必ずゲート（成否判定）があり、緑になってから次へ進む</figcaption>
     </figure>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-refresh"/></svg><b><code>sync-manifest</code> の位置が肝</b>。<code>apply</code> が確定した実 ID を <code>pro-code/manifest.json</code> の alias→<code>dataSetId</code>／コレクション <code>id</code> に書き込む冪等処理で、<b>必ず <code>domo publish</code> より前</b>に走らせる。先に publish すると、配布 design が別インスタンスの ID を抱えたまま出てしまい、<code>verify</code> が「manifest の ID が live と不一致」で赤くなる（対応は下の〈つまずいたら〉表）。列を足しただけなら ID は変わらないので差分は出ない。</p>
 
@@ -1949,17 +1954,18 @@ export PL_SANDBOX_SUFFIX="検証・<あなたの氏名>"
 python3 scripts/provision_domo.py apply
 python3 scripts/provision_domo.py sync-manifest   <span class="c"># 出力4本・AppDB の実IDを manifest へ</span>
 
-<span class="c"># 配備2  Pro Code を publish（design を配布・開ける URL はまだ無い）</span>
+<span class="c"># 配備2  初回公開より前に手動起動のCE/親子Workflowを配備（認証は§1の②）</span>
+set -a; . config/secrets.env; set +a
+python3 scripts/provision_workflows.py provision --apply --release
+python3 scripts/provision_workflows.py sync-manifest
+<span class="c"># Pro Code を publish（design を配布・開ける URL はまだ無い）</span>
 cd pro-code &amp;&amp; domo publish &amp;&amp; cd -
 
 <span class="c"># 配備3  App Studio にカードを埋め込む（/app-studio/&lt;id&gt; が開ける・SSO で可）</span>
 python3 scripts/provision_domo.py app-studio
 python3 scripts/provision_domo.py verify          <span class="c"># ok: true を確認（App/Card/URL は出力に出る）</span>
 
-<span class="c"># 任意（AI 長文レポート）: ワークフロー層＝開発者トークン/SID が要る（§1 の②）
-#   名札付きなら自分専用に配備。名札なしで保守用インスタンスの本番を触ると拒否される（→ §8）</span>
-set -a; . config/secrets.env; set +a              <span class="c"># DOMO_DEVELOPER_TOKEN を読み込む</span>
-python3 scripts/provision_workflows.py provision --apply --release
+<span class="c"># Workflowの構造も確認。実行はアプリの更新ボタン→確認で1回だけ（約25分）</span>
 python3 scripts/provision_workflows.py verify</pre>
     </div>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-eye"/></svg><b>いきなり <code>--apply</code> しない</b>のが安全。<code>provision_workflows.py provision</code> は <code>--apply</code> を付けなければ<b>ネットワーク読み取りのみ</b>（PUT しない）で、組み立てた統合サブWF／WF-01 の定義を <code>/tmp/plwf</code> に書き出す dry-run になる。中身を確認してから <code>--apply --release</code> で本適用する。<code>apply --skip-dataflow-run</code> も同系の抑制で、配線だけ更新して重い DataFlow 実行を飛ばせる。</p>
@@ -2673,7 +2679,7 @@ python3 scripts/provision_domo.py app-studio
 python3 scripts/provision_domo.py verify
 <span class="c"># 2 回目以降は domo publish だけで反映される（FOLLOW_LATEST）</span></pre>
     </div>
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-list"/></svg><b>バックエンドまで作る回の順番（迷ったらこの一列）</b>：<code>provision_domo.py apply</code> →&nbsp;<code>sync-manifest</code> →&nbsp;<code>cd pro-code &amp;&amp; domo publish</code> →&nbsp;<code>provision_domo.py app-studio</code> →&nbsp;<code>verify</code>（ここまで SSO で可）→ AI 長文まで出すなら <code>set -a; . config/secrets.env; set +a</code> →&nbsp;<code>provision_workflows.py provision --apply --release</code> →&nbsp;<code>verify</code> → <b>WF-01 を手動実行</b>（約 25 分）。<b>FE だけなら上の 3 コマンド（apply は飛ばして publish → app-studio）で足りる</b>。</p>
+    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-list"/></svg><b>バックエンドまで作る回の順番</b>：<code>provision_domo.py apply</code>→同<code>sync-manifest</code>→トークン/SIDを設定→<code>provision_workflows.py provision --apply --release</code>→同<code>sync-manifest</code>→<code>domo publish</code>→<code>app-studio</code>→<code>verify</code>→アプリの<b>更新ボタンと確認</b>で手動実行（約25分）。<b>配線済み環境でFEだけを改善する回なら、publishで足りる</b>。</p>
 
     <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-alert"/></svg><b>AI 長文レポートの再生成はコスト大・慎重に。</b>pl の Pro Code は<b>読取専用</b>（画面に再生成ボタンは無い）。レポートを作り直すには <b>WF-01 を手動実行</b>する＝統合サブWF が AI を回し AppDB を更新し <b>AI クレジットを消費</b>する（約 100 店舗で約 25 分）。<b>名札付きのサンドボックスなら自分の AppDB／WF・自分のクレジット</b>に作用し、本番や他参加者には影響しない。<b>データ層だけのサンドボックス（ワークフロー層未配備）では長文は「準備中」のまま</b>＝WF-01 は回さなくてよい。迷ったら回さない。</p>
 
@@ -3276,7 +3282,7 @@ python3 scripts/provision_domo.py apply</pre>
       <dl class="defs">
         <dt>①</dt><dd><b>フロントとバックの境界は？</b> ― フロント（Pro Code）＝<b>見せる・操作</b>、バック（Code Engine／Magic ETL／Workflow／AppDB）＝<b>守る・計算・保存</b>。「<b>書く・守る・記録する</b>」は必ずサーバー（CE）を通す。→ <a href="#s2">§2</a></dd>
         <dt>②</dt><dd><b><code>domo publish</code> だけで、業務利用者が開ける URL はできる？</b> ― <b>いいえ。</b>publish は <b>design（アプリの実体）を配るだけ</b>。開ける URL（<code>/app-studio/&lt;id&gt;</code>）は <b>App Studio への埋め込み</b>で作る。→ <a href="#s5">§5</a></dd>
-        <dt>③</dt><dd><b>画面から本番データを直接書き換えてよい？</b> ― <b>だめ。</b>表示の直読は可だが、<b>保存は必ず保存CE（サーバー）経由</b>（画面は読取専用）。書込み 3 経路（<code>provision_domo.py apply</code>／<code>provision_workflows.py provision</code>／WF-01 実行）は、<b>名札（<code>PL_SANDBOX_SUFFIX</code>）付きなら自分のサンドボックスに実行してよい</b>／<b>名札なしで保守用の本番を触ると provisioner が拒否</b>。→ <a href="#s3">§3</a>・<a href="#s8">§8</a></dd>
+        <dt>③</dt><dd><b>画面から本番データを直接書き換えてよい？</b> ― <b>だめ。</b>表示の直読は可だが、<b>保存は必ず保存CE（サーバー）経由</b>（        長文更新は確認付きでCE→Workflowを起動）。書込み 3 経路（<code>provision_domo.py apply</code>／<code>provision_workflows.py provision</code>／WF-01 実行）は、<b>名札（<code>PL_SANDBOX_SUFFIX</code>）付きなら自分のサンドボックスに実行してよい</b>／<b>名札なしで保守用の本番を触ると provisioner が拒否</b>。→ <a href="#s3">§3</a>・<a href="#s8">§8</a></dd>
         <dt>④</dt><dd><b>短文 AI（概要タブの短文サマリー）と長文レポート（サマリータブ）は、それぞれどこが作る？</b> ― <b>短文</b>は DataFlow 内の <b>TextGeneration</b>、<b>長文</b>（経営レポート）は統合サブWF 内の <b>AI Agent</b>。出力の長さで 2 系統を使い分ける（状態ラベルは両者とも転記）。→ <a href="#s3">§3</a></dd>
         <dt>⑤</dt><dd><b>詰まった／自信ありげなエージェントの出力をどう扱う？</b> ― <b>鵜呑みにしない。</b>ローカル検証（テスト・<code>domo dev</code> プレビュー）と実画面で裏取りし、<b>公開の承認は人間が握る</b>。無い列・id・alias の創作は実データで裏取り、禁止コマンドの提案は<b>実行せず止める</b>。→ <a href="#s6">§6</a></dd>
         <dt>⑥</dt><dd><b>同じ店舗・同じ期間を 2 回生成したら、AppDB に重複が残る？</b> ― <b>残らない。</b>保存CE <code>pl_report_api(save)</code> が、同一 <code>doc_key</code> の<b>厳密に古い版だけ</b>を保存時に削除する（重複除去を保存処理に内包）。別実行の正レポートは巻き添えにしない。→ <a href="#s3">§3</a></dd>
@@ -3462,7 +3468,7 @@ git config --global http.proxy http://proxy.example.co.jp:8080</pre>
 </main>
 
 <footer class="sitefoot">
-  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>店舗別損益 ・ 開発ガイド ― 店舗別損益AI分析 ・ v0.2.0
+  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>店舗別損益 ・ 開発ガイド ― 店舗別損益AI分析 ・ v0.3.0
 </footer>
 
 <!-- トースト（コピー等のフィードバック） -->

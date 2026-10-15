@@ -93,6 +93,14 @@ Tile の id 集合 == action の id 集合。3 箇所すべてを同じ値へ書
 
 `verify_layout()` は V1/V2/V3 を、`verify_flow(elements, flow_rank)` は V6a/V6b を文字列リストで
 返す（空＝健全）。**両方をデプロイ前・build 時アサーションで必ず呼ぶ。** V4/V5 は連続量なので
+
+**Per-edge check (2026-10-15, P/L reference)**: V6a is a section-average check and V6b compares
+the minimum/maximum depth. They do **not** prove that every `dependsOn` edge points right.
+Small flows can be stacked into one section column and pass both while individual edges run backward.
+Before claiming left-to-right layout, additionally assert `upstream.x < downstream.x` for **every**
+edge, and choose `max_cols` large enough to avoid depth-band folding. The standalone
+`pl-summary-app/scripts/polish_dataflow.py` reuses the shared engine for internal geometry, then
+places named branch lanes using actual dependency constraints and section gaps before validating all edges.**両方をデプロイ前・build 時アサーションで必ず呼ぶ。** V4/V5 は連続量なので
 `bbox` 面積比・充填率・最小 gap を print して目視する（下記チューニング参照）。
 
 ---

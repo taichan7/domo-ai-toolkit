@@ -703,6 +703,7 @@ def create_app_studio_card(client: DomoClient, view_id: str, manifest: Dict[str,
         "designId": str(manifest.get("id") or ""),
         "mapping": mappings,
         "collections": collections,
+        "packageMapping": manifest.get("packagesMapping") or [],
     }) or {}
     context_id = str(context[0].get("id") if isinstance(context, list) else _id(context))
     query = urllib.parse.urlencode({
@@ -818,6 +819,8 @@ def reconcile_app_studio_context(client: DomoClient, context_id: str, manifest: 
     警告のみで続行する(既存フローを壊さない)。
     """
     if not context_id:
+        if manifest.get("packagesMapping"):
+            raise RuntimeError("Code Engine配線のため既存カードのcontextIdを解決する必要があります。")
         print("warning: App Studio contextId is unknown; skipped context mapping reconcile", flush=True)
         return {"changed": False, "mapping": [], "collections": []}
     current = client.request("GET", f"domoapps/apps/v2/contexts/{context_id}") or {}
@@ -826,10 +829,16 @@ def reconcile_app_studio_context(client: DomoClient, context_id: str, manifest: 
          "fields": row.get("fields") or []}
         for row in manifest.get("datasetsMapping") or [] if row.get("dataSetId") and row.get("alias")
     ]
+    desired_mapping += [dict(row) for row in current.get("mapping") or []
+                        if row.get("alias") not in {r["alias"] for r in desired_mapping}]
     desired_collections = [
         {"name": str(row.get("name") or ""), "id": str(row.get("id") or "")}
         for row in manifest.get("collectionsMapping") or [] if row.get("name") and row.get("id")
     ]
+    desired_packages = [dict(row) for row in manifest.get("packagesMapping") or []
+                        if row.get("alias") and row.get("packageId")]
+    desired_packages += [dict(row) for row in current.get("packageMapping") or []
+                         if row.get("alias") not in {r["alias"] for r in desired_packages}]
 
     def _mapping_key(row: Dict[str, Any]) -> Tuple[str, str]:
         return str(row.get("alias") or ""), str(row.get("dataSetId") or "")
@@ -837,9 +846,22 @@ def reconcile_app_studio_context(client: DomoClient, context_id: str, manifest: 
     def _collection_key(row: Dict[str, Any]) -> Tuple[str, str]:
         return str(row.get("name") or row.get("alias") or ""), str(row.get("id") or "")
 
+    def _parameter(row: Dict[str, Any]) -> Dict[str, Any]:
+        return dict({key: row.get(key) for key in ("alias", "name", "type", "value", "nullable", "isList")},
+                    children=[_parameter(r) for r in row.get("children") or []])
+
+    def _packages(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        return sorted([
+            dict({key: row.get(key) for key in ("alias", "packageId", "version", "functionName")},
+                 parameters=[_parameter(r) for r in row.get("parameters") or []],
+                 output=_parameter(row.get("output") or {}))
+            for row in rows
+        ], key=lambda row: str(row.get("alias") or ""))
+
     mapping_changed = sorted(map(_mapping_key, current.get("mapping") or [])) != sorted(map(_mapping_key, desired_mapping))
     collections_changed = sorted(map(_collection_key, current.get("collections") or [])) != sorted(map(_collection_key, desired_collections))
-    if not mapping_changed and not collections_changed:
+    packages_changed = _packages(current.get("packageMapping") or []) != _packages(desired_packages)
+    if not mapping_changed and not collections_changed and not packages_changed:
         return {"changed": False, "mapping": desired_mapping, "collections": desired_collections}
 
     payload = {
@@ -848,7 +870,7 @@ def reconcile_app_studio_context(client: DomoClient, context_id: str, manifest: 
         "designVersion": current.get("designVersion"),
         "mapping": desired_mapping,
         "collections": desired_collections,
-        "packageMapping": current.get("packageMapping") or [],
+        "packageMapping": desired_packages,
         "workflowMapping": current.get("workflowMapping") or [],
         "accountMapping": current.get("accountMapping") or [],
         "actionMapping": current.get("actionMapping") or [],
@@ -858,8 +880,28 @@ def reconcile_app_studio_context(client: DomoClient, context_id: str, manifest: 
     updated = client.request("GET", f"domoapps/apps/v2/contexts/{context_id}") or {}
     if sorted(map(_mapping_key, updated.get("mapping") or [])) != sorted(map(_mapping_key, desired_mapping)):
         raise RuntimeError("App Studio context dataset mapping did not persist")
+    if sorted(map(_collection_key, updated.get("collections") or [])) != sorted(map(_collection_key, desired_collections)):
+        raise RuntimeError("App Studio context collection mapping did not persist")
+    if _packages(updated.get("packageMapping") or []) != _packages(desired_packages):
+        raise RuntimeError("App Studio context Code Engine mapping did not persist")
     print(f"updated App Studio context mappings: {context_id}", flush=True)
     return {"changed": True, "mapping": desired_mapping, "collections": desired_collections}
+
+def resolve_app_studio_identity(client: DomoClient, manifest: Dict[str, Any], card_id: str) -> Dict[str, str]:
+    design_id = str(manifest.get("id") or "")
+    design = client.request("GET", f"api/apps/v1/designs/{design_id}?parts=cards,instances") or {}
+    cards = [r for r in design.get("referencingCards") or [] if _id(r) == card_id]
+    if len(cards) != 1:
+        raise RuntimeError("対象カードとPro Codeデザインの対応を一意に確認できません。")
+    proxy_id = str((cards[0].get("domoapp") or {}).get("id") or "")
+    if not proxy_id:
+        raise RuntimeError("対象カードのAppインスタンスIDを確認できません。")
+    instance = client.request("GET", f"domoapps/apps/v2/{proxy_id}") or {}
+    context = instance.get("context") or {}
+    context_id = str(context.get("id") or "")
+    if not context_id or instance.get("designId") != design_id or context.get("designId") != design_id:
+        raise RuntimeError("対象Appインスタンスのcontextとデザインが一致しません。")
+    return {"proxyId": proxy_id, "contextId": context_id}
 
 
 def app_studio(client: DomoClient) -> Dict[str, Any]:
@@ -923,6 +965,8 @@ def app_studio(client: DomoClient) -> Dict[str, Any]:
         existing_card = next((row for row in reversed(cards) if row.get("title") == APP_STUDIO_CARD_TITLE), None)
     if existing_card:
         card_id = _id(existing_card)
+        identity = resolve_app_studio_identity(client, manifest, card_id)
+        proxy_id, context_id = identity["proxyId"], identity["contextId"]
         print(f"reused App Studio card: {card_id}", flush=True)
     else:
         created = create_app_studio_card(client, view_id, manifest, APP_STUDIO_CARD_TITLE)

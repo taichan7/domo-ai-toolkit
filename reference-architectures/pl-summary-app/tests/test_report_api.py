@@ -100,6 +100,99 @@ def _seed(doc_id, key, created, html="x"):
                         "location_name": "銀座店", "analysis_html": html}}
 
 
+class ManualWorkflowTest(unittest.TestCase):
+    def setUp(self):
+        self.old_model = ra.MAIN_WORKFLOW_MODEL_ID
+        self.old_submodel = ra.SUB_WORKFLOW_MODEL_ID
+        ra.MAIN_WORKFLOW_MODEL_ID = GUID
+        ra.SUB_WORKFLOW_MODEL_ID = "22222222-2222-4222-8222-222222222222"
+        self.calls = []
+        self.rows = []
+        self.model = {"versions": [{"version": "1.0.9", "active": True},
+                                   {"version": "1.0.21", "active": True},
+                                   {"version": "9.0.0", "active": False}]}
+        self.instance = "11111111-1111-4111-8111-111111111111"
+        self.start_error = False
+        sys.modules["codeengine"].send_request = self.send
+
+    def tearDown(self):
+        ra.MAIN_WORKFLOW_MODEL_ID = self.old_model
+        ra.SUB_WORKFLOW_MODEL_ID = self.old_submodel
+
+    def send(self, method, path, body=None):
+        self.calls.append((method, path, body))
+        if "/instances?" in path:
+            return self.rows
+        if path.endswith("/instances/message"):
+            if self.start_error:
+                raise TimeoutError("network timeout")
+            return {"id": self.instance, "status": "IN_PROGRESS"}
+        if "/instances/" in path:
+            return {"id": self.instance, "modelId": GUID, "status": "COMPLETED"}
+        if "/versions/" in path:
+            return {"savedJson": json.dumps({"designElements": [{"type": "rootNode", "data": {"title": "開始（AI要約）"}}]})}
+        if "/models/" in path:
+            return self.model
+        raise AssertionError(path)
+
+    def test_start_uses_only_embedded_model_latest_active_and_live_start_title(self):
+        result = ra.pl_report_api("start", {})
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["model_version"], "1.0.21")
+        self.assertEqual(self.calls[-1], ("post", "api/workflow/v1/instances/message",
+                         {"messageName": "開始（AI要約）", "modelId": GUID, "version": "1.0.21", "data": {}}))
+        self.assertEqual(result["instance_id"], self.instance)
+
+    def test_existing_running_execution_is_reused_without_a_post(self):
+        self.rows = [{"id": self.instance, "modelId": GUID, "status": "IN_PROGRESS", "createdOn": "2026-10-15T00:00:00Z"}]
+        result = ra.pl_report_api("start", {})
+        self.assertTrue(result["already_running"])
+        self.assertEqual(len(self.calls), 1)
+
+    def test_status_prefers_running_over_a_newer_completed_instance(self):
+        self.rows = [{"id": self.instance, "modelId": GUID, "status": "IN_PROGRESS", "createdOn": "2026-10-14"},
+                     {"id": "other", "modelId": GUID, "status": "COMPLETED", "createdOn": "2026-10-15"}]
+        self.assertTrue(ra.pl_report_api("status", {})["running"])
+
+    def test_empty_history_is_idle_and_status_is_read_only(self):
+        self.assertEqual(ra.pl_report_api("status", {})["status"], "IDLE")
+        self.assertTrue(all(method == "get" for method, _, _ in self.calls))
+
+    def test_invalid_start_parameters_cannot_select_other_models(self):
+        result = ra.pl_report_api("start", {"modelId": self.instance})
+        self.assertEqual(result["error"]["code"], "INVALID_REQUEST")
+        self.assertFalse(self.calls)
+
+    def test_undeployed_placeholder_fails_without_api_calls(self):
+        ra.MAIN_WORKFLOW_MODEL_ID = "__MAIN_WORKFLOW_MODEL_ID__"
+        self.assertEqual(ra.pl_report_api("start", {})["error"]["code"], "WORKFLOW_NOT_CONFIGURED")
+        self.assertFalse(self.calls)
+
+    def test_no_released_version_fails_without_a_post(self):
+        self.model = {"versions": [{"version": "1.0.0", "active": False}]}
+        self.assertEqual(ra.pl_report_api("start", {})["error"]["code"], "WORKFLOW_NOT_RELEASED")
+        self.assertFalse(any(method == "post" for method, _, _ in self.calls))
+
+    def test_ambiguous_start_is_not_retried_or_reported_as_unstarted(self):
+        self.start_error = True
+        result = ra.pl_report_api("start", {})
+        self.assertEqual(result["error"]["code"], "START_UNCONFIRMED")
+        self.assertEqual(sum(method == "post" for method, _, _ in self.calls), 1)
+
+    def test_invalid_instance_id_is_rejected_before_network(self):
+        self.assertEqual(ra.pl_report_api("status", {"instance_id": "../foreign"})["error"]["code"], "INVALID_INSTANCE_ID")
+        self.assertFalse(self.calls)
+
+    def test_other_model_instance_is_rejected(self):
+        sys.modules["codeengine"].send_request = lambda *args: {"modelId": self.instance, "status": "COMPLETED"}
+        self.assertEqual(ra.pl_report_api("status", {"instance_id": self.instance})["error"]["code"], "INVALID_INSTANCE_ID")
+
+    def test_malformed_status_response_cannot_enable_execution(self):
+        self.rows = {"unexpected": []}
+        self.assertEqual(ra.pl_report_api("start", {})["error"]["code"], "WORKFLOW_STATUS_ERROR")
+        self.assertFalse(any(method == "post" for method, _, _ in self.calls))
+
+
 class ValidateTest(unittest.TestCase):
     def setUp(self):
         _FakeAppDB().install()
