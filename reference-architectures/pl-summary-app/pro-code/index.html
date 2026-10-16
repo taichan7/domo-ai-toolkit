@@ -28,12 +28,12 @@
           <select id="store-select" aria-label="店舗を選択"></select>
         </div>
       </div>
-      <div class="workflow-actions"><button id="workflow-run" class="workflow-button" type="button" disabled>全社AIレポートを更新</button><button id="workflow-check" class="workflow-progress" type="button" disabled aria-label="サブWorkflowの実行状況を新しいタブで開く">実行状況 <span aria-hidden="true">↗</span></button></div></div>
+      <div class="workflow-actions"><button id="workflow-run" class="workflow-button" type="button" disabled>全社AIレポートを更新</button><button id="workflow-check" class="workflow-progress" type="button" disabled aria-label="レポート作成の進捗を新しいタブで開く">実行状況 <span aria-hidden="true">↗</span></button></div></div>
     </div>
   </div>
 
   <div class="main-content container" id="main-content" role="main" tabindex="-1">
-    <p id="workflow-status" class="workflow-status" role="status" aria-live="polite">Workflowの実行状況を確認しています…</p>
+    <p id="workflow-status" class="workflow-status" role="status" aria-live="polite">AIレポートの更新状況を確認しています…</p>
     <div id="message-container"></div>
 
     <div id="loading" class="loading">
@@ -46,7 +46,7 @@
         <div class="workflow-confirm-head"><div><p class="workflow-kicker">実行前の確認</p><h2 id="workflow-confirm-title">全店舗・全社のAIレポートを更新しますか？</h2></div><button class="workflow-close" type="submit" value="cancel" aria-label="確認を閉じる">×</button></div>
         <p class="workflow-scope">対象は全店舗と全社です。店舗セレクターの選択には限定されません。</p>
         <p class="workflow-recipient">通知先（実行者）: <span id="workflow-recipient-email">確認中…</span></p>
-        <p id="workflow-confirm-note">現在の損益DataSetをもとに長文レポートを生成し、AppDBへ保存します。AIクレジットを使用します。全社レポートのメール通知は上記の通知先（および設定済みの宛先）に送信します。店舗数に応じて時間がかかりますが、現在のレポートは引き続き閲覧できます。定期実行は行いません。</p>
+        <p id="workflow-confirm-note">最新の損益データをもとに長文レポートを作成し、結果を保存します。AIクレジットを使用します。全社レポートのメール通知は上記の通知先（および設定済みの宛先）に送信します。店舗数に応じて時間がかかりますが、現在のレポートは引き続き閲覧できます。定期実行は行いません。</p>
         <div class="workflow-confirm-actions"><button id="workflow-cancel" class="workflow-check" type="submit" value="cancel" autofocus>キャンセル</button><button id="workflow-confirm-yes" class="workflow-button" type="submit" value="default">はい、更新を実行する</button></div>
       </form>
     </dialog>

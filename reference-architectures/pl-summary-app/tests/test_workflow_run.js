@@ -133,8 +133,11 @@ test('ambiguous start locks resubmission and never retries automatically', async
 test('status failure cannot silently enable the execute button', async () => {
   const h = harness({ok: false, error: {code: 'INTERNAL_ERROR', message: '権限を確認してください'}});
   await settle();
-  assert.equal(h.get('workflow-run').disabled, true);
-  assert.match(h.get('workflow-status').textContent, /権限を確認/);
+  assert.equal(h.get('workflow-run').disabled, true);   // 主眼: 状況不明では実行ボタンを有効化しない
+  // PL-009: 生の技術メッセージ（英語や enum）は業務担当者に出さず、固定の実行可能な日本語を見せる
+  //（技術詳細は console へ）。本テストは「エラー状態で可視のメッセージが出る」ことを新文言で固定する。
+  assert.match(h.get('workflow-status').textContent, /実行状況を取得できませんでした/);
+  assert.doesNotMatch(h.get('workflow-status').textContent, /権限を確認/);  // 生 message を UI へ素通ししない
 });
 
 test('queued close after cancellation cannot consume a reopened confirmation', async () => {

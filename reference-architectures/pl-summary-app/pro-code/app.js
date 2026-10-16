@@ -158,7 +158,7 @@
     Promise.all([loadSummary(), loadCompanyAi(), loadTrend(), loadDept()])
       .then(function (res) {
         var rows = res[0];
-        if (!rows || !rows.length) throw new Error("summary データが空です");
+        if (!rows || !rows.length) throw new Error("損益データが空です");
         state.stores = rows.map(normalizeStore);
         state.stores.forEach(function (s) { state.byId[s.id] = s; });
         state.period = rows[0]["期間"] || rows[0].period || "";
@@ -172,7 +172,8 @@
       })
       .catch(function (err) {
         els.loading.classList.add("hidden");
-        showMessage("データの取得に失敗しました：" + (err && err.message ? err.message : err));
+        console.error("[pl] データ取得に失敗:", err);
+        showMessage("データを取得できませんでした。少し時間をおいてから再読み込みしてください。", true);
       });
   }
 
@@ -371,7 +372,8 @@
         try {
           els.analysis.innerHTML = sanitizeReportHtml(content.analysis_html);
         } catch (error) {
-          els.analysis.innerHTML = '<div class="ai-pending" role="alert"><p>' + esc(error.message) + '</p></div>';
+          console.error("[pl] AIレポート表示に失敗:", error);
+          els.analysis.innerHTML = '<div class="ai-pending" role="alert"><p>AIレポートを表示できませんでした。時間をおいて再度お試しください。</p></div>';
           els.insightNote.textContent = "";
           return;
         }
@@ -1822,6 +1824,21 @@
     return template.innerHTML;
   }
 
-  function showMessage(m) { els.message.textContent = m; els.message.style.display = "block"; }
+  function showMessage(m, retry) {
+    els.message.textContent = "";
+    var p = document.createElement("p");
+    p.className = "message-text";
+    p.textContent = m;
+    els.message.appendChild(p);
+    if (retry) {   // 行き止まりにしない: 取得失敗には再読み込み導線を添える（PL-010）
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "retry-button";
+      btn.textContent = "再読み込み";
+      btn.addEventListener("click", function () { window.location.reload(); });
+      els.message.appendChild(btn);
+    }
+    els.message.style.display = "block";
+  }
   function hideMessage() { els.message.style.display = "none"; els.message.textContent = ""; }
 })();

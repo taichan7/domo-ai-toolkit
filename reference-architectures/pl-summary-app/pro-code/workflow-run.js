@@ -14,7 +14,7 @@
         var result = response && response.result !== undefined ? response.result : response;
         if (typeof result === "string") result = JSON.parse(result);
         if (!result || result.ok !== true) {
-          var error = new Error(result && result.error && result.error.message || "Workflowの処理に失敗しました。");
+          var error = new Error(result && result.error && result.error.message || "レポート更新処理に失敗しました。");
           error.code = result && result.error && result.error.code;
           throw error;
         }
@@ -61,12 +61,13 @@
     } else if (state.running) {
       renderStatus("全店舗・全社のAIレポートを更新中です。現在のレポートは引き続き閲覧できます。");
     } else if (result.status === "COMPLETED") {
-      renderStatus("メインWorkflowは完了しました。個別のAIレポートは順次反映されます。");
+      renderStatus("レポートの更新が完了しました。個別のAIレポートは順次反映されます。");
       if (wasRunning) window.dispatchEvent(new Event("pl-workflow-completed"));
     } else if (result.status === "IDLE") {
       renderStatus("全店舗・全社の長文AIレポートを手動で更新します。", false, true);
     } else {
-      renderStatus("前回の実行状態: " + result.status + "。詳細は実行状況を別タブで確認してください。", true);
+      console.warn("[pl] 想定外の実行状態:", result.status);
+      renderStatus("前回の更新状態を確認できませんでした。実行状況を別タブで確認してください。", true);
     }
     saveState();
     schedulePoll();
@@ -82,7 +83,8 @@
         acceptStatus(result);
       }).catch(function (error) {
         state.requesting = false;
-        renderStatus("実行状況を取得できませんでした: " + error.message, true);
+        console.error("[pl] 実行状況の取得に失敗:", error);
+        renderStatus("実行状況を取得できませんでした。時間をおいて再度お試しください。", true);
         els.run.disabled = true;
         // 一過性失敗（CE coldstart / 20秒timeout / 5xx）から自動回復する: 有界リトライを arm する。
         // schedulePoll は running/unknown 時しか再試行しないため、新規ロードの単発失敗だと唯一の主要CTA
@@ -142,7 +144,7 @@
     state.requesting = true;
     state.beganAt = new Date().toISOString();
     state.instanceId = "";
-    renderStatus("メインWorkflowを開始しています…");
+    renderStatus("レポートの更新を開始しています…");
     var emailPromise = state.executorResolved ? Promise.resolve(state.executorEmail) : resolveExecutorEmail();
     return emailPromise.then(function (email) {
       state.executorEmail = email;
@@ -155,7 +157,8 @@
     }).catch(function (error) {
       state.requesting = false;
       state.unknown = error.code === "START_UNCONFIRMED" || !error.code;
-      renderStatus(error.message, true);
+      console.error("[pl] 更新開始に失敗:", error);
+      renderStatus("レポートの更新を開始できませんでした。時間をおいて再度お試しください。", true);
       saveState();
       schedulePoll();
     });
@@ -192,7 +195,8 @@
       els.cancel.focus({preventScroll: true});
     } catch (error) {
       closeConfirmation();
-      renderStatus("確認画面を表示できません: " + error.message, true);
+      console.error("[pl] 確認画面の表示に失敗:", error);
+      renderStatus("確認画面を表示できませんでした。画面を再読み込みしてください。", true);
     }
   }
 
@@ -215,7 +219,7 @@
     els.run.addEventListener("click", confirmRun);
     els.check.addEventListener("click", function () {
       if (!state.progressPath || typeof domo.navigate !== "function") {
-        renderStatus("実行状況の画面を開けません。Domo SDKとWorkflowの配線を確認してください。", true);
+        renderStatus("実行状況の画面を開けませんでした。管理者にお問い合わせください。", true);
         return;
       }
       domo.navigate(state.progressPath, true);
