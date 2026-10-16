@@ -80,7 +80,7 @@
       <div><dt>文書種別</dt><dd>ハンズオン教材（手を動かす）</dd></div>
       <div><dt>所要</dt><dd>約 3 時間・ステップ順</dd></div>
       <div><dt>対象</dt><dd>店舗別損益AIデモ 開発者</dd></div>
-      <div><dt>版</dt><dd>v0.3.4（2026-10-16）</dd></div>
+      <div><dt>版</dt><dd>v0.3.5（2026-10-16）</dd></div>
     </dl>
 
     <div class="abstract">
@@ -612,7 +612,7 @@ set -a; . config/secrets.env; set +a</pre>
     </figure>
     <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-lock"/></svg><b>トークンの厳禁事項（必ず守る）</b>：① <b>echo・表示・チャットへ貼り付け・コミットをしない</b>（値を会話に残さない）。② 書き込む前に <code>config/secrets.env</code> が <code>.gitignore</code> に載っていることを確認（配布キットは設定済み）。③ <b><code>git add -A</code>／<code>git add -a</code> を使わず、明示パスだけ stage</b>する。④ プロンプト本文にトークンを貼って渡してしまったら、<b>まず <code>config/secrets.env</code> へ退避し、会話に残る本文からは消す</b>。</p>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-refresh"/></svg><b>再開チェック（休憩後・ターミナルを開き直したら必ず）</b>：資格情報と名札はセッションに紐づくので、続きを始める前に <b>① <code>domo login</code>（SID は約 1 時間で失効）→ ② <code>set -a; . config/secrets.env; set +a</code>（トークン）→ ③ 名札（<code>PL_SANDBOX_SUFFIX</code>）</b>の順で入れ直す。これを飛ばすと「さっきまで動いていたのに急に認証エラー」になりやすい。</p>
-    <p class="sec__note">本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</p>
+    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg>同じインスタンスで複数人が進める回は、名札 <code>PL_SANDBOX_SUFFIX</code>（例「検証・氏名」）を設定すると DataFlow・4 出力・保存CE・統合サブWF・WF-01・AppDB・DataApp がすべて自分専用名になり、本番や他参加者と衝突しない。名札なしで本番名へ配備しようとすると<b>本番オブジェクトの作成・更新が拒否される</b>（本番保護・詳細は §8）。本番メンテナが本番を更新する時だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示する。</p>
     <div class="callouts callouts--2">
       <div class="callout callout--accent"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-user"/></svg></span><h4>ひとりで進めるとき（講師・運営なし）</h4><p>開発者トークンが無くても、<b>編集 → <code>node --check</code> → <code>node tests/test_drill_helpers.js</code> → <code>domo dev</code> プレビュー → <code>domo publish</code> → データ層配備（<code>provision_domo.py</code>）→ App Studio 埋め込み</b>まで、すべて <code>domo login</code> だけで一人で回せる。<b>ソロで唯一塞がるのは ワークフロー層（<code>provision_workflows.py</code>＝AI 長文レポート・開発者トークン/SID が要る）</b>だけ。概要／事業部別タブ（KPI・チャート・短文サマリー）は長文が無くても動く。</p></div>
       <div class="callout"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg></span><h4>詰まったら</h4><p>ネットワーク／権限で詰んだら、運営（いなければ<b>自社の Domo 管理者／情シス</b>）へ。共有 AppDB を誤操作したら再実行・削除せず、そのまま管理者へ。</p></div>
@@ -1442,7 +1442,7 @@ node tests/test_drill_helpers.js</pre>
         <dt>メイン WF（WF-01）</dt><dd><b>並列サイドブランチ＋終了 2 つ</b>。開始→店舗別SQL から、本線（店舗ループ：単一店舗→整形→<b>15 秒待機タイマー</b>→統合サブWF(<code>store</code>)→次店舗?→終了#1）と、フォークした全社ブランチ（全店舗SQL→整形→統合サブWF(<code>company</code>)→終了#2）を並走。15 秒は <code>company</code> を <code>wait:False</code> で非同期投入する際の同時実行を抑え、AI 書込みの一時失敗を平準化する（従来 2 回連続実行で収束）。先頭の dedupe ノードは撤去済み（保存CE に内包）。座標・経路は <code>provision_workflows.py</code> の<b>数学的レイアウトエンジン</b>が算出し、PUT 前に <code>validate_layout</code> が重なり 0・経路貫通 0 をゲートする＝再デプロイで崩れない。</dd>
         <dt>統合サブWF</dt><dd>開始→<b>5 秒待機</b>→レポート種別? ゲートウェイ（<code>report_type</code> で分岐）→店舗AI／全社AI→保存→終了。両 AI が <code>pl_report_api(save)</code> で AppDB 保存、全社 AI は <code>Send Email</code> も保持（宛先は env <code>PL_EMAIL_PERSON_RECIPIENTS</code>。未設定なら宛先ゼロで配備され配備時に警告が出る＝実行時は AI が宛先を創作せず送信をスキップする。保存は実施されるので成功を偽装しない）。<b>旧 WF-02（店舗）／WF-03（全社）を 1 本に統合済み</b>（プロンプトのファイル名 <code>prompt_wf02_store.md</code>／<code>prompt_wf03_summary.md</code> の <code>wf02</code>／<code>wf03</code> はその名残）。</dd>
         <dt>AI Agent（2 つ）</dt><dd>統合サブWF 内の自律ノード。①<b>店舗ブランチ</b>（<code>prompt_wf02_store.md</code>）＝店舗長文。②<b>全社ブランチ</b>（<code>prompt_wf03_summary.md</code>）＝全社長文（純利益ワースト視点）。両方 <b>context＝<code>summary</code>＋<code>detail</code></b>、<b>tool＝<code>pl_report_api</code></b>、指示＝プロンプト。計算させず解釈だけ、<b>状態ラベルは転記</b>、成果は<b>ツール引数（構造化 JSON）</b>で受け取る。</dd>
-        <dt>名札（PL_SANDBOX_SUFFIX）とデプロイ入口</dt><dd>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</dd>
+        <dt>名札（PL_SANDBOX_SUFFIX）とデプロイ入口</dt><dd>データ層は <code>provision_domo.py</code>（seed／CE／AppDB／DataFlow／4 出力）、ワークフロー層は <code>provision_workflows.py</code>（保存CE・統合サブWF・WF-01）が配備する。<code>PL_SANDBOX_SUFFIX</code> を 1 個設定すると両層が読み、全オブジェクト名が一意化されて本番や他参加者と衝突しない。名札なしで本番名のまま配備するのは本番メンテナが <code>PL_ALLOW_PRODUCTION=1</code> を明示したときだけ（既定は fail-closed で止まる・詳細は §8）。</dd>
       </dl>
       <figcaption>部品ごとの具体仕様 ― 種データ・画面・集計・決定的列・短文 AI・保存・サーバー関数・親子 WF・長文 AI・名札。正本は各フォルダのコード</figcaption>
     </figure>
@@ -2102,7 +2102,7 @@ python3 scripts/provision_workflows.py verify</pre>
       <dt><code>DA0004</code></dt><dd>未マッピング alias を proxy が解決できない時の 400。FE はトレンド空・事業部タブ非表示へ graceful degrade する（白画面にしない）。</dd>
       <dt><code>domo-assets.json</code></dt><dd>解決済みの App／Page／Card／context 実 ID の控え。<b>gitignore 済みで配布されない</b>ため、新規インスタンスでは名称で発見／作成になる。</dd>
       <dt><code>--skip-dataflow-run</code></dt><dd><code>apply</code> で配線だけ更新し、重い DataFlow 実行（＝短文 AI 生成）を飛ばすフラグ。</dd>
-      <dt><code>PL_ALLOW_PRODUCTION</code></dt><dd>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</dd>
+      <dt><code>PL_ALLOW_PRODUCTION</code></dt><dd>本番名のまま反映する時だけ <code>=1</code> を立てる本番メンテナ専用スイッチ。名札なしの本番書込みはこれが無いと拒否される（→ §8）。</dd>
     </dl>
 
     <div class="try">
@@ -2460,7 +2460,7 @@ AGENT.md・docs/setup-guide.md・prompts/deploy-with-agent.ja.md に従うこと
       </div>
       <figcaption id="tblcap-s7-cmds"><code>provision_domo.py</code> のサブコマンド早見 ― データ層・埋め込みは SSO で届く（ワークフロー層だけ <code>provision_workflows.py provision --apply --release</code> ＋ 開発者トークン）</figcaption>
     </figure>
-    <p class="sec__note sec__note--strong">本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</p>
+    <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg><b>データ層・ワークフロー層を実行する前に名札を確認</b>。<code>PL_SANDBOX_SUFFIX</code>（例「検証・氏名」）を設定すれば自分専用スタックに配備され、本番や他参加者と衝突しない。名札なしで本番名へ配備しようとすると拒否される（本番メンテナのみ <code>PL_ALLOW_PRODUCTION=1</code>・→ §8）。</p>
     <figure class="fig">
       <div class="callouts callouts--2">
         <div class="callout callout--accent"><span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-database"/></svg></span><h4>外部データは要らない（seed が合成）</h4><p>バックエンドまで作っても<b>外部の入力データセット ID は不要</b>。DataFlow の Python タイルが<b>ダミーの P/L を合成</b>し、集計 SQL と AI タイルが <code>summary</code>／<code>detail</code>／<code>trend</code>／<code>dept</code> の 4 出力まで作る。<b>空のインスタンスでも 1 本で完結</b>するので、小さく試して仕組みを掴める。</p></div>
@@ -2793,7 +2793,7 @@ WF-01／統合サブWF / 他参加者（別の名札）の資産
       <div class="callout callout--accent">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-database"/></svg></span>
         <h4>本番は名札（PL_SANDBOX_SUFFIX）で守る</h4>
-        <p>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</p>
+        <p>名札（<code>PL_SANDBOX_SUFFIX</code>）を付ければ自分専用スタックに配備され、本番と衝突しない。名札なしで本番名へ配備しようとすると拒否され、本番メンテナが <code>PL_ALLOW_PRODUCTION=1</code> を明示したときだけ通る（→ §8）。</p>
       </div>
       <div class="callout">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-grid"/></svg></span>
@@ -2818,7 +2818,7 @@ WF-01／統合サブWF / 他参加者（別の名札）の資産
       <div class="callout">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg></span>
         <h4>本番は「名札の有無」で守る（全インスタンス共通）</h4>
-        <p>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</p>
+        <p>ガードは<b>すべての対象インスタンス</b>で有効。名札があれば通り、無ければ本番名への配備を止める。例外は本番メンテナが <code>PL_ALLOW_PRODUCTION=1</code> を明示したときだけ（→ §8）。</p>
       </div>
       <div class="callout">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-alert"/></svg></span>
@@ -2853,9 +2853,9 @@ WF-01／統合サブWF / 他参加者（別の名札）の資産
           </tbody>
         </table>
       </div>
-      <figcaption id="tblcap-s8guard">本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</figcaption>
+      <figcaption id="tblcap-s8guard">本番保護ガードの判定 ― <b>名札も明示フラグも無いまま本番名へ配備するときだけ止める</b>（全対象インスタンス共通）。名札付き（サンドボックス）、または本番メンテナの <code>PL_ALLOW_PRODUCTION=1</code> なら通る。</figcaption>
     </figure>
-    <p class="sec__note sec__note--strong">本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</p>
+    <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg><b>覚え方</b>：ガードが止めるのは<b>「本番名＋名札なし＋明示フラグなし」の一点だけ</b>。ハンズオン受講者は<b>名札（<code>PL_SANDBOX_SUFFIX</code>）を付ければ必ず通る</b>し、本番メンテナは <code>PL_ALLOW_PRODUCTION=1</code> を明示すれば通る。だから<b>うっかり本番を書き換える経路が無い</b>。</p>
 
     <h3 class="sub">名札あり ⇄ 名札なし（何が変わる？）</h3>
     <figure class="fig">
@@ -2935,12 +2935,12 @@ export PL_SANDBOX_SUFFIX='検証・&lt;あなたの氏名&gt;'</pre>
     <h3 class="sub">この節の用語</h3>
     <figure class="fig">
       <dl class="defs">
-        <dt>PL_SANDBOX_SUFFIX</dt><dd>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</dd>
-        <dt>PL_ALLOW_PRODUCTION</dt><dd>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</dd>
-        <dt>DOMO_INSTANCE</dt><dd>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</dd>
+        <dt>PL_SANDBOX_SUFFIX</dt><dd>名札。全オブジェクト名に「（検証・氏名）」を付けて一意化する環境変数。データ層・ワークフロー層の両スクリプトが同じ値を読み、本番や他参加者と衝突しない自分専用スタックになる（名札を付ければ本番保護ガードを通る）。</dd>
+        <dt>PL_ALLOW_PRODUCTION</dt><dd>本番メンテナ専用の明示フラグ（<code>1</code>/<code>true</code>/<code>yes</code>）。名札なしで本番名のまま配備できる唯一の経路で、ハンズオンでは使わない（未設定なら名札なしの本番書込みは拒否される）。</dd>
+        <dt>DOMO_INSTANCE</dt><dd>配備先インスタンスのホスト名（例 <code>example.domo.com</code>）。接続先を明示する環境変数。本番保護ガードは<b>すべての対象インスタンス</b>で有効（判定ロジックは §8）。</dd>
         <dt><code>provision</code> と <code>apply</code></dt><dd><code>provision_workflows.py provision</code>＝名称で<b>自分専用の CE／WF を発見・作成</b>（サンドボックス向き）。<code>provision_domo.py apply</code>＝<b>データ層</b>（seed→DataFlow→4 出力）を配備。</dd>
       </dl>
-      <figcaption>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</figcaption>
+      <figcaption>この節で使う環境変数とコマンドの早見表。本番保護ガードの判定ロジックは §8 を参照。</figcaption>
     </figure>
 
     <h3 class="sub">この節のチェックリスト</h3>
@@ -3296,8 +3296,8 @@ python3 scripts/provision_domo.py apply</pre>
         <dt>SDK（<code>domo.js</code>）</dt><dd>画面から Domo を呼ぶ部品（<code>window.domo</code>）。<code>vendor/</code> に<b>同梱</b>する。</dd>
         <dt>同梱／CDN 禁止</dt><dd>使う JS・CSS・SDK をアプリに<b>同梱</b>し外部 CDN から読まない原則。理由＝①CDN 障害や版違いで壊れない（可用性）②外部の第三者コードを実行しない（安全）。フォントは代替指定つきなら外部可（詳細は §3）。</dd>
         <dt>サンドボックス</dt><dd>参加者ごとに隔離した<b>自分専用の練習環境</b>（FE＋DataFlow＋WF＋CE＋AppDB）。自由に改良でき、本番や他参加者には触れない（§7）。</dd>
-        <dt><code>PL_SANDBOX_SUFFIX</code></dt><dd>サンドボックスの<b>名札</b>（例「検証・氏名」）。設定すると全オブジェクト名に付き本番・他参加者と一意に分離。<b>未設定だと本番名のまま＝保守用インスタンスの本番書換を provisioner が拒否する</b>（本番メンテナのみ <code>PL_ALLOW_PRODUCTION=1</code>）。</dd>
-        <dt><code>PL_ALLOW_PRODUCTION</code></dt><dd>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</dd>
+        <dt><code>PL_SANDBOX_SUFFIX</code></dt><dd>サンドボックスの<b>名札</b>（例「検証・氏名」）。設定すると全オブジェクト名に付き本番・他参加者と一意に分離。<b>未設定だと本番名のまま＝名札なしの本番書換を provisioner が拒否する</b>（本番メンテナのみ <code>PL_ALLOW_PRODUCTION=1</code>）。</dd>
+        <dt><code>PL_ALLOW_PRODUCTION</code></dt><dd>本番メンテナ専用の明示フラグ（<code>1</code>/<code>true</code>/<code>yes</code>）。名札なしで本番名のまま配備できる唯一の経路。ハンズオンでは使わない（→ §8）。</dd>
         <dt>店舗別損益（P/L）</dt><dd>本アプリの題材。店舗×勘定科目×月の損益を集計し、売上・利益率・費用構成・純利益ランキングを見る。元データは DataFlow の Python タイルが実名店舗にアーキタイプ（スター店／苦戦店／回復基調 等）を付けて合成する。</dd>
         <dt>Store PL AI Insights</dt><dd>本アプリの<b>Pro-Code カード名</b>。概要／事業部別／サマリーの 3 タブを 1 枚で持つ完全自己完結カード（App Studio の外部フィルターに非依存）。</dd>
         <dt>DF-2042（DataFlow）</dt><dd>集計・整形の中核 Magic ETL。入力整形 → Python 損益合成 → 集計 SQL → 2 枚の TextGeneration（店舗／全社短文）を経て、<b>4 出力</b>（明細 <code>detail</code>／要約 <code>summary</code>／トレンド <code>trend</code>／事業部別 <code>dept</code>）を生む。</dd>
@@ -3465,7 +3465,7 @@ git config --global http.proxy http://proxy.example.co.jp:8080</pre>
 </main>
 
 <footer class="sitefoot">
-  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>店舗別損益 ・ 開発ガイド ― 店舗別損益AI分析 ・ v0.3.4
+  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>店舗別損益 ・ 開発ガイド ― 店舗別損益AI分析 ・ v0.3.5
 </footer>
 
 <!-- トースト（コピー等のフィードバック） -->

@@ -333,6 +333,7 @@ test('PL-001: ドリル帯の aria-label に数値を畳み込み、フォーカ
   assert.match(extractFunction('drawDivergingBars'), /aria-label="' \+[\s\S]{0,160}jpMoney\(/, 'ランキング/店舗別横棒の aria-label に金額がない');
   assert.match(extractFunction('drawDeptBar'), /aria-label="' \+[\s\S]{0,120}jpMoney\(/, '事業部積み上げ棒の aria-label に金額がない');
   assert.match(extractFunction('drawDeptTrend'), /aria-label="' \+[\s\S]{0,120}jpMoney\(/, '事業部トレンド帯の aria-label に金額がない');
+  assert.match(extractFunction('donutInto'), /aria-label="' \+[\s\S]{0,140}jpMoney\(/, '費用ドーナツ donutInto の aria-label に金額がない（R5-001）');
   // キーボード focus でもホバーと同じツールチップを出す配線（bbox 基準で配置）。
   const hover = extractFunction('bindChartHover');
   assert.match(hover, /"focusin"/, 'focusin 配線がない');

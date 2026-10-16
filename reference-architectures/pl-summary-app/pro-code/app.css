@@ -50,6 +50,9 @@ body{
 .workflow-button, .workflow-check{ font: inherit; cursor: pointer; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; min-height: 44px; background: var(--surface); color: var(--accent); }
 .workflow-button{ font-weight: 600; font-size: 13px; }
 .workflow-button:disabled, .workflow-check:disabled{ cursor: default; opacity: .55; }
+/* スキップリンク（キーボード/SR 用・focus 時のみ可視・enji 面）。inventory 本体と同じ作法。 */
+.skip-link{ position: fixed; top: -60px; left: 16px; z-index: 1000; padding: 10px 16px; color: #fff; background: var(--accent); border-radius: 8px; text-decoration: none; }
+.skip-link:focus{ top: 8px; outline: 2px solid transparent; outline-offset: 2px; }
 .workflow-button:focus-visible, .workflow-check:focus-visible, .workflow-close:focus-visible{ outline: 2px solid var(--accent); outline-offset: 3px; }
 .workflow-actions{ display: flex; align-items: center; gap: 12px; }
 .workflow-progress{ padding: 8px 0; border: 0; background: transparent; color: var(--ink-muted); cursor: pointer; font: inherit; font-size: 13px; white-space: nowrap; }
@@ -95,7 +98,7 @@ body{
   border: 1px solid var(--border); border-radius: 10px;
   box-shadow: var(--shadow-sm); cursor: pointer;
 }
-#store-select:focus{ outline: none; border-color: var(--accent-weak); box-shadow: 0 0 0 3px rgba(127,29,45,.12); }
+#store-select:focus{ outline: 2px solid transparent; outline-offset: 2px; border-color: var(--accent-weak); box-shadow: 0 0 0 3px rgba(127,29,45,.12); }
 
 /* ---------- Main ---------- */
 .main-content{ padding: 28px 24px 48px; }
@@ -163,6 +166,9 @@ body{
 .ai-quick-body{ font-size: 14px; line-height: 1.85; color: var(--ink); }
 .ai-quick-body p{ margin: 0 0 6px; }
 .ai-quick-body p:last-child{ margin-bottom: 0; }
+.ai-quick-mark--synth{ background: var(--ink-muted); font-size: 12px; }  /* 集計フォールバック＝実AIの enji バッジと区別 */
+.ai-quick-note{ margin-top: 8px; font-size: 11px; line-height: 1.6; color: var(--ink-muted); }
+.insight-disclaimer{ margin: -4px 0 14px; font-size: 11px; line-height: 1.6; color: var(--ink-muted); }
 
 /* ---------- Charts grid ---------- */
 .charts-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
@@ -323,7 +329,7 @@ body{
 }
 .view-tab:hover{ color: var(--accent); }
 .view-tab.active{ color: #fff; background: var(--accent); box-shadow: var(--shadow-sm); }
-.view-tab:focus-visible{ outline: none; box-shadow: 0 0 0 3px rgba(127,29,45,.2); }
+.view-tab:focus-visible{ outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(127,29,45,.2); }
 
 .view-panel{ display: none; }
 .view-panel.active{ display: block; animation: fadeUp .3s ease-out both; }
@@ -436,7 +442,7 @@ body{
   padding: 3px 10px; cursor: pointer; transition: color .15s, border-color .15s;
 }
 .drill-btn:hover{ color: var(--accent); border-color: rgba(127,29,45,.35); }
-.drill-btn:focus-visible{ outline: none; box-shadow: 0 0 0 3px rgba(127,29,45,.18); }
+.drill-btn:focus-visible{ outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(127,29,45,.18); }
 .drill-path{ display: inline-flex; align-items: center; gap: 3px; flex-wrap: wrap; min-width: 0; }
 .drill-crumb{
   -webkit-appearance: none; appearance: none; font-family: inherit;
@@ -446,7 +452,7 @@ body{
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .drill-crumb:hover{ background: rgba(127,29,45,.12); }
-.drill-crumb:focus-visible{ outline: none; box-shadow: 0 0 0 3px rgba(127,29,45,.18); }
+.drill-crumb:focus-visible{ outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(127,29,45,.18); }
 .drill-crumb.current{ color: #fff; background: var(--accent); border-color: var(--accent); cursor: default; }
 .drill-sep{ color: var(--ink-muted); font-size: 11px; }
 .drill-foot{ margin: 10px 2px 0; font-size: 11.5px; line-height: 1.7; color: var(--ink-muted); letter-spacing: .01em; }
@@ -454,7 +460,7 @@ body{
 /* Drillable chart elements: keyboard focus ring + generic hit band */
 .svg [data-drill]{ cursor: pointer; }
 .svg [data-drill]:focus{ outline: none; }
-.svg [data-drill]:focus-visible{ stroke: var(--accent); stroke-width: 2; }
+.svg [data-drill]:focus-visible{ outline: 2px solid transparent; outline-offset: 2px; stroke: var(--accent); stroke-width: 2; }
 .svg .drill-hit{ fill: transparent; }
 .svg .drill-hit:hover{ fill: rgba(127,29,45,.05); }
 

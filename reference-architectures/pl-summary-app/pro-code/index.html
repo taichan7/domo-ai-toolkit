@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="app.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
   <div id="header">
     <div class="header-content container">
       <div class="brand">
@@ -26,11 +27,11 @@
           <select id="store-select" aria-label="店舗を選択"></select>
         </div>
       </div>
-      <div class="workflow-actions"><button id="workflow-run" class="workflow-button" type="button" disabled>AIレポートを更新</button><button id="workflow-check" class="workflow-progress" type="button" disabled aria-label="サブWorkflowの実行状況を新しいタブで開く">実行状況 <span aria-hidden="true">↗</span></button></div></div>
+      <div class="workflow-actions"><button id="workflow-run" class="workflow-button" type="button" disabled>全社AIレポートを更新</button><button id="workflow-check" class="workflow-progress" type="button" disabled aria-label="サブWorkflowの実行状況を新しいタブで開く">実行状況 <span aria-hidden="true">↗</span></button></div></div>
     </div>
   </div>
 
-  <div class="main-content container">
+  <div class="main-content container" id="main-content" role="main" tabindex="-1">
     <p id="workflow-status" class="workflow-status" role="status" aria-live="polite">Workflowの実行状況を確認しています…</p>
     <div id="message-container"></div>
 
@@ -112,7 +113,7 @@
             </section>
 
             <section class="chart-card span-3">
-              <h2 class="chart-title" id="title-dept-trend">事業部別 月次売上トレンド<span class="chart-note">2025年度・季節性（3月/7月/12月が繁忙）</span></h2>
+              <h2 class="chart-title" id="title-dept-trend">事業部別 月次売上トレンド<span class="chart-note">2025年度・月次の季節変動を確認</span></h2>
               <div id="chart-dept-trend" class="chart-body"></div>
               <div id="legend-dept-trend" class="legend"></div>
             </section>
@@ -129,6 +130,7 @@
       <section id="panel-summary" class="view-panel" role="tabpanel" aria-labelledby="tab-summary">
         <section class="insight-card">
           <h2 class="chart-title">AI 経営インサイト<span class="chart-note" id="insight-note"></span></h2>
+          <p class="insight-disclaimer">AIが生成したレポートです。重要な判断の前に数値をご確認ください。</p>
           <div id="analysis-container"></div>
         </section>
       </section>

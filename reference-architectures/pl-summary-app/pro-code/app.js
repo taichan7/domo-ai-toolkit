@@ -59,7 +59,6 @@
   var PALETTE = {
     rev: "#7F1D2D",     // 売上・プライマリ臙脂
     profit: "#5F7A64",  // 純利益・グリーン
-    rankNeg: "#C77",    // 赤字バー（ランキング）
     rankSel: "#5A0F1C"  // 選択店ハイライト
   };
   var BAR_COGS = "#C97B84", BAR_GROSS = PALETTE.profit; // 事業部積み上げ棒: 売上原価ローズ / 粗利益グリーン
@@ -406,6 +405,7 @@
     };
     // 全社短文サマリー: DataFlow の TextGeneration 由来（全行共通）を優先、
     // 未生成時は集計値からクライアント側で簡易生成してフォールバック。
+    v.aiIsSynth = !state.companyAi;   // 実AI未生成時は集計フォールバック＝「AI」と偽らず区別する
     v.aiSummary = state.companyAi || synthCompanySummary(v);
     return v;
   }
@@ -487,7 +487,14 @@
     if (v.aiSummary) {
       var paras = String(v.aiSummary).split(/\n+/).filter(Boolean)
         .map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("");
-      els.aiQuick.innerHTML = '<div class="ai-quick-mark">AI</div><div class="ai-quick-body">' + paras + "</div>";
+      // 実AI出力か、未生成時の集計フォールバックかを明示的に区別する（合成文を「AI」と偽らない）。
+      var mark = v.aiIsSynth
+        ? '<div class="ai-quick-mark ai-quick-mark--synth">集計</div>'
+        : '<div class="ai-quick-mark">AI</div>';
+      var note = v.aiIsSynth
+        ? '<p class="ai-quick-note">AI要約は未生成のため、集計値から自動作成した概要を表示しています。</p>'
+        : '<p class="ai-quick-note">AIが生成した要約です。重要な判断の前に数値をご確認ください。</p>';
+      els.aiQuick.innerHTML = mark + '<div class="ai-quick-body">' + paras + note + "</div>";
       els.aiQuick.classList.remove("hidden");
     } else {
       els.aiQuick.classList.add("hidden");
@@ -1033,7 +1040,7 @@
   function renderDeptTrendCard() {
     var top = topFrame("deptTrend");
     if (!top) {
-      drawDeptTrend(DEPT.monthly, { drill: true, title: "事業部別 月次売上トレンド", note: DEPT.fy + "年度・季節性（3月/7月/12月が繁忙）" });
+      drawDeptTrend(DEPT.monthly, { drill: true, title: "事業部別 月次売上トレンド", note: DEPT.fy + "年度・月次の季節変動を確認" });
     } else if (top.type === "deptMonthBreakdown") {
       drawDeptMonthBreakdown(top);
     } else if (top.type === "deptMonthly") {
@@ -1149,7 +1156,8 @@
         '" data-pct="' + Math.round(frac * 100) + '" data-color="' + c.color + '"';
       if (opts.drill) {
         attrs += ' data-drill="slice" data-key="' + esc(c.key || "") +
-          '" tabindex="0" role="button" aria-label="' + esc(c.label + " の内訳を表示") + '"';
+          '" tabindex="0" role="button" aria-label="' +
+          esc(c.label + "、" + jpMoney(c.value) + "、構成比 " + Math.round(frac * 100) + "%。内訳を表示") + '"';
       }
       if (opts.highlight && c.key && c.key !== opts.highlight) attrs += ' style="opacity:.35"';
       svg.push(donutArc(cx, cy, r, rin, ang, a2, c.color, attrs));
@@ -1308,7 +1316,7 @@
     drawDeptTrend(DEPT.monthly, {
       drill: true,
       title: "事業部別 月次売上トレンド",
-      note: DEPT.fy + "年度・季節性（3月/7月/12月が繁忙）"
+      note: DEPT.fy + "年度・月次の季節変動を確認"
     });
     renderBudgetTable(divs);
     renderDrillBar("deptBar", ALL_LABEL);
@@ -1375,7 +1383,7 @@
     setChartTitle(els.titleDeptBar, "事業部別 売上・粗利", "積み上げ＝売上原価＋粗利益");
   }
 
-  // 事業部別 月次売上トレンド（複数折れ線）。季節性（3月/7月/12月の繁忙）を可視化。
+  // 事業部別 月次売上トレンド（複数折れ線）。月次の季節変動を可視化。
   // opts.target で描画先カード（deptTrend / deptBar / deptDonut）を差し替え、opts.series で
   // 系列を絞り込む（事業部ドリル）。opts.drill で各月をクリック可能にする。
   function drawDeptTrend(monthly, opts) {

@@ -31,6 +31,7 @@
   --shadow: 0 1px 2px rgba(26, 38, 60, .06);
   --shadow-raised: 0 8px 24px rgba(26, 38, 60, .09);
   --radius: 8px;
+  --icon-stroke: 1.7;   /* 線画SVGの共通ストローク幅。全アイコンで統一する（INV-007） */
   --sidebar: 204px;
   --header: 56px;
   --app-viewport-height: 100vh;
@@ -88,7 +89,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   height: 1em;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.7;
+  stroke-width: var(--icon-stroke);
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -264,7 +265,7 @@ textarea { padding: 12px 13px; resize: vertical; }
 /* プレースホルダは入力例のヒント。旧 #97a6b8(2.48:1)は判読しにくいため --muted へ上げ、
    入力済みの値(--ink)より淡いまま可読性(5.18:1)を確保する。 */
 input::placeholder, textarea::placeholder { color: var(--muted); }
-input:focus, select:focus, textarea:focus { border-color: var(--navy-800); outline: 0; box-shadow: 0 0 0 3px rgba(47, 107, 176, .11); }
+input:focus:not(:focus-visible), select:focus:not(:focus-visible), textarea:focus:not(:focus-visible) { border-color: var(--navy-800); outline: 0; box-shadow: 0 0 0 3px rgba(47, 107, 176, .11); }
 .search-wrap { position: relative; margin-bottom: 13px; }
 .search-wrap .search-icon { position: absolute; top: 50%; left: 13px; width: 16px; height: 16px; color: #7b8794; transform: translateY(-50%); }
 .search-wrap input { padding-left: 38px; }
@@ -367,9 +368,9 @@ button[disabled] { cursor: not-allowed; opacity: .55; }
 .kpi-card small { color: var(--muted); }
 .kpi-card.alert small, .kpi-card.alert strong { color: var(--red-600); }
 /* 不足アラート時だけ注記へ前置する注意アイコン。色のみ依存を避ける非色シグナル（文言＋アイコン）。 */
-.kpi-alert-icon { width: 12px; height: 12px; margin-right: 4px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.kpi-alert-icon { width: 12px; height: 12px; margin-right: 4px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
 .kpi-footer { display: flex; align-items: center; justify-content: space-between; }
-.drill-icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.drill-icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
 .kpi-footer .drill-icon { color: #8b96a4; }
 /* 上部ツールバー: 左に横断検索、右にWorkflow起動ボタン。どちらもリファレンスとして重要な機能を、
    目に付く上部へ独立配置する。狭幅では自然に折り返す。 */
@@ -639,7 +640,7 @@ body.drawer-open main { overflow: hidden; }
 .balance-flow-node small { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; }
 .balance-flow-node strong { color: var(--navy-950); font-size: 22px; font-weight: 600; line-height: 1.1; }
 .balance-flow-node.is-after strong { color: var(--teal-700); }
-.balance-flow-arrow { width: 15px; height: 15px; margin-top: 8px; flex: none; align-self: center; fill: none; stroke: var(--line-strong); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.balance-flow-arrow { width: 15px; height: 15px; margin-top: 8px; flex: none; align-self: center; fill: none; stroke: var(--line-strong); stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
 .balance-flow-delta { margin-left: auto; flex: none; color: var(--green-700); font-size: 15px; font-weight: 700; }
 .balance-flow-delta.out { color: var(--orange-600); }
 
