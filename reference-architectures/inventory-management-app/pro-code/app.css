@@ -473,7 +473,7 @@ tbody tr:hover { background: var(--surface-muted); }
    ルールで、横は min-width:480px の表がはみ出す狭幅時のために overflow-x:auto を明示）。 */
 .master-list { margin: 0; overflow-x: auto; }
 .master-table { min-width: 480px; }
-.master-status { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.master-status { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; }
 .master-status.active { color: var(--navy-900); background: var(--teal-100); }
 .master-status.inactive { color: var(--muted); background: var(--surface-muted); }
 .master-row-inactive td { color: var(--muted); }
@@ -633,7 +633,7 @@ body.drawer-open main { overflow: hidden; }
 /* 取引明細の主役。登録前→登録後の在庫の流れと増減量を、KPI箱ではなく静かな1本の帯で示す。
    種別バッジ・矢印・増減量だけに絞り、枠や色数を抑えて品のある見え方にする。 */
 .balance-flow { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-muted); }
-.balance-flow-badge { flex: none; padding: 3px 11px; color: var(--green-700); border-radius: 999px; background: var(--green-100); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+.balance-flow-badge { flex: none; padding: 3px 11px; color: var(--green-700); border-radius: 4px; background: var(--green-100); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
 .balance-flow-badge.out { color: var(--orange-600); background: var(--orange-100); }
 .balance-flow-track { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .balance-flow-node { display: flex; min-width: 0; flex-direction: column; gap: 1px; }

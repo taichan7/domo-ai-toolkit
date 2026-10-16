@@ -21,7 +21,7 @@ body{
   font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
                "Yu Gothic", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   color: var(--ink);
-  background: linear-gradient(180deg, var(--bg), #F7F6F4 40%, var(--bg) 100%);
+  background: var(--bg);
   letter-spacing: .02em;
 }
 
@@ -154,7 +154,7 @@ body{
 /* ---------- Quick AI summary ---------- */
 .ai-quick{
   display: flex; gap: 14px; align-items: flex-start;
-  background: linear-gradient(135deg, #FBF3F4, #F9F1F2);
+  background: #FBF3F4;
   border: 1px solid rgba(127,29,45,.18); border-radius: var(--radius);
   padding: 16px 18px; margin-bottom: 20px; box-shadow: var(--shadow-sm);
 }
@@ -284,7 +284,7 @@ body{
 }
 .dept-table th, .dept-table td{ padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: right; }
 .dept-table thead th{
-  background: linear-gradient(135deg, #FAF9F7, #F2F1EF); color: var(--ink);
+  background: #FAF9F7; color: var(--ink);
   font-weight: 700; font-size: 12px; letter-spacing: .04em; border-bottom: 2px solid var(--accent-weak);
 }
 .dept-table th:first-child, .dept-table td:first-child{ text-align: left; }
@@ -304,7 +304,7 @@ body{
 }
 .insight-card::before{
   content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-weak), var(--accent));
+  background: var(--accent);
 }
 .ai-pending{ padding: 30px 0; text-align: center; color: var(--ink-muted); }
 .ai-pending p{ margin: 6px 0; font-size: 14px; line-height: 1.8; }
@@ -413,7 +413,7 @@ body{
   border-bottom: 1px solid var(--border);
 }
 #analysis-container th{
-  background: linear-gradient(135deg, #FAF9F7, #F2F1EF); color: var(--ink);
+  background: #FAF9F7; color: var(--ink);
   font-weight: 700; font-size: 12px; letter-spacing: .04em; border-bottom: 2px solid var(--accent-weak);
 }
 #analysis-container td{ font-variant-numeric: tabular-nums; }
