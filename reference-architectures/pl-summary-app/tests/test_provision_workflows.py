@@ -180,6 +180,19 @@ class DiscoverOrCreate(unittest.TestCase):
         pw.request = lambda method, path, body=None: {"collections": [{"id": "x", "name": "無関係"}]}
         self.assertEqual(pw.resolve_collection_id(), "", "未存在は空文字（cmd_provision が apply 時に loud fail する）")
 
+    def test_resolve_collection_id_paginates_beyond_first_page(self):
+        # BK-004: 業務コレクションが1ページ目(1000件)より後ろにあっても全ページを辿って発見する
+        # （単一ページ打ち切りだと取りこぼし→空文字→apply で誤って再作成しかねない）。
+        page1 = [{"id": f"c{i}", "name": f"other-{i}"} for i in range(1000)]
+        def fake(method, path, body=None):
+            if method == "GET" and path == "api/datastores/v1/collections?limit=1000&offset=0":
+                return {"collections": page1}
+            if method == "GET" and path == "api/datastores/v1/collections?limit=1000&offset=1000":
+                return {"collections": [{"id": "col-B", "name": pw.BUSINESS_COLLECTION_NAME}]}
+            raise AssertionError(f"unexpected call {method} {path}")
+        pw.request = fake
+        self.assertEqual(pw.resolve_collection_id(), "col-B")  # 2ページ目の既存を発見
+
 
 class ManualTriggerSafety(unittest.TestCase):
     def setUp(self):
@@ -303,6 +316,31 @@ class ExecutorEmailThreading(unittest.TestCase):
         exec_in = next(i for i in company_sub["data"]["input"] if i.get("paramName") == "executor_email")
         self.assertEqual(exec_in["mappedTo"], pw.VAR_EXECUTOR_EMAIL)
         self.assertEqual(pw.validate_layout(d), [], "executor_email 追加後もレイアウトは崩れない")
+
+
+class PinnedSubflowVersionGuard(unittest.TestCase):
+    """BK-005: released 親へ *ピンする* サブ版は active(released) 必須。active_version が draft へ
+    フォールバックするのに対し、ピン用途の active_version_for_pin は active 皆無なら release を促して止める。"""
+
+    def setUp(self):
+        self._orig = pw.request
+
+    def tearDown(self):
+        pw.request = self._orig
+
+    def _meta(self, versions):
+        pw.request = lambda method, path, body=None: {"versions": versions}
+
+    def test_returns_highest_active_version_not_higher_draft(self):
+        self._meta([{"version": "1.0.0", "active": True}, {"version": "1.0.3", "active": True},
+                    {"version": "2.0.0", "active": False}])  # 2.0.0 は未 release の draft
+        self.assertEqual(pw.active_version_for_pin("m"), "1.0.3")  # active の最大を選ぶ（draft は無視）
+
+    def test_raises_when_no_active_version_where_lax_resolver_would_pin_a_draft(self):
+        self._meta([{"version": "1.0.0", "active": False}, {"version": "1.0.1", "active": False}])  # draft のみ
+        self.assertEqual(pw.active_version("m")[0], "1.0.1")  # 緩い版は未 release の draft へフォールバック
+        with self.assertRaises(RuntimeError):
+            pw.active_version_for_pin("m")  # ピン用途は draft を返さず明示停止（divergence）
 
 
 if __name__ == "__main__":

@@ -904,7 +904,7 @@ class WorkflowModelAutomationTests(unittest.TestCase):
         PROVISION.WORKFLOW_MODEL_ID_PINNED = False
         client = FakeClient({
             ("GET", "api/workflow/v2/tools"): [],
-            ("GET", "api/workflow/v1/models"): [{"name": PROVISION.WORKFLOW_MODEL_NAME, "id": "found-1"}],
+            ("GET", "api/workflow/v1/models?limit=1000&offset=0"): [{"name": PROVISION.WORKFLOW_MODEL_NAME, "id": "found-1"}],
             ("GET", "api/workflow/v1/models/found-1"): {"versions": [{"version": "1.0.2"}]},
         })
         info = PROVISION.ensure_workflow_model(client)
@@ -917,7 +917,7 @@ class WorkflowModelAutomationTests(unittest.TestCase):
         PROVISION.WORKFLOW_MODEL_ID_PINNED = False
         client = FakeClient({
             ("GET", "api/workflow/v2/tools"): [],
-            ("GET", "api/workflow/v1/models"): [{"name": "someone-elses-model", "id": "other"}],
+            ("GET", "api/workflow/v1/models?limit=1000&offset=0"): [{"name": "someone-elses-model", "id": "other"}],
             ("POST", "api/workflow/v2/models"): {"id": "new-1"},
             ("GET", "api/workflow/v1/models/new-1"): {"versions": []},
             ("POST", "api/workflow/v2/models/new-1/versions"): {"version": "1.0.0"},
@@ -932,7 +932,7 @@ class WorkflowModelAutomationTests(unittest.TestCase):
         PROVISION.WORKFLOW_MODEL_ID_PINNED = False
         client = FakeClient({
             ("GET", "api/workflow/v2/tools"): [],
-            ("GET", "api/workflow/v1/models"): [],
+            ("GET", "api/workflow/v1/models?limit=1000&offset=0"): [],
             ("POST", "api/workflow/v2/models"): {},  # id が空 → 誤アセット解決を避けて即 raise
         })
         with self.assertRaises(RuntimeError):
@@ -948,7 +948,7 @@ class WorkflowModelAutomationTests(unittest.TestCase):
     def test_resolve_id_discovers_by_name(self):
         PROVISION.WORKFLOW_MODEL_ID = "stale-default"
         PROVISION.WORKFLOW_MODEL_ID_PINNED = False
-        client = FakeClient({("GET", "api/workflow/v1/models"): [
+        client = FakeClient({("GET", "api/workflow/v1/models?limit=1000&offset=0"): [
             {"name": "unrelated", "id": "x"},
             {"name": PROVISION.WORKFLOW_MODEL_NAME, "id": "found-9"},
         ]})
@@ -960,7 +960,7 @@ class WorkflowModelAutomationTests(unittest.TestCase):
         declared = "published-workflow-on-selected-instance"
         PROVISION.WORKFLOW_MODEL_ID = "SENTINEL-must-not-be-returned"
         PROVISION.WORKFLOW_MODEL_ID_PINNED = False
-        client = FakeClient({("GET", "api/workflow/v1/models"): []})
+        client = FakeClient({("GET", "api/workflow/v1/models?limit=1000&offset=0"): []})
         with tempfile.TemporaryDirectory() as tmp:
             manifest = pathlib.Path(tmp) / "manifest.json"
             manifest.write_text(json.dumps({"workflowsMapping": [{"modelId": declared}]}))
@@ -1120,6 +1120,122 @@ class CollectionOwnerAwarenessTests(unittest.TestCase):
         client = self._client_with_owner({})  # 所有者フィールドなし
         _, out = self._run(client, current_user_id="me-1")
         self.assertNotIn("owned by another user", out)
+
+
+class EnsureIdempotencyTests(unittest.TestCase):
+    """BK-008: ensure_package / ensure_dataflow / ensure_collection の reuse-vs-create 判定を
+    実関数で特性化する。従来の apply テストは両 ensure_* を record() スタブへ差し替えていたため、
+    「名称一致で既存を再利用＝共有インスタンスに重複資産を作らない」という provisioner の看板
+    不変条件が無検証だった（名称一致述語を壊すと毎回新規作成になる回帰を CI が検知できなかった）。"""
+
+    PKG_LIST = ("GET", "api/codeengine/v2/packages?limit=500&offset=0")
+    PKG_CREATE = ("POST", "api/codeengine/v2/packages")
+    DF_LIST = ("GET", "api/dataprocessing/v1/dataflows?limit=500&offset=0")
+    DF_CREATE = ("POST", "api/dataprocessing/v1/dataflows")
+    COL_LIST = ("GET", "api/datastores/v1/collections?limit=1000&offset=0")
+
+    def test_ensure_package_reuses_existing_by_name_without_creating(self):
+        source = "SENTINEL_SOURCE"
+        latest = ("GET", "api/codeengine/v2/packages/pkg-1/versions/latest?parts=code,functions,configuration,manifest")
+        client = FakeClient({
+            self.PKG_LIST: {"packages": [{"id": "pkg-1", "name": PROVISION.PACKAGE_NAME, "version": "1.0.5"}]},
+            latest: {"version": "1.0.5", "code": source, "functions": [{"name": "inventory_api"}]},
+        })
+        existing, version = PROVISION.ensure_package(client, source)
+        self.assertEqual(PROVISION._id(existing), "pkg-1")
+        self.assertEqual(version, "1.0.5")
+        self.assertFalse(any(m == "POST" for m, _, _ in client.calls))  # 再利用＝新規作成も新版も出さない
+
+    def test_ensure_package_creates_exactly_once_when_absent(self):
+        client = FakeClient({
+            self.PKG_LIST: {"packages": []},
+            self.PKG_CREATE: {"id": "pkg-new", "version": "1.0.0"},
+        })
+        _, version = PROVISION.ensure_package(client, "SRC")
+        self.assertEqual(version, "1.0.0")
+        creates = [c for c in client.calls if (c[0], c[1]) == self.PKG_CREATE]
+        self.assertEqual(len(creates), 1)  # 新規作成 POST はちょうど1回
+
+    def test_ensure_dataflow_reuses_existing_by_name_without_creating(self):
+        df_get = ("GET", "api/dataprocessing/v1/dataflows/df-1")
+        df_put = ("PUT", "api/dataprocessing/v1/dataflows/df-1")
+        client = FakeClient({
+            self.DF_LIST: {"dataflows": [{"id": "df-1", "name": PROVISION.DATAFLOW_NAME}]},
+            df_get: {"id": "df-1", "name": PROVISION.DATAFLOW_NAME, "outputs": [{"dataSourceId": "out-ds"}]},
+            df_put: {"id": "df-1"},
+        })
+        result = PROVISION.ensure_dataflow(client, "in-ds")
+        self.assertEqual(PROVISION._id(result), "df-1")
+        seen = [(c[0], c[1]) for c in client.calls]
+        self.assertNotIn(self.DF_CREATE, seen)  # 新規作成しない
+        self.assertIn(df_put, seen)             # 既存を PUT 更新（1入力へ寄せる）
+
+    def test_ensure_dataflow_creates_exactly_once_when_absent(self):
+        client = FakeClient({
+            self.DF_LIST: {"dataflows": []},
+            self.DF_CREATE: {"id": "df-new"},
+        })
+        result = PROVISION.ensure_dataflow(client, "in-ds")
+        self.assertEqual(PROVISION._id(result), "df-new")
+        creates = [c for c in client.calls if (c[0], c[1]) == self.DF_CREATE]
+        self.assertEqual(len(creates), 1)
+
+    def test_ensure_collection_creates_when_absent(self):
+        col_create = ("POST", "api/datastores/v1/collections?datastoreId=ds-1")
+        client = FakeClient({
+            self.COL_LIST: {"collections": []},
+            ("GET", "api/datastores/v1?limit=1000&offset=0"): {"datastores": [{"id": "ds-1", "name": PROVISION.DATASTORE_NAME}]},
+            col_create: {"id": "col-new"},
+        })
+        with contextlib.redirect_stdout(io.StringIO()):
+            result = PROVISION.ensure_collection(client, "")
+        self.assertEqual(PROVISION._id(result), "col-new")
+        self.assertIn(col_create, [(c[0], c[1]) for c in client.calls])  # コレクションを新規作成
+
+    def test_ensure_collection_puts_on_schema_drift(self):
+        drift = {"id": "col-1", "name": PROVISION.COLLECTION_NAME,
+                 "schema": {"columns": [{"name": "stale", "type": "STRING"}]}}  # 期待スキーマと不一致
+        col_put = ("PUT", "api/datastores/v1/collections/col-1")
+        client = FakeClient({self.COL_LIST: {"collections": [drift]}, col_put: {"id": "col-1"}})
+        with contextlib.redirect_stdout(io.StringIO()):
+            result = PROVISION.ensure_collection(client, "")
+        self.assertEqual(PROVISION._id(result), "col-1")
+        self.assertIn(col_put, [(c[0], c[1]) for c in client.calls])  # スキーマ差分→PUT 更新（作成はしない）
+        self.assertNotIn(("POST", "api/datastores/v1/collections?datastoreId="), [(c[0], c[1]) for c in client.calls])
+
+    def test_discover_by_name_paginates_beyond_first_page(self):
+        # BK-004: 既存資産が1ページ目(500件)より後ろにあっても、全ページを辿って発見し ensure_* が
+        # 重複を新規作成しない（単一ページ打ち切りだと取りこぼして毎回 create＝冪等契約を破る）。
+        page1 = [{"id": f"pkg-{i}", "name": f"other-{i}", "version": "1.0.0"} for i in range(500)]
+        target = {"id": "pkg-x", "name": PROVISION.PACKAGE_NAME, "version": "1.0.5"}
+        latest = ("GET", "api/codeengine/v2/packages/pkg-x/versions/latest?parts=code,functions,configuration,manifest")
+        client = FakeClient({
+            ("GET", "api/codeengine/v2/packages?limit=500&offset=0"): {"packages": page1},
+            ("GET", "api/codeengine/v2/packages?limit=500&offset=500"): {"packages": [target]},
+            latest: {"version": "1.0.5", "code": "S", "functions": [{"name": "inventory_api"}]},
+        })
+        existing, version = PROVISION.ensure_package(client, "S")
+        self.assertEqual(PROVISION._id(existing), "pkg-x")  # 2ページ目の既存を発見
+        self.assertEqual(version, "1.0.5")
+        self.assertFalse(any((c[0], c[1]) == self.PKG_CREATE for c in client.calls))  # 重複作成しない
+
+
+class WorkflowVersionParsingTests(unittest.TestCase):
+    """BK-013: workflow_version は厳密な3部 numeric semver だけを対象にし、共有・UI 編集可能な
+    モデルに非 semver ラベル（'v2'/'1.0'/'1.0.0-rc1'/空）が混ざっても落ちない（max/bump 前に弾く）。"""
+
+    def _client(self, versions):
+        path = ("GET", f"api/workflow/v1/models/{PROVISION.WORKFLOW_MODEL_ID}")
+        return FakeClient({path: {"versions": [{"version": v} for v in versions]}})
+
+    def test_ignores_non_semver_labels_and_picks_highest_numeric(self):
+        client = self._client(["1.0.0", "v2", "1.0.9", "1.0.10", "1.0.0-rc1", "1.0", ""])
+        self.assertEqual(PROVISION.workflow_version(client), "1.0.10")  # 非 semver を無視し numeric 最大
+
+    def test_raises_clearly_when_no_numeric_version(self):
+        client = self._client(["v2", "1.0", "draft"])
+        with self.assertRaises(RuntimeError):
+            PROVISION.workflow_version(client)  # クラッシュでなく明示エラーへ縮退
 
 
 if __name__ == "__main__":

@@ -48,12 +48,14 @@ class _FakeAppDB:
     seed で既存文書（任意の createdOn）を事前投入でき、create_fail / delete_fail で失敗を注入する。
     """
 
-    def __init__(self, seed=None, create_fail=False, delete_fail=False):
+    def __init__(self, seed=None, create_fail=False, delete_fail=False, hide_created=False):
         self.docs = {}
         self.seq = 0
         self.create_fail = create_fail
         self.delete_fail = delete_fail
+        self.hide_created = hide_created  # True: 作成直後の文書を query から隠す（read-after-write ラグ再現）
         self.deleted_ids = []
+        self.invisible_ids = set()
         for d in seed or []:
             self.docs[d["id"]] = d
 
@@ -67,10 +69,19 @@ class _FakeAppDB:
             doc = {"id": f"new{self.seq}", "createdOn": f"2026-10-05T00:00:{self.seq:02d}+00:00",
                    "content": body["content"]}
             self.docs[doc["id"]] = doc
+            if self.hide_created:
+                self.invisible_ids.add(doc["id"])  # ラグ: 作成直後は query にまだ現れない
             return {"id": doc["id"]}
         if m == "post" and "/documents/query" in base:
             key = body["content.doc_key"]["$eq"]
-            return [d for d in self.docs.values() if (d.get("content") or {}).get("doc_key") == key]
+            # AppDB は documents/query を limit/offset（クエリ文字列）でページングする。fake も同契約を
+            # 再現し、_save の複数ページ掃引（BK-016）と作成直後の不可視（BK-007）を検証可能にする。
+            params = dict(p.split("=", 1) for p in path.split("?", 1)[1].split("&")) if "?" in path else {}
+            limit = int(params.get("limit", "100000"))
+            offset = int(params.get("offset", "0"))
+            matched = [d for d in self.docs.values()
+                       if (d.get("content") or {}).get("doc_key") == key and d["id"] not in self.invisible_ids]
+            return matched[offset:offset + limit]
         if m == "delete" and "/documents/bulk" in base:
             if self.delete_fail:
                 raise RuntimeError("boom")
@@ -170,6 +181,16 @@ class ManualWorkflowTest(unittest.TestCase):
                 self.assertTrue(result["ok"], bad)
                 self.assertEqual(self.calls[-1][2]["data"], {}, bad)  # 不正値は data へ流さない
 
+    def test_start_drops_pattern_valid_but_overlong_executor_email(self):
+        # BK-014: 形式は妥当でも MAX_EXECUTOR_EMAIL_LEN 超過は長さ節で drop する（正規表現節とは独立）。
+        # 過去のテストは短い形式不正値だけで、長さ節は未到達だった。長さ節を外しても通る回帰を塞ぐ。
+        over = "a" * (ra.MAX_EXECUTOR_EMAIL_LEN - 5) + "@b.com"
+        self.assertGreater(len(over), ra.MAX_EXECUTOR_EMAIL_LEN)
+        self.assertTrue(ra.EMAIL_PATTERN.fullmatch(over))  # 正規表現は通る＝drop 理由は長さのみ
+        result = ra.pl_report_api("start", {"executor_email": over})
+        self.assertTrue(result["ok"])
+        self.assertEqual(self.calls[-1][2]["data"], {})  # 長さ超過は Workflow data へ流さない（Send Email 混入防止）
+
     def test_start_rejects_executor_email_combined_with_other_keys(self):
         # executor_email 以外のキーは従来どおり拒否（任意キーで別モデルを起動させない）。
         result = ra.pl_report_api("start", {"executor_email": "exec@example.com", "modelId": self.instance})
@@ -186,6 +207,15 @@ class ManualWorkflowTest(unittest.TestCase):
         self.rows = [{"id": self.instance, "modelId": GUID, "status": "IN_PROGRESS", "createdOn": "2026-10-14"},
                      {"id": "other", "modelId": GUID, "status": "COMPLETED", "createdOn": "2026-10-15"}]
         self.assertTrue(ra.pl_report_api("status", {})["running"])
+
+    def test_status_latest_instance_uses_time_not_lexicographic_order(self):
+        # BK-012: 精度混在の createdOn を「時刻」として比較する。'…01.500Z'(新) は '…01Z'(旧) より
+        # 新しいが、文字列比較だと '.'(0x2E) < 'Z'(0x5A) で順序が逆転し旧を最新と誤選択してしまう。
+        self.rows = [
+            {"id": "older", "modelId": GUID, "status": "COMPLETED", "createdOn": "2026-10-05T00:00:01Z"},
+            {"id": "newer", "modelId": GUID, "status": "COMPLETED", "createdOn": "2026-10-05T00:00:01.500Z"},
+        ]
+        self.assertEqual(ra.pl_report_api("status", {})["instance_id"], "newer")  # 時刻で新しい方を選ぶ
 
     def test_empty_history_is_idle_and_status_is_read_only(self):
         self.assertEqual(ra.pl_report_api("status", {})["status"], "IDLE")
@@ -301,6 +331,32 @@ class SaveDedupeTest(unittest.TestCase):
         self.assertEqual(out["deleted_stale"], 0)
         self.assertEqual(len(db.live_keys("K")), 2)
 
+    def test_save_under_read_after_write_lag_keeps_all_and_flags_pending(self):
+        # BK-007: 直後照会に新版がまだ現れないラグ下では、作成文書も旧版も消さない
+        # （observed=created フォールバック→POST 応答に createdOn 無し→created_time=None→
+        # stale 判定が成立しない）。consistency_pending=True を表面化し、旧版の掃除は後続 save に委ねる。
+        older = [_seed("old1", "K", "2026-10-01T00:00:00+00:00", "a"),
+                 _seed("old2", "K", "2026-10-02T00:00:00+00:00", "b")]
+        db = _FakeAppDB(seed=older, hide_created=True).install()
+        out = ra.pl_report_api("save", {"collection_id": GUID, "document": _full(html="new")})
+        self.assertTrue(out["ok"])
+        self.assertTrue(out["consistency_pending"])   # observed_now=False を表面化
+        self.assertEqual(out["deleted_stale"], 0)      # ラグ中は何も消さない（旧版も作成文書も）
+        self.assertEqual(db.deleted_ids, [])           # 作成した当の文書は絶対に消さない（不変条件①）
+        self.assertEqual(len(db.live_keys("K")), 3)    # old1・old2・新規（隠れているが格納済み）
+
+    def test_save_prunes_older_same_key_across_query_pages(self):
+        # BK-016: 同一 key の旧版が1ページ（1000件）を超えても、_save は offset を進めて全ページを
+        # 掃引し、厳密に古い全件を削除して作成文書だけ残す（fake も limit/offset を honor する）。
+        older = [_seed(f"old{i}", "K", "2026-10-01T00:00:00+00:00", "x") for i in range(1100)]
+        db = _FakeAppDB(seed=older).install()
+        out = ra.pl_report_api("save", {"collection_id": GUID, "document": _full(html="new")})
+        self.assertTrue(out["ok"])
+        self.assertEqual(out["deleted_stale"], 1100)   # 1000+100 を2ページ掃引で全件刈る
+        self.assertFalse(out["consistency_pending"])   # 作成文書は照会に現れる
+        live = db.live_keys("K")
+        self.assertEqual([d["content"]["analysis_html"] for d in live], ["new"])  # 作成文書だけ残る
+
 
 class SafetyGateTest(unittest.TestCase):
     """★ Finding 1: 不完全ドキュメントの保存は既存の正レポートを巻き添え削除しない。"""
@@ -355,6 +411,18 @@ class DocumentShapeTest(unittest.TestCase):
         stored = self.db.live_keys("K")[0]["content"]
         for leaked in ("report_type", "operation", "collection_id", "executor_email"):
             self.assertNotIn(leaked, stored)
+
+    def test_routing_and_pii_keys_dropped_from_nested_document(self):
+        # BK-011: 入れ子 document パスでも flat パスと同じく routing/PII キーを落とす（defense-in-depth）。
+        # 従来は flat 分岐だけ strip し、dict を直接渡す通常経路は未保護だった。
+        doc = dict(_full(html="p"), executor_email="exec@example.com", report_type="store",
+                   operation="save", collection_id=GUID)
+        ra.pl_report_api("save", {"collection_id": GUID, "document": doc})
+        stored = self.db.live_keys("K")[0]["content"]
+        for leaked in ("report_type", "operation", "collection_id", "executor_email"):
+            self.assertNotIn(leaked, stored)
+        self.assertEqual(stored["analysis_html"], "p")   # 正当なフィールドは残る
+        self.assertEqual(stored["store_id"], "JPN001")   # store_id 等の本文は維持
 
     def test_generated_at_autofilled_when_empty(self):
         ra.pl_report_api("save", {"collection_id": GUID, "document": _full()})

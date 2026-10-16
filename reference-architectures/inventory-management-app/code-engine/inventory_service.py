@@ -165,7 +165,14 @@ def _service() -> dict:
             raise Exception({"code": "CONFIGURATION_ERROR", "message": "AppDBコレクションが設定されていません。", "details": {}})
 
         if command in {"query", "find"}:
-            criteria = dict(content or {})
+            # content の追加条件は AppDB の documents/query が要求する content.<field> 名前空間へ
+            # 正規化する（record_type/field と同じ規則）。付与しないと生キー（例 is_shortage）が
+            # 格納フィールド content.is_shortage に一致せず、docstring が謳う絞り込みが黙って無効化する。
+            # 既に content. 付きのキーは二重付与しない。
+            criteria = {
+                (key if str(key).startswith("content.") else f"content.{key}"): val
+                for key, val in (content or {}).items()
+            }
             if record_type:
                 criteria["content.record_type"] = record_type
             if field:
@@ -300,6 +307,16 @@ def _service() -> dict:
             })
 
 
+    def num(value: Any) -> str:
+        # 整数は小数点を出さず、小数は6桁で丸める。見出し・不足一覧（describe_shortage）だけでなく、
+        # 自動経路（_register）・手動経路（_notify_now）が ALERT_HISTORY.notification_body に保存する
+        # 監査文面の桁表記も同じ規則で揃える（例: 38.0 ではなく 38）。
+        try:
+            number = round(float(value), 6)
+        except (TypeError, ValueError):
+            return "0"
+        return str(int(number)) if number == int(number) else str(number)
+
     # --- 通知整形の共有ユーティリティ（ディスパッチ対象の6ヘルパーではなく、自動経路
     #     _register と手動経路 _notify_now が同じ通知文面を作るための内部関数） ---
     def describe_shortage(row: dict, recovered: bool = False) -> str:
@@ -315,14 +332,6 @@ def _service() -> dict:
         Returns:
             「品目（コード） / ロケーション（コード）：現在庫 … ／ 基準在庫 … ／ 不足 …」形式の1行。
         """
-        def num(value: Any) -> str:
-            # 整数は小数点を出さず、小数は6桁で丸めて通知面の桁を _register の見込みと揃える。
-            try:
-                number = round(float(value), 6)
-            except (TypeError, ValueError):
-                return "0"
-            return str(int(number)) if number == int(number) else str(number)
-
         item_code = str(row.get("item_code") or "")
         location_code = str(row.get("location_code") or "")
         where = f"{row.get('item_name') or item_code}（{item_code}） / {row.get('location_name') or location_code}（{location_code}）"
@@ -524,6 +533,40 @@ def _service() -> dict:
             # 冪等リプレイでも内部フィールド(_document_id)は公開しない。LIST_MASTERS と同じ
             # 「AppDB の内部IDを FE 契約に漏らさない」方針に揃える。balance_after は元行から読む。
             transaction = {name: value for name, value in duplicate.items() if not name.startswith("_")}
+            # BK-002: AppDB 書込みは非アトミックなので、一度目が TRANSACTION 作成後・BALANCE 投影前に
+            # 落ちると投影が古いまま残り、同一 request_id のリプレイがここで早期 return して成功を装い、
+            # RECALCULATE が必要なことを誰にも知らせない。そこでリプレイ時に当該キーの BALANCE を
+            # 取引正本から再導出して idempotent に再 upsert し、半適用を自己修復する。duplicate 行の
+            # balance_after を直接書き戻さないのは重要: 並行オペレータが同キーに後続取引を入れていた
+            # 場合、古い時点残高へ巻き戻してしまう。RECALCULATE と同じ順序非依存の総和
+            # (signed_quantity の合計・6桁丸め+0.0・archived 除外) で現残高を作り直す。健全なリプレイ
+            # では同値を再投影するだけ(=live 残高は不変)。返却 balance は従来どおり時点の balance_after。
+            loc = str(duplicate.get("location_code") or "")
+            itm = str(duplicate.get("item_code") or "")
+            if loc and itm:
+                heal_key = f"{loc}|{itm}"
+                now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+                ledger = [row for row in _records("query", "TRANSACTION", field="item_code", value=itm)
+                          if str(row.get("location_code") or "") == loc and not _is_true(row.get("archived"))]
+                healed = round(sum(float(row.get("signed_quantity") or 0) for row in ledger), 6) + 0.0
+                last_at = max((str(row.get("occurred_at") or row.get("created_at") or "") for row in ledger), default="")
+                rule = _records("find", "RULE", field="rule_key", value=heal_key)
+                rule_active = bool(rule) and _is_true(rule.get("active", "true"))
+                minimum = float((rule or {}).get("minimum_quantity") or 0) if rule_active else 0.0
+                is_shortage = minimum > 0 and healed < minimum
+                _records("upsert", "BALANCE", record_key=f"BALANCE|{heal_key}", content={
+                    "balance_key": heal_key, "item_code": itm, "item_name": duplicate.get("item_name") or itm,
+                    "location_code": loc, "location_name": duplicate.get("location_name") or loc,
+                    "quantity": healed, "minimum_quantity": minimum,
+                    "shortage_quantity": round(max(minimum - healed, 0), 6) + 0.0, "is_shortage": is_shortage,
+                    "last_transaction_at": last_at, "updated_at": now,
+                })
+                # 不足解消済みなら据え置きの SHORTAGE を NORMAL へ掃除する(RECALCULATE と同じ一方向のみ。
+                # 逆向きの強制はしない＝未通知の不足で正当な SHORTAGE 通知を握り潰さないため)。
+                if not is_shortage:
+                    stale_alert = _records("find", "ALERT_STATE", field="balance_key", value=heal_key)
+                    if stale_alert and str(stale_alert.get("status")) == "SHORTAGE":
+                        _records("upsert", "ALERT_STATE", record_key=f"ALERT_STATE|{heal_key}", content={"status": "NORMAL", "updated_at": now})
             return {"ok": True, "duplicate": True, "transaction": transaction, "balance": {"quantity": duplicate.get("balance_after")}, "notification": {"triggered": False}}
 
         transaction_type = str(request.get("transaction_type") or "").upper()
@@ -610,7 +653,7 @@ def _service() -> dict:
         if event_type:
             alert_id = f"ALERT-{uuid.uuid4()}"
             subject = f"在庫{'回復' if event_type == 'RECOVERY' else '不足'}: {transaction['item_name']} / {transaction['location_name']}"
-            body = f"現在庫{after}、基準在庫{minimum}、不足数{shortage_quantity}です。"
+            body = f"現在庫{num(after)}、基準在庫{num(minimum)}、不足数{num(shortage_quantity)}です。"
             notification_enabled = str((rule or {}).get("notification_enabled", "true")).lower() in {"true", "1"}
             recipient_email = _resolve_recipient_email(request, user)
             workflow_ready = notification_enabled and "@" in recipient_email
@@ -702,7 +745,7 @@ def _service() -> dict:
         others = len(notifiable) - 1  # 監査本文の「ほかN件」は実際に集約する通知対象の残数に合わせる。
         alert_id = f"ALERT-{uuid.uuid4()}"
         subject = f"在庫不足（手動通知）: {item_name} / {location_name}"
-        body = f"現在庫{current_quantity}、基準在庫{minimum_quantity}、不足数{shortage_quantity}です。" + (f"ほか{others}件の不足があります。" if others > 0 else "")
+        body = f"現在庫{num(current_quantity)}、基準在庫{num(minimum_quantity)}、不足数{num(shortage_quantity)}です。" + (f"ほか{others}件の不足があります。" if others > 0 else "")
         _records("create", "ALERT_HISTORY", record_key=f"ALERT_HISTORY|{alert_id}", content={
             "alert_id": alert_id, "event_type": "MANUAL", "balance_key": str(worst.get("balance_key") or ""),
             "item_code": item_code, "item_name": item_name, "location_code": location_code, "location_name": location_name,

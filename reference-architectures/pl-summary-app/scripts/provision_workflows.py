@@ -240,19 +240,45 @@ def active_version(model_id: str) -> Tuple[str, str]:
     return str(row.get("version") or ""), str(row.get("manualTriggerId") or "")
 
 
+def active_version_for_pin(model_id: str) -> str:
+    """released 親へ **ピンする** 版を解決する厳格版（BK-005）。
+
+    `active_version` は active（released）版が無いと最高の draft へ黙ってフォールバックする。
+    read-only の verify ではそれで良いが、released な親 WF-01 の SUB_FLOW ノードへ未 release の draft を
+    ピンすると、Domo がランタイムで解決できず店舗/全社サブ実行が失敗する（provisioning は成功と報告）。
+    ピン用途ではフォールバックを許さず、active 版が無ければ release を促して明示的に止める。
+    """
+    versions = [r for r in model_meta(model_id).get("versions") or [] if isinstance(r, dict)]
+    active = [r for r in versions if r.get("active")]
+    if not active:
+        raise RuntimeError(
+            "統合サブWF に released（active）版がありません。released 親 WF-01 が未 release の draft を"
+            "参照すると実行時に解決できずサブ実行が失敗します。先に `subflow --apply --release` でサブWF を"
+            "release してから mainflow を実行してください（または --sub-version で明示）。")
+    return str(max(active, key=lambda r: version_key(str(r.get("version") or "0.0.0"))).get("version") or "")
+
+
 def highest_version(model_id: str) -> str:
     versions = [str(r.get("version") or "0.0.0") for r in model_meta(model_id).get("versions") or []]
     return max(versions, key=version_key) if versions else "1.0.0"
 
 
-def list_models() -> List[Dict[str, Any]]:
-    offset, page, rows = 0, 1000, []
+def _paged_items(base_path: str, key: str, page: int = 1000) -> List[Dict[str, Any]]:
+    """discover-by-name の列挙を全ページ辿って返す（BK-004）。1ページ上限で打ち切ると資産数が上限を
+    超えるインスタンスで既存を取りこぼし、`next((row ... name==X))` が None を返して重複作成/誤発見に
+    つながる。短いページが返るまで offset を進めて全件そろえる。base_path は limit/offset 無しのパス。"""
+    sep = "&" if "?" in base_path else "?"
+    offset, rows = 0, []
     while True:
-        batch = items(request("GET", f"api/workflow/v1/models?limit={page}&offset={offset}"), "models")
+        batch = items(request("GET", f"{base_path}{sep}limit={page}&offset={offset}"), key)
         rows.extend(batch)
         if len(batch) < page:
             return rows
         offset += page
+
+
+def list_models() -> List[Dict[str, Any]]:
+    return _paged_items("api/workflow/v1/models", "models", 1000)
 
 
 def ensure_model(name: str, description: str, apply: bool) -> Tuple[str, bool]:
@@ -278,7 +304,7 @@ def ensure_model(name: str, description: str, apply: bool) -> Tuple[str, bool]:
 
 def resolve_collection_id() -> str:
     """AppDB 業務コレクション（店舗別損益AI要約）を名前で発見して UUID を返す（インスタンス非依存）。"""
-    cols = items(request("GET", "api/datastores/v1/collections?limit=1000&offset=0"), "collections")
+    cols = _paged_items("api/datastores/v1/collections", "collections", 1000)
     row = next((c for c in cols if c.get("name") == BUSINESS_COLLECTION_NAME), {})
     return asset_id(row)
 
@@ -360,7 +386,7 @@ def ensure_report_api_package(apply: bool, model_id: str = "", subflow_id: str =
         source = source.replace("__MAIN_WORKFLOW_MODEL_ID__", model_id)
     if subflow_id:
         source = source.replace("__SUB_WORKFLOW_MODEL_ID__", subflow_id)
-    packages = items(request("GET", "api/codeengine/v2/packages?limit=1000&offset=0"), "packages")
+    packages = _paged_items("api/codeengine/v2/packages", "packages", 1000)
     package = next((r for r in packages if r.get("name") == REPORT_API_PACKAGE_NAME), None)
     if not package:
         if not apply:
@@ -403,7 +429,7 @@ def sync_workflow_manifest() -> Dict[str, Any]:
     model_id, _ = ensure_model(WF01_MODEL_NAME, "", False)
     subflow_id, _ = ensure_model(SUBFLOW_NAME, "", False)
     collection_id = resolve_collection_id()
-    package = next((r for r in items(request("GET", "api/codeengine/v2/packages?limit=1000&offset=0"), "packages")
+    package = next((r for r in _paged_items("api/codeengine/v2/packages", "packages", 1000)
                     if r.get("name") == REPORT_API_PACKAGE_NAME), {})
     package_id = asset_id(package)
     if not model_id or not subflow_id or not package_id or not collection_id:
@@ -1373,7 +1399,15 @@ def main() -> int:
     elif args.command == "subflow":
         cmd_subflow(args.apply, args.release, dry_dir)
     elif args.command == "mainflow":
-        sub_version = args.sub_version or active_version(SUBFLOW_MODEL_ID)[0]
+        # BK-005: --release で親 WF-01 を release する標準 mainflow 経路では、サブ版を未 release の
+        # draft へフォールバックさせない（released 親が draft 子を参照する実行時失敗を防ぐ）。
+        # --sub-version 明示なら尊重し、非 release なら従来どおり（draft 同士は整合）。
+        if args.sub_version:
+            sub_version = args.sub_version
+        elif args.release:
+            sub_version = active_version_for_pin(SUBFLOW_MODEL_ID)
+        else:
+            sub_version = active_version(SUBFLOW_MODEL_ID)[0]
         cmd_mainflow(args.apply, args.release, dry_dir, sub_version)
     elif args.command == "delete-wf03":
         cmd_delete_wf03(args.apply)

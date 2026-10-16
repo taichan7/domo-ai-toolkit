@@ -410,9 +410,15 @@ def generate_pl_data():
     """Generate the complete P&L dataset"""
     records = []
     
-    start_date = date(2024, 1, 1)
-    end_date = date(2025, 12, 31)
-    
+    # Rolling 24-month window derived from the run date so yesterday
+    # (CURRENT_DATE) always lands inside it, splitting Actual (through the
+    # current month) from Forecast (the next few months). A hardcoded
+    # 2024-2025 range left Forecast empty and Actual ~stale once the
+    # wall clock passed 2025-12.
+    current_month_first = CURRENT_DATE.replace(day=1)
+    end_date = current_month_first + relativedelta(months=4, days=-1)
+    start_date = current_month_first - relativedelta(months=20)
+
     current_date_iter = start_date
     while current_date_iter <= end_date:
         month = current_date_iter.month

@@ -129,6 +129,15 @@ DEV_GUIDE_PAGE_TITLE = "開発ガイド"
 DEV_GUIDE_CARD_TITLE = _sx("在庫管理リファレンス ガイド")
 DEV_GUIDE_STANDARD = (60, 82)  # ページ2 standard layout（自己フィットの縦スクロール文書）
 DEV_GUIDE_COMPACT = (12, 29)   # ページ2 compact layout（現行 12x6 はモバイルで低すぎ→上書き）
+# 参照（本番）デザイン id の単一ソース（本モジュールが正典）。これらはリポジトリに commit された
+# 共有ベースラインの design id。sync-manifest のサンドボックス経路では“これらだけ”を剥がして
+# `domo publish` に自分専用デザインを新規採番させ、参加者が一度採番した id は保持して再実行を
+# 冪等に保つ（無条件に剥がすと再 sync-manifest→publish が毎回別デザインを採番し orphan 化＝BK-006）。
+# rest_publish_design.py も PROVISION.REFERENCE_DESIGN_IDS を参照して同じ集合を共有する（単一の真実源）。
+REFERENCE_DESIGN_IDS = {
+    "e4e7b1d1-5c98-5cad-bd3c-ae902908a2af",  # pro-code 業務アプリ本体（在庫入出庫管理）
+    "bbf6886d-f16e-564d-92a4-b8d94ffa7101",  # dev-guide 開発ガイド
+}
 WORKFLOW_MODEL_ID = os.environ.get("DOMO_WORKFLOW_MODEL_ID", "").strip()
 # DOMO_WORKFLOW_MODEL_ID が明示指定されたか（＝既定値でなく人が固定したか）。指定時は
 # ensure_workflow_model が発見/作成せずその ID を尊重する（既存運用の互換）。既定のままなら
@@ -334,8 +343,26 @@ def current_user(client: DomoClient) -> Dict[str, Any]:
     return {"id": owner_id, "name": display_name or "Domo利用者"}
 
 
+def _paged(client: DomoClient, base_path: str, key: str, page: int = 500) -> List[Dict[str, Any]]:
+    """discover-by-name の列挙を全ページ辿って返す（BK-004）。
+
+    1ページ上限で打ち切ると、資産数が上限を超える成熟インスタンスで既存を取りこぼし、
+    後続の `next((row ... name==X))` が None を返して ensure_* が同名資産を重複作成する＝
+    「apply は名称で冪等」契約を破る。provision_workflows.list_models と同じく短いページが
+    返るまで offset を進めて全件そろえる。base_path は limit/offset を持たないパス（本関数が付与）。
+    """
+    sep = "&" if "?" in base_path else "?"
+    offset, rows = 0, []
+    while True:
+        batch = _items(client.request("GET", f"{base_path}{sep}limit={page}&offset={offset}"), key)
+        rows.extend(batch)
+        if len(batch) < page:
+            return rows
+        offset += page
+
+
 def list_collections(client: DomoClient) -> List[Dict[str, Any]]:
-    return _items(client.request("GET", "api/datastores/v1/collections?limit=1000&offset=0"), "collections")
+    return _paged(client, "api/datastores/v1/collections", "collections", 1000)
 
 
 def _collection_owner_id(collection: Dict[str, Any]) -> str:
@@ -466,7 +493,7 @@ def query_documents(client: DomoClient, collection_id: str, criteria: Optional[D
 
 
 def list_packages(client: DomoClient) -> List[Dict[str, Any]]:
-    return _items(client.request("GET", "api/codeengine/v2/packages?limit=500&offset=0"), "packages")
+    return _paged(client, "api/codeengine/v2/packages", "packages", 500)
 
 
 def deployed_source(collection_id: str, owner_id: str, datastore_id: str = "", workflow_model_id: str = "") -> str:
@@ -537,7 +564,7 @@ def invoke_inventory_api(client: DomoClient, package_id: str, version: str, oper
 
 
 def list_dataflows(client: DomoClient) -> List[Dict[str, Any]]:
-    return _items(client.request("GET", "api/dataprocessing/v1/dataflows?limit=500&offset=0"), "dataflows")
+    return _paged(client, "api/dataprocessing/v1/dataflows", "dataflows", 500)
 
 
 def output_dataset_id(dataflow: Dict[str, Any]) -> str:
@@ -636,9 +663,17 @@ def workflow_definition(client: DomoClient, version: str) -> Dict[str, Any]:
 def workflow_version(client: DomoClient) -> str:
     metadata = client.request("GET", f"api/workflow/v1/models/{WORKFLOW_MODEL_ID}") or {}
     versions = [str(row.get("version") if isinstance(row, dict) else row) for row in metadata.get("versions") or []]
-    if not versions:
-        raise RuntimeError("Inventory notification Workflow has no version")
-    return max(versions, key=lambda value: tuple(int(part) for part in value.split(".")))
+    # BK-013: sync_manifest（下記 re.fullmatch ガード）と同じく、厳密な3部 numeric semver だけを
+    # max/bump の対象にする。共有・UI 編集可能なモデルに 'v2' / '1.0' / '1.0.0-rc1' / 空 のような
+    # 非 semver ラベルが1つでも混ざると、素の int(part) が ValueError を、呼び出し側 parts[2] が
+    # IndexError を投げて apply/verify/workflow を不透明なトレースバックで巻き添え落としてしまう。
+    # _version_tuple は非数値を安全に切り詰めるが、2部ラベルを (1,0) と誤って比較に通してしまうため
+    # キー関数ではなく事前フィルタで弾く（current_version は常に x.y.z＝後段の版 bump も安全になる）。
+    numeric = [value for value in versions if re.fullmatch(r"\d+\.\d+\.\d+", value)]
+    if not numeric:
+        raise RuntimeError("Inventory notification Workflow has no numeric (x.y.z) version; "
+                           "release a semver version before provisioning.")
+    return max(numeric, key=_version_tuple)
 
 
 def workflow_last_run(client: DomoClient) -> Dict[str, Any]:
@@ -678,8 +713,13 @@ def manifest_dashboard_dataset_id() -> str:
 
 
 def list_workflow_models(client: DomoClient) -> List[Dict[str, Any]]:
-    """全 Workflow モデルの平坦な一覧（各行は name / owner を持つ）を返す。名称での発見に使う。"""
-    return [row for row in (client.request("GET", "api/workflow/v1/models") or []) if isinstance(row, dict)]
+    """全 Workflow モデルの平坦な一覧（各行は name / owner を持つ）を返す。名称での発見に使う。
+
+    BK-004: limit/offset 無しだとプラットフォーム既定ページ（〜50件とされる）で打ち切られ、
+    モデル数が多いインスタンスで既存の通知モデルを取りこぼして重複作成し得る。明示的な高 limit で
+    全ページを辿る（workflow models エンドポイントは provision_workflows.list_models と同じく
+    limit/offset を受ける）。"""
+    return _paged(client, "api/workflow/v1/models", "models", 1000)
 
 
 def resolve_send_email_package(client: DomoClient) -> Tuple[str, str]:
@@ -1262,9 +1302,13 @@ def sync_manifest(client: DomoClient) -> Dict[str, Any]:
     # domo-assets.json は従来どおり参加者ごとの state ディレクトリに分離＝共有台帳は汚さない。）
     # ⚠ryuu は id を「省略」したときのみ新規採番する（空文字 "" は失敗）ため、キーごと pop する。
     # 本番（名札なし）は id を保持したまま従来どおり pro-code へ書く（design は初回publishで採番済）。
+    # ⚠BK-006: 剥がすのは共有ベースライン（REFERENCE_DESIGN_IDS）を指すときだけ。初回 publish が
+    # 参加者専用デザインを採番して manifest へ書き戻した後の再 sync-manifest で“参加者採番 id”まで
+    # 剥がすと、続く publish が毎回さらに別デザインを採番して orphan を量産し隔離が崩れる。参加者
+    # 採番 id はそのまま残す＝再実行は冪等（docstring の「id は維持／差分ゼロ」とも一致）。
     manifest_out = MANIFEST_PATH
     stripped_id: Optional[str] = None
-    if SANDBOX and manifest.get("id"):
+    if SANDBOX and str(manifest.get("id") or "") in REFERENCE_DESIGN_IDS:
         stripped_id = str(manifest.pop("id"))
     if changes or stripped_id is not None:
         manifest_out.parent.mkdir(parents=True, exist_ok=True)

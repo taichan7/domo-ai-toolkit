@@ -61,10 +61,8 @@ PROVISION_PATH = SCRIPT_DIR / "provision_domo.py"
 # 共有参照デザインのライブ版を上書きする事故になる。サンドボックスの正順は「id を外した配布コピー
 # から publish して自分専用デザインを採番する」（dev-guide §7）ため、名札付きでこれらを指す publish は
 # --confirm / INVENTORY_ALLOW_PRODUCTION 無しでは拒否する（input-based の抜け穴を塞ぐ result-based 判定）。
-REFERENCE_DESIGN_IDS = {
-    "e4e7b1d1-5c98-5cad-bd3c-ae902908a2af",  # pro-code 業務アプリ本体（在庫入出庫管理）
-    "bbf6886d-f16e-564d-92a4-b8d94ffa7101",  # dev-guide 開発ガイド
-}
+# 集合の正典は provision_domo.py（REFERENCE_DESIGN_IDS）。下の PROVISION ロード後に束縛して共有する
+# （sync-manifest の id 剥がしと同じ集合を単一の真実源から使うため＝drift 防止 / BK-006）。
 
 # DESIGNS_BASE_URL from ryuu models/constants/endpoints.js (leading slash dropped
 # so it composes cleanly with client.base and client.request()'s lstrip('/')).
@@ -128,6 +126,8 @@ def _load_provision() -> Any:
 
 PROVISION = _load_provision()
 DomoApiError = PROVISION.DomoApiError
+# 参照（本番）デザイン id は provision_domo.py を正典として共有する（single source of truth）。
+REFERENCE_DESIGN_IDS = PROVISION.REFERENCE_DESIGN_IDS
 
 
 # ── Content type ───────────────────────────────────────────────────────────

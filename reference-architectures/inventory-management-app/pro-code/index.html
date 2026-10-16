@@ -29,14 +29,14 @@
         <div><strong>在庫入出庫管理</strong><small>Inventory operations</small></div>
       </div>
       <div class="topbar-actions">
-        <span id="sync-status" class="sync-status" role="status" hidden><span class="status-dot"></span>接続を確認中</span>
+        <span id="sync-status" class="sync-status" role="status" hidden><span class="status-dot"></span><span id="sync-status-label">接続を確認中</span></span>
         <button id="refresh-button" class="icon-button" type="button" aria-label="データを更新" title="更新"><svg class="ui-icon" aria-hidden="true"><use href="#icon-refresh"></use></svg></button>
         <div class="user-chip"><span id="user-initial">利</span><span id="user-name">利用者</span></div>
       </div>
     </header>
 
-    <aside class="sidebar" aria-label="メインナビゲーション">
-      <nav>
+    <aside class="sidebar">
+      <nav aria-label="メインナビゲーション">
         <button class="nav-item active" data-view="operations" type="button" aria-current="page"><svg class="nav-icon" aria-hidden="true"><use href="#icon-transfer"></use></svg><em>入出庫</em></button>
         <button class="nav-item" data-view="dashboard" type="button"><svg class="nav-icon" aria-hidden="true"><use href="#icon-dashboard"></use></svg><em>ダッシュボード</em></button>
         <button class="nav-item" data-view="history" type="button"><svg class="nav-icon" aria-hidden="true"><use href="#icon-history"></use></svg><em>履歴・管理</em></button>
@@ -130,10 +130,10 @@
       </section>
 
       <section id="view-dashboard" class="view" tabindex="-1" aria-labelledby="dashboard-title">
-        <div class="page-heading"><div><p class="eyebrow">アナリティクス</p><h1 id="dashboard-title">在庫ダッシュボード</h1><p>集計から品目・場所・日付を選び、現在庫と取引明細を確認できます。</p></div><div class="dashboard-actions"><span class="interaction-note"><svg class="ui-icon" aria-hidden="true"><use href="#icon-info"></use></svg>カーソルで内訳・クリックで明細</span></div></div>
+        <div class="page-heading"><div><p class="eyebrow">アナリティクス</p><h1 id="dashboard-title">在庫ダッシュボード</h1><p>集計から品目・ロケーション・日付を選び、現在庫と取引明細を確認できます。</p></div><div class="dashboard-actions"><span class="interaction-note"><svg class="ui-icon" aria-hidden="true"><use href="#icon-info"></use></svg>カーソルで内訳・クリックで明細</span></div></div>
         <div class="dashboard-toolbar">
-          <div class="search-wrap dashboard-search-wrap"><svg class="search-icon" aria-hidden="true"><use href="#icon-search"></use></svg><input id="dashboard-search" type="search" autocomplete="off" aria-label="品目・場所・不足・滞留を検索" placeholder="品目・場所・不足・滞留を検索"></div>
-          <div class="toolbar-workflow"><span class="toolbar-workflow-hint">不足品目の担当者へメール通知するWorkflowを実行</span><button id="run-notification" class="secondary-button" type="button" title="不足品目の担当者へメール通知するWorkflowをその場で実行します。"><svg class="button-icon" aria-hidden="true"><use href="#icon-bell"></use></svg>AI在庫通知を実行</button></div>
+          <div class="search-wrap dashboard-search-wrap"><svg class="search-icon" aria-hidden="true"><use href="#icon-search"></use></svg><input id="dashboard-search" type="search" autocomplete="off" aria-label="品目・ロケーション・不足・滞留を検索" placeholder="品目・ロケーション・不足・滞留を検索"></div>
+          <div class="toolbar-workflow"><span class="toolbar-workflow-hint">在庫不足サマリーを実行ユーザー宛てにメール通知するWorkflowを実行</span><button id="run-notification" class="secondary-button" type="button" title="現在の在庫不足サマリーを、実行ユーザー（あなた）のメールアドレス宛てにその場で送信します。"><svg class="button-icon" aria-hidden="true"><use href="#icon-bell"></use></svg>AI在庫通知を実行</button></div>
         </div>
         <div id="kpi-grid" class="kpi-grid"></div>
         <article class="panel ai-note-panel"><div class="panel-heading"><div><h2>AI在庫コメント</h2><p>生成AIが品目ごとに要約</p></div><span class="ai-note-tag">AI生成</span></div><div id="ai-note-list"></div></article>
@@ -144,7 +144,7 @@
             <article class="panel shortage-panel"><div class="panel-heading"><div><h2>在庫不足</h2><p>補充確認が必要な品目</p></div><span class="panel-action-hint">不足明細</span></div><div id="shortage-list" class="dash-scroll"></div><nav id="shortage-pager" class="pager pager-compact" aria-label="在庫不足のページ送り" hidden></nav></article>
           </div>
           <div class="dashboard-row row-secondary">
-            <article class="panel chart-panel location-stock-panel"><div class="panel-heading"><div><h2>ロケーション別在庫</h2><p>現在の数量構成</p></div><span class="panel-action-hint">場所明細</span></div><div id="location-chart" class="bar-chart dash-scroll"></div><nav id="location-pager" class="pager pager-compact" aria-label="ロケーション別在庫のページ送り" hidden></nav></article>
+            <article class="panel chart-panel location-stock-panel"><div class="panel-heading"><div><h2>ロケーション別在庫</h2><p>現在の数量構成</p></div><span class="panel-action-hint">ロケーション明細</span></div><div id="location-chart" class="bar-chart dash-scroll"></div><nav id="location-pager" class="pager pager-compact" aria-label="ロケーション別在庫のページ送り" hidden></nav></article>
             <article class="panel dormant-panel"><div class="panel-heading"><div><h2>滞留在庫</h2><p>最終取引から30日超</p></div><span class="panel-action-hint">滞留明細</span></div><div id="dormant-list" class="dash-scroll"></div><nav id="dormant-pager" class="pager pager-compact" aria-label="滞留在庫のページ送り" hidden></nav></article>
           </div>
         </div>
@@ -160,7 +160,7 @@
           <button id="record-tab-rule" class="record-tab admin-only" data-record="rule" type="button" role="tab" aria-selected="false" tabindex="-1" hidden>基準在庫</button>
         </div>
         <div class="panel filter-panel" id="history-filter">
-          <label for="history-search">検索<input id="history-search" type="search" placeholder="品目、場所、担当者、日付"></label>
+          <label for="history-search">検索<input id="history-search" type="search" placeholder="品目、ロケーション、担当者、日付"></label>
           <label for="history-type">種別<select id="history-type"><option value="">すべて</option><option value="IN">入庫</option><option value="OUT">出庫</option></select></label>
           <button id="history-refresh" class="secondary-button" type="button">更新</button>
           <button id="history-clear" class="secondary-button" type="button">条件をクリア</button>
@@ -168,7 +168,7 @@
         <div class="master-detail" id="record-panel-history" role="tabpanel" aria-labelledby="record-tab-transactions">
           <div class="panel table-panel md-list">
             <div class="table-caption"><span><svg class="ui-icon" aria-hidden="true"><use href="#icon-info"></use></svg>行を選択すると右側に明細を表示します</span><strong id="history-result-count" aria-live="polite">0件</strong></div>
-            <div class="table-scroll"><table><thead id="history-head"></thead><tbody id="history-body"></tbody></table></div>
+            <div class="table-scroll"><table><caption class="sr-only" id="history-caption">取引履歴</caption><thead id="history-head"></thead><tbody id="history-body"></tbody></table></div>
             <nav id="history-pager" class="pager" aria-label="取引履歴のページ送り" hidden></nav>
           </div>
           <aside class="panel md-detail" id="detail-pane" aria-labelledby="detail-title">
@@ -202,11 +202,11 @@
                   <label>品目<select id="master-rule-item"></select></label>
                   <label>基準在庫数<input id="master-rule-minimum" type="number" min="0" step="1" inputmode="numeric" placeholder="10"></label>
                 </div>
-                <label class="master-active-toggle" id="master-active-row" hidden><input id="master-active" type="checkbox"><span>入出庫で選択できる状態にする（オフにすると一時停止・元に戻せます）</span></label>
-                <p class="master-note" id="master-note">「削除」はこの項目をAppDBから完全に削除します（取り消せません）。基準在庫や現在庫などの関連データも一緒に削除されますが、入出庫・通知の履歴は監査証跡として残ります。一時的に止めたいだけなら上の切り替えで停止できます。</p>
+                <label class="master-active-toggle" id="master-active-row" hidden><input id="master-active" type="checkbox"><span>入出庫で選択できるようにする（オフにすると停止中・元に戻せます）</span></label>
+                <p class="master-note" id="master-note">「削除」はこの項目をAppDBから完全に削除します（取り消せません）。基準在庫や現在庫などの関連データも一緒に削除されますが、入出庫・通知の履歴は監査証跡として残ります。一時的に止めたいだけなら、チェックボックス「入出庫で選択できるようにする」をオフにしてください（元に戻せます）。</p>
                 <div class="button-row">
                   <button id="master-delete" class="secondary-button danger" type="button" hidden>削除</button>
-                  <button id="master-submit" class="primary-button" type="submit">登録・更新</button>
+                  <button id="master-submit" class="primary-button" type="submit">登録する</button>
                 </div>
               </form>
             </div>
@@ -253,7 +253,7 @@
     </form>
   </dialog>
 
-  <dialog id="confirm-dialog" class="modal confirm-modal" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+  <dialog id="confirm-dialog" class="modal confirm-modal" aria-labelledby="confirm-title" aria-describedby="confirm-details confirm-message">
     <form method="dialog" class="modal-card">
       <div class="modal-heading"><div><span class="step-label">実行前の確認</span><h2 id="confirm-title">実行の確認</h2></div><button class="close-button" type="submit" value="cancel" aria-label="確認を閉じる">×</button></div>
       <dl id="confirm-details" class="confirm-details"></dl>
@@ -264,7 +264,7 @@
 
   <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
 
-  <div id="toast-region" class="toast-region" aria-live="polite"></div>
+  <div id="toast-region" class="toast-region"></div>
   <div id="loading-overlay" class="loading-overlay" role="status" hidden><div class="spinner"></div><p>処理しています</p></div>
 
   <script src="boot-diagnostics.js"></script>

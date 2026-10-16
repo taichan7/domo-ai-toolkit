@@ -235,6 +235,21 @@ class SandboxFeManifestWiring(unittest.TestCase):
             self.assertEqual(result["manifestPath"], str(manifest_path))  # 配布コピー自身へ書く
             self.assertNotIn("id", written)  # ryuu は id 省略で新規採番（空文字では失敗）＝キーごと除去
 
+    def test_sandbox_keeps_participant_minted_design_id(self):
+        # BK-006: 初回 publish が採番した“参加者専用デザイン id”は再 sync-manifest でも剥がさない。
+        # 無条件に剥がすと続く publish が毎回別デザインを採番して orphan を量産するため、参照
+        # ベースライン(REFERENCE_DESIGN_IDS)以外の id は保持して再実行を冪等に保つ。
+        minted = "11111111-2222-3333-4444-555555555555"  # 参照集合に無い＝参加者採番
+        seed = {"id": minted, "version": "1.0.0",
+                "collectionsMapping": [{"name": "c", "id": "x"}],
+                "datasetsMapping": [{"alias": "d", "dataSetId": "x", "fields": []}]}
+        with env_module(INVENTORY_SANDBOX_SUFFIX=SUFFIX) as m:
+            self.assertNotIn(minted, m.REFERENCE_DESIGN_IDS)  # 前提: 参照集合に無い
+            result, written, _ = self._run_sync(m, seed)
+            self.assertTrue(result["sandbox"])
+            self.assertFalse(result["designIdStripped"])  # 参加者採番 id は剥がさない
+            self.assertEqual(written.get("id"), minted)    # 保持＝再 sync-manifest→publish が冪等
+
     def test_production_retains_top_level_id(self):
         seed = {"id": "e4e7b1d1-5c98-5cad-bd3c-ae902908a2af", "version": "1.0.0",
                 "collectionsMapping": [{"name": "c", "id": "x"}],

@@ -256,6 +256,117 @@ class InventoryServiceTest(unittest.TestCase):
         self.assertEqual(alerts[0]["notification_status"], "STARTED")
         self.assertEqual(alerts[0]["workflow_instance_id"], "wf-instance-1")
 
+    def test_alert_history_body_formats_whole_quantities_without_decimal(self):
+        # BK-009: 整数数量の不足は監査本文 ALERT_HISTORY.notification_body も見出し(describe_shortage)
+        # と同じ桁で保存する（38.0 ではなく 38）。残高 20→8、基準 10、不足 2 ＝全整数。
+        self._register("in-20", "IN", 20)
+        result = self._register("out-12", "OUT", 12)
+        alert = SERVICE._records("find", "ALERT_HISTORY", field="alert_id", value=result["notification"]["alert_id"])
+        self.assertEqual(alert["notification_body"], "現在庫8、基準在庫10、不足数2です。")
+        self.assertNotIn(".0", alert["notification_body"])
+
+    def test_manual_notification_body_formats_whole_quantities_without_decimal(self):
+        # BK-009: 手動通知(_notify_now / NOTIFY_NOW)の監査本文も同じ桁規則で保存する。
+        self._register("in-20", "IN", 20)
+        self._register("out-12", "OUT", 12)
+        manual = self._api("NOTIFY_NOW", {})
+        self.assertTrue(manual["ok"])
+        rows = [a for a in SERVICE._records("query", "ALERT_HISTORY") if a.get("event_type") == "MANUAL"]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["notification_body"], "現在庫8、基準在庫10、不足数2です。")
+        self.assertNotIn(".0", rows[0]["notification_body"])
+
+    def test_records_query_content_conditions_use_content_prefix(self):
+        # BK-010: query/find の追加条件(content=)は AppDB の content.<field> 名前空間へ正規化して
+        # 送る。生キーのまま送ると本物の AppDB では格納フィールド content.<field> に一致せず、
+        # docstring が謳う絞り込みが黙って無効化する（fake は content. を剥がして照合するため
+        # 機能面では差が出ず、送信ボディを直接検証する）。
+        captured = []
+        original = FAKE.send_request
+        def spy(method, url, body=None):
+            if "documents/query" in url:
+                captured.append(dict(body or {}))
+            return original(method, url, body)
+        FAKE.send_request = spy
+        self.addCleanup(setattr, FAKE, "send_request", original)
+        SERVICE._records("query", "BALANCE", content={"is_shortage": True})
+        self.assertTrue(captured)
+        self.assertIn("content.is_shortage", captured[0])
+        self.assertNotIn("is_shortage", captured[0])  # 生キーのままでは送らない
+        self.assertEqual(captured[0].get("content.record_type"), "BALANCE")
+
+    def test_replay_self_heals_stale_balance_projection(self):
+        # BK-002: 一度目が TRANSACTION 作成後・BALANCE 投影前に落ちた半適用状態を再現し、
+        # 同一 request_id のリプレイが当該キーの BALANCE を取引正本から作り直す(自己修復)。
+        self._register("in-20", "IN", 20)  # BALANCE=20
+        # 二度目(OUT 5)の TRANSACTION だけ記録され、BALANCE 投影前に落ちた状態を手で作る。
+        SERVICE._records("create", "TRANSACTION", record_key="TRANSACTION|TRX-out5", content={
+            "transaction_id": "TRX-out5", "request_id": "out-5", "transaction_type": "OUT",
+            "item_code": "ITEM-001", "item_name": "安全手袋", "location_code": "LOC-01", "location_name": "中央倉庫",
+            "quantity": 5, "signed_quantity": -5, "balance_before": 20, "balance_after": 15,
+            "occurred_at": "2026-10-16T00:00:00Z", "created_at": "2026-10-16T00:00:00Z",
+        })
+        stale = self._api("GET_STATE", {"location_code": "LOC-01", "item_code": "ITEM-001"})
+        self.assertEqual(stale["balance"]["quantity"], 20)  # 投影は古いまま
+        replay = self._register("out-5", "OUT", 5)  # 重複として扱われ BALANCE を再導出
+        self.assertTrue(replay["duplicate"])
+        self.assertEqual(replay["balance"]["quantity"], 15)  # 返却は時点 balance_after
+        healed = self._api("GET_STATE", {"location_code": "LOC-01", "item_code": "ITEM-001"})
+        self.assertEqual(healed["balance"]["quantity"], 15)  # 永続 BALANCE が 15 へ自己修復
+
+    def test_replay_does_not_regress_balance_when_later_transaction_exists(self):
+        # BK-002: duplicate 行の balance_after を直接書き戻さず台帳から再導出するため、
+        # 後続取引のある同キーをリプレイしても現残高を巻き戻さない(退行防止)。
+        self._register("in-20", "IN", 20)        # 20
+        self._register("out-5a", "OUT", 5)       # 15
+        self._register("out-5b", "OUT", 5)       # 10（後続取引）
+        current = self._api("GET_STATE", {"location_code": "LOC-01", "item_code": "ITEM-001"})
+        self.assertEqual(current["balance"]["quantity"], 10)
+        replay = self._register("out-5a", "OUT", 5)  # 先行取引 out-5a のリプレイ
+        self.assertTrue(replay["duplicate"])
+        self.assertEqual(replay["balance"]["quantity"], 15)  # 返却は out-5a 時点の balance_after
+        after = self._api("GET_STATE", {"location_code": "LOC-01", "item_code": "ITEM-001"})
+        self.assertEqual(after["balance"]["quantity"], 10)  # 現残高は 10 のまま（巻き戻らない）
+
+    def test_replay_leaves_live_balance_and_alert_rows_unchanged(self):
+        # BK-017: 健全なリプレイ（半適用でない）は live BALANCE 数量も ALERT_STATE/ALERT_HISTORY/
+        # TRANSACTION 件数も変えない（BK-002 の自己修復は同値を再投影するだけ＝観測可能な副作用なし）。
+        # 件数のみの従来アサートより強く、分岐先で投影を二重適用する回帰を固定する。
+        self._register("in-20", "IN", 20)
+        self._register("out-12", "OUT", 12)  # 不足遷移（ALERT_HISTORY 1件・ALERT_STATE 1件）
+        def snapshot():
+            q = lambda t: len(SERVICE._records("query", t))
+            bal = self._api("GET_STATE", {"location_code": "LOC-01", "item_code": "ITEM-001"})["balance"]["quantity"]
+            return bal, q("ALERT_HISTORY"), q("ALERT_STATE"), q("TRANSACTION")
+        before = snapshot()
+        replay = self._register("out-12", "OUT", 12)  # 同一 request_id の健全リプレイ
+        self.assertTrue(replay["duplicate"])
+        self.assertEqual(snapshot(), before)  # 残高・各監査件数すべて不変
+
+    def test_record_leaves_pending_when_alert_history_not_yet_queryable(self):
+        # BK-015: 監査行(ALERT_HISTORY)が作成直後まだ query に反映されないラグ下では、record() は
+        # 再試行しても見つからず、重複行を作らずに status 更新を諦めて PENDING のまま残す（raise しない）。
+        frozen = []
+
+        class _Frozen:
+            def sleep(_self, seconds):
+                frozen.append(seconds)  # クロックは進めない＝ALERT_HISTORY は最後まで不可視
+
+        original = SERVICE.time
+        SERVICE.time = _Frozen()
+        self.addCleanup(lambda: setattr(SERVICE, "time", original))
+        # ALERT_HISTORY だけ反映遅延を課す（他種別は即可視＝register の happy path を保つ）。
+        FAKE.lag_exempt_record_types = {"BALANCE", "ALERT_STATE", "TRANSACTION", "ITEM", "LOCATION", "RULE"}
+        FAKE.create_visibility_lag = 100.0
+        self._register("in-20", "IN", 20)
+        result = self._register("out-12", "OUT", 12)  # 不足遷移→ALERT_HISTORY 作成＋通知起動
+        self.assertTrue(result["ok"])          # record() の空振りは register を失敗にしない
+        self.assertGreater(len(frozen), 0)      # 反映待ちで実際にバックオフした（分岐に到達）
+        alert_rows = [r["content"] for r in FAKE.stores["records"]
+                      if r["content"].get("record_type") == "ALERT_HISTORY"]
+        self.assertEqual(len(alert_rows), 1)    # 重複 ALERT_HISTORY を作らない
+        self.assertEqual(alert_rows[0]["notification_status"], "PENDING")  # 状態更新を諦め PENDING のまま
+
     def test_register_records_failed_when_workflow_start_fails(self):
         # Workflow起動の失敗は在庫登録の結果を覆さない。CE は ALERT_HISTORY に FAILED と理由を残し、
         # Pro Code は notification.workflow_started=False / workflow_error を見て利用者へ伝える。

@@ -141,7 +141,7 @@ test('all master saves, including active changes, require confirmation and retai
     h.get('master-rule-minimum').value = '5';
     h.app.submitMaster({preventDefault() {}});
     assert.equal(h.calls.length, 0);
-    assert.match(h.get('confirm-details').innerHTML, /一時停止/);
+    assert.match(h.get('confirm-details').innerHTML, /停止中/);  // INV-027: 無効化状態は「停止中」へ統一
     h.get('master-item-name').value = '確認後の未承認変更';
     h.get('confirm-dialog').close('default');
     await settle();
@@ -239,4 +239,25 @@ test('changed registration draft or revoked master permission cannot execute a s
   h.get('confirm-dialog').close('default');
   await settle();
   assert.equal(h.calls.length, 0);
+});
+
+test('マスタ物理削除の確認に影響範囲（連鎖削除の現在庫・拠点数・基準在庫件数）を定量表示する（INV-017）', () => {
+  const h = harness();
+  h.app.state.data.balances = [
+    {item_code: 'ITEM-01', location_code: 'LOC-01', quantity: 1000},
+    {item_code: 'ITEM-01', location_code: 'LOC-02', quantity: 250},
+    {item_code: 'ITEM-09', location_code: 'LOC-01', quantity: 3},
+  ];
+  h.app.state.data.rules = [
+    {item_code: 'ITEM-01', location_code: 'LOC-01', rule_key: 'LOC-01|ITEM-01'},
+    {item_code: 'ITEM-01', location_code: 'LOC-02', rule_key: 'LOC-02|ITEM-01'},
+  ];
+  h.app.confirmMasterDelete('item', 'ITEM-01', '安全手袋');
+  const details = h.get('confirm-details').innerHTML;
+  assert.match(details, /影響範囲/);
+  assert.match(details, /2拠点に現在庫 計1,250 \/ 基準在庫2件を同時削除/);
+  // 基準在庫（rule）単体の削除は在庫を道連れにしないため、影響範囲行は出さない。
+  const h2 = harness();
+  h2.app.confirmMasterDelete('rule', 'LOC-01|ITEM-01', 'LOC-01 / ITEM-01');
+  assert.doesNotMatch(h2.get('confirm-details').innerHTML, /影響範囲/);
 });

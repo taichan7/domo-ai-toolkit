@@ -294,8 +294,26 @@ def current_user(client: DomoClient) -> Dict[str, Any]:
 # --------------------------------------------------------------------------- #
 # AppDB collections
 # --------------------------------------------------------------------------- #
+def _paged(client: DomoClient, base_path: str, key: str, page: int = 500) -> List[Dict[str, Any]]:
+    """discover-by-name の列挙を全ページ辿って返す（BK-004）。
+
+    1ページ上限で打ち切ると、資産数が上限を超える成熟インスタンスで既存を取りこぼし、後続の
+    `next((row ... name==X))` が None を返して ensure_* が同名資産を重複作成する＝「apply は名称で
+    冪等」契約を破る。短いページが返るまで offset を進めて全件そろえる。base_path は limit/offset を
+    持たないパス（本関数が付与）。
+    """
+    sep = "&" if "?" in base_path else "?"
+    offset, rows = 0, []
+    while True:
+        batch = _items(client.request("GET", f"{base_path}{sep}limit={page}&offset={offset}"), key)
+        rows.extend(batch)
+        if len(batch) < page:
+            return rows
+        offset += page
+
+
 def list_collections(client: DomoClient) -> List[Dict[str, Any]]:
-    return _items(client.request("GET", "api/datastores/v1/collections?limit=1000&offset=0"), "collections")
+    return _paged(client, "api/datastores/v1/collections", "collections", 1000)
 
 
 def _ensure_datastore(client: DomoClient, name: str) -> str:
@@ -384,7 +402,7 @@ def resolve_seed_dataset(client: DomoClient, wait_seconds: int = 60) -> Tuple[Di
 # Code Engine
 # --------------------------------------------------------------------------- #
 def list_packages(client: DomoClient) -> List[Dict[str, Any]]:
-    return _items(client.request("GET", "api/codeengine/v2/packages?limit=500&offset=0"), "packages")
+    return _paged(client, "api/codeengine/v2/packages", "packages", 500)
 
 
 def dedupe_function_manifest() -> List[Dict[str, Any]]:
@@ -432,7 +450,7 @@ def ensure_package(client: DomoClient) -> Tuple[Dict[str, Any], str]:
 # DataFlow (Magic ETL v2) rebuilt from captured 2042.json
 # --------------------------------------------------------------------------- #
 def list_dataflows(client: DomoClient) -> List[Dict[str, Any]]:
-    return _items(client.request("GET", "api/dataprocessing/v1/dataflows?limit=500&offset=0"), "dataflows")
+    return _paged(client, "api/dataprocessing/v1/dataflows", "dataflows", 500)
 
 
 def _flow_output_ids(dataflow: Dict[str, Any]) -> Dict[str, str]:

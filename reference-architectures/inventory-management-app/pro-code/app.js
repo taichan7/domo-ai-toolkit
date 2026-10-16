@@ -111,7 +111,8 @@
     if (status) {
       status.hidden = false;
       status.classList.add('error');
-      if (status.lastChild) status.lastChild.textContent = '起動エラー';
+      const label = byId('sync-status-label');  // INV-061: 安定ラベル要素へ書く（lastChild 頼みを排す）
+      if (label) label.textContent = '起動エラー';
     }
     if (global.InventoryBoot && typeof global.InventoryBoot.fail === 'function') {
       global.InventoryBoot.fail(error);
@@ -120,7 +121,7 @@
 
   function cacheElements() {
     [
-      'sync-status', 'user-initial', 'user-name', 'location-search', 'item-search', 'location-options', 'item-options',
+      'sync-status', 'sync-status-label', 'history-caption', 'user-initial', 'user-name', 'location-search', 'item-search', 'location-options', 'item-options',
       'selected-location', 'selected-location-code', 'selected-item', 'selected-item-code', 'current-stock', 'minimum-stock',
       'quantity', 'reason', 'stock-preview', 'review-list', 'submit-button', 'recent-operations', 'kpi-grid', 'item-chart', 'location-chart',
       'trend-chart', 'shortage-list', 'dormant-list', 'ai-note-list', 'dashboard-search', 'history-search', 'history-type', 'history-head', 'history-body',
@@ -373,6 +374,9 @@
   function setConnectionStatus(mode) {
     const node = elements['sync-status'];
     if (!node) return;
+    // INV-061: ラベルは安定要素 #sync-status-label に書き、末尾テキストノード頼み（lastChild）を使わない
+    //（ドットを別行にする整形や末尾テキスト削除で lastChild が dot span や null になる脆さを排す）。
+    const label = elements['sync-status-label'];
     node.className = 'sync-status';
     if (mode === 'connected') {
       node.hidden = true;
@@ -380,10 +384,10 @@
     }
     node.hidden = false;
     if (mode === 'demo') {
-      node.lastChild.textContent = 'ローカルデモ';
+      if (label) label.textContent = 'ローカルデモ';
     } else {
       node.classList.add('error');
-      node.lastChild.textContent = '接続エラー';
+      if (label) label.textContent = '接続エラー';
     }
   }
 
@@ -626,7 +630,7 @@
     }
     if (after < 0) node.classList.add('error');
     else if (minimum > 0 && after < minimum) node.classList.add('warning');
-    const suffix = after < 0 ? '（在庫不足のため登録不可）' : minimum > 0 && after < minimum ? '（基準在庫を下回ります）' : '';
+    const suffix = after < 0 ? '（在庫数を超えるため登録できません）' : minimum > 0 && after < minimum ? '（基準在庫を下回ります）' : '';
     const unit = state.item.unit || '';
     const operation = state.transactionType === 'OUT' ? '出庫' : '入庫';
     const operator = state.transactionType === 'OUT' ? '−' : '＋';
@@ -647,7 +651,7 @@
       ['ロケーション', `${state.location.location_name} (${state.location.location_code})`],
       ['品目', `${state.item.item_name} (${state.item.item_code})`],
       ['数量', `${number.format(state.quantity)} ${state.item.unit || ''}`],
-      ['登録後見込み在庫', `${number.format(projectedQuantity())} ${state.item.unit || ''}（現在 ${number.format(Number(currentBalance()?.quantity || 0))} ${state.item.unit || ''} ${state.transactionType === 'OUT' ? '−' : '＋'} ${number.format(state.quantity)} ${state.item.unit || ''}）`],
+      ['登録後の見込み在庫', `${number.format(projectedQuantity())} ${state.item.unit || ''}（現在 ${number.format(Number(currentBalance()?.quantity || 0))} ${state.item.unit || ''} ${state.transactionType === 'OUT' ? '−' : '＋'} ${number.format(state.quantity)} ${state.item.unit || ''}）`],
       ['理由・メモ', state.reason || '—']
     ];
     elements['review-list'].innerHTML = rows.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join('');
@@ -657,7 +661,7 @@
 
   function validateDraft() {
     if (!state.location || !state.item) return 'ロケーションと品目を選択してください。';
-    if (!isActive(state.location) || !isActive(state.item)) return '無効なマスターは登録できません。';
+    if (!isActive(state.location) || !isActive(state.item)) return '停止中のロケーションまたは品目には登録できません。先に対象を有効化してください。';
     if (!Number.isFinite(state.quantity) || !Number.isInteger(state.quantity) || state.quantity < config.quantityMinimum || state.quantity > config.quantityMaximum) return `数量は${number.format(config.quantityMinimum)}以上${number.format(config.quantityMaximum)}以下の整数で入力してください。`;
     if (state.transactionType === 'OUT' && projectedQuantity() < 0) return '在庫数を超える出庫は登録できません。';
     return '';
@@ -691,7 +695,7 @@
         ['ロケーション', `${state.location.location_name}（${payload.location_code}）`],
         ['品目', `${state.item.item_name}（${payload.item_code}）`],
         ['数量', `${operation} ${number.format(payload.quantity)} ${unit}`],
-        ['見込み在庫', `${number.format(Number(currentBalance()?.quantity || 0))} → ${number.format(projectedQuantity())} ${unit}`],
+        ['登録後の見込み在庫', `${number.format(Number(currentBalance()?.quantity || 0))} → ${number.format(projectedQuantity())} ${unit}`],
         ['理由・メモ', payload.reason || '—']
       ],
       actionLabel: 'はい、登録する',
@@ -772,7 +776,7 @@
     const recipient = {operator_email: state.user.email || '', operator_display_name: state.user.name || ''};
     showActionConfirmation({
       title: 'AI在庫通知を実行しますか？',
-      message: '実行時点の在庫不足をCode Engineで確認し、AIが通知文を作成してメールを送信します。不足がない場合は通知しません。',
+      message: '実行時点の在庫不足をCode Engineで確認し、AIが通知文を作成して実行ユーザー宛てにメールを送信します。不足がない場合は通知しません。',
       details: [['通知先', recipient.operator_email || '実行時にDomoユーザーのメールアドレスを確認します']],
       actionLabel: 'はい、通知を実行する',
       trigger: elements['run-notification'],
@@ -854,7 +858,7 @@
   /**
    * 在庫ダッシュボードの一覧行を、上部ツールバーの横断検索語で絞り込む。
    *
-   * 検索対象は各行が持ちうる表示項目（品目名/コード・場所名/コード・分類・ゾーン・表示ラベル）を
+   * 検索対象は各行が持ちうる表示項目（品目名/コード・ロケーション名/コード・分類・ゾーン・表示ラベル）を
    * 1本の文字列へ連結したもの。品目別在庫・ロケーション別在庫・在庫不足・滞留在庫の4パネルで共用する。
    * KPI・7日間トレンド・AIコメントは集計/時系列のため呼び出し側で対象外にしている。
    * 検索語が空なら元の配列をそのまま返し、絞り込み前と完全に同じ表示にする（無退行）。
@@ -866,7 +870,10 @@
     const query = state.dashboardQuery;
     if (!query) return rows;
     return rows.filter((row) => {
-      const haystack = [row.label, row.item_code, row.item_name, row.category, row.location_code, row.location_name, row.zone]
+      // 状態トークン（不足/滞留）を haystack へ合成し、検索プレースホルダの約束どおり
+      // 「不足」「滞留」で該当パネルを絞り込めるようにする（INV-013。record_type が状態の真実源）。
+      const stateToken = row.record_type === 'SHORTAGE' ? '不足' : (row.record_type === 'DORMANT' ? '滞留' : '');
+      const haystack = [row.label, row.item_code, row.item_name, row.category, row.location_code, row.location_name, row.zone, stateToken]
         .filter((value) => value != null && value !== '')
         .join(' ')
         .toLocaleLowerCase('ja-JP');
@@ -939,14 +946,17 @@
       return (row, index) => {
         const value = Number(row.metric_value || 0);
         const share = total > 0 ? value / total * 100 : 0;
-        return `<button type="button" class="bar-row chart-hit" data-drill-kind="${kind}" data-drill-index="${index}" data-tooltip-title="${escapeAttribute(row.label)}" data-tooltip-detail="${escapeAttribute(`現在庫 ${number.format(value)} / 構成比 ${number.format(share)}%`)}"><span class="bar-label">${escapeHtml(row.label)}</span><span class="bar-track"><span style="width:${Math.max(2, value / maximum * 100)}%"></span></span><b>${number.format(value)}</b><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button>`;
+        return `<button type="button" class="bar-row chart-hit" data-drill-kind="${kind}" data-drill-index="${index}" data-tooltip-title="${escapeAttribute(row.label)}" data-tooltip-detail="${escapeAttribute(`現在庫 ${number.format(value)} / 構成比 ${number.format(share)}%`)}"><span class="bar-label">${escapeHtml(row.label)}</span><span class="bar-track"><span style="width:${barPct(value, maximum)}%"></span></span><b>${number.format(value)}</b><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button>`;
       };
     }
 
     const trend = rows.filter((row) => row.record_type === 'TREND').sort((a, b) => String(a.date_key).localeCompare(String(b.date_key))).slice(-config.analytics.trendWindowDays);
     state.dashboardDrilldowns.trend = trend;
-    const trendMax = Math.max(...trend.flatMap((row) => [Number(row.inbound_quantity || 0), Number(row.outbound_quantity || 0)]), 1);
-    elements['trend-chart'].innerHTML = trend.length ? trend.map((row, index) => `<button type="button" class="trend-column chart-hit" data-drill-kind="trend" data-drill-index="${index}" aria-label="${escapeAttribute(`${formatDisplayDate(row.date_key)} 入庫 ${number.format(Number(row.inbound_quantity || 0))} 出庫 ${number.format(Number(row.outbound_quantity || 0))}`)}" data-tooltip-title="${escapeAttribute(formatDisplayDate(row.date_key))}" data-tooltip-detail="${escapeAttribute(`入庫 ${number.format(Number(row.inbound_quantity || 0))} / 出庫 ${number.format(Number(row.outbound_quantity || 0))}`)}"><span class="trend-bars"><span style="height:${Math.max(2, Number(row.inbound_quantity || 0) / trendMax * 100)}%"></span><span class="out" style="height:${Math.max(2, Number(row.outbound_quantity || 0) / trendMax * 100)}%"></span></span><small>${escapeHtml(formatShortDate(row.date_key))}</small></button>`).join('') : emptyHtml(`直近${config.analytics.trendWindowDays}日間の取引がありません。`);
+    // barRowHtml と同じ方針で、配列を可変長スプレッドで Math.max へ展開しない（大規模データで
+    // 実行系の引数上限を超え RangeError になる反パターンを避ける）。reduce で1行ずつ畳み、各行は
+    // 固定アリティの Math.max(max, 入, 出) に収める＝trend 件数に依らず安全（INV-043）。
+    const trendMax = trend.reduce((max, row) => Math.max(max, Number(row.inbound_quantity || 0), Number(row.outbound_quantity || 0)), 1);
+    elements['trend-chart'].innerHTML = trend.length ? trend.map((row, index) => `<button type="button" class="trend-column chart-hit" data-drill-kind="trend" data-drill-index="${index}" aria-label="${escapeAttribute(`${formatDisplayDate(row.date_key)} 入庫 ${number.format(Number(row.inbound_quantity || 0))} 出庫 ${number.format(Number(row.outbound_quantity || 0))}`)}" data-tooltip-title="${escapeAttribute(formatDisplayDate(row.date_key))}" data-tooltip-detail="${escapeAttribute(`入庫 ${number.format(Number(row.inbound_quantity || 0))} / 出庫 ${number.format(Number(row.outbound_quantity || 0))}`)}"><span class="trend-bars"><span style="height:${barPct(row.inbound_quantity, trendMax)}%"></span><span class="out" style="height:${barPct(row.outbound_quantity, trendMax)}%"></span></span><small>${escapeHtml(formatShortDate(row.date_key))}</small></button>`).join('') : emptyHtml(`直近${config.analytics.trendWindowDays}日間の取引がありません。`);
 
     const shortages = filterDashboardRows(rows.filter((row) => row.record_type === 'SHORTAGE').sort((a, b) => Number(b.shortage_quantity || 0) - Number(a.shortage_quantity || 0)));
     state.dashboardDrilldowns.shortage = shortages;
@@ -1227,21 +1237,24 @@
     resetDetailPane();
     const query = normalizedSearch(elements['history-search'].value);
     const type = elements['history-type'].value;
+    // 表のアクセシブル名（INV-034）。1画面に複数の表が並ぶため、SR の表一覧で取引/通知を区別できるよう
+    // モードに応じた隠しキャプションを与える。
+    if (elements['history-caption']) elements['history-caption'].textContent = state.historyMode === 'alerts' ? '通知履歴' : '取引履歴';
     let rows;
     let renderRow;
     let emptyColspan;
     let emptyMessage;
     if (state.historyMode === 'alerts') {
       elements['history-type'].closest('label').hidden = true;
-      elements['history-head'].innerHTML = '<tr><th scope="col">日時</th><th scope="col">イベント</th><th scope="col">品目</th><th scope="col">場所</th><th scope="col">在庫 / 基準</th><th scope="col">通知</th><th scope="col">件名</th><th scope="col" aria-label="詳細"></th></tr>';
-      rows = [...state.data.alerts].filter((row) => !query || `${row.item_code || ''} ${row.item_name || ''} ${row.location_code || ''} ${row.location_name || ''} ${row.notification_subject || ''} ${row.created_at || ''} ${row.alert_id || ''}`.toLocaleLowerCase('ja-JP').includes(query)).sort(sortNewest('created_at'));
+      elements['history-head'].innerHTML = '<tr><th scope="col">日時</th><th scope="col">イベント</th><th scope="col">品目</th><th scope="col">ロケーション</th><th scope="col">在庫 / 基準</th><th scope="col">通知</th><th scope="col">件名</th><th scope="col" aria-label="詳細"></th></tr>';
+      rows = [...state.data.alerts].filter((row) => !query || `${row.item_code || ''} ${row.item_name || ''} ${row.location_code || ''} ${row.location_name || ''} ${row.notification_subject || ''} ${row.created_at || ''} ${formatDate(row.created_at)} ${formatDisplayDate(row.created_at)} ${row.alert_id || ''}`.toLocaleLowerCase('ja-JP').includes(query)).sort(sortNewest('created_at'));
       renderRow = (row, index) => `<tr class="drilldown-row" data-history-index="${index}"><td>${formatDate(row.created_at)}</td><td><span class="status-pill ${row.event_type === 'RECOVERY' ? 'recovery' : 'shortage'}">${escapeHtml(row.event_type === 'RECOVERY' ? '回復' : '不足')}</span></td><td>${escapeHtml(row.item_name || row.item_code)}</td><td>${escapeHtml(row.location_name || row.location_code)}</td><td>${number.format(Number(row.current_quantity || 0))} / ${number.format(Number(row.minimum_quantity || 0))}</td><td><span class="status-pill ${statusClass(row.notification_status)}">${escapeHtml(statusLabel(row.notification_status))}</span></td><td>${escapeHtml(row.notification_subject || '—')}</td><td class="drill-cell"><button type="button" class="drill-btn" aria-label="${escapeAttribute(row.item_name || row.item_code)}の明細を開く"><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button></td></tr>`;
       emptyColspan = 8;
       emptyMessage = '通知履歴がありません。';
     } else {
       elements['history-type'].closest('label').hidden = false;
-      elements['history-head'].innerHTML = '<tr><th scope="col">日時</th><th scope="col">種別</th><th scope="col">品目</th><th scope="col">場所</th><th scope="col">数量</th><th scope="col">残高</th><th scope="col">担当者</th><th scope="col">理由</th><th scope="col" aria-label="詳細"></th></tr>';
-      rows = [...state.data.transactions].filter((row) => (!type || row.transaction_type === type) && (!query || `${row.item_code || ''} ${row.item_name || ''} ${row.location_code || ''} ${row.location_name || ''} ${row.operator_name || ''} ${row.reason || ''} ${row.occurred_at || ''} ${row.transaction_id || ''} ${row.request_id || ''}`.toLocaleLowerCase('ja-JP').includes(query))).sort(sortNewest('occurred_at'));
+      elements['history-head'].innerHTML = '<tr><th scope="col">日時</th><th scope="col">種別</th><th scope="col">品目</th><th scope="col">ロケーション</th><th scope="col">数量</th><th scope="col">残高</th><th scope="col">担当者</th><th scope="col">理由</th><th scope="col" aria-label="詳細"></th></tr>';
+      rows = [...state.data.transactions].filter((row) => (!type || row.transaction_type === type) && (!query || `${row.item_code || ''} ${row.item_name || ''} ${row.location_code || ''} ${row.location_name || ''} ${row.operator_name || ''} ${row.reason || ''} ${row.occurred_at || ''} ${formatDate(row.occurred_at)} ${formatDisplayDate(row.occurred_at)} ${row.transaction_id || ''} ${row.request_id || ''}`.toLocaleLowerCase('ja-JP').includes(query))).sort(sortNewest('occurred_at'));
       renderRow = (row, index) => {
         const cls = row.transaction_type === 'OUT' ? 'pending' : 'sent';
         return `<tr class="drilldown-row" data-history-index="${index}"><td>${formatDate(row.occurred_at)}</td><td><span class="status-pill ${cls}">${escapeHtml(transactionLabel(row.transaction_type))}</span></td><td>${escapeHtml(row.item_name || row.item_code)}</td><td>${escapeHtml(row.location_name || row.location_code)}</td><td>${number.format(Number(row.quantity || 0))}</td><td>${number.format(Number(row.balance_after || 0))}</td><td>${escapeHtml(row.operator_name || row.operator_user_id || '—')}</td><td>${escapeHtml(row.reason || '—')}</td><td class="drill-cell"><button type="button" class="drill-btn" aria-label="${escapeAttribute(row.item_name || row.item_code)}の明細を開く"><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button></td></tr>`;
@@ -1379,14 +1392,14 @@
   function openHistoryRow(index) {
     const row = state.historyVisibleRows[index];
     if (!row) return;
-    // マスター（一覧）で選択行を強調し、詳細（ペイン）を同一ビュー内で差し替える。
+    // マスタ（一覧）で選択行を強調し、詳細（ペイン）を同一ビュー内で差し替える。
     state.selectedHistoryIndex = index;
     highlightSelectedHistoryRow();
     if (state.historyMode === 'alerts') openAlertDetail(row);
     else openTransactionDetail(row);
   }
 
-  /** 選択中の履歴行だけに is-selected を付け、他行から外す（マスター側のカレント表示）。 */
+  /** 選択中の履歴行だけに is-selected を付け、他行から外す（マスタ側のカレント表示）。 */
   function highlightSelectedHistoryRow() {
     elements['history-body'].querySelectorAll('.drilldown-row').forEach((node) => {
       const selected = Number(node.dataset.historyIndex) === state.selectedHistoryIndex;
@@ -1474,8 +1487,8 @@
       openDetail({
         eyebrow: '要対応',
         title: row.label,
-        subtitle: '基準在庫を下回る品目と場所',
-        content: detailStats([['不足箇所', shortages.length], ['不足数量', shortages.reduce((sum, item) => sum + Number(item.shortage_quantity || 0), 0)]]) + aiNoteSection(shortages) + detailSection('不足一覧', detailTable(['品目', '場所', '現在', '基準', '不足'], shortages.map((item) => [item.item_name || item.item_code, item.location_name || item.location_code, number.format(Number(item.quantity || item.current_quantity || 0)), number.format(Number(item.minimum_quantity || 0)), number.format(Number(item.shortage_quantity || 0))]))),
+        subtitle: '基準在庫を下回る品目とロケーション',
+        content: detailStats([['不足箇所', shortages.length], ['不足数量', shortages.reduce((sum, item) => sum + Number(item.shortage_quantity || 0), 0)]]) + aiNoteSection(shortages) + detailSection('不足一覧', detailTable(['品目', 'ロケーション', '現在', '基準', '不足'], shortages.map((item) => [item.item_name || item.item_code, item.location_name || item.location_code, number.format(Number(item.quantity || item.current_quantity || 0)), number.format(Number(item.minimum_quantity || 0)), number.format(Number(item.shortage_quantity || 0))]), '不足一覧')),
         historyFilter: {mode: 'alerts', query: '', type: ''}
       });
       return;
@@ -1505,7 +1518,7 @@
       eyebrow: '品目ドリルダウン',
       title: label || itemCode || '品目明細',
       subtitle: itemCode || '分析DataSetの集計名で照合',
-      content: detailStats([['現在庫', total], ['保管場所', balances.length], ['取引件数', transactions.length]]) + aiNoteSection(balances) + detailSection('ロケーション別現在庫', renderBalanceDetails(balances)) + detailSection('直近の取引', renderDetailTransactions(transactions.slice(0, config.ui.detailTransactionLimit))),
+      content: detailStats([['現在庫', total], ['ロケーション数', balances.length], ['取引件数', transactions.length]]) + aiNoteSection(balances) + detailSection('ロケーション別現在庫', renderBalanceDetails(balances)) + detailSection('直近の取引', renderDetailTransactions(transactions.slice(0, config.ui.detailTransactionLimit))),
       historyFilter: {mode: 'transactions', query: itemCode || label, type: ''}
     });
   }
@@ -1546,7 +1559,7 @@
     openDetail({
       eyebrow: '不足明細',
       title: row.item_name || row.item_code || '在庫不足',
-      subtitle: `${row.location_name || row.location_code || '場所未設定'} / 補充確認が必要`,
+      subtitle: `${row.location_name || row.location_code || 'ロケーション未設定'} / 補充確認が必要`,
       content: detailStats([['現在庫', Number(row.quantity || row.current_quantity || 0)], ['基準在庫', Number(row.minimum_quantity || 0)], ['不足数量', Number(row.shortage_quantity || 0)]]) + aiNoteSection([row]) + detailSection('直近の取引', renderDetailTransactions(transactions.slice(0, config.ui.detailTransactionLimit))),
       historyFilter: {mode: 'transactions', query: row.item_code || row.item_name || '', type: ''}
     });
@@ -1557,7 +1570,7 @@
     openDetail({
       eyebrow: '滞留明細',
       title: row.item_name || row.item_code || '滞留在庫',
-      subtitle: `${row.location_name || row.location_code || '場所未設定'} / ${number.format(Number(row.age_days || 0))}日取引なし`,
+      subtitle: `${row.location_name || row.location_code || 'ロケーション未設定'} / ${number.format(Number(row.age_days || 0))}日取引なし`,
       content: detailStats([['現在庫', Number(row.quantity || 0)], ['経過日数', Number(row.age_days || 0)], ['取引件数', transactions.length]]) + aiNoteSection([row]) + detailSection('過去の取引', renderDetailTransactions(transactions.slice(0, config.ui.detailTransactionLimit))),
       historyFilter: {mode: 'transactions', query: row.item_code || row.item_name || '', type: ''}
     });
@@ -1800,12 +1813,12 @@
       const quantity = Number(row.quantity || 0);
       const minimum = minimumForBalance(row);
       return [row.item_name || row.item_code || '—', row.location_name || row.location_code || '—', number.format(quantity), number.format(minimum), minimum > 0 && quantity < minimum ? '不足' : '正常'];
-    }));
+    }), '在庫明細');
   }
 
   function renderDetailTransactions(rows) {
     if (!rows.length) return '<div class="empty-state">該当する取引はありません。</div>';
-    return detailTable(['日時', '種別', '品目・場所', '数量', '残高'], rows.map((row) => [formatDate(row.occurred_at), transactionLabel(row.transaction_type), `${row.item_name || row.item_code || '—'} / ${row.location_name || row.location_code || '—'}`, number.format(Number(row.quantity || 0)), number.format(Number(row.balance_after || 0))]));
+    return detailTable(['日時', '種別', '品目・ロケーション', '数量', '残高'], rows.map((row) => [formatDate(row.occurred_at), transactionLabel(row.transaction_type), `${row.item_name || row.item_code || '—'} / ${row.location_name || row.location_code || '—'}`, number.format(Number(row.quantity || 0)), number.format(Number(row.balance_after || 0))]), '取引明細');
   }
 
   function detailStats(rows) {
@@ -1820,9 +1833,11 @@
     return `<dl class="detail-definition">${rows.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join('')}</dl>`;
   }
 
-  function detailTable(headers, rows) {
+  function detailTable(headers, rows, caption) {
+    // 表のアクセシブル名（INV-034）。ドリルダウン明細も SR の表一覧で種別が分かるよう隠しキャプションを添える。
+    const cap = caption ? `<caption class="sr-only">${escapeHtml(caption)}</caption>` : '';
     if (!rows.length) return '<div class="empty-state">明細がありません。</div>';
-    return `<div class="detail-table-wrap"><table class="detail-table"><thead><tr>${headers.map((header) => `<th scope="col">${escapeHtml(header)}</th>`).join('')}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((value) => `<td>${escapeHtml(value)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    return `<div class="detail-table-wrap"><table class="detail-table">${cap}<thead><tr>${headers.map((header) => `<th scope="col">${escapeHtml(header)}</th>`).join('')}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((value) => `<td>${escapeHtml(value)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
   }
 
   /**
@@ -1901,7 +1916,7 @@
     ['master-item-code', 'master-location-code'].forEach((id) => { if (elements[id]) elements[id].readOnly = false; });
     if (elements['master-rule-location']) { elements['master-rule-location'].disabled = false; elements['master-rule-location'].selectedIndex = 0; }
     if (elements['master-rule-item']) { elements['master-rule-item'].disabled = false; elements['master-rule-item'].selectedIndex = 0; }
-    if (elements['master-submit']) { elements['master-submit'].textContent = '登録・更新'; elements['master-submit'].hidden = false; }
+    if (elements['master-submit']) { elements['master-submit'].textContent = '登録する'; elements['master-submit'].hidden = false; }
     if (elements['master-delete']) elements['master-delete'].hidden = true;
     // 状態トグルは既存レコードの編集時のみ表示（新規は常に有効で登録する）。
     if (elements['master-active-row']) elements['master-active-row'].hidden = true;
@@ -2011,7 +2026,10 @@
     // .detail-table-wrap（枠線＋角丸の入れ子カード）を流用すると、列見出しの下の縁だけが丸く
     // 見えて履歴表と不揃いになる。スクロール枠は親の #master-list（.master-list）が担い、
     // 見出しは共通の sticky th（#f3f6fc・角丸なしでフラット）に揃える。
-    return `<table class="master-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+    // 表のアクセシブル名（INV-034）。履歴表と並ぶ画面で品目/ロケーション/基準在庫のどのマスタ一覧かを
+    // SR が区別できるよう、現在のマスタ種別から隠しキャプションを与える。
+    const caption = `${MASTER_LABELS[state.masterTab] || 'マスタ'}の一覧`;
+    return `<table class="master-table"><caption class="sr-only">${escapeHtml(caption)}</caption><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
   }
 
   function masterRowHtml(tab, code, label, cells, active) {
@@ -2062,10 +2080,10 @@
     }
     const editing = Boolean(state.masterEditKey);
     const editKey = state.masterEditKey;
-    details.push(['状態', fields.active === false ? '一時停止（元に戻せます）' : '有効']);
+    details.push(['状態', fields.active === false ? '停止中（元に戻せます）' : '有効']);
     showActionConfirmation({
       title: `${MASTER_LABELS[tab]}を${editing ? '更新' : '登録'}しますか？`,
-      message: '以下の内容を保存します。有効・一時停止の変更は、入出庫の選択肢と基準在庫の判定に反映されます。',
+      message: '以下の内容を保存します。有効・停止中の変更は、入出庫の選択肢と基準在庫の判定に反映されます。',
       details,
       actionLabel: 'はい、保存する',
       trigger: event?.submitter || elements['master-submit'],
@@ -2161,13 +2179,30 @@
 
   // 物理削除の確認ダイアログ。不可逆であること・関連データも連鎖削除されること・
   // ただし台帳(履歴)は残ることを明示し、一時停止したいだけなら状態トグルへ誘導する。
+  function masterDeleteImpact(tab, code) {
+    // 品目/ロケーションの物理削除で道連れになる現在庫・相手側の拠点/品目数・基準在庫件数を、メモリ上の
+    // state.data から定量化する（INV-017。基準在庫〔rule〕単体の削除は在庫を道連れにしないため対象外）。
+    if (tab !== 'item' && tab !== 'location') return '';
+    const field = tab === 'item' ? 'item_code' : 'location_code';
+    const otherField = tab === 'item' ? 'location_code' : 'item_code';
+    const otherLabel = tab === 'item' ? '拠点' : '品目';
+    const balances = state.data.balances.filter((row) => row[field] === code);
+    const rules = state.data.rules.filter((row) => row[field] === code);
+    const totalQty = balances.reduce((sum, row) => sum + Number(row.quantity || 0), 0);
+    const otherCount = new Set(balances.map((row) => row[otherField])).size;
+    return `${otherCount}${otherLabel}に現在庫 計${number.format(totalQty)} / 基準在庫${rules.length}件を同時削除`;
+  }
+
   function confirmMasterDelete(tab, code, label) {
     if (!state.user.isAdmin) return;
     const typeLabel = tab === 'item' ? '品目' : tab === 'location' ? 'ロケーション' : '基準在庫';
+    const details = [['削除対象', `${label || code}（${code}）`]];
+    const impact = masterDeleteImpact(tab, code);
+    if (impact) details.push(['影響範囲', impact]);  // 不可逆操作の影響範囲を定量で見せる
     showActionConfirmation({
       title: `${typeLabel}を完全に削除しますか？`,
-      message: 'この項目をAppDBから完全に削除します。この操作は取り消せません。関連する基準在庫や現在庫も一緒に削除されますが、入出庫・通知の履歴は監査証跡として残ります。一時的に止めたいだけなら、削除せず「有効の切り替え」で停止できます。',
-      details: [['削除対象', `${label || code}（${code}）`]],
+      message: 'この項目をAppDBから完全に削除します。この操作は取り消せません。関連する基準在庫や現在庫も一緒に削除されますが、入出庫・通知の履歴は監査証跡として残ります。一時的に止めたいだけなら、削除せずチェックボックス「入出庫で選択できるようにする」をオフにしてください（停止中・元に戻せます）。',
+      details,
       actionLabel: 'はい、完全に削除する',
       danger: true,
       trigger: elements['master-delete'],
@@ -2300,6 +2335,14 @@
 
   function sortNewest(field) {
     return (a, b) => new Date(b[field] || 0).getTime() - new Date(a[field] || 0).getTime();
+  }
+
+  function barPct(raw, denom) {
+    // 棒のサイズ(%)。真のゼロ（在庫0・入出庫0の静かな日）は 0 幅/0 高で描き、最小クランプ(2%)の
+    // 「わずかに有り」の瘤を出さない＝ゼロと少量を見分けられる（INV-023）。値>0 のときだけ最小 2% を
+    // 下限にし、負値・分母0（全ゼロ）は 0 にする（0/0 の NaN 棒も防ぐ）。
+    const value = Number(raw) || 0;
+    return value > 0 && denom > 0 ? Math.max(2, value / denom * 100) : 0;
   }
 
   function formatDate(value) {

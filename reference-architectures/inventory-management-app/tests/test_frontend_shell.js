@@ -60,13 +60,17 @@ test('調整(ADJUST)は概念ごと廃止し、UIから完全に取り除く', (
   assert.doesNotMatch(app, /'ADJUST'/, "app.js に 'ADJUST' 分岐が残っている");
 });
 
-test('トースト領域は aria-live=polite のみとし、aria-atomic で古いトーストを読み直させない', () => {
-  // 各トーストは role=alert / role=status を自前で持つため、領域側の aria-atomic=true は
-  // 新規トースト追加時に既存トーストまで読み直させてしまう。領域は polite のみに保つ。
+test('トーストは単一ライブソース＝容器の aria-live を外し子の role(alert/status) に委ねる（INV-036）', () => {
+  // 容器 aria-live=polite と 子の role=alert/status が入れ子になると NVDA/JAWS で二重読み上げ＋
+  // politeness 競合（error を assertive で割り込めない）を招く。容器のライブ指定を外し通知ソースを
+  // 各トーストの role へ一本化＝error=alert(assertive) / その他=status(polite)。aria-atomic は付けない
+  // （旧トーストの読み直し防止）。role は要素ごとに自スコープを読むため旧トースト再読みも起きない。
   const region = html.match(/<div id="toast-region"[^>]*>/);
   assert.ok(region, 'toast-region が見つからない');
-  assert.match(region[0], /aria-live="polite"/, 'toast-region に aria-live=polite が無い');
+  assert.doesNotMatch(region[0], /aria-live/, 'toast-region の aria-live は外し子の role に委ねる');
   assert.doesNotMatch(region[0], /aria-atomic/, 'toast-region に aria-atomic を残さない');
+  // 通知ソース＝子トーストの role：error は alert(assertive)、その他は status(polite)。
+  assert.match(app, /setAttribute\('role', type === 'error' \? 'alert' : 'status'\)/);
 });
 
 test('チューニング値は config.js に集約され、消費側はベタ書きせず参照する', () => {
@@ -160,6 +164,16 @@ test('ダッシュボードの横棒集計は可変長スプレッドを使わ�
   assert.doesNotMatch(app, /Math\.max\(\s*\.\.\.\s*all\.map/);
   // 走査版が存在すること（棒幅の基準最大値を for ループで求めている）を確かめる。
   assert.match(app, /if \(value > maximum\) maximum = value/);
+  // INV-043: trendMax も同じ方針＝可変長スプレッドを使わず reduce＋固定アリティ Math.max(max, 入, 出) で畳む。
+  assert.doesNotMatch(app, /Math\.max\(\s*\.\.\.\s*trend/);
+  assert.match(app, /trend\.reduce\(\(max, row\) => Math\.max\(max, Number\(row\.inbound_quantity/);
+});
+
+test('接続状態は安定ラベル要素へ書き、末尾テキストノード頼み（lastChild）を排す（INV-061）', () => {
+  assert.match(html, /<span id="sync-status-label">接続を確認中<\/span>/);
+  assert.match(app, /const label = elements\['sync-status-label'\]/);
+  assert.match(app, /byId\('sync-status-label'\)/);  // fatal boot 経路も安定ラベルへ
+  assert.doesNotMatch(app, /\.lastChild\.textContent/);  // 3箇所の lastChild 賭けを撤去
 });
 
 test('集計ドリルダウン・直近一覧は archived 取引を除外し、台帳（履歴）は監査証跡として残す', () => {
@@ -245,6 +259,11 @@ test('リファレンス実装として、取引に依らずWorkflowを起動で
   // 参照アーキテクチャの要：Workflow をボタンでキックできる導線を明確にするため、起動ボタンは
   // 在庫不足カード内ではなくダッシュボード上部の独立ツールバー（.toolbar-workflow）へ常設する。
   assert.match(html, /class="toolbar-workflow"[\s\S]*id="run-notification"/);
+  // INV-015: 通知の宛先は実行ユーザー本人（recipient = state.user.email）。ヒント/title/確認メッセージも
+  // 「担当者へ」ではなく実挙動（実行ユーザー宛て）に揃え、FE 内の宛先文言の食い違いを無くす。
+  assert.match(html, /在庫不足サマリーを実行ユーザー宛てにメール通知する/);
+  assert.doesNotMatch(html, /担当者へメール通知/);
+  assert.match(app, /実行ユーザー宛てにメールを送信します/);
   assert.match(css, /\.toolbar-workflow\s*\{[^}]*margin-left:\s*auto/s);
   // 旧レイアウト（在庫不足カード内のボタン枠 .shortage-actions）は撤去済みで痕跡を残さない。
   assert.doesNotMatch(html, /class="shortage-actions"/);
@@ -357,7 +376,7 @@ test('QR選択と在庫変化を業務文脈で案内する', () => {
   assert.match(app, /を選択しました。続けて数量を確認してください。/);
   assert.match(app, /登録後の見込み在庫/);
   assert.match(app, /現在 .* \$\{operator\} \$\{operation\}/);
-  assert.match(app, /\['登録後見込み在庫'/);
+  assert.match(app, /\['登録後の見込み在庫'/);  // INV-069: 3画面で「登録後の見込み在庫」に統一
   assert.match(app, /確定在庫 \$\{number\.format\(before\)\} → \$\{number\.format\(after\)\}/);
   assert.doesNotMatch(html, /同じリクエストは二重登録されません/);
   assert.match(html, /内容に問題がなければ「登録を確定」を押してください/);
@@ -510,6 +529,11 @@ test('ダッシュボード上部のツールバーに横断検索とWorkflow起
   assert.match(app, /state\.dashboardQuery = normalizedSearch\(elements\['dashboard-search'\]\.value\)/);
   assert.match(app, /function filterDashboardRows\(rows\)/);
   assert.match(app, /if \(!query\) return rows;/);
+  // INV-013: プレースホルダ「品目・場所・不足・滞留を検索」の約束どおり、SHORTAGE/DORMANT 行の
+  // haystack に状態トークン（不足/滞留）を合成する＝「不足」で該当パネルが空表示にならない。
+  assert.match(app, /stateToken = row\.record_type === 'SHORTAGE' \? '不足'/);
+  assert.match(app, /row\.record_type === 'DORMANT' \? '滞留'/);
+  assert.match(app, /row\.location_name, row\.zone, stateToken\]/);
   // 一致なしの時だけ専用の空表示に切り替え、既存の空文言（在庫不足はありません等）を誤表示しない。
   assert.match(app, /function dashboardEmpty\(defaultMarkup\)/);
   assert.match(app, /に一致する記録がありません。/);
@@ -748,7 +772,7 @@ test('管理者はマスタCRUDを単一のCode Engine入口で操作し、削�
   // マスタ一覧は取引・通知の履歴表と同じ「素の table.master-table」で描く。詳細ペイン用の
   // .detail-table-wrap（枠線＋角丸カード）を流用すると列見出しの下の縁だけ丸く見えて不揃いになるため、
   // masterTableHtml は wrapper 無しの table を返し、見出しは共通の sticky th に揃える（回帰防止）。
-  assert.match(app, /function masterTableHtml[\s\S]*?return `<table class="master-table"><thead>/);
+  assert.match(app, /function masterTableHtml[\s\S]*?return `<table class="master-table"><caption class="sr-only">\$\{escapeHtml\(caption\)\}<\/caption><thead>/);
   assert.doesNotMatch(app, /<div class="detail-table-wrap"><table class="detail-table master-table"/);
   // ドリルダウン詳細ペインの表は従来どおり .detail-table-wrap/.detail-table を維持する（別用途）。
   assert.match(app, /<div class="detail-table-wrap"><table class="detail-table">/);
@@ -1154,4 +1178,93 @@ test('ダッシュボード各パネルもページ送りで縦の伸びを抑�
   // AI在庫コメントは全幅バンドとして .dashboard-grid の前（上）に置くため、order ハックに頼らない。
   assert.match(html, /class="panel ai-note-panel"[\s\S]*<div class="dashboard-grid">/);
   assert.doesNotMatch(css, /\.ai-note-panel\s*\{\s*order:/);
+});
+
+test('無効化状態の呼称を「停止中」へ統一し「在庫不足」の二義を解消（INV-027/028）', () => {
+  // INV-027: 状態は「有効 / 停止中」の対に統一。登録ブロックのエラーは原因＋対処を述べ「無効」とは呼ばない
+  //（担当者自身が止めた状態を「壊れている/禁止」と誤認させない）。
+  assert.match(app, /停止中のロケーションまたは品目には登録できません。先に対象を有効化してください。/);
+  assert.doesNotMatch(app, /無効なマスターは登録できません/);
+  assert.match(app, /'停止中（元に戻せます）'/);
+  assert.doesNotMatch(app, /一時停止（元に戻せます）/);
+  assert.match(html, /オフにすると停止中・元に戻せます/);
+  // INV-028: 負在庫（ハード禁止）のプレビュー注記は検証本体（在庫数を超える出庫…）に揃え、
+  // ダッシュボードの「在庫不足」（基準割れ＝出庫可の警告）と同語に潰さない。
+  assert.match(app, /（在庫数を超えるため登録できません）/);
+  assert.doesNotMatch(app, /（在庫不足のため登録不可）/);
+});
+
+test('履歴検索は画面表示の日付トークンでも一致する（INV-014）', () => {
+  // 表の日時は formatDate（例「10/16 14:30」）で描画される。raw ISO だけでなく formatDate/
+  // formatDisplayDate 由来のトークンも haystack に連結し、見えている日付（10/16・2026年10月16日）で絞れる。
+  assert.match(app, /\$\{formatDate\(row\.occurred_at\)\} \$\{formatDisplayDate\(row\.occurred_at\)\}/);
+  assert.match(app, /\$\{formatDate\(row\.created_at\)\} \$\{formatDisplayDate\(row\.created_at\)\}/);
+});
+
+test('棒グラフの真のゼロは0描画＝下限クランプは値>0のときだけ（INV-023）', () => {
+  // ゼロ在庫・無活動日に最小2%の瘤を描かず、ゼロと少量を見分けられる（分母0の 0/0 NaN 棒も防ぐ）。
+  assert.match(app, /function barPct\(raw, denom\)/);
+  assert.match(app, /value > 0 && denom > 0 \? Math\.max\(2, value \/ denom \* 100\) : 0/);
+  assert.match(app, /width:\$\{barPct\(value, maximum\)\}%/);
+  assert.match(app, /height:\$\{barPct\(row\.inbound_quantity, trendMax\)\}%/);
+  assert.match(app, /height:\$\{barPct\(row\.outbound_quantity, trendMax\)\}%/);
+  // 旧来の無条件クランプ（値0でも2%）は残っていない。
+  assert.doesNotMatch(app, /Math\.max\(2, value \/ maximum \* 100\)/);
+  assert.doesNotMatch(app, /Math\.max\(2, Number\(row\.(inbound|outbound)_quantity/);
+});
+
+test('「ロケーション/場所」の用語を「ロケーション」へ統一（INV-026）', () => {
+  // 不足明細・履歴ヘッダ・検索プレースホルダ・序文・パネルヒントの可視「場所」を正準「ロケーション」へ。
+  assert.match(app, /<th scope="col">ロケーション<\/th>/);
+  assert.match(app, /\['品目', 'ロケーション', '現在', '基準', '不足'\]/);
+  assert.match(html, /品目・ロケーション・不足・滞留を検索/);
+  assert.match(html, /品目、ロケーション、担当者、日付/);
+  assert.match(html, /ロケーション明細/);
+  // app.js の可視テキスト・コメントから「場所」は消える。html は狭幅短縮 data-short="場所" だけ意図的に許容。
+  assert.doesNotMatch(app, /場所/);
+  assert.doesNotMatch(html.replace(/data-short="場所"/g, ''), /場所/);
+});
+
+test('印刷スタイルで固定クロームを隠し本文を紙幅へ流す（INV-004）', () => {
+  // @media print が存在し、固定クローム（topbar/sidebar/mobile-nav/toast/overlay/tooltip 等）を隠す。
+  assert.match(css, /@media print \{/);
+  assert.match(css, /\.skip-link, \.topbar, \.sidebar, \.mobile-nav[\s\S]*?display: none !important;/);
+  assert.match(css, /\.toast-region, \.loading-overlay, \.chart-tooltip \{ display: none !important; \}/);
+  // 固定クロームぶんの main オフセットを解除し、スクロール枠を可視化して全列・全行を流す。
+  assert.match(css, /main \{ padding: 0 !important; min-height: 0 !important; \}/);
+  assert.match(css, /\.dashboard-row > \.panel > \.dash-scroll \{ overflow: visible !important;/);
+  // ⚠空白ページ防止：印刷で break-inside プロパティを使わない（巨大パネルで空白ページを生むため）。
+  assert.doesNotMatch(css, /break-inside\s*:/);
+});
+
+test('COPY一貫性：見込み在庫3画面統一・新規ボタン・削除導線・マスタ長音（INV-069/032/030/070）', () => {
+  // INV-069: プレビュー/確認リスト/モーダルの3画面で「登録後の見込み在庫」に統一（旧「登録後見込み在庫」「見込み在庫」排除）。
+  assert.doesNotMatch(app, /\['登録後見込み在庫'/);
+  assert.doesNotMatch(app, /\['見込み在庫',/);
+  // INV-032: 新規モードのボタンは更新を謳わず「登録する」（更新不可の場面で「登録・更新」を出さない）。
+  assert.doesNotMatch(html, />登録・更新</);
+  assert.match(html, /id="master-submit"[^>]*>登録する</);
+  assert.match(app, /master-submit'\]\.textContent = '登録する'/);
+  // INV-030: 存在しない「有効の切り替え」誘導を実在のチェックボックス名へ統一。
+  assert.doesNotMatch(app, /「有効の切り替え」/);
+  assert.doesNotMatch(html, /上の切り替えで停止できます/);
+  assert.match(app, /チェックボックス「入出庫で選択できるようにする」をオフに/);
+  assert.match(html, /チェックボックス「入出庫で選択できるようにする」をオフに/);
+  // INV-070: 可視文言・コメントとも「マスター」(長音)を排し「マスタ」に統一（app.js に「マスター」なし）。
+  assert.doesNotMatch(app, /マスター/);
+});
+
+test('全テーブルにアクセシブル名（sr-only caption）を与える（INV-034）', () => {
+  // 視覚非表示ユーティリティ .sr-only（隠しキャプションの受け皿）が存在する。
+  assert.match(css, /\.sr-only\s*\{[^}]*clip-path:\s*inset\(50%\)/s);
+  // 履歴表＝モード依存の隠しキャプション（取引履歴/通知履歴）。
+  assert.match(html, /<caption class="sr-only" id="history-caption">/);
+  assert.match(app, /history-caption'\]\.textContent = state\.historyMode === 'alerts' \? '通知履歴' : '取引履歴'/);
+  // マスタ表＝種別依存キャプション（{品目|ロケーション|基準在庫}の一覧）。
+  assert.match(app, /const caption = `\$\{MASTER_LABELS\[state\.masterTab\] \|\| 'マスタ'\}の一覧`/);
+  // 明細表＝detailTable が caption 引数を sr-only で出し、種別ごとに固定名を渡す。
+  assert.match(app, /const cap = caption \?/);
+  assert.match(app, /'在庫明細'\)/);
+  assert.match(app, /'取引明細'\)/);
+  assert.match(app, /'不足一覧'\)/);
 });

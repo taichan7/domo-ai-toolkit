@@ -304,7 +304,7 @@ test('日付の形式が不正でもトレンドのHTMLは実行可能な要素�
       dashboardEmpty: (markup) => markup, emptyHtml: () => '',
       renderAiNotes: () => {}, scheduleDashboardEqualize: () => {},
     };
-    vm.runInNewContext(['formatDisplayDate', 'formatShortDate', 'renderDashboard'].map(extractFunction).join('\n') + '\nrenderDashboard();', context);
+    vm.runInNewContext(['formatDisplayDate', 'formatShortDate', 'barPct', 'renderDashboard'].map(extractFunction).join('\n') + '\nrenderDashboard();', context);
     return context.elements['trend-chart'].innerHTML;
   }
   const hostile = render(payload);

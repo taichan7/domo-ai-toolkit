@@ -85,7 +85,11 @@ def _service() -> dict:
                 raise Exception({"code": "WORKFLOW_STATUS_ERROR", "message": "実行状況を確認できません。", "details": {}})
             owned = [r for r in rows if isinstance(r, dict) and r.get("modelId") == model_id]
             running = [r for r in owned if str(r.get("status") or "").upper() in RUNNING_STATUSES]
-            row = max(running or owned, key=lambda r: str(r.get("createdOn") or ""), default={})
+            # BK-012: createdOn は文字列ではなく時刻として比較する（精度混在での新旧逆転を防ぐ）。
+            # 解釈不能な行は最古（EPOCH）扱いで、有効な時刻を持つ行に優先させない。
+            row = max(running or owned,
+                      key=lambda r: _server_time(r.get("createdOn")) or datetime.min.replace(tzinfo=timezone.utc),
+                      default={})
         status = str(row.get("status") or ("IDLE" if not row else "")).upper()
         if not status:
             raise Exception({"code": "WORKFLOW_STATUS_ERROR", "message": "実行状況を確認できません。", "details": {}})
@@ -143,6 +147,19 @@ def _service() -> dict:
         return {"ok": True, "instance_id": str(started["id"]), "status": str(started.get("status") or "IN_PROGRESS"),
                 "progress_path": f"/workflows/instances/{SUB_WORKFLOW_MODEL_ID}/",
                 "model_version": version, "running": True, "already_running": False}
+
+    def _server_time(value: Any):
+        """createdOn 等の ISO8601 文字列を比較可能な aware datetime へ（解釈不能なら None）。
+
+        BK-012: status の「最新インスタンス」選択や _save の prune は createdOn を**時刻として**比較する。
+        文字列の辞書順比較だと、ミリ秒有無など精度混在（'…01.5Z' と '…01Z'）で新旧が逆転し得るため、
+        このファイル内のどの createdOn 比較も本パーサ経由の datetime 比較へ統一する。
+        """
+        try:
+            parsed = datetime.fromisoformat(str(value or "").replace("Z", "+00:00"))
+            return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+        except (TypeError, ValueError):
+            return None
 
     def _valid_iso_timestamp(value: str) -> bool:
         """generated_at が ISO8601 として解釈できるか（不正値を画面の日時降順ソートへ流さない）。"""
@@ -250,6 +267,12 @@ def _service() -> dict:
             document = {name: value for name, value in request.items()
                         if name not in ("collection_id", "operation", "report_type", "executor_email")}
         report = _coerce_document(document)
+        # BK-011: 入れ子 document パスでも平坦フォールバック（上）と同じルーティング/PII キーを落とす。
+        # executor_email は実行時 PII（AGENT.md が永続禁止）、report_type/operation/collection_id は
+        # ルーティング用。万一 document 内に紛れても共有 AppDB レポートへ焼き込まず、両パスで保存形を
+        # 一致させる（defense-in-depth。現行プロンプトは §8.3 固定スキーマで出さないが将来のドリフト保険）。
+        for routing_key in ("collection_id", "operation", "report_type", "executor_email"):
+            report.pop(routing_key, None)
         _require_report_fields(report)  # 不完全ドキュメントで既存の正レポートを上書き削除しない門番
         encoded = json.dumps(report, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         if len(encoded) > MAX_DOCUMENT_BYTES:
@@ -282,11 +305,7 @@ def _service() -> dict:
                 offset += page
 
             def server_time(row: Dict[str, Any]):
-                try:
-                    value = datetime.fromisoformat(str(row.get("createdOn") or "").replace("Z", "+00:00"))
-                    return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
-                except (TypeError, ValueError):
-                    return None
+                return _server_time(row.get("createdOn"))  # 共有パーサへ委譲（status と同じ時刻基準）
 
             observed = next((row for row in matching if str(row.get("id")) == created_id), created)
             created_time = server_time(observed)
