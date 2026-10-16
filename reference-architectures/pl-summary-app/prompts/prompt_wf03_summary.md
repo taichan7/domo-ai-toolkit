@@ -89,8 +89,11 @@
 
 ### 8.2 手順2：メール送信（宛先が設定されている場合のみ）
 - ツール: `Send Email`
-- 宛先: **事前に設定済みの `personRecipients`（配備時に環境変数 `PL_EMAIL_PERSON_RECIPIENTS` で束縛される宛先）だけに送信する。宛先アドレスや人物IDを自分で創作・推測しない。**
-- **宛先が1件も設定されていない場合は、メール送信をスキップする**（§8.1 の保存は実施済みなので、分析自体は正常完了。スキップは失格ではない）。
+- 宛先は次の2系統を**両方**設定する（どちらも設定済みの値だけを使い、創作・推測しない）:
+  1. **`personRecipients`**: 事前に設定済みの宛先（配備時に環境変数 `PL_EMAIL_PERSON_RECIPIENTS` で束縛）だけに送信する。宛先アドレスや人物IDを自分で創作・推測しない。
+  2. **`recipientEmails`**: ワークフロー入力 `executor_email`（このWorkflowを実行した本人のメール）**だけ**を設定する。**`recipientEmails` 入力の型定義に厳密に合わせること**＝リスト型なら要素1つの配列 `[executor_email]`、単一テキスト型なら `executor_email` をそのまま（型不一致は送信ツールが失敗する）。`executor_email` が空またはメール形式でない場合は `recipientEmails` を設定しない（実行者への追加送信をスキップするだけで、保存と `personRecipients` 宛て送信は通常どおり行う）。
+- 人物・グループ宛先の創作、添付、Reply All は使用しない。
+- **`personRecipients` と `executor_email` のどちらも無い（＝宛先が1件もない）場合のみ、メール送信をスキップする**（§8.1 の保存は実施済みなので、分析自体は正常完了。スキップは失格ではない）。
 - `subject`: `【AI財務分析】全社損益サマリー報告（{period} / リスク：{risk_level}）`
 - `body`: 分析結果の `analysis_html` の内容（HTMLメール形式）
 

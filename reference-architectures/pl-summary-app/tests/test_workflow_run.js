@@ -8,7 +8,7 @@ const source = fs.readFileSync(path.join(__dirname, '../pro-code/workflow-run.js
 const settle = () => new Promise((resolve) => setImmediate(resolve));
 
 const progressPath = '/workflows/instances/22222222-2222-4222-8222-222222222222/';
-function harness(status = {ok: true, status: 'IDLE', running: false, progress_path: progressPath}) {
+function harness(status = {ok: true, status: 'IDLE', running: false, progress_path: progressPath}, opts = {}) {
   const nodes = new Map(), calls = [], saved = new Map();
   let document;
   function get(id) {
@@ -34,7 +34,10 @@ function harness(status = {ok: true, status: 'IDLE', running: false, progress_pa
   const context = {document, console, Date, Promise, Event: class {}, setTimeout: () => 0, clearTimeout() {},
     sessionStorage: {getItem: (key) => saved.get(key) || null, setItem: (key, value) => saved.set(key, value)},
     addEventListener(type, fn) { events[type] = fn; }, dispatchEvent() {},
-    domo: {navigate: (path, newTab) => navigations.push({path, newTab}), async post(url, body) {
+    domo: {
+      env: opts.env === undefined ? {userId: 'u-exec-1', userEmail: 'env-fallback@example.com'} : opts.env,
+      get: opts.get || (async () => ({emailAddress: 'exec@example.com'})),
+      navigate: (path, newTab) => navigations.push({path, newTab}), async post(url, body) {
       calls.push({url, body});
       return {result: body.operation === 'start'
         ? {ok: true, instance_id: 'test-instance', status: 'IN_PROGRESS', running: true, progress_path: progressPath}
@@ -168,4 +171,54 @@ test('untrusted external progress URL is not navigable', async () => {
   assert.equal(h.get('workflow-check').disabled, true);
   h.get('workflow-check').dispatch('click');
   assert.equal(h.navigations.length, 0);
+});
+
+test('start carries the resolved executor email so the existing AI email also reaches the operator', async () => {
+  const h = harness();
+  await settle();
+  await h.app.startWorkflow();
+  const start = h.calls.find((call) => call.body.operation === 'start');
+  assert.ok(start);
+  assert.equal(start.body.request.executor_email, 'exec@example.com');
+});
+
+test('executor email falls back to domo.env.userEmail when People API returns no address', async () => {
+  const h = harness(undefined, {get: async () => ({})});
+  await settle();
+  await h.app.startWorkflow();
+  const start = h.calls.find((call) => call.body.operation === 'start');
+  assert.equal(start.body.request.executor_email, 'env-fallback@example.com');
+});
+
+test('unresolved executor identity still starts the run with no executor recipient', async () => {
+  const h = harness(undefined, {env: {}});
+  await settle();
+  await h.app.startWorkflow();
+  const start = h.calls.find((call) => call.body.operation === 'start');
+  assert.ok(start);
+  assert.equal(start.body.request.executor_email, undefined);
+  assert.equal(Object.keys(start.body.request).length, 0);
+});
+
+test('confirmation dialog shows the resolved executor email as the recipient', async () => {
+  const h = harness();
+  await settle();
+  h.app.confirmRun();
+  await settle();
+  assert.equal(h.get('workflow-recipient-email').textContent, 'exec@example.com');
+});
+
+test('recipient line falls back when the executor identity cannot be resolved', async () => {
+  const h = harness(undefined, {env: {}});
+  await settle();
+  h.app.confirmRun();
+  await settle();
+  assert.match(h.get('workflow-recipient-email').textContent, /取得できませんでした/);
+});
+
+test('a transient status-check failure arms a bounded auto-retry instead of a dead button (PL-002)', async () => {
+  const h = harness({ok: false, error: {code: 'INTERNAL_ERROR', message: 'timeout'}});
+  await settle();
+  assert.equal(h.get('workflow-run').disabled, true);   // 状況不明時は安全側で無効のまま
+  assert.ok(h.app.state.statusRetries >= 1);             // だが有界リトライが arm 済み＝恒久的な死にボタンにならない
 });

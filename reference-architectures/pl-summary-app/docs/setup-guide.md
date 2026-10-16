@@ -252,6 +252,12 @@ python3 scripts/provision_workflows.py verify                      # scheduleCou
     または API `GET https://${DOMO_INSTANCE}/api/content/v2/users`（開発者トークン/SID 認証）で `email` → `id` を
     引く。複数人へ送るならカンマ区切り（例 `<person-id-1>,<person-id-2>`）。宛先はメールアドレスではなく **person ID**。
   - 設定の有無は `provision` のログ（「personRecipients に N 件を束縛」／「未設定 — …送信されません」）で確認できる。
+  - **実行者本人への送信（宛先追加・設定不要）**: 上記 `personRecipients`（チーム宛先）に加えて、アプリで
+    「AIレポートを更新」を押した**本人**にも同じ全社メールが届く。本人のメールはフロントが People API
+    （`/domo/users/v1/{userId}`）で実行時に解決し、Code Engine が形式検証した上で `executor_email` として
+    Workflow へ渡し、全社 `Send Email` の `recipientEmails`（スカラー）へ入れる。**追加設定は不要**。本人の
+    メールが解決できない場合はチーム宛先だけに送信し、実行自体は正常に進む（本人への送信をスキップするだけ）。
+    そのため `PL_EMAIL_PERSON_RECIPIENTS` が未設定でも、実行者本人には届く（本人が解決できる場合）。
 - `workflow/*.json`（WF-01／WF-02／`send_email_tool.json`）は**バージョン定義のスナップショット**。
   `provision` はモデルが未存在のとき WF-01 をこのスナップショットから seed し、束縛を張り替える。
 

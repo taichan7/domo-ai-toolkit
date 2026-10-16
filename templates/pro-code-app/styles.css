@@ -1,19 +1,20 @@
 /* ============================================================
-   DESIGN SYSTEM — keep these variables at the top.
-   Your AI agent should reuse them; never hardcode colors below.
+   デザインシステム — これらの変数は先頭に置いたまま使う。
+   AI エージェントは必ずこの変数を再利用し、以降で色を直書きしない。
+   ハウス標準＝小綺麗で品のある「淡色・和文ファースト」。各アプリ固有の
+   パレット（在庫＝紺／ティール、損益＝臙脂／セージ 等）はここへコピーしない。
    ============================================================ */
 
 :root {
-  --bg-dark:       #0f1419;
-  --canyon-red:    #C4533A;   /* alerts, errors, destructive */
-  --sandstone:     #D4A76A;   /* highlights, secondary */
-  --sage-green:    #7C9473;   /* positive, success, primary */
-  --alpine-blue:   #5B8DB8;   /* info, links */
-  --snow-white:    #F5F0E8;   /* primary text */
-  --text-muted:    rgba(245, 240, 232, 0.55);
-  --glass-bg:      rgba(15, 20, 25, 0.85);
-  --glass-border:  rgba(255, 255, 255, 0.08);
-  --gap:           16px;
+  --bg:          #f6f7f9;   /* 画面地（淡いグレー） */
+  --surface:     #ffffff;   /* カード・バーの地 */
+  --ink:         #1f2733;   /* 本文テキスト */
+  --text-muted:  #697180;   /* 補助テキスト（AA を満たす中間グレー） */
+  --line:        #e4e8ed;   /* 境界線 */
+  --primary:     #4f7093;   /* 一次アクション・リンク（落ち着いた青） */
+  --danger:      #b4544a;   /* 警告・エラー・破壊的 */
+  --success:     #5f8468;   /* 肯定・成功 */
+  --gap:         16px;
 }
 
 * { box-sizing: border-box; }
@@ -24,15 +25,16 @@ html, body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: var(--bg-dark);
-  color: var(--snow-white);
-  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  /* 和文を含むため JA フォントまでフォールバックを張る（読み込めなくても OS 標準へ） */
+  font-family: 'Inter', 'Segoe UI', system-ui, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', Meiryo, sans-serif;
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 /* ============================================================
-   PAGE GRID — single source of layout truth
+   ページグリッド — レイアウトの唯一の基準
    ============================================================ */
 
 #app {
@@ -46,7 +48,7 @@ html, body {
 }
 
 /* ============================================================
-   BRAND HEADER
+   ブランドヘッダー
    ============================================================ */
 
 .brand-header {
@@ -54,21 +56,18 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--line);
 }
 
 .brand-name {
   margin: 0;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 800;
-  letter-spacing: -0.5px;
 }
 
 .brand-tagline {
   display: block;
   font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
   color: var(--text-muted);
   margin-top: 4px;
 }
@@ -77,39 +76,37 @@ html, body {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: var(--sandstone);
+  color: var(--primary);
   text-align: right;
 }
 
 /* ============================================================
-   STATS BAR
+   統計バー
    ============================================================ */
 
 .stats-bar {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 0 24px;
 }
 
 .stat-number {
-  font-size: 36px;
+  font-size: 34px;
   font-weight: 700;
 }
 
 .stat-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
+  font-size: 12px;
   color: var(--text-muted);
   margin-top: 2px;
 }
 
 /* ============================================================
-   CONTENT GRID
+   コンテンツグリッド
    ============================================================ */
 
 .content-grid {
@@ -120,24 +117,23 @@ html, body {
 }
 
 /* ============================================================
-   CARDS
+   カード
    ============================================================ */
 
 .card {
   display: flex;
   flex-direction: column;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 2px rgba(31, 39, 51, 0.04), 0 2px 10px rgba(31, 39, 51, 0.05);
   padding: 24px;
   overflow: hidden;
 }
 
 .card-header {
   font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
+  font-weight: 700;
   color: var(--text-muted);
   margin-bottom: 16px;
 }
@@ -155,7 +151,7 @@ html, body {
 }
 
 /* ============================================================
-   TABLE
+   テーブル
    ============================================================ */
 
 table {
@@ -167,27 +163,26 @@ table {
 thead th {
   text-align: left;
   padding: 12px 8px;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
+  font-size: 12px;
+  font-weight: 700;
   color: var(--text-muted);
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
-  background: var(--glass-bg);
+  background: var(--surface);
 }
 
 tbody td {
   padding: 10px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--line);
 }
 
 tbody tr:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: #f1f3f6;
 }
 
 /* ============================================================
-   BUTTONS
+   ボタン
    ============================================================ */
 
 .btn {
@@ -199,27 +194,26 @@ tbody tr:hover {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .btn.primary {
-  background: var(--sage-green);
-  color: var(--bg-dark);
+  background: var(--primary);
+  color: #fff;
 }
 
 .btn.primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
+  filter: brightness(1.05);
 }
 
 .btn.secondary {
-  background: transparent;
-  color: var(--snow-white);
-  border: 1px solid var(--glass-border);
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
 }
 
 .btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: #f1f3f6;
 }
 
 .action-hint {
@@ -232,14 +226,14 @@ tbody tr:hover {
 .action-hint code {
   font-family: 'SF Mono', Consolas, monospace;
   font-size: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  background: #eef1f4;
   padding: 2px 6px;
   border-radius: 4px;
-  color: var(--sandstone);
+  color: var(--primary);
 }
 
 /* ============================================================
-   EMPTY / LOADING STATES
+   空・ローディング状態
    ============================================================ */
 
 .empty-state {
@@ -255,7 +249,7 @@ tbody tr:hover {
 }
 
 .empty-state strong {
-  color: var(--snow-white);
+  color: var(--ink);
   font-size: 16px;
   margin-bottom: 8px;
 }

@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#7F1D2D">
   <title>店舗別損益｜開発ガイド</title>
-  <!-- 書体は 先行アプリと同じ方式（Google Fonts の Noto Sans JP）。未取得時は OS 標準へフォールバック。 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;800&amp;display=swap" rel="stylesheet">
+  <!-- 書体は OS 標準の日本語フォントへフォールバック（CDN 非依存＝配布物を自己完結に保つ）。Google Fonts 等のランタイム読込は行わない（本体アプリ・inventory-management-app と同基準）。 -->
   <link rel="stylesheet" href="app.css">
 </head>
 <body>
@@ -83,7 +80,7 @@
       <div><dt>文書種別</dt><dd>ハンズオン教材（手を動かす）</dd></div>
       <div><dt>所要</dt><dd>約 3 時間・ステップ順</dd></div>
       <div><dt>対象</dt><dd>店舗別損益AIデモ 開発者</dd></div>
-      <div><dt>版</dt><dd>v0.3.2（2026-10-15）</dd></div>
+      <div><dt>版</dt><dd>v0.3.4（2026-10-16）</dd></div>
     </dl>
 
     <div class="abstract">
@@ -2085,9 +2082,9 @@ python3 scripts/provision_workflows.py verify</pre>
         <div class="vs__panel">
           <div class="vs__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg>名札なし ― 本番保護ガード</div>
           <ul class="vs__list">
-            <li>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-alert"/></svg>名札なしで本番オブジェクトを作成／更新しようとすると、<code>provision_domo.py</code>（<code>apply</code>／<code>app-studio</code>／<code>embed-guide</code>）と <code>provision_workflows.py</code>（<code>provision</code>）が<b>実行を拒否</b>する。</li>
             <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-key"/></svg>本番メンテナが本番名のまま反映する時だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示</li>
-            <li>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg>ガードは <b>すべての対象インスタンス</b>で有効（接続先は <code>DOMO_INSTANCE</code> で明示）。名札（<code>PL_SANDBOX_SUFFIX</code>）付きサンドボックスでなら実行してよい。</li>
           </ul>
         </div>
       </div>
@@ -2820,7 +2817,7 @@ WF-01／統合サブWF / 他参加者（別の名札）の資産
       </div>
       <div class="callout">
         <span class="callout__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg></span>
-        <h4>守るのは example.domo.com だけ</h4>
+        <h4>本番は「名札の有無」で守る（全インスタンス共通）</h4>
         <p>本番保護ガードは <b>すべての対象インスタンス</b>で有効です。接続先 <code>DOMO_INSTANCE</code> を明示し、ハンズオンでは <code>PL_SANDBOX_SUFFIX</code> を付けます。名札なしで本番名へ配備する担当者だけ <code>PL_ALLOW_PRODUCTION=1</code> を明示します。保守コマンド <code>ce/subflow/mainflow</code> はサンドボックスで使わず、通常は <code>provision</code> を使います。</p>
       </div>
       <div class="callout">
@@ -3468,7 +3465,7 @@ git config --global http.proxy http://proxy.example.co.jp:8080</pre>
 </main>
 
 <footer class="sitefoot">
-  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>店舗別損益 ・ 開発ガイド ― 店舗別損益AI分析 ・ v0.3.2
+  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>店舗別損益 ・ 開発ガイド ― 店舗別損益AI分析 ・ v0.3.4
 </footer>
 
 <!-- トースト（コピー等のフィードバック） -->

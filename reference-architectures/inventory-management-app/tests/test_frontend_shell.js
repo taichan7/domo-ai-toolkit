@@ -587,12 +587,34 @@ test('履歴・マスタの2ペインは同じ高さ枠で丈を揃える（NEW-
   assert.match(css, /@media \(max-width: 980px\)[\s\S]*\.md-list\s*\{\s*min-height:\s*0;\s*max-height:\s*none/);
 });
 
-test('取引・通知履歴は行クリックとキーボードで明細を開く', () => {
+test('在庫不足KPIは色だけに頼らず状態語＋警告アイコンで示す（INV-002）／通知状態は日本語化（INV-003）', () => {
+  // INV-002: 不足>0 は「要補充 N件」＋ bell アイコン、0 は「基準内」、他KPIは「最新集計」。
+  assert.match(app, /isShortage \? \(isAlert \? `要補充 \$\{number\.format\(value\)\}件` : '基準内'\) : '最新集計'/);
+  assert.match(app, /isAlert \? '<svg class="kpi-alert-icon" aria-hidden="true"><use href="#icon-bell">/);
+  // 既定の注記色は muted、赤は本当のアラート時だけ（色のみ依存を解消しつつ赤を温存）。
+  assert.match(css, /\.kpi-card small \{ color: var\(--muted\); \}/);
+  assert.match(css, /\.kpi-card\.alert small, \.kpi-card\.alert strong \{ color: var\(--red-600\); \}/);
+  assert.match(css, /\.kpi-alert-icon \{/);
+  // INV-003: 通知状態 enum を表示専用に日本語化する statusLabel を持ち、履歴列・明細の両方で使う。
+  assert.match(app, /function statusLabel\(status\)/);
+  assert.match(app, /PENDING: '送信待ち'[\s\S]*?SENT: '送信済み'[\s\S]*?FAILED: '送信失敗'[\s\S]*?FALLBACK: '代替送信'/);
+  assert.match(app, /status-pill \$\{statusClass\(row\.notification_status\)\}">\$\{escapeHtml\(statusLabel\(row\.notification_status\)\)\}/);
+  assert.match(app, /\['通知状態', statusLabel\(row\.notification_status\)\]/);
+  // 生の英語 enum をそのまま描画しない（PENDING フォールバック直書きの撤去）。
+  assert.doesNotMatch(app, /row\.notification_status \|\| 'PENDING'/);
+});
+
+test('取引・通知履歴は素のtr＋末尾の実ボタンで、行クリックとキーボード両方で明細を開く', () => {
   assert.match(html, /id="history-result-count"/);
   assert.match(html, /id="history-clear"/);
-  assert.match(app, /class="drilldown-row" tabindex="0" role="button" data-history-index/);
-  assert.match(app, /function handleHistoryDrilldownKey/);
-  assert.match(app, /event\.key !== 'Enter' && event\.key !== ' '/);
+  // INV-001: 行は素の <tr>（role=row のままセルが読める）。旧「行を role=button へ畳む」形は撤去。
+  assert.match(app, /<tr class="drilldown-row" data-history-index="\$\{index\}">/);
+  assert.doesNotMatch(app, /drilldown-row" tabindex="0" role="button" data-history-index/);
+  // キーボード/AT の起点は末尾 .drill-cell の本物の <button>（aria-label はその行の品目名入り）。
+  assert.match(app, /<td class="drill-cell"><button type="button" class="drill-btn" aria-label="\$\{escapeAttribute\(row\.item_name \|\| row\.item_code\)\}の明細を開く">/);
+  // ネイティブ button が Enter/Space を担うため独自 keydown は撤去済み（二重発火防止）。
+  assert.doesNotMatch(app, /function handleHistoryDrilldownKey/);
+  assert.doesNotMatch(app, /addEventListener\('keydown', handleHistoryDrilldownKey\)/);
   assert.match(app, /function openTransactionDetail/);
   assert.match(app, /function openAlertDetail/);
   // 行選択でマスター側を強調し、詳細を同一ビューのペインへ差し替える（モーダルなし）。
@@ -600,6 +622,7 @@ test('取引・通知履歴は行クリックとキーボードで明細を開�
   assert.match(app, /function highlightSelectedHistoryRow/);
   assert.match(app, /function fillDetailPane/);
   assert.match(css, /\.drilldown-row\.is-selected/);
+  assert.match(css, /\.drill-btn:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--teal-700\)/);
   assert.doesNotMatch(app, /detail-dialog|function closeDetail|function showRelatedHistory/);
 });
 
@@ -714,9 +737,14 @@ test('管理者はマスタCRUDを単一のCode Engine入口で操作し、削�
   assert.match(app, /function newMaster/);
   assert.match(app, /function updateMasterSelection/);
   assert.match(app, /function handleMasterRowActivate/);
-  assert.match(app, /function handleMasterRowKey/);
-  // 行はドリルダウン行として data-master-edit を持ち、行内アクションボタン（.master-link）は廃止済み。
+  // ネイティブ button が Enter/Space を担うため、master 行の独自 keydown は撤去済み（二重発火防止）。
+  assert.doesNotMatch(app, /function handleMasterRowKey/);
+  assert.doesNotMatch(app, /addEventListener\('keydown', handleMasterRowKey\)/);
+  // 行はドリルダウン行として data-master-edit を持ち（role=button では畳まない）、キーボード/AT の
+  // 起点は末尾 .drill-cell の本物の <button>。行内アクションボタン（.master-link）は廃止済み。
   assert.match(app, /class="drilldown-row[^"]*"[^>]*data-master-edit=/);
+  assert.doesNotMatch(app, /data-master-edit="\$\{escapeAttribute\(code\)\}"[^>]*role="button"/);
+  assert.match(app, /<td class="drill-cell"><button type="button" class="drill-btn" aria-label="\$\{escapeAttribute\(label\)\}を編集">/);
   // マスタ一覧は取引・通知の履歴表と同じ「素の table.master-table」で描く。詳細ペイン用の
   // .detail-table-wrap（枠線＋角丸カード）を流用すると列見出しの下の縁だけ丸く見えて不揃いになるため、
   // masterTableHtml は wrapper 無しの table を返し、見出しは共通の sticky th に揃える（回帰防止）。
@@ -760,11 +788,11 @@ test('物理削除の確認は close 単一実行点で、確定時だけ1回実
   assert.match(app, /dialog\.returnValue = ''/);
 });
 
-test('選択状態は role=button 行では aria-current で表し、ビュー枠はプログラム的フォーカスを受けられる', () => {
-  // 行(drilldown-row)は role="button"。aria-selected は listbox/grid 専用で role=button/素の tr では
-  // 無効なため、集合内カレントを表す aria-current へ統一する。視覚選択は is-selected クラスが担う。
-  assert.match(app, /class="drilldown-row" tabindex="0" role="button" data-history-index/);
-  assert.match(app, /role="button" data-master-edit=/);
+test('選択状態は素のtr行で aria-current で表し、ビュー枠はプログラム的フォーカスを受けられる', () => {
+  // 行(drilldown-row)は素の <tr>（role=row）。aria-selected は listbox/grid 専用で tr には無効なため、
+  // 集合内カレントを表す aria-current へ統一する。視覚選択は is-selected クラスが担う。
+  assert.match(app, /<tr class="drilldown-row" data-history-index="\$\{index\}">/);
+  assert.doesNotMatch(app, /drilldown-row[^>]*role="button"/);
   assert.match(app, /node\.setAttribute\('aria-current', 'true'\)/);
   assert.match(app, /node\.removeAttribute\('aria-current'\)/);
   // 行に対して無効な aria-selected を残さない。候補ピッカーも role=option を廃し、選択は aria-current に統一。

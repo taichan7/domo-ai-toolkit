@@ -31,6 +31,12 @@ from typing import Any, Dict, List
 
 # Domo が将来 v4 以外の UUID を発行しても誤拒否しない（GUID 形状チェックが主ガード）。
 GUID_PATTERN = re.compile(r"^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$")
+# 実行者メールの許可パターン（単一 ASCII アドレスのみ）。local=英数と ._%+- 、domain=英数と .- 、
+# TLD=英字2+ の**真の allowlist**。制御文字(NUL/ESC)・ゼロ幅/双方向(bidi)・同形異義(homoglyph)・空白・
+# カンマ・引用符・山括弧・複数@ を全て弾き、Workflow の start data 経由で AI の Send Email 宛先/本文へ
+# 複数アドレスや HTML・不可視文字が混入するのを防ぐ。
+EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$")
+MAX_EXECUTOR_EMAIL_LEN = 254
 MAX_DOCUMENT_BYTES = 200_000
 # bulk 削除は URL 長を抑えるため 100 件ずつに分割する（GUID×100 ≒ 3700 文字）。
 DELETE_CHUNK_SIZE = 100
@@ -92,10 +98,21 @@ def _service() -> dict:
 
     def _workflow_start(request: Dict[str, Any]) -> Dict[str, Any]:
         import codeengine
-        if request:
+        # 実行者本人の通知のため executor_email だけは受理する（既存メールの宛先に実行者を1人加える
+        # 用途のみ）。それ以外のキーは従来どおり拒否し、実行対象・入力のサーバー側固定を保つ
+        # （任意キーが Workflow trigger の data へ漏れないようにする）。
+        unexpected = set(request) - {"executor_email"}
+        if unexpected:
             raise Exception({"code": "INVALID_REQUEST",
-                             "message": "実行対象・入力はサーバー側で固定されています。空のrequestを指定してください。",
+                             "message": "実行対象・入力はサーバー側で固定されています。executor_email 以外は指定できません。",
                              "details": {}})
+        executor_email = str(request.get("executor_email") or "").strip()
+        # 実行者通知は任意の付加機能。形式不正・長すぎる値は本人宛て送信だけをスキップ（空扱い）し、
+        # レポート生成（主機能）は止めない＝FE の best-effort／プロンプトの skip-if-invalid と整合。
+        # 厳格 allowlist を通らない値は Workflow data へ流さない（AI の Send Email 宛先/本文への混入も防ぐ）。
+        if executor_email and (len(executor_email) > MAX_EXECUTOR_EMAIL_LEN
+                               or not EMAIL_PATTERN.fullmatch(executor_email)):
+            executor_email = ""
         current = _workflow_status({})
         if current["running"]:
             return dict(current, already_running=True)
@@ -115,7 +132,8 @@ def _service() -> dict:
         try:
             started = codeengine.send_request("post", "api/workflow/v1/instances/message",
                                              {"messageName": message_name, "modelId": model_id,
-                                              "version": version, "data": {}})
+                                              "version": version,
+                                              "data": {"executor_email": executor_email} if executor_email else {}})
             if not isinstance(started, dict) or not GUID_PATTERN.fullmatch(str(started.get("id") or "")):
                 raise ValueError("missing workflow instance id")
         except Exception as error:
@@ -230,7 +248,7 @@ def _service() -> dict:
             # 平坦フォールバック: 保存先/操作/分岐などの非ドキュメント・ルーティングキーは文書に混ぜない
             # （report_type 等が AppDB へ漏れてスキーマがドリフトしないようにする）。
             document = {name: value for name, value in request.items()
-                        if name not in ("collection_id", "operation", "report_type")}
+                        if name not in ("collection_id", "operation", "report_type", "executor_email")}
         report = _coerce_document(document)
         _require_report_fields(report)  # 不完全ドキュメントで既存の正レポートを上書き削除しない門番
         encoded = json.dumps(report, ensure_ascii=False, separators=(",", ":")).encode("utf-8")

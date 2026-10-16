@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var state = {requesting: false, running: false, unknown: false, instanceId: "", beganAt: "", progressPath: "", timer: null, pending: null};
+  var state = {requesting: false, running: false, unknown: false, instanceId: "", beganAt: "", progressPath: "", timer: null, pending: null, executorEmail: "", executorResolved: false, statusRetries: 0};
   var els = {}, storageKey = "pl-workflow-run";
 
   function call(operation, request) {
@@ -74,13 +74,63 @@
     return call("status", state.instanceId ? {instance_id: state.instanceId} : {})
       .then(function (result) {
         state.requesting = false;
+        state.statusRetries = 0;
         acceptStatus(result);
       }).catch(function (error) {
         state.requesting = false;
         renderStatus("実行状況を取得できませんでした: " + error.message, true);
         els.run.disabled = true;
-        schedulePoll();
+        // 一過性失敗（CE coldstart / 20秒timeout / 5xx）から自動回復する: 有界リトライを arm する。
+        // schedulePoll は running/unknown 時しか再試行しないため、新規ロードの単発失敗だと唯一の主要CTA
+        // が永久に無効のまま詰む。恒久失敗なら数回で打ち切る（その間はボタン無効＝状況不明時の安全側）。
+        if (state.statusRetries < 3) {
+          state.statusRetries += 1;
+          stopPoll();
+          state.timer = setTimeout(checkStatus, 6000);
+        } else {
+          schedulePoll();
+        }
       });
+  }
+
+  // 実行者（このWorkflowを起動した本人）を既存の全社メールの宛先に加えるため、本人のメール
+  // アドレスをフロントで解決して start に載せる。Code Engine 側の実行者メールは空になるため、
+  // People API（inventory-management-app と同じ /domo/users/v1/{userId}）で解決し、取得できなければ
+  // domo.env.userEmail、それも無ければ空文字（宛先追加なし＝従来どおりチーム宛てだけ送信）に落とす。
+  function resolveExecutorEmail() {
+    try {
+      var env = (typeof domo !== "undefined" && domo.env) ? domo.env : {};
+      var fromEnv = String(env.userEmail || "").trim();
+      if (!env.userId || typeof domo === "undefined" || typeof domo.get !== "function") {
+        return Promise.resolve(fromEnv);
+      }
+      // People API がハングしても起動を止めない：8秒でフォールバック値に解決する（call() の timeout と同趣旨）。
+      var guard = new Promise(function (resolve) { setTimeout(function () { resolve(fromEnv); }, 8000); });
+      var lookup = Promise.resolve(domo.get("/domo/users/v1/" + encodeURIComponent(env.userId) + "?includeDetails=true"))
+        .then(function (details) { return String((details && details.emailAddress) || "").trim() || fromEnv; })
+        .catch(function () { return fromEnv; });
+      return Promise.race([lookup, guard]);
+    } catch (error) {
+      return Promise.resolve("");
+    }
+  }
+
+  // 確認ダイアログに通知先（実行者本人のメール）を表示する（inventory-management-app と同じUX）。
+  // 1回だけ解決してキャッシュし、startWorkflow でも再利用する（二重解決を避ける）。
+  function renderRecipient() {
+    if (!els.recipient) return;
+    if (!state.executorResolved) { els.recipient.textContent = "確認中…"; return; }
+    els.recipient.textContent = state.executorEmail || "取得できませんでした（設定済みの宛先のみに送信）";
+  }
+
+  function fillRecipient() {
+    renderRecipient();
+    if (state.executorResolved) return;
+    resolveExecutorEmail().then(function (email) {
+      state.executorEmail = email;
+      state.executorResolved = true;
+      renderRecipient();
+    });
   }
 
   function startWorkflow() {
@@ -89,7 +139,12 @@
     state.beganAt = new Date().toISOString();
     state.instanceId = "";
     renderStatus("メインWorkflowを開始しています…");
-    return call("start", {}).then(function (result) {
+    var emailPromise = state.executorResolved ? Promise.resolve(state.executorEmail) : resolveExecutorEmail();
+    return emailPromise.then(function (email) {
+      state.executorEmail = email;
+      state.executorResolved = true;
+      return call("start", email ? {executor_email: email} : {});
+    }).then(function (result) {
       state.requesting = false;
       state.unknown = false;
       acceptStatus(result);
@@ -129,6 +184,7 @@
     try {
       els.dialog.showModal();
       document.body.style.overflow = "hidden";
+      fillRecipient();
       els.cancel.focus({preventScroll: true});
     } catch (error) {
       closeConfirmation();
@@ -143,6 +199,7 @@
     els.dialog = document.getElementById("workflow-confirm");
     els.cancel = document.getElementById("workflow-cancel");
     els.yes = document.getElementById("workflow-confirm-yes");
+    els.recipient = document.getElementById("workflow-recipient-email");
     try {
       var saved = JSON.parse(sessionStorage.getItem(storageKey) || "{}");
       state.instanceId = saved.instanceId || "";

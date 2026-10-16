@@ -251,5 +251,59 @@ class ReportCollectionBinding(unittest.TestCase):
         self.assertTrue(all(call.args[0] == "GET" for call in request.call_args_list))
 
 
+class ExecutorEmailThreading(unittest.TestCase):
+    """実行者メール executor_email が WF-02 入力／WF-01 start フォーム・SUB_FLOW 入力に通る（既存宛先に実行者を追加）。"""
+
+    def setUp(self):
+        # send_email_tool() のパッケージ版 GET をオフライン化（ファイル版を使う）。build/scratch は元々ネット不要。
+        self._orig = (pw.SUBFLOW_MODEL_ID, pw.request)
+        pw.request = lambda *a, **k: {}
+
+    def tearDown(self):
+        pw.SUBFLOW_MODEL_ID, pw.request = self._orig
+
+    def test_subflow_declares_optional_executor_email_input(self):
+        d = pw.subflow_definition("pkg", "1.0.0")
+        schema = d["schema"]["inputs"]
+        self.assertIn(pw.INPUT_EXECUTOR_EMAIL_ID, schema)
+        self.assertEqual(schema[pw.INPUT_EXECUTOR_EMAIL_ID]["name"], "executor_email")
+        self.assertTrue(schema[pw.INPUT_EXECUTOR_EMAIL_ID]["isNullable"], "任意＝店舗ブランチ呼び出しを壊さない")
+        self.assertIn(pw.VAR_EXECUTOR_EMAIL, [v["id"] for v in d["dataList"]])
+        root = next(e for e in d["designElements"] if e.get("type") == "rootNode")
+        exec_input = next(i for i in root["data"]["input"] if i["paramName"] == "executor_email")
+        self.assertFalse(exec_input["required"], "executor_email フォーム入力は required=False")
+
+    def test_company_ai_surfaces_executor_email_store_does_not(self):
+        import json
+        d = pw.subflow_definition("pkg", "1.0.0")
+        company = next(e for e in d["designElements"] if e.get("id") == "ai_company")
+        store = next(e for e in d["designElements"] if e.get("id") == "ai_store")
+        self.assertIn("executor_email", json.dumps(company["data"]["prompt"]["value"], ensure_ascii=False))
+        self.assertNotIn("executor_email", json.dumps(store["data"]["prompt"]["value"], ensure_ascii=False))
+
+    def test_company_send_email_recipientEmails_guides_to_executor(self):
+        d = pw.subflow_definition("pkg", "1.0.0")
+        company = next(e for e in d["designElements"] if e.get("id") == "ai_company")
+        send = next(t for t in company["data"]["agent"]["tools"] if t.get("functionName") == "sendEmail")
+        rc = next(f for f in send["inputs"] if f["paramName"] == "recipientEmails")
+        self.assertIn("executor_email", str(rc.get("aiDescription") or ""))
+
+    def test_wf01_start_form_and_company_subflow_pass_executor_email(self):
+        d = pw.build_wf01_definition(NEW_SUB_MODEL, "1.0.0", NEW_COLLECTION, NEW_SUMMARY_DS, wf01_created_new=True)
+        root = next(e for e in d["designElements"] if e.get("type") == "rootNode")
+        self.assertIn("executor_email", [i.get("paramName") for i in root["data"].get("input") or []])
+        self.assertIn(pw.VAR_EXECUTOR_EMAIL, [v.get("id") for v in d.get("dataList") or []])
+        # F1: message-start の data.executor_email が束縛されるよう schema.inputs にも宣言（rootNode.input と対）。
+        wf01_schema = (d.get("schema") or {}).get("inputs") or {}
+        self.assertIn(pw.INPUT_EXECUTOR_EMAIL_ID, wf01_schema, "WF-01 schema.inputs に executor_email が必要")
+        self.assertTrue(wf01_schema[pw.INPUT_EXECUTOR_EMAIL_ID]["isNullable"])
+        company_sub = next(e for e in d["designElements"] if e.get("type") == "SUB_FLOW"
+                           and next((i.get("value") for i in e["data"].get("input") or []
+                                     if i.get("paramName") == "report_type"), None) == "company")
+        exec_in = next(i for i in company_sub["data"]["input"] if i.get("paramName") == "executor_email")
+        self.assertEqual(exec_in["mappedTo"], pw.VAR_EXECUTOR_EMAIL)
+        self.assertEqual(pw.validate_layout(d), [], "executor_email 追加後もレイアウトは崩れない")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

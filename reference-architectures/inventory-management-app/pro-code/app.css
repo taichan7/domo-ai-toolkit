@@ -364,8 +364,10 @@ button[disabled] { cursor: not-allowed; opacity: .55; }
 .kpi-card:hover, .kpi-card:focus-visible { border-color: var(--line-strong); box-shadow: var(--shadow); }
 .kpi-card span { color: var(--muted); font-size: 11px; font-weight: 600; }
 .kpi-card strong { display: block; margin: 5px 0 2px; color: var(--navy-950); font-size: 26px; line-height: 1.1; }
-.kpi-card small { color: var(--green-700); }
+.kpi-card small { color: var(--muted); }
 .kpi-card.alert small, .kpi-card.alert strong { color: var(--red-600); }
+/* 不足アラート時だけ注記へ前置する注意アイコン。色のみ依存を避ける非色シグナル（文言＋アイコン）。 */
+.kpi-alert-icon { width: 12px; height: 12px; margin-right: 4px; vertical-align: -1px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .kpi-footer { display: flex; align-items: center; justify-content: space-between; }
 .drill-icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .kpi-footer .drill-icon { color: #8b96a4; }
@@ -453,10 +455,12 @@ td { color: #354860; font-size: 12px; }
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr:hover { background: var(--surface-muted); }
 .drilldown-row { cursor: pointer; }
-/* マウス選択時の面ハイライトのみ担う。キーボード操作の輪郭は淡い半透明リングで
-   潰さず、共通の :focus-visible（不透明アクセント青 2px）に委ねる（WCAG 2.4.7）。 */
-.drilldown-row:focus { background: var(--surface-selected); }
 .drill-cell { width: 34px; color: var(--teal-700); text-align: center; }
+/* キーボード/AT の起点は各行末尾の実ボタン（行自体は role=row のままセルを読める）。
+   セル幅いっぱいの透明ボタンで chevron 色（teal）を継ぎ、:focus-visible で不透明アクセント青
+   2px の輪郭を出す（WCAG 2.4.7）。マウスは行全体クリックの委譲でも開ける。 */
+.drill-btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 6px 0; color: inherit; background: none; border: 0; cursor: pointer; }
+.drill-btn:focus-visible { outline: 2px solid var(--teal-700); outline-offset: -2px; border-radius: 4px; }
 
 .master-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 /* 種別タブで非表示にした入力群は、display:grid が [hidden] 属性の既定 display:none を

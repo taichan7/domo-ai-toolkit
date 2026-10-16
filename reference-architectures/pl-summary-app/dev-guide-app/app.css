@@ -631,8 +631,13 @@ dl.defs dd a:focus-visible, ol.proc a:focus-visible {
 .vs__head { display: flex; align-items: center; gap: 10px; font-size: 0.98rem; font-weight: 800; color: var(--brand-ink); }
 .vs__head .ic { color: var(--brand-primary); flex: 0 0 auto; }
 .vs__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
-.vs__list li { display: flex; align-items: flex-start; gap: 9px; font-size: var(--fs-sm); color: var(--ink); line-height: 1.45; }
-.vs__list .ic { width: 17px; height: 17px; flex: 0 0 auto; color: var(--brand-accent); margin-top: 2px; }
+/* 本文は通常フローにする。flex にすると inline の <code>/<b> ごとに別フレックスアイテム化し、
+   CJK テキスト断片が min-content（＝1文字幅）まで縮んで縦に割れる。先頭アイコンは .sec__note と
+   同じく絶対配置で左ガターに吊り、本文はそのぶん字下げする（アイコンの無い li は字下げしない）。 */
+.vs__list li { position: relative; font-size: var(--fs-sm); color: var(--ink); line-height: 1.45; }
+.vs__list li:has(> .ic:first-child) { padding-left: 26px; }
+.vs__list li > .ic:first-child { position: absolute; left: 0; top: 2px; }
+.vs__list .ic { width: 17px; height: 17px; flex: 0 0 auto; color: var(--brand-accent); }
 
 /* ══════════════════════════════════════════════════════════════════
  * 開発ガイド向けの追加プリミティブ（本日の流れ・ハンズオン強調・凡例バッジ）

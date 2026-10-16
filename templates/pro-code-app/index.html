@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pro Code Starter</title>
+  <title>Pro Code スターター</title>
   <script src="https://unpkg.com/ryuu.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -12,37 +12,37 @@
 
     <header class="brand-header">
       <div class="brand-identity">
-        <h1 class="brand-name" id="brandName">Your Company</h1>
-        <span class="brand-tagline" id="brandTagline">Pro Code Starter App</span>
+        <h1 class="brand-name" id="brandName">会社名</h1>
+        <span class="brand-tagline" id="brandTagline">Pro Code スターターアプリ</span>
       </div>
       <div class="app-title">
-        <h2 class="app-name">Dataset Explorer</h2>
+        <h2 class="app-name">データセット閲覧</h2>
       </div>
     </header>
 
     <section class="stats-bar" id="statsBar">
       <div class="stat">
         <div class="stat-number" id="rowCount">—</div>
-        <div class="stat-label">Rows</div>
+        <div class="stat-label">行数</div>
       </div>
       <div class="stat">
         <div class="stat-number" id="columnCount">—</div>
-        <div class="stat-label">Columns</div>
+        <div class="stat-label">列数</div>
       </div>
       <div class="stat">
         <div class="stat-number" id="userName">—</div>
-        <div class="stat-label">Signed In As</div>
+        <div class="stat-label">ログインユーザー</div>
       </div>
       <div class="stat">
         <div class="stat-number" id="instanceName">—</div>
-        <div class="stat-label">Instance</div>
+        <div class="stat-label">インスタンス</div>
       </div>
     </section>
 
     <main class="content-grid">
 
       <section class="card" id="tableCard">
-        <div class="card-header">Dataset Preview</div>
+        <div class="card-header">データプレビュー</div>
         <div class="card-content scrollable">
           <table id="dataTable">
             <thead></thead>
@@ -52,13 +52,13 @@
       </section>
 
       <aside class="card" id="actionsCard">
-        <div class="card-header">Actions</div>
+        <div class="card-header">操作</div>
         <div class="card-content">
-          <button class="btn primary" id="refreshBtn">Refresh Data</button>
-          <button class="btn secondary" id="runSqlBtn">Run Custom SQL</button>
+          <button class="btn primary" id="refreshBtn">データを再取得</button>
+          <button class="btn secondary" id="runSqlBtn">SQL を実行</button>
           <div class="action-hint">
-            Replace this skeleton's manifest <code>dataSetId</code> with your own dataset UUID,
-            then have your AI agent build the workflow you actually need on top of it.
+            このスケルトンの manifest の <code>dataSetId</code> を自分のデータセット UUID に差し替え、
+            その上に AI エージェントで必要なワークフローを構築してください。
           </div>
         </div>
       </aside>

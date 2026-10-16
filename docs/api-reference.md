@@ -53,7 +53,7 @@ SID=$(curl -s "https://$INSTANCE/api/oauth2/sid" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   | python -c "import json,sys; print(json.load(sys.stdin)['sid'])")
 
-echo "Authenticated to $INSTANCE — SID=$SID"
+echo "Authenticated to $INSTANCE (SID acquired — not printed; do not copy or share it)"
 ```
 
 Then use the SID on every request:

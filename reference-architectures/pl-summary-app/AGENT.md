@@ -33,6 +33,16 @@ instructions and authorization policy.
 - Treat AI/AppDB HTML as untrusted. Keep inert parsing and the rendering allowlist.
 - Manual generation runs all stores plus company; the store selector is browsing
   scope. Keep confirmation, cancellation, duplicate-start and uncertain-start guards.
+- The operator who runs the update is also emailed the company report: the FE resolves
+  their address (People API) and passes `executor_email` into `start`; the CE validates
+  it (strict single-address allowlist) and threads it to the Workflow, which places it on
+  the company `Send Email` `recipientEmails` (scalar) alongside the configured
+  `personRecipients`. It is optional and runtime-only — never persist, log, or bake it in,
+  and an unresolved/invalid address must not block the run or the team send. Match the AI
+  prompt's exact-shape rule for `recipientEmails` (list vs text) to avoid the 2.1.17+ send
+  regression; verify by actual receipt, not COMPLETED status. The recipient is
+  caller-supplied and NOT server-verified (same posture as inventory-management-app) — for
+  sensitive real data, add server-side caller-binding or restrict who can run the update.
 - Resolve latest active parent in CE. Do not restore a parent TIMER schedule.
   Parent SUB_FLOW pins must follow a child release; pacing timers remain.
 - Retain the quiet enji UI, chart drill paths and instance-relative progress route.

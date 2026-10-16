@@ -145,6 +145,37 @@ class ManualWorkflowTest(unittest.TestCase):
                          {"messageName": "開始（AI要約）", "modelId": GUID, "version": "1.0.21", "data": {}}))
         self.assertEqual(result["instance_id"], self.instance)
 
+    def test_start_threads_valid_executor_email_into_workflow_data(self):
+        # 実行者メールは Workflow start の data.executor_email に scalar で載る（既存メールの宛先に実行者を追加）。
+        result = ra.pl_report_api("start", {"executor_email": "exec@example.com"})
+        self.assertTrue(result["ok"])
+        self.assertEqual(self.calls[-1], ("post", "api/workflow/v1/instances/message",
+                         {"messageName": "開始（AI要約）", "modelId": GUID, "version": "1.0.21",
+                          "data": {"executor_email": "exec@example.com"}}))
+
+    def test_start_with_empty_executor_email_fires_with_empty_data(self):
+        # 空（実行者が解決できなかった場合）は従来どおり data:{} で発火（宛先追加なし＝チーム宛てだけ）。
+        result = ra.pl_report_api("start", {"executor_email": ""})
+        self.assertTrue(result["ok"])
+        self.assertEqual(self.calls[-1][2]["data"], {})
+
+    def test_start_drops_malformed_executor_email_but_still_runs(self):
+        # 不正アドレスは本人宛て送信だけスキップ（空扱い）＝主機能（レポート生成）は止めない。
+        # 不正値は Workflow data へ流さない（AI の Send Email 宛先/本文への混入防止）。制御文字・bidi も弾く。
+        for bad in ("not-an-email", "a@b.com, c@d.com", "a@b.com c@d.com", "a@b.com<script>",
+                    "no-at-sign.example", "missing-dot@localhost", "a\x00@b.co", "a‮@b.co"):
+            with self.subTest(bad=bad):
+                self.calls = []
+                result = ra.pl_report_api("start", {"executor_email": bad})
+                self.assertTrue(result["ok"], bad)
+                self.assertEqual(self.calls[-1][2]["data"], {}, bad)  # 不正値は data へ流さない
+
+    def test_start_rejects_executor_email_combined_with_other_keys(self):
+        # executor_email 以外のキーは従来どおり拒否（任意キーで別モデルを起動させない）。
+        result = ra.pl_report_api("start", {"executor_email": "exec@example.com", "modelId": self.instance})
+        self.assertEqual(result["error"]["code"], "INVALID_REQUEST")
+        self.assertFalse(self.calls)
+
     def test_existing_running_execution_is_reused_without_a_post(self):
         self.rows = [{"id": self.instance, "modelId": GUID, "status": "IN_PROGRESS", "createdOn": "2026-10-15T00:00:00Z"}]
         result = ra.pl_report_api("start", {})
@@ -317,13 +348,13 @@ class DocumentShapeTest(unittest.TestCase):
         self.assertTrue(out["ok"])
 
     def test_report_type_not_leaked_via_flat_fallback(self):
-        # Finding 4: 平坦フォールバックでも routing キー(report_type/operation)は文書へ混ぜない。
-        ra.pl_report_api("save", dict({"collection_id": GUID, "report_type": "store", "operation": "save"},
-                                      **_full(html="x")))
+        # Finding 4: 平坦フォールバックでも routing/PII キー(report_type/operation/collection_id/executor_email)は
+        # 文書へ混ぜない（executor_email は実行時 PII。AppDB の共有レポートへ永続化させない）。
+        ra.pl_report_api("save", dict({"collection_id": GUID, "report_type": "store", "operation": "save",
+                                       "executor_email": "exec@example.com"}, **_full(html="x")))
         stored = self.db.live_keys("K")[0]["content"]
-        self.assertNotIn("report_type", stored)
-        self.assertNotIn("operation", stored)
-        self.assertNotIn("collection_id", stored)
+        for leaked in ("report_type", "operation", "collection_id", "executor_email"):
+            self.assertNotIn(leaked, stored)
 
     def test_generated_at_autofilled_when_empty(self):
         ra.pl_report_api("save", {"collection_id": GUID, "document": _full()})

@@ -48,25 +48,25 @@ domo whoami
 
 ```bash
 cd domo-ai-toolkit
-bash ../scripts/authenticate.sh your-company.domo.com
+bash scripts/authenticate.sh your-company.domo.com
 ```
 
 (`your-company.domo.com` は実際のインスタンスドメインに置き換えてください。)
 
-`Authenticated to your-company.domo.com - SID=...` と表示されれば成功です。スクリプトは `../scripts/` フォルダに `.sid` ファイルを保存します。他のスクリプトはこれを自動的に読み込みます。`.sid` は `.gitignore` に含まれているので、Git にはコミットされません。
+指定したインスタンスで認証成功と表示されれば準備完了です。スクリプトは所有者のみが読める、Git 管理外の `../scripts/.sid` ファイルを保存し、他のスクリプトが自動的に読み込みます。認証情報（SID）は画面に表示しません。SID や認証ヘッダーをコピー・共有しないでください。
 
 ---
 
 ## ステップ 3 — データセットの一覧表示
 
 ```bash
-bash ../scripts/list-datasets.sh
+bash scripts/list-datasets.sh
 ```
 
 インスタンス内の最初の 50 件のデータセットが ID、名前、タイプ、行数、所有者とともに表示されます。さらに多くを取得するには件数を渡してください:
 
 ```bash
-bash ../scripts/list-datasets.sh 200   # 50 件ずつのページングで最初の 200 件を取得
+bash scripts/list-datasets.sh 200   # 50 件ずつのページングで最初の 200 件を取得
 ```
 
 ---
@@ -76,21 +76,21 @@ bash ../scripts/list-datasets.sh 200   # 50 件ずつのページングで最初
 上記の一覧から任意のデータセット ID を選択し、以下を実行します:
 
 ```bash
-bash ../scripts/query-dataset.sh <dataset-id> "SELECT * FROM table LIMIT 5"
+bash scripts/query-dataset.sh <dataset-id> "SELECT * FROM table LIMIT 5"
 ```
 
 テーブル名は常に `table` です — データセット自身を指します。標準的な SQL がそのまま使えます:
 
 ```bash
-bash ../scripts/query-dataset.sh <id> "SELECT COUNT(*) FROM table"
-bash ../scripts/query-dataset.sh <id> "SELECT * FROM table WHERE status = 'open' LIMIT 10"
-bash ../scripts/query-dataset.sh <id> "SELECT \`Column Name\` FROM table LIMIT 5"
+bash scripts/query-dataset.sh <id> "SELECT COUNT(*) FROM table"
+bash scripts/query-dataset.sh <id> "SELECT * FROM table WHERE status = 'open' LIMIT 10"
+bash scripts/query-dataset.sh <id> "SELECT \`Column Name\` FROM table LIMIT 5"
 ```
 
 `LIMIT 0` を使うと列情報のみを取得できます (スキーマの確認に便利):
 
 ```bash
-bash ../scripts/query-dataset.sh <id> "SELECT * FROM table LIMIT 0"
+bash scripts/query-dataset.sh <id> "SELECT * FROM table LIMIT 0"
 ```
 
 ---
@@ -98,13 +98,13 @@ bash ../scripts/query-dataset.sh <id> "SELECT * FROM table LIMIT 0"
 ## ステップ 5 — 失敗した ETL の診断
 
 ```bash
-bash ../scripts/diagnose-etls.sh
+bash scripts/diagnose-etls.sh
 ```
 
 直近の実行に失敗した Magic ETL データフローをエラーコードごとにグループ化して一覧表示します。特定の失敗を掘り下げるには:
 
 ```bash
-bash ../scripts/diagnose-etls.sh <flow-id>
+bash scripts/diagnose-etls.sh <flow-id>
 ```
 
 失敗したタイル、関連する式や結合キー、返されたエラーコードが表示されます。コードを `api-reference.ja.md` の表と照らし合わせて推奨される修正方法を確認してください。
@@ -141,7 +141,7 @@ CLI はインストールされていますが PATH に含まれていません�
 アカウントがこのインスタンスのどのデータセットにも読み取り権限を持っていない可能性があります。Domo 管理者に確認してください。
 
 **実行中に `401 Unauthorized`**
-SID の有効期限 (約 1 時間) が切れています。`bash ../scripts/authenticate.sh <instance>` を再実行してください。
+SID の有効期限 (約 1 時間) が切れています。`bash scripts/authenticate.sh <instance>` を再実行してください。
 
 **SQL クエリで列が返らない**
 SQL が有効か確認してください — まず Domo の Analyzer で試してみてください。スペースを含む列名はクォートではなくバッククォート (`` `Column Name` ``) で囲む必要があります。

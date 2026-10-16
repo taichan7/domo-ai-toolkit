@@ -1,6 +1,6 @@
 {
   "name": "Store PL AI Insights",
-  "version": "0.3.3",
+  "version": "0.3.6",
   "size": {
     "width": 1,
     "height": 1
@@ -48,7 +48,7 @@
       "name": "plReportService",
       "alias": "plReportApi",
       "packageId": "",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "functionName": "pl_report_api",
       "parameters": [
         {

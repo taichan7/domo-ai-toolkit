@@ -48,7 +48,7 @@ You should see your instance and your user.
 
 ```bash
 cd domo-ai-toolkit
-bash ../scripts/authenticate.sh your-company.domo.com
+bash scripts/authenticate.sh your-company.domo.com
 ```
 
 (Replace `your-company.domo.com` with your actual instance domain.)
@@ -60,13 +60,13 @@ If it reports authentication succeeded for the requested instance, you are ready
 ## Step 3 — List datasets
 
 ```bash
-bash ../scripts/list-datasets.sh
+bash scripts/list-datasets.sh
 ```
 
 You should see the first 50 datasets in your instance, with their ID, name, type, row count, and owner. To get more, pass a number:
 
 ```bash
-bash ../scripts/list-datasets.sh 200   # fetch the first 200 in pages of 50
+bash scripts/list-datasets.sh 200   # fetch the first 200 in pages of 50
 ```
 
 ---
@@ -76,21 +76,21 @@ bash ../scripts/list-datasets.sh 200   # fetch the first 200 in pages of 50
 Pick any dataset ID from the list above. Then:
 
 ```bash
-bash ../scripts/query-dataset.sh <dataset-id> "SELECT * FROM table LIMIT 5"
+bash scripts/query-dataset.sh <dataset-id> "SELECT * FROM table LIMIT 5"
 ```
 
 The table name is always `table` — it refers to the dataset itself. You can use any standard SQL:
 
 ```bash
-bash ../scripts/query-dataset.sh <id> "SELECT COUNT(*) FROM table"
-bash ../scripts/query-dataset.sh <id> "SELECT * FROM table WHERE status = 'open' LIMIT 10"
-bash ../scripts/query-dataset.sh <id> "SELECT \`Column Name\` FROM table LIMIT 5"
+bash scripts/query-dataset.sh <id> "SELECT COUNT(*) FROM table"
+bash scripts/query-dataset.sh <id> "SELECT * FROM table WHERE status = 'open' LIMIT 10"
+bash scripts/query-dataset.sh <id> "SELECT \`Column Name\` FROM table LIMIT 5"
 ```
 
 Use `LIMIT 0` to see only the column list (schema discovery):
 
 ```bash
-bash ../scripts/query-dataset.sh <id> "SELECT * FROM table LIMIT 0"
+bash scripts/query-dataset.sh <id> "SELECT * FROM table LIMIT 0"
 ```
 
 ---
@@ -98,13 +98,13 @@ bash ../scripts/query-dataset.sh <id> "SELECT * FROM table LIMIT 0"
 ## Step 5 — Diagnose failing ETLs
 
 ```bash
-bash ../scripts/diagnose-etls.sh
+bash scripts/diagnose-etls.sh
 ```
 
 This lists every Magic ETL dataflow whose last run failed, grouped by error code. To drill into one specific failure:
 
 ```bash
-bash ../scripts/diagnose-etls.sh <flow-id>
+bash scripts/diagnose-etls.sh <flow-id>
 ```
 
 You will see the failing tile, the expression or join keys involved, and which error code came back. Match the code against the table in `api-reference.md` for a recommended fix.
@@ -141,7 +141,7 @@ You have not run `domo login` against that instance yet. Run it and pick the rig
 Your account may not have read access on any datasets in this instance. Check with your Domo admin.
 
 **`401 Unauthorized` mid-run**
-The SID expired (it lasts roughly an hour). Re-run `bash ../scripts/authenticate.sh <instance>` and try again.
+The SID expired (it lasts roughly an hour). Re-run `bash scripts/authenticate.sh <instance>` and try again.
 
 **SQL returns no columns**
 Make sure the SQL is valid — try it in Domo's Analyzer first. Check that column names with spaces use backticks (`` `Column Name` ``), not quotes.

@@ -44,7 +44,7 @@
 - [ ] **開発者トークン**を発行できるか（できない場合は本ノート §3「トークン無し運用」へ）
 - [ ] 社内プロキシの値（npm / git / Domo への到達）
 - [ ] **当日端末のソフト導入可否**（会社管理 PC は winget / `npm install -g` が禁止のことがある。不可なら事前に情シス申請、または事前キッティング済みの貸与端末を手配）
-- [ ] **会場ネットワークで実機 1 台の事前疎通**（前日までに `npm install -g ryuu` / `git clone` / `domo login` / `domo publish` まで通す＝false green 対策。失敗時は許可ドメイン `fonts.googleapis.com` / `github.com` / `*.domo.com` を IT へ申請）
+- [ ] **会場ネットワークで実機 1 台の事前疎通**（前日までに `npm install -g ryuu` / `git clone` / `domo login` / `domo publish` まで通す＝false green 対策。失敗時は許可ドメイン `registry.npmjs.org` / `github.com` / `*.domo.com` を IT へ申請）
 - [ ] **後方支援比率**（受講者 6〜8 名ごとに巡回 TA 1 名。環境点検ゲート 0:10-0:35 に人員を厚く。早く終わった人は dev-guide §9「もっと深く」へ誘導）
 - [ ] 各参加者の利用許可済みエージェントアカウント／組織から割り当てられた席と利用上限。ログインやAPIキーを参加者間で共有しない。利用枠がない場合は講師の実演・ペア作業へ切り替える
 - [ ] インスタンス名の案内文（`<自社>.domo.com`）

@@ -143,6 +143,8 @@ VAR_COMPANY_RESULT = "var_company_result"  # 全社AIの結果（object）
 INPUT_COLLECTION_ID = "input_CollectionId"
 INPUT_PROMPT_ID = "input_AiPromptText"
 INPUT_REPORT_TYPE_ID = "input_report_type"
+VAR_EXECUTOR_EMAIL = "var_executor_email"      # executor_email（text・実行者本人の宛先。任意／空可）
+INPUT_EXECUTOR_EMAIL_ID = "input_executor_email"
 
 # 待機（タイマー）秒数。reference-app を踏襲（子=5秒 / 親ループ=15秒）。
 # 親ループの15秒は WF-02 を wait:False で非同期投入する際の同時実行数を抑え、AI 書込みの
@@ -461,10 +463,10 @@ def wf_var(var_id: str, param_name: str, data_type: str = "text", is_list: bool 
             "children": [], "showChildren": False, "entitySubType": None, "value": None, "isOutput": False}
 
 
-def form_input(input_id: str, param_name: str, var_id: str) -> Dict[str, Any]:
+def form_input(input_id: str, param_name: str, var_id: str, required: bool = True) -> Dict[str, Any]:
     return {"id": input_id, "paramName": param_name, "acceptsInput": False, "useExternalValues": False,
             "dataType": "text", "mappedTo": var_id, "value": None, "fieldOptionsMappedTo": None,
-            "fieldOptionsValue": None, "datasetMapping": None, "required": True, "children": [],
+            "fieldOptionsValue": None, "datasetMapping": None, "required": required, "children": [],
             "displayName": param_name, "visible": True, "formFieldId": str(uuid.uuid4()), "formFieldType": None,
             "flag": "input", "customMappingType": "form_start", "entitySubType": None, "isList": False,
             "configType": "forms"}
@@ -476,7 +478,8 @@ def root_node(title: str) -> Dict[str, Any]:
         "type": "Start", "_designNode": "rootNode", "isFormStart": True,
         "input": [form_input(INPUT_COLLECTION_ID, "CollectionId", VAR_COLLECTION),
                   form_input(INPUT_PROMPT_ID, "AiPromptText", VAR_PROMPT),
-                  form_input(INPUT_REPORT_TYPE_ID, "report_type", VAR_REPORT_TYPE)],
+                  form_input(INPUT_REPORT_TYPE_ID, "report_type", VAR_REPORT_TYPE),
+                  form_input(INPUT_EXECUTOR_EMAIL_ID, "executor_email", VAR_EXECUTOR_EMAIL, required=False)],
         "output": [], "formId": str(uuid.uuid4()), "formTitle": "null", "formDescription": "null",
     }, "style": {"zIndex": 4, "outline": "none"}, "index": 0, "type": "rootNode"}
 
@@ -537,8 +540,12 @@ def report_type_rule(value: str) -> List[Dict[str, Any]]:
     ]}]
 
 
-def prompt_value() -> List[Dict[str, Any]]:
-    """AI_AGENT の prompt.value（CollectionId と AiPromptText を注入）。既存 WF-02 の形を踏襲。"""
+def prompt_value(executor: bool = False) -> List[Dict[str, Any]]:
+    """AI_AGENT の prompt.value（CollectionId と AiPromptText を注入）。既存 WF-02 の形を踏襲。
+
+    executor=True（全社ブランチ）のときは実行者本人のメール executor_email も変数として注入する
+    （§8.2 の宛先ルールで、既存の personRecipients に加えて recipientEmails へ入れるために使う）。
+    """
     def para(text: str) -> Dict[str, Any]:
         return {"type": "paragraph", "children": [{"text": text, "bold": False, "italic": False, "underlined": False, "sql": False}]}
 
@@ -547,16 +554,22 @@ def prompt_value() -> List[Dict[str, Any]]:
                 "dataType": "text", "id": var_id, "name": name, "isList": False}
 
     blank = {"text": "", "bold": False, "italic": False, "underlined": False, "sql": False}
-    return [
+    blocks = [
         para("入力変数："),
         {"type": "paragraph", "children": [blank | {"text": "collection_id: "}, var_ref(VAR_COLLECTION, "CollectionId"), dict(blank)]},
         para("これはAppDBコレクションID（文字列）です。保存は pl_report_api(operation=\"save\", request={collection_id, document}) で行う。"),
+    ]
+    if executor:
+        blocks.append({"type": "paragraph", "children": [blank | {"text": "executor_email: "}, var_ref(VAR_EXECUTOR_EMAIL, "executor_email"), dict(blank)]})
+        blocks.append(para("これはこのWorkflowを実行した本人のメールアドレス（任意・空の場合あり）。§8.2 の宛先ルールで使う。"))
+    blocks += [
         para(""),
         para("以下のデータに基づいて分析を行ってください。"),
         para("<data>"),
         {"type": "paragraph", "children": [dict(blank), var_ref(VAR_PROMPT, "AiPromptText"), dict(blank)]},
         para("</data>"),
     ]
+    return blocks
 
 
 def pl_report_api_tool(package_id: str, package_version: str) -> Dict[str, Any]:
@@ -589,20 +602,33 @@ def send_email_tool() -> Dict[str, Any]:
     """全社ブランチ用 Send Email 組込みツール。配布安全化のため実シェイプを2点だけ動的化する。
 
     設計思想「インスタンスに合わせて解決し、成功を偽装しない」:
-    - packageVersion: 配備先の Send Email パッケージの最新版を解決（固定版の取り違え＝バインド失敗を防ぐ）。
-      宛先は personRecipients（person 型・**全版で list のまま＝シェイプ無変化**）を使うため、2.1.17+ で
-      recipientEmails が list 化しても影響を受けない（inventory の recipientEmails 経路とは別物。隔離テストで
-      2.1.18＋personRecipients の AI エージェント送信が COMPLETED を実測）。
+    - packageVersion: recipientEmails が scalar のままになる **2.1.17 未満の最新版**を選ぶ（executor_email を
+      recipientEmails に scalar で入れるため。2.1.17+ では recipientEmails が list 化し、scalar 前提の本定義・
+      §8.2「単一テキストはそのまま」と食い違う＝inventory が避ける送信レグレッション）。該当版が無ければファイルの版。
+      personRecipients は person 型で全版 list のまま＝チーム宛先は影響なし（隔離テストで送信 COMPLETED 実測）。
     - personRecipients: env `PL_EMAIL_PERSON_RECIPIENTS`（カンマ区切り person ID）があれば注入する。
       配布物（send_email_tool.json）には実在の個人IDを焼き込まない。**未設定なら宛先ゼロで配備し、その旨を
       配備時に大きく警告する**（プロンプトは宛先を創作せずスキップ＝WF は COMPLETED でもメールは出さない）。
     """
     tool = json.loads(SEND_EMAIL_TOOL_PATH.read_text(encoding="utf-8"))
+    # recipientEmails（scalar text・従来は未使用）に、実行者本人 executor_email を AI が入れる。inventory と
+    # 同じく「入力の型定義に厳密に合わせる」ことを aiDescription で指示（2.1.17+ で list 化していても壊れない）。
+    # personRecipients（チーム宛先・下で env 束縛）はそのまま＝既存の宛先は不変、実行者を1人加えるだけ。
+    for _f in tool.get("inputs") or []:
+        if _f.get("paramName") == "recipientEmails":
+            _f["aiDescription"] = ("ワークフロー入力 executor_email（このWorkflowを実行した本人のメール）だけを設定する。"
+                                   "この欄の型定義に厳密に合わせること：リスト型なら要素1つの配列 [executor_email]、"
+                                   "単一テキスト型ならそのまま。executor_email が空またはメール形式でなければ設定しない。"
+                                   "宛先アドレスを創作・推測しない。")
     pkg_id = str(tool.get("packageId") or "")
     try:
-        latest = request("GET", f"api/codeengine/v2/packages/{pkg_id}/versions/latest") or {}
-        if isinstance(latest, dict) and latest.get("version"):
-            tool["packageVersion"] = str(latest["version"])
+        # recipientEmails は 2.1.17+ で list 化するため、scalar を保てる **2.1.17 未満の最新版**を選ぶ
+        # （本ツール定義は isList:false＝scalar。版と型を一致させて 2.1.17+ 送信レグレッションを避ける）。
+        rows = items(request("GET", f"api/codeengine/v2/packages/{pkg_id}/versions?limit=1000&offset=0"), "versions")
+        scalar_safe = [str(v.get("version")) for v in rows
+                       if v.get("version") and version_key(str(v.get("version"))) < (2, 1, 17)]
+        if scalar_safe:
+            tool["packageVersion"] = max(scalar_safe, key=version_key)
     except Exception:
         pass  # 解決失敗（dry-run/権限）時はファイルの版を使う
     if EMAIL_PERSON_RECIPIENTS:
@@ -623,14 +649,14 @@ def send_email_tool() -> Dict[str, Any]:
 
 
 def ai_agent_node(node_id: str, title: str, description: str, instructions: str, result_var: str,
-                  x: int, y: int, index: int, tools: List[Dict[str, Any]]) -> Dict[str, Any]:
+                  x: int, y: int, index: int, tools: List[Dict[str, Any]], executor: bool = False) -> Dict[str, Any]:
     datasets = [{"id": v} for alias, v in dataset_ids().items() if alias in CONTEXT_DATASET_ALIASES and v]
     result = {"id": gen_id(), "paramName": "result", "dataType": "object", "mappedTo": result_var, "value": None,
               "required": True, "isList": False, "children": [], "displayName": "Result", "visible": True,
               "flag": "output", "customMappingType": None, "configType": None, "entitySubType": None, "aiDescription": None}
     return {"id": node_id, "position": {"x": x, "y": y}, "data": {
         "dimensions": {"width": 200, "height": 60}, "title": title, "description": description,
-        "prompt": {"id": gen_id(), "paramName": "prompt", "dataType": "text", "mappedTo": None, "value": prompt_value(),
+        "prompt": {"id": gen_id(), "paramName": "prompt", "dataType": "text", "mappedTo": None, "value": prompt_value(executor),
                    "required": True, "isList": False, "children": [], "displayName": "Prompt", "visible": True,
                    "flag": "input", "customMappingType": None, "configType": None, "entitySubType": None, "aiDescription": None},
         "result": result,
@@ -653,7 +679,7 @@ def subflow_definition(package_id: str, package_version: str) -> Dict[str, Any]:
     store_ai = ai_agent_node("ai_store", "AIエージェント｜店舗レポート生成", "単一店舗の損益レポートを生成しAppDBへ保存",
                              build_instructions(STORE_PROMPT_PATH), VAR_STORE_RESULT, 360, 440, 4, [store_tool])
     company_ai = ai_agent_node("ai_company", "AIエージェント｜全社サマリー生成", "全社損益サマリーを生成しAppDBへ保存・通知",
-                               build_instructions(COMPANY_PROMPT_PATH), VAR_COMPANY_RESULT, 580, 440, 3, company_tools)
+                               build_instructions(COMPANY_PROMPT_PATH), VAR_COMPANY_RESULT, 580, 440, 3, company_tools, executor=True)
     end = end_node(360, 5, y=640)
 
     e_root_timer = edge(root["id"], settle["id"], 6)
@@ -687,11 +713,14 @@ def subflow_definition(package_id: str, package_version: str) -> Dict[str, Any]:
                           "isNullable": False, "id": INPUT_PROMPT_ID, "isChild": False, "parent": None},
         INPUT_REPORT_TYPE_ID: {"name": "report_type", "type": "text", "subType": None, "isList": False,
                                "isNullable": False, "id": INPUT_REPORT_TYPE_ID, "isChild": False, "parent": None},
+        INPUT_EXECUTOR_EMAIL_ID: {"name": "executor_email", "type": "text", "subType": None, "isList": False,
+                                  "isNullable": True, "id": INPUT_EXECUTOR_EMAIL_ID, "isChild": False, "parent": None},
     }
     data_list = [
         wf_var(VAR_COLLECTION, "CollectionId", "text"),
         wf_var(VAR_PROMPT, "AiPromptText", "text"),
         wf_var(VAR_REPORT_TYPE, "report_type", "text"),
+        wf_var(VAR_EXECUTOR_EMAIL, "executor_email", "text"),
         wf_var(VAR_STORE_RESULT, "StoreResult", "object"),
         wf_var(VAR_COMPANY_RESULT, "CompanyResult", "object"),
     ]
@@ -908,21 +937,23 @@ def validate_layout(definition: Dict[str, Any]) -> List[str]:
 # WF-01 を reference-app 流（並列サイドブランチ＋2終了）へ再構成する
 # =========================================================================== #
 def _ensure_subflow_input(subflow: Dict[str, Any], sub_version: str, report_type: str) -> None:
-    """SUB_FLOW ノードを統合モデルへ張替（report_type 付与・prompt 入力名を AiPromptText に統一）。"""
+    """SUB_FLOW ノードを統合モデルへ張替（report_type 付与・prompt 入力名を AiPromptText に統一）。
+    実行者メール executor_email（任意）も WF-01 変数 VAR_EXECUTOR_EMAIL から子へ渡す（宛先追加用）。"""
     data = subflow["data"]
     data["modelId"] = SUBFLOW_MODEL_ID
     data["modelVersion"] = sub_version
     prompt_mapped = next((i.get("mappedTo") for i in data.get("input") or []
-                          if i.get("paramName") not in ("CollectionId", "report_type")), None)
+                          if i.get("paramName") not in ("CollectionId", "report_type", "executor_email")), None)
 
-    def field(name: str, mapped: Optional[str], value: Optional[str]) -> Dict[str, Any]:
+    def field(name: str, mapped: Optional[str], value: Optional[str], required: bool = True) -> Dict[str, Any]:
         return {"id": gen_id(), "paramName": name, "dataType": "text", "mappedTo": mapped, "value": value,
-                "required": True, "isList": False, "children": [], "displayName": name, "visible": True,
+                "required": required, "isList": False, "children": [], "displayName": name, "visible": True,
                 "flag": "input", "customMappingType": None, "configType": None, "entitySubType": None, "aiDescription": None}
 
     data["input"] = [field("CollectionId", VAR_COLLECTION, None),
                      field("AiPromptText", prompt_mapped, None),
-                     field("report_type", None, report_type)]
+                     field("report_type", None, report_type),
+                     field("executor_email", VAR_EXECUTOR_EMAIL, None, required=False)]
 
 
 def ci_style_mainflow_definition(definition: Dict[str, Any], sub_version: str) -> Dict[str, Any]:
@@ -945,6 +976,26 @@ def ci_style_mainflow_definition(definition: Dict[str, Any], sub_version: str) -
 
     # --- 役割同定（ID/タイトルに依存せず type・functionName・変数配線で判定） ---
     root = next(e for e in nodes if e.get("type") == "rootNode")
+    # 実行者メール（任意）を WF-01 の start フォーム入力＋dataList 変数として注入する。CE は start 時に
+    # data.executor_email で渡し、この form_start 入力に束縛される（未指定なら空＝実行者宛て送信なし）。
+    dl = d.setdefault("dataList", [])
+    if not any(v.get("id") == VAR_EXECUTOR_EMAIL for v in dl):
+        dl.append(wf_var(VAR_EXECUTOR_EMAIL, "executor_email", "text"))
+    root_inputs = root.setdefault("data", {}).setdefault("input", [])
+    if not any(i.get("paramName") == "executor_email" for i in root_inputs):
+        root_inputs.append(form_input(INPUT_EXECUTOR_EMAIL_ID, "executor_email", VAR_EXECUTOR_EMAIL, required=False))
+    root["data"]["isFormStart"] = True
+    if not root["data"].get("formId"):
+        root["data"]["formId"] = str(uuid.uuid4())
+    # メッセージ開始の data.executor_email を束縛するには、rootNode.input だけでなく schema.inputs にも
+    # 宣言が要る（WF-02 と同じ契約。未宣言だとキーが落ちて実行者が通知されない＝機能が無言で no-op）。
+    schema = d.setdefault("schema", {})
+    schema_inputs = schema.setdefault("inputs", {})
+    if INPUT_EXECUTOR_EMAIL_ID not in schema_inputs:
+        schema_inputs[INPUT_EXECUTOR_EMAIL_ID] = {"name": "executor_email", "type": "text", "subType": None,
+                                                  "isList": False, "isNullable": True, "id": INPUT_EXECUTOR_EMAIL_ID,
+                                                  "isChild": False, "parent": None}
+    schema.setdefault("outputs", {})
     gateway = next(e for e in nodes if e.get("type") == "conditionalGatewayNode")
     timer = next(e for e in nodes if e.get("type") == "intermediateCatchEventNode")
     getone = next(e for e in nodes if svc_fn(e) == "getObjectFromList")   # 単一店舗取得

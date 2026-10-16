@@ -182,7 +182,6 @@
     byId('view-dashboard').addEventListener('focusin', handleChartFocus);
     byId('view-dashboard').addEventListener('focusout', hideChartTooltip);
     elements['history-body'].addEventListener('click', handleHistoryDrilldown);
-    elements['history-body'].addEventListener('keydown', handleHistoryDrilldownKey);
     // ページ送りは安定した外枠コンテナへ委譲する（中身は再描画で作り替えるため個別バインド不可）。
     if (elements['history-pager']) elements['history-pager'].addEventListener('click', handlePagerClick);
     if (elements['master-pager']) elements['master-pager'].addEventListener('click', handlePagerClick);
@@ -225,7 +224,6 @@
     global.addEventListener('pagehide', cancelConfirmation);
     if (elements['master-list']) {
       elements['master-list'].addEventListener('click', handleMasterRowActivate);
-      elements['master-list'].addEventListener('keydown', handleMasterRowKey);
     }
     elements['selected-location-card'].addEventListener('click', () => setStep(1));
     elements['selected-item-card'].addEventListener('click', () => setStep(2));
@@ -900,9 +898,15 @@
     });
     state.dashboardDrilldowns.kpi = kpiRows;
     elements['kpi-grid'].innerHTML = kpiRows.map((row, index) => {
-      const isAlert = row.metric_key === 'SHORTAGE_COUNT' && Number(row.metric_value) > 0;
-      const note = row.metric_key === 'SHORTAGE_COUNT' ? '基準未満' : '最新集計';
-      return `<button type="button" class="kpi-card ${isAlert ? 'alert' : ''}" data-drill-kind="kpi" data-drill-index="${index}" data-tooltip-title="${escapeAttribute(row.label)}" data-tooltip-detail="${escapeAttribute(`${number.format(Number(row.metric_value || 0))} / クリックして内訳を表示`)}"><span class="kpi-label">${escapeHtml(row.label)}</span><strong>${number.format(Number(row.metric_value || 0))}</strong><span class="kpi-footer"><small>${note}</small><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></span></button>`;
+      const isShortage = row.metric_key === 'SHORTAGE_COUNT';
+      const value = Number(row.metric_value || 0);
+      const isAlert = isShortage && value > 0;
+      // 状態を色だけに頼らせない: 不足>0は「要補充 N件」＋警告アイコン、0は「基準内」、他KPIは「最新集計」。
+      // これでアクセシブル名が状態ごとに別語になり（例「在庫不足 3 要補充 3件」/「在庫不足 0 基準内」）、
+      // 色覚・AT 利用者にも不足の有無が文言で伝わる。
+      const note = isShortage ? (isAlert ? `要補充 ${number.format(value)}件` : '基準内') : '最新集計';
+      const alertIcon = isAlert ? '<svg class="kpi-alert-icon" aria-hidden="true"><use href="#icon-bell"></use></svg>' : '';
+      return `<button type="button" class="kpi-card ${isAlert ? 'alert' : ''}" data-drill-kind="kpi" data-drill-index="${index}" data-tooltip-title="${escapeAttribute(row.label)}" data-tooltip-detail="${escapeAttribute(`${number.format(value)} / クリックして内訳を表示`)}"><span class="kpi-label">${escapeHtml(row.label)}</span><strong>${number.format(value)}</strong><span class="kpi-footer"><small>${alertIcon}${escapeHtml(note)}</small><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></span></button>`;
     }).join('');
 
     const itemStocks = filterDashboardRows(rows.filter((row) => row.record_type === 'ITEM_STOCK').sort((a, b) => Number(b.metric_value) - Number(a.metric_value)));
@@ -1231,7 +1235,7 @@
       elements['history-type'].closest('label').hidden = true;
       elements['history-head'].innerHTML = '<tr><th scope="col">日時</th><th scope="col">イベント</th><th scope="col">品目</th><th scope="col">場所</th><th scope="col">在庫 / 基準</th><th scope="col">通知</th><th scope="col">件名</th><th scope="col" aria-label="詳細"></th></tr>';
       rows = [...state.data.alerts].filter((row) => !query || `${row.item_code || ''} ${row.item_name || ''} ${row.location_code || ''} ${row.location_name || ''} ${row.notification_subject || ''} ${row.created_at || ''} ${row.alert_id || ''}`.toLocaleLowerCase('ja-JP').includes(query)).sort(sortNewest('created_at'));
-      renderRow = (row, index) => `<tr class="drilldown-row" tabindex="0" role="button" data-history-index="${index}" aria-label="${escapeAttribute(row.item_name || row.item_code)}の通知詳細"><td>${formatDate(row.created_at)}</td><td><span class="status-pill ${row.event_type === 'RECOVERY' ? 'recovery' : 'shortage'}">${escapeHtml(row.event_type === 'RECOVERY' ? '回復' : '不足')}</span></td><td>${escapeHtml(row.item_name || row.item_code)}</td><td>${escapeHtml(row.location_name || row.location_code)}</td><td>${number.format(Number(row.current_quantity || 0))} / ${number.format(Number(row.minimum_quantity || 0))}</td><td><span class="status-pill ${statusClass(row.notification_status)}">${escapeHtml(row.notification_status || 'PENDING')}</span></td><td>${escapeHtml(row.notification_subject || '—')}</td><td class="drill-cell"><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></td></tr>`;
+      renderRow = (row, index) => `<tr class="drilldown-row" data-history-index="${index}"><td>${formatDate(row.created_at)}</td><td><span class="status-pill ${row.event_type === 'RECOVERY' ? 'recovery' : 'shortage'}">${escapeHtml(row.event_type === 'RECOVERY' ? '回復' : '不足')}</span></td><td>${escapeHtml(row.item_name || row.item_code)}</td><td>${escapeHtml(row.location_name || row.location_code)}</td><td>${number.format(Number(row.current_quantity || 0))} / ${number.format(Number(row.minimum_quantity || 0))}</td><td><span class="status-pill ${statusClass(row.notification_status)}">${escapeHtml(statusLabel(row.notification_status))}</span></td><td>${escapeHtml(row.notification_subject || '—')}</td><td class="drill-cell"><button type="button" class="drill-btn" aria-label="${escapeAttribute(row.item_name || row.item_code)}の明細を開く"><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button></td></tr>`;
       emptyColspan = 8;
       emptyMessage = '通知履歴がありません。';
     } else {
@@ -1240,7 +1244,7 @@
       rows = [...state.data.transactions].filter((row) => (!type || row.transaction_type === type) && (!query || `${row.item_code || ''} ${row.item_name || ''} ${row.location_code || ''} ${row.location_name || ''} ${row.operator_name || ''} ${row.reason || ''} ${row.occurred_at || ''} ${row.transaction_id || ''} ${row.request_id || ''}`.toLocaleLowerCase('ja-JP').includes(query))).sort(sortNewest('occurred_at'));
       renderRow = (row, index) => {
         const cls = row.transaction_type === 'OUT' ? 'pending' : 'sent';
-        return `<tr class="drilldown-row" tabindex="0" role="button" data-history-index="${index}" aria-label="${escapeAttribute(row.item_name || row.item_code)}の取引詳細"><td>${formatDate(row.occurred_at)}</td><td><span class="status-pill ${cls}">${escapeHtml(transactionLabel(row.transaction_type))}</span></td><td>${escapeHtml(row.item_name || row.item_code)}</td><td>${escapeHtml(row.location_name || row.location_code)}</td><td>${number.format(Number(row.quantity || 0))}</td><td>${number.format(Number(row.balance_after || 0))}</td><td>${escapeHtml(row.operator_name || row.operator_user_id || '—')}</td><td>${escapeHtml(row.reason || '—')}</td><td class="drill-cell"><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></td></tr>`;
+        return `<tr class="drilldown-row" data-history-index="${index}"><td>${formatDate(row.occurred_at)}</td><td><span class="status-pill ${cls}">${escapeHtml(transactionLabel(row.transaction_type))}</span></td><td>${escapeHtml(row.item_name || row.item_code)}</td><td>${escapeHtml(row.location_name || row.location_code)}</td><td>${number.format(Number(row.quantity || 0))}</td><td>${number.format(Number(row.balance_after || 0))}</td><td>${escapeHtml(row.operator_name || row.operator_user_id || '—')}</td><td>${escapeHtml(row.reason || '—')}</td><td class="drill-cell"><button type="button" class="drill-btn" aria-label="${escapeAttribute(row.item_name || row.item_code)}の明細を開く"><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button></td></tr>`;
       };
       emptyColspan = 9;
       emptyMessage = '取引履歴がありません。';
@@ -1372,14 +1376,6 @@
     openHistoryRow(Number(target.dataset.historyIndex));
   }
 
-  function handleHistoryDrilldownKey(event) {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    const target = event.target.closest('[data-history-index]');
-    if (!target) return;
-    event.preventDefault();
-    openHistoryRow(Number(target.dataset.historyIndex));
-  }
-
   function openHistoryRow(index) {
     const row = state.historyVisibleRows[index];
     if (!row) return;
@@ -1395,8 +1391,8 @@
     elements['history-body'].querySelectorAll('.drilldown-row').forEach((node) => {
       const selected = Number(node.dataset.historyIndex) === state.selectedHistoryIndex;
       node.classList.toggle('is-selected', selected);
-      // 選択は集合内のカレント項目なので aria-current で表す。行は role="button" のため
-      // aria-selected は無効（listbox/grid 専用）。未選択時は属性ごと外す。
+      // 行は素の <tr>（role=row）。集合内のカレント項目は aria-current で表す（aria-selected は
+      // listbox/grid 専用で tr には無効）。未選択時は属性ごと外す。
       if (selected) node.setAttribute('aria-current', 'true');
       else node.removeAttribute('aria-current');
     });
@@ -1604,7 +1600,7 @@
           ['イベント', row.event_type === 'RECOVERY' ? '在庫回復' : '在庫不足'],
           ['品目', `${row.item_name || '—'} (${row.item_code || '—'})`],
           ['ロケーション', `${row.location_name || '—'} (${row.location_code || '—'})`],
-          ['通知状態', row.notification_status || 'PENDING'],
+          ['通知状態', statusLabel(row.notification_status)],
           ['本文', row.notification_body || '—'],
           ['エラー', row.error_message || '—']
         ]))
@@ -2023,7 +2019,7 @@
     const status = active ? '<span class="master-status active">有効</span>' : '<span class="master-status inactive">停止中</span>';
     const selected = code === state.masterEditKey;
     // 行全体をクリック／キー操作の対象にし、右ペインの編集フォームへ読み込む（履歴の明細ドリルダウンと同じ操作感）。
-    return `<tr class="drilldown-row${active ? '' : ' master-row-inactive'}${selected ? ' is-selected' : ''}" tabindex="0" role="button" data-master-edit="${escapeAttribute(code)}"${selected ? ' aria-current="true"' : ''} aria-label="${escapeAttribute(label)}を編集">${dataCells}<td>${status}</td><td class="drill-cell"><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></td></tr>`;
+    return `<tr class="drilldown-row${active ? '' : ' master-row-inactive'}${selected ? ' is-selected' : ''}" data-master-edit="${escapeAttribute(code)}"${selected ? ' aria-current="true"' : ''}>${dataCells}<td>${status}</td><td class="drill-cell"><button type="button" class="drill-btn" aria-label="${escapeAttribute(label)}を編集"><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button></td></tr>`;
   }
 
   function submitMaster(event) {
@@ -2151,7 +2147,7 @@
     elements['master-list'].querySelectorAll('[data-master-edit]').forEach((node) => {
       const selected = node.dataset.masterEdit === state.masterEditKey;
       node.classList.toggle('is-selected', selected);
-      // 行は role="button"。選択は集合内カレントなので aria-current で表す（aria-selected は無効）。
+      // 行は素の <tr>（role=row）。選択は集合内カレントなので aria-current で表す（aria-selected は無効）。
       if (selected) node.setAttribute('aria-current', 'true');
       else node.removeAttribute('aria-current');
     });
@@ -2160,14 +2156,6 @@
   function handleMasterRowActivate(event) {
     const row = event.target.closest('[data-master-edit]');
     if (!row) return;
-    editMaster(state.masterTab, row.dataset.masterEdit);
-  }
-
-  function handleMasterRowKey(event) {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    const row = event.target.closest('[data-master-edit]');
-    if (!row) return;
-    event.preventDefault(); // Space でのスクロールを抑止し、行を「決定」として扱う
     editMaster(state.masterTab, row.dataset.masterEdit);
   }
 
@@ -2339,6 +2327,16 @@
     if (value === 'SENT' || value === 'SUCCESS') return 'sent';
     if (value === 'FAILED' || value === 'FALLBACK') return 'failed';
     return 'pending';
+  }
+
+  // バックエンドの通知ステータス enum を表示専用の日本語へ（取引種別の transactionLabel と同じ方針）。
+  // 色は statusClass、文字は statusLabel で「色＋文字」を満たす。未知値はそのまま出す（黙って隠さない）。
+  function statusLabel(status) {
+    const value = String(status || '').toUpperCase();
+    return {
+      PENDING: '送信待ち', STARTED: '送信中', SENT: '送信済み', SUCCESS: '送信済み',
+      FAILED: '送信失敗', FALLBACK: '代替送信', SKIPPED: '送信省略'
+    }[value] || (status ? String(status) : '送信待ち');
   }
 
   function transactionLabel(type) {

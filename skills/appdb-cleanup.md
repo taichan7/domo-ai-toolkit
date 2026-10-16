@@ -5,7 +5,7 @@ Use this skill when asked to delete or prune AppDB documents — e.g. "昨日よ
 ## Safety rules
 
 - Always count and show the documents to be deleted **before** deleting.
-- AppDB deletes are permanent. Require explicit user confirmation if count > 100 or if the collection is tagged as high-risk in `../docs/appdb-catalog.md`.
+- AppDB deletes are permanent. Require explicit user confirmation if count > 100, or if the collection is one your organization treats as high-risk (if you keep such a list).
 - Never delete documents from the current day without explicit confirmation.
 - For recurring cleanup, prefer the fast script in `../scripts/appdb-prune-latest.py`; it defaults to dry-run and uses parallel DELETE workers only after explicit confirmation.
 
@@ -31,7 +31,7 @@ Dry-run prints:
 - exact keep candidates
 - delete candidate sample
 
-Show those counts to the user. If delete count is over 100, the collection is high-risk in `../docs/appdb-catalog.md`, or current-day documents are included, require explicit confirmation before running the execute command.
+Show those counts to the user. If delete count is over 100, current-day documents are included, or the collection is one your organization treats as high-risk, require explicit confirmation before running the execute command.
 
 ### 2. Execute after explicit confirmation
 
@@ -125,7 +125,7 @@ Use this only if `../scripts/appdb-prune-latest.py` cannot be used or the cleanu
 
 ### 1. Identify the collection
 
-Look up the collection in `../docs/appdb-catalog.md` by the URL or name the user provides.
+Identify the collection from the URL or name the user provides (if your organization keeps an AppDB catalog, cross-check it there).
 
 URL pattern: `https://<instance>/appDb/<collectionId>/dataexplorer`
 
@@ -207,7 +207,7 @@ to_delete = [
 print(f"To delete: {len(to_delete)},  To keep: {len(all_docs) - len(to_delete)}")
 ```
 
-Show the count to the user. For high-risk collections (see appdb-catalog.md) or counts > 100, pause for explicit confirmation before proceeding.
+Show the count to the user. For high-risk collections (if your organization keeps such a list) or counts > 100, pause for explicit confirmation before proceeding.
 
 ### 5. Bulk delete
 

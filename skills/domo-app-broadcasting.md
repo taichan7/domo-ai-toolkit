@@ -163,14 +163,14 @@ Choose broadcasting for **free-form, real-time, channel-based coordination withi
 
 - **The import idiom is real** `[REPO]`: `import domo from 'ryuu.js'` is how the repo's Pro Code apps load the SDK (16 files reference ryuu).
 - **App Broadcasting is ABSENT from the repo's pinned SDK** `[REPO]`: the vendored `ryuu.js` build is **4.6.0**, byte-identical across all vendored copies (`md5 77b232e5…`, per `domo-variables-filters.md:170`), and its listener registry is exactly `{onFiltersUpdate, onAppData, onVariablesUpdated}` — **there is no `broadcast`/`onBroadcast`** in it. So **broadcasting cannot run against the SDK the repo currently vendors**; it requires the **v5/v6 generation** (the same generation gap flagged at `domo-procode-embedded-cards.md:140-143`). Which exact SDK version first shipped broadcasting is `[INFER]` — pin and feature-detect before relying on it.
-- **Zero App-Framework broadcasting usage exists repo-wide** `[REPO]`: the only two `broadcast` tokens in the tree are **false friends** — a CodeEngine SMS helper `broadcast_text_message()` (`../docs/codeengine-functions.md:66`) and a Magic ETL "global-broadcast join" (a data-fanout sense, `2026-09-04-df3063-…:88`). Neither is the pub/sub bus.
+- **Zero App-Framework broadcasting usage exists repo-wide** `[REPO]`: the only two `broadcast` tokens in the tree are **false friends** — a CodeEngine SMS helper `broadcast_text_message()` and a Magic ETL "global-broadcast join" (a data-fanout sense, `2026-09-04-df3063-…:88`). Neither is the pub/sub bus.
 - Therefore **every runtime-contract claim here is `[DOC]`**, anchored only to the two dev-portal guides — **never `[REPO]`**, because no repo code exercises the API. Re-verify live before asserting behavior on any instance.
 
 ## Naming traps
 
 - **App Broadcasting ≠ the older `sendAppData`/`requestAppDataUpdate` "Custom App Data" channel** (`domo-procode-embedded-cards.md:110`). Same host-mediated custom-app↔custom-app transport, **older generation**: no named channels, no `sourceAppId`. App Broadcasting is the successor, not a parallel option.
 - **App Broadcasting ≠ page filters / page Variables** — those persist and replay; broadcasting does not (table above). → `domo-variables-filters.md`.
-- **`broadcast()` (App-Framework pub/sub) ≠ `broadcast_text_message()`** (a CodeEngine SMS/notification function, `../docs/codeengine-functions.md`) **≠ a Magic ETL "broadcast join"** (fanning a scalar to all rows). Three unrelated senses of "broadcast" — do not cross-wire.
+- **`broadcast()` (App-Framework pub/sub) ≠ `broadcast_text_message()`** (a CodeEngine SMS/notification function) **≠ a Magic ETL "broadcast join"** (fanning a scalar to all rows). Three unrelated senses of "broadcast" — do not cross-wire.
 - **`sourceAppId` ≠ a manifest/app id you set** — it is the host-assigned per-**instance** id; two copies of one app differ. You cannot fake it or read it before receiving a message.
 
 ## Safety

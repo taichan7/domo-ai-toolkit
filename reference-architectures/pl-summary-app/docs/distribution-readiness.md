@@ -29,7 +29,10 @@ and sandbox isolation. A clean checkout must run without local deployment state.
 
 Follow the setup guide on the destination. Verify data and Workflow bindings,
 release pins, grants, available AI models/consumption, actual report completeness,
-and intended email recipients/delivery. The store selector limits browsing;
+and intended email recipients/delivery — including the operator who ran it, whose
+address is resolved at runtime from the signed-in user and added to the company
+report's recipients (verify actual receipt, since COMPLETED does not prove delivery).
+The store selector limits browsing;
 manual generation processes all stores and company. No parent schedule is created.
 
 ## Production limits
@@ -40,6 +43,12 @@ The sample's definitions are not automatically correct for another customer's bo
 The store selector is a display filter. The AppDB report collection is shared
 among authorized app users; DataSet PDP does not secure its records. Add server-side
 record authorization or separate collections for restricted store/department access.
+
+The executor recipient is caller-supplied and not server-verified: an authorized app
+user calling the Code Engine directly could direct the company summary to an arbitrary
+external address (they can already view it in-app). For sensitive real data, restrict
+who can run the update, or add server-side caller-binding (resolve the operator's own
+address from the Code Engine execution context instead of trusting the request).
 
 Manual-start duplicate prevention is best effort, not a distributed atomic lock.
 AppDB creation and older-report cleanup are separate operations; cleanup can be

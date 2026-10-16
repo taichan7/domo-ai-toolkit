@@ -326,6 +326,20 @@ test('各 draw 関数は data-drill マーカーを出力する（クリック�
   assert.match(extractFunction('drawDeptBar'), /data-drill="dept"/, '事業部積み上げ棒');
 });
 
+test('PL-001: ドリル帯の aria-label に数値を畳み込み、フォーカスでもツールチップを出す', () => {
+  // マウス専用の是正: SR/キーボード利用者がドリル動作だけでなく金額も得られること。
+  // 各帯の aria-label 連結に金額整形（jpMoney）が入っているかを source-text で固定する。
+  assert.match(extractFunction('drawTrend'), /aria-label="' \+[\s\S]{0,120}jpMoney\(/, 'トレンド帯の aria-label に金額がない');
+  assert.match(extractFunction('drawDivergingBars'), /aria-label="' \+[\s\S]{0,160}jpMoney\(/, 'ランキング/店舗別横棒の aria-label に金額がない');
+  assert.match(extractFunction('drawDeptBar'), /aria-label="' \+[\s\S]{0,120}jpMoney\(/, '事業部積み上げ棒の aria-label に金額がない');
+  assert.match(extractFunction('drawDeptTrend'), /aria-label="' \+[\s\S]{0,120}jpMoney\(/, '事業部トレンド帯の aria-label に金額がない');
+  // キーボード focus でもホバーと同じツールチップを出す配線（bbox 基準で配置）。
+  const hover = extractFunction('bindChartHover');
+  assert.match(hover, /"focusin"/, 'focusin 配線がない');
+  assert.match(hover, /"focusout"/, 'focusout 配線がない');
+  assert.match(hover, /getBoundingClientRect/, 'focus 時の配置が bbox 基準でない');
+});
+
 test('横棒のクリック要素は店舗名を data-name で持つ（ドリルフレームの店舗名 null 防止）', () => {
   // 過去に data-label しか持たず drillFrom の data-name 読みが null になった回帰のガード。
   assert.match(extractFunction('drawHBars'), /data-name="' \+ esc\(r\.name\)/);

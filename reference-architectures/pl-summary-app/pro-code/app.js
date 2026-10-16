@@ -640,20 +640,30 @@
   // その描画フレームに存在するマーカーだけがヒットする（redraw 後も delegated listener が生きる）。
   function bindChartHover(host, tip, specs) {
     function clearAll() { specs.forEach(function (s) { if (s.clear) s.clear(host); }); }
-    host.addEventListener("mousemove", function (e) {
+    // target から該当 spec を引き、ツールチップを client 座標 (cx, cy) に出す。見つかれば true。
+    function showFor(target, cx, cy) {
       for (var i = 0; i < specs.length; i++) {
-        var el = closestAttr(e.target, specs[i].marker, host);
+        var el = closestAttr(target, specs[i].marker, host);
         if (!el) continue;
         clearAll();
         if (specs[i].prepare) specs[i].prepare(host, el);
         showTip(tip, specs[i].html(el));
-        moveTip(tip, host, e.clientX, e.clientY);
-        return;
+        moveTip(tip, host, cx, cy);
+        return true;
       }
-      hideTip(tip);
-      clearAll();
+      return false;
+    }
+    host.addEventListener("mousemove", function (e) {
+      if (!showFor(e.target, e.clientX, e.clientY)) { hideTip(tip); clearAll(); }
     });
     host.addEventListener("mouseleave", function () { hideTip(tip); clearAll(); });
+    // キーボード操作: ドリル帯（tabindex=0）へフォーカスが入ったら、ホバーと同じツールチップを
+    // 帯の bbox 中央上に出す。focusin/focusout は bubble するため、再描画後も host 委譲で生き続ける。
+    host.addEventListener("focusin", function (e) {
+      var r = e.target && e.target.getBoundingClientRect && e.target.getBoundingClientRect();
+      if (r) showFor(e.target, (r.left + r.right) / 2, r.top + 24);
+    });
+    host.addEventListener("focusout", function () { hideTip(tip); clearAll(); });
   }
 
   // 2系列トレンド（売上/純利益）の縦ガイド線＋フォーカス点
@@ -951,8 +961,8 @@
       drawDivergingBars(els.trend, pickTopBottom(storeRowsForPeriod(top.period), 8, 5), { drillKind: "store" });
       setChartTitle(els.titleTrend, "店舗別 純利益", longPeriod(top.period) + "・上位8 / 下位5");
       els.legendTrend.innerHTML =
-        '<span class="lg"><i class="sw sw-dot" style="background:' + PALETTE.rev + '"></i>黒字</span>' +
-        '<span class="lg"><i class="sw sw-dot" style="background:' + PALETTE.rankNeg + '"></i>赤字</span>';
+        '<span class="lg"><i class="sw sw-dot" style="background:' + PALETTE.profit + '"></i>黒字</span>' +
+        '<span class="lg"><i class="sw sw-dot" style="background:' + PALETTE.rev + '"></i>赤字</span>';
     } else if (top.type === "storeTrend") {
       drawTrend(trendFor(top.storeId), { drill: true, title: top.storeName + " 売上・利益トレンド", note: "直近24ヶ月" });
     } else if (top.type === "monthDetail") {
@@ -1101,7 +1111,8 @@
       var x0 = h === 0 ? ml : (x(h - 1) + cxp) / 2;
       var x1b = h === n - 1 ? (W - mr) : (cxp + x(h + 1)) / 2;
       var drill = opts.drill ? ' data-drill="month" tabindex="0" role="button" aria-label="' +
-        esc(longPeriod(data[h].period) + " の内訳を表示") + '"' : "";
+        esc(longPeriod(data[h].period) + "、売上 " + jpMoney(data[h].rev) +
+          "、純利益 " + jpMoney(data[h].profit) + "。内訳を表示") + '"' : "";
       svg.push('<rect class="trend-hit"' + drill + ' data-i="' + h + '"' +
         ' data-x="' + cxp.toFixed(1) + '" data-yrev="' + y(data[h].rev).toFixed(1) +
         '" data-yprofit="' + y(data[h].profit).toFixed(1) + '"' +
@@ -1190,7 +1201,7 @@
       var pos = s.profit >= 0;
       var bx = pos ? cx : cx - half;
       var bw = Math.max(half, 1);
-      var fill = isSel ? PALETTE.rankSel : (pos ? PALETTE.rev : PALETTE.rankNeg);
+      var fill = isSel ? PALETTE.rankSel : (pos ? PALETTE.profit : PALETTE.rev);
       svg.push('<rect x="' + (labelW - 8) + '" y="' + yy + '" width="' + (W - labelW + 8) + '" height="' + rowH + '" class="rank-row' + (isSel ? " sel" : "") + '"/>');
       svg.push('<text x="8" y="' + (yy + rowH / 2 + 4) + '" class="rank-name' + (isSel ? " sel" : "") + '">' +
         (opts.rankOf ? '<tspan class="rank-num">' + opts.rankOf[s.id] + ".</tspan> " : "") + esc(trunc(s.name, nameChars)) + "</text>");
@@ -1201,7 +1212,10 @@
         ' data-store-id="' + esc(s.id) + '" data-name="' + esc(s.name) + '"' +
         ' data-profit="' + s.profit + '" data-margin="' + (s.margin != null ? s.margin : "") + '"' +
         (s.rev != null ? ' data-rev="' + s.rev + '"' : "") +
-        (opts.drillKind ? ' data-drill="' + opts.drillKind + '" tabindex="0" role="button" aria-label="' + esc(s.name + " の推移を表示") + '"' : "") +
+        (opts.drillKind ? ' data-drill="' + opts.drillKind + '" tabindex="0" role="button" aria-label="' +
+          esc(s.name + "、純利益 " + jpMoney(s.profit) +
+            (s.rev != null ? "、売上 " + jpMoney(s.rev) : "") +
+            (s.margin != null ? "、利益率 " + fmtPct(s.margin) : "") + "。推移を表示") + '"' : "") +
         ' x="' + (labelW - 8) + '" y="' + yy + '" width="' + (W - labelW + 8) + '" height="' + rowH + '"/>');
     });
     svg.push(hits.join(""));
@@ -1226,8 +1240,8 @@
     setChartTitle(els.rankTitle, "店舗別 純利益ランキング", selectedId ? "選択店をハイライト" : "上位8 / 下位5");
     if (els.legendRank) {
       els.legendRank.innerHTML =
-        '<span class="lg"><i class="sw sw-dot" style="background:' + PALETTE.rev + '"></i>黒字</span>' +
-        '<span class="lg"><i class="sw sw-dot" style="background:' + PALETTE.rankNeg + '"></i>赤字</span>';
+        '<span class="lg"><i class="sw sw-dot" style="background:' + PALETTE.profit + '"></i>黒字</span>' +
+        '<span class="lg"><i class="sw sw-dot" style="background:' + PALETTE.rev + '"></i>赤字</span>';
     }
   }
 
@@ -1348,7 +1362,8 @@
       svg.push('<text x="' + cx + '" y="' + (H - 14) + '" class="bar-xlabel">' + esc(shortDept(d.name)) + "</text>");
       hits.push('<rect class="bar-hit drill-hit" data-dept="' + i + '" data-key="' + esc(d.code) + '" data-name="' + esc(d.name) +
         '" data-rev="' + d.rev + '" data-cogs="' + d.cogs + '" data-gross="' + d.gross +
-        '" data-drill="dept" tabindex="0" role="button" aria-label="' + esc(d.name + " の月次推移を表示") + '"' +
+        '" data-drill="dept" tabindex="0" role="button" aria-label="' +
+        esc(d.name + "、売上 " + jpMoney(d.rev) + "、粗利益 " + jpMoney(d.gross) + "。月次推移を表示") + '"' +
         ' x="' + (ml + band * i) + '" y="' + mt + '" width="' + band + '" height="' + ih + '"/>');
     });
     svg.push(hits.join(""));
@@ -1411,8 +1426,10 @@
       var cxp = x(h);
       var xa = h === 0 ? ml : (x(h - 1) + cxp) / 2;
       var xb = h === n - 1 ? (W - mr) : (cxp + x(h + 1)) / 2;
+      var monthTotal = 0;
+      for (var si0 = 0; si0 < series.length; si0++) monthTotal += series[si0].rev[h] || 0;
       var drill = opts.drill ? ' data-drill="month" tabindex="0" role="button" aria-label="' +
-        esc(longPeriod(periods[h]) + " の事業部内訳を表示") + '"' : "";
+        esc(longPeriod(periods[h]) + "、売上合計 " + jpMoney(monthTotal) + "。事業部内訳を表示") + '"' : "";
       var attr = drill + ' data-i="' + h + '" data-x="' + cxp.toFixed(1) + '" data-period="' + esc(periods[h]) + '"';
       series.forEach(function (s, si) {
         attr += ' data-v' + si + '="' + s.rev[h] + '" data-y' + si + '="' + y(s.rev[h]).toFixed(1) + '"';
