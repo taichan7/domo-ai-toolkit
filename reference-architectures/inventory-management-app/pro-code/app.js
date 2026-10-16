@@ -99,7 +99,7 @@
       canvas: byId('qr-canvas'),
       title: byId('scanner-title')
     });
-    setQrControlsReady(false);
+    setQrControlsReady(false, true);  // 起動直後＝読み込み中（busy）
     renderTestQrCodes();
     await refreshAll({quiet: true});
   }
@@ -125,7 +125,7 @@
       'selected-location', 'selected-location-code', 'selected-item', 'selected-item-code', 'current-stock', 'minimum-stock',
       'quantity', 'reason', 'stock-preview', 'review-list', 'submit-button', 'recent-operations', 'kpi-grid', 'item-chart', 'location-chart',
       'trend-chart', 'shortage-list', 'dormant-list', 'ai-note-list', 'dashboard-search', 'history-search', 'history-type', 'history-head', 'history-body',
-      'history-result-count', 'history-pager', 'master-pager', 'item-pager', 'location-pager', 'shortage-pager', 'dormant-pager', 'loading-overlay', 'toast-region', 'confirm-dialog', 'confirm-title', 'confirm-message', 'confirm-details', 'confirm-action', 'confirm-cancel',
+      'history-result-count', 'history-type-filter', 'masters-empty-guide', 'goto-master-register', 'history-pager', 'master-pager', 'item-pager', 'location-pager', 'shortage-pager', 'dormant-pager', 'loading-overlay', 'toast-region', 'confirm-dialog', 'confirm-title', 'confirm-message', 'confirm-details', 'confirm-action', 'confirm-cancel',
       'detail-pane', 'detail-eyebrow', 'detail-title', 'detail-subtitle', 'detail-content', 'chart-tooltip',
       'context-detail', 'context-detail-backdrop', 'context-detail-eyebrow', 'context-detail-title', 'context-detail-subtitle', 'context-detail-content', 'context-detail-more', 'context-detail-close',
       'step-count', 'step-action', 'selected-location-card', 'selected-item-card', 'run-notification',
@@ -139,6 +139,8 @@
 
   function bindEvents() {
     document.querySelectorAll('.nav-item').forEach((button) => button.addEventListener('click', () => switchView(button.dataset.view)));
+    // マスタ空の空状態ガイドから登録先（履歴・管理）へ直接遷移する（INV-020）。
+    if (elements['goto-master-register']) elements['goto-master-register'].addEventListener('click', () => switchView('history'));
     document.querySelectorAll('.type-button').forEach((button) => button.addEventListener('click', () => setTransactionType(button.dataset.type)));
     document.querySelectorAll('.back-button').forEach((button) => button.addEventListener('click', () => setStep(Number(button.dataset.back))));
     document.querySelectorAll('[data-step-nav]').forEach((button) => button.addEventListener('click', () => setStep(Number(button.dataset.stepNav))));
@@ -167,15 +169,17 @@
     // WKWebView が HTML の inputmode 属性を無視することがあるため、整数キーパッドは IDL 側でも明示する。
     elements.quantity.inputMode = 'numeric';
     elements.reason.addEventListener('input', () => { state.reason = elements.reason.value; invalidateReview(); renderStepNavigation(); });
-    // 検索語・種別の変更は絞り込みが変わるので、必ず1ページ目へ戻してから描画する。
-    elements['history-search'].addEventListener('input', () => { state.historyPage = 0; renderHistory(); });
+    // 検索語・種別の変更は絞り込みが変わるので、必ず1ページ目へ戻してから描画する。毎キーストロークで
+    // 全件を再フィルタ+再ソート+再描画しないよう input はデバウンスする（INV-042）。種別は change ＝
+    // 1回だけ発火するので即時のまま。候補リスト（30件上限）も即時のまま。
+    elements['history-search'].addEventListener('input', debounce(() => { state.historyPage = 0; renderHistory(); }, config.ui.searchDebounceMs));
     elements['history-type'].addEventListener('change', () => { state.historyPage = 0; renderHistory(); });
     // ダッシュボード上部の横断検索。4パネルの絞り込みが変わるため、該当ページ位置を先頭へ戻して再描画する。
-    elements['dashboard-search'].addEventListener('input', () => {
+    elements['dashboard-search'].addEventListener('input', debounce(() => {
       state.dashboardQuery = normalizedSearch(elements['dashboard-search'].value);
       ['item', 'location', 'shortage', 'dormant'].forEach((key) => { state.dashboardPages[key] = 0; });
       renderDashboard();
-    });
+    }, config.ui.searchDebounceMs));
     byId('view-dashboard').addEventListener('click', handleDashboardDrilldown);
     byId('view-dashboard').addEventListener('pointerover', handleChartPointerOver);
     byId('view-dashboard').addEventListener('pointermove', handleChartPointerMove);
@@ -261,10 +265,16 @@
     return document.documentElement.dataset.domoPlatform === 'mobile';
   }
 
-  // サイドバーの「QR形式（テスト用）」にスキャン可能なテストQRを描画する。
+  // サイドバーの「動作確認用QR」にスキャン可能なテストQRを描画する（demo モードのみ表示）。
   // 内製生成器で自己完結させ（正しさは同梱jsQRとの往復テストで担保）、静的な内容なので
   // 起動時に一度だけ描く。サイドバーはモバイルでは非表示のため PC 専用で足りる。
   function renderTestQrCodes() {
+    // 固定コード（LOC-01/ITEM-001）のサンプルQRは顧客の実マスタでは必ず失敗するため、デモモードの
+    // ときだけ表示する（本番=domo/error では隠す。試用導線は開発ガイドへ集約）＝INV-068。
+    const block = document.getElementById('test-qr-help');
+    if (!block) return;
+    if (dataApi.mode !== 'demo') { block.hidden = true; return; }
+    block.hidden = false;
     if (!global.InventoryQR || typeof global.InventoryQR.toSvg !== 'function') return;
     document.querySelectorAll('.qr-sample[data-qr]').forEach((node) => {
       const payload = node.dataset.qr;
@@ -296,7 +306,7 @@
     const quiet = options && options.quiet;
     if (!quiet) setLoading(true, 'データを更新しています');
     state.bootReady = false;
-    setQrControlsReady(false);
+    setQrControlsReady(false, true);  // 読み込み中＝busy
     try {
       const loaded = await dataApi.loadInitialData();
       state.data = loaded;
@@ -305,10 +315,12 @@
       updateUser();
       renderAll();
       state.bootReady = loaded.locations.some(isActive) && loaded.items.some(isActive);
-      setQrControlsReady(state.bootReady);
+      setQrControlsReady(state.bootReady);  // 読み込み完了＝busy でない（不可用は disabled のみ）
+      // マスタ空＝入出庫の行き止まり。登録先（履歴・管理）への空状態ガイドを出す（INV-020）。
+      if (elements['masters-empty-guide']) elements['masters-empty-guide'].hidden = state.bootReady;
       if (global.InventoryBoot && typeof global.InventoryBoot.ready === 'function') global.InventoryBoot.ready();
       if (!state.bootReady) {
-        toast('有効なロケーションまたは品目マスタがありません。QRを使う前にデータを確認してください。', 'error', config.ui.toastDurationLong);
+        toast('有効な品目・ロケーションのマスタがありません。「履歴・管理」で品目とロケーションを登録してください。', 'error', config.ui.toastDurationLong);
       }
 
       const authTask = dataApi.callFunction('get_inventory_state', {request_json: '{}'}).then((auth) => {
@@ -493,17 +505,28 @@
     return String(value || '').trim().toLocaleLowerCase('ja-JP');
   }
 
+  // 連続入力の最後の1回だけ fn を走らせる（INV-042）。横断検索の毎キーストローク全再描画を抑える。
+  function debounce(fn, wait) {
+    let timer = 0;
+    return (...args) => {
+      global.clearTimeout(timer);
+      timer = global.setTimeout(() => fn(...args), wait);
+    };
+  }
+
   function renderLocationOptions() {
     const query = normalizedSearch(elements['location-search'].value);
-    const rows = state.data.locations.filter((row) => isActive(row) && (!query || `${row.location_code} ${row.location_name} ${row.zone || ''}`.toLocaleLowerCase('ja-JP').includes(query))).slice(0, config.ui.optionListLimit);
-    elements['location-options'].innerHTML = rows.length ? rows.map((row) => optionHtml('location', row.location_code, row.location_name, row.zone ? `ゾーン ${row.zone}` : '', state.location?.location_code === row.location_code)).join('') : emptyHtml('該当するロケーションがありません。');
+    const matched = state.data.locations.filter((row) => isActive(row) && (!query || `${row.location_code} ${row.location_name} ${row.zone || ''}`.toLocaleLowerCase('ja-JP').includes(query)));
+    const rows = matched.slice(0, config.ui.optionListLimit);
+    elements['location-options'].innerHTML = rows.length ? rows.map((row) => optionHtml('location', row.location_code, row.location_name, row.zone ? `ゾーン ${row.zone}` : '', state.location?.location_code === row.location_code)).join('') + optionMoreNote(matched.length) : emptyHtml('該当するロケーションがありません。');
     elements['location-options'].querySelectorAll('.option-button').forEach((button) => button.addEventListener('click', () => selectLocation(button.dataset.code)));
   }
 
   function renderItemOptions() {
     const query = normalizedSearch(elements['item-search'].value);
-    const rows = state.data.items.filter((row) => isActive(row) && (!query || `${row.item_code} ${row.item_name} ${row.category || ''}`.toLocaleLowerCase('ja-JP').includes(query))).slice(0, config.ui.optionListLimit);
-    elements['item-options'].innerHTML = rows.length ? rows.map((row) => optionHtml('item', row.item_code, row.item_name, row.category || '', state.item?.item_code === row.item_code)).join('') : emptyHtml('該当する品目がありません。');
+    const matched = state.data.items.filter((row) => isActive(row) && (!query || `${row.item_code} ${row.item_name} ${row.category || ''}`.toLocaleLowerCase('ja-JP').includes(query)));
+    const rows = matched.slice(0, config.ui.optionListLimit);
+    elements['item-options'].innerHTML = rows.length ? rows.map((row) => optionHtml('item', row.item_code, row.item_name, row.category || '', state.item?.item_code === row.item_code)).join('') + optionMoreNote(matched.length) : emptyHtml('該当する品目がありません。');
     elements['item-options'].querySelectorAll('.option-button').forEach((button) => button.addEventListener('click', () => selectItem(button.dataset.code)));
   }
 
@@ -511,6 +534,13 @@
   // role="option" は listbox の子専用で、キーボードモデル（活性子孫・矢印移動）を伴わないと不完全な契約
   // になる。ここでは検索入力＋候補ボタン群という素直な構成にし、選択中候補は集合内カレントを表す
   // aria-current で示す（履歴・マスタ行と統一した規約）。
+  function optionMoreNote(total) {
+    // 候補は単一キャップ（ページングしない）規約。超過時だけ末尾へ非対話の注記を出し、超過の事実と
+    // 次の行動（検索語で絞り込む）を伝える＝沈黙打ち切りで「登録されていない」と誤認させない（INV-012）。
+    const hidden = total - config.ui.optionListLimit;
+    return hidden > 0 ? `<p class="option-note" role="note">ほか ${number.format(hidden)} 件の候補があります。検索語を追加して絞り込んでください。</p>` : '';
+  }
+
   function optionHtml(type, code, name, meta, selected) {
     const icon = type === 'location' ? 'LOC' : 'SKU';
     return `<button class="option-button" type="button"${selected ? ' aria-current="true"' : ''} data-code="${escapeAttribute(code)}"><span class="option-icon">${icon}</span><span><strong>${escapeHtml(name)}</strong><small>${escapeHtml(code)}</small></span><span class="option-meta">${escapeHtml(meta)}</span></button>`;
@@ -542,19 +572,16 @@
     }
     try {
       const scanResult = await state.scanner.open(expectedType);
-      const parsed = state.scanner.parse(scanResult.rawValue);
-      if (parsed.qr_type !== expectedType) {
-        throw new Error(expectedType === 'location'
-          ? '品目QRを読み取りました。現在はロケーション選択です。先にロケーションQRを読み取ってください。'
-          : 'ロケーションQRを読み取りました。現在は品目選択です。品目QRを読み取ってください。');
-      }
+      // スキャナは expectedType 一致時のみ解決する（型不一致は届かない）ので、再パースや到達不能な
+      // 型不一致 throw は持たず、解決済み code を直接使う。接頭辞パースの唯一定義源はスキャナ側の
+      // parse() のままで、ここから越境して呼ばない（INV-060）。
       if (expectedType === 'location') {
-        const match = state.data.locations.find((row) => row.location_code === parsed.code && isActive(row));
+        const match = state.data.locations.find((row) => row.location_code === scanResult.code && isActive(row));
         if (!match) throw new Error('有効なロケーションが見つかりません。');
         selectLocation(match.location_code);
         toast(`${match.location_name}を選択しました。続けて品目を選んでください。`, 'success');
       } else {
-        const match = state.data.items.find((row) => row.item_code === parsed.code && isActive(row));
+        const match = state.data.items.find((row) => row.item_code === scanResult.code && isActive(row));
         if (!match) throw new Error('有効な品目が見つかりません。');
         selectItem(match.item_code);
         toast(`${match.item_name}を選択しました。続けて数量を確認してください。`, 'success');
@@ -564,10 +591,13 @@
     }
   }
 
-  function setQrControlsReady(ready) {
+  function setQrControlsReady(ready, busy = false) {
     document.querySelectorAll('.scan-button').forEach((button) => {
       button.disabled = !ready;
-      button.setAttribute('aria-busy', String(!ready));
+      // aria-busy は「読み込み中」のときだけ true。マスタ空やエラーで使えない状態は disabled だけで表し、
+      // 「読込中」を意味する aria-busy を居座らせない（INV-020）。
+      if (busy) button.setAttribute('aria-busy', 'true');
+      else button.removeAttribute('aria-busy');
     });
   }
 
@@ -675,7 +705,7 @@
       item_code: state.item?.item_code,
       quantity: state.quantity,
       reason: state.reason,
-      source: isMobile() ? 'DOMO_MOBILE' : 'DOMO_WEB',
+      source: isMobileHostActive() ? 'DOMO_MOBILE' : 'DOMO_WEB',
       operator_email: state.user.email || '',
       operator_display_name: state.user.name || ''
     };
@@ -840,9 +870,8 @@
   // 同一画面でカード値と内訳・一覧が食い違わないようにする。台帳（履歴）ビューは監査証跡として
   // archived 取引も表示するので、そちらは state.data.transactions を素で使い続ける。
   function activeTransactions() {
-    return state.data.transactions.filter(
-      (row) => !(row.archived === true || String(row.archived).toLowerCase() === 'true')
-    );
+    // archived 判定は集計（domo-access.buildDashboardRows）と同一にするため共有定義を使う（INV-041）。
+    return state.data.transactions.filter((row) => !dataApi.isArchived(row));
   }
 
   function renderRecent() {
@@ -925,28 +954,29 @@
     renderDashboardPanel('location', locations, 'location-chart', 'location-pager', dashboardEmpty(emptyHtml('分析データがありません。')), barRowHtml(locations, 'location'));
 
     /**
-     * 横棒1本のHTMLを組み立てるクロージャを返す。棒幅・構成比は「全件」の最大値・合計を基準にするため、
-     * ページ送りで表示中の並びが変わっても棒の長さと％が揺れない（比較の基準が固定される）。
+     * 横棒1本のHTMLを組み立てるクロージャを返す。棒幅もツールチップの「最大比」も「全件」の最大値を
+     * 基準にする（同じ分母＝絵と数字が一致）ため、ページ送りで表示中の並びが変わっても棒の長さと％が
+     * 揺れない（比較の基準が固定される）。
      * @param {Array} all 整列済み全件（この種別の drilldown 対象）
      * @param {string} kind ドリルダウン種別（'item' | 'location'）
      * @return {function(object, number): string} (行, 絶対index) → 横棒HTML
      */
     function barRowHtml(all, kind) {
-      // 棒幅の基準（最大値）と構成比の基準（合計）を線形走査で求める。品目/ロケーションが
-      // 数万件規模になり得る配布先では、配列を可変長スプレッドで最大値関数へ展開する書き方だと
-      // 実行系の引数上限（V8で約6.5万・iOS WebViewはさらに小さい）を超えて RangeError を投げ、
-      // renderDashboard 全体が例外終了してダッシュボードが空になる。走査なら件数に依らず安全。
+      // 棒幅の基準（最大値）を線形走査で求める。品目/ロケーションが数万件規模になり得る配布先では、
+      // 配列を可変長スプレッドで最大値関数へ展開する書き方だと実行系の引数上限（V8で約6.5万・iOS
+      // WebView はさらに小さい）を超えて RangeError を投げ、renderDashboard 全体が例外終了して
+      // ダッシュボードが空になる。走査なら件数に依らず安全。
       let maximum = 1;
-      let total = 0;
       for (const row of all) {
         const value = Number(row.metric_value || 0);
         if (value > maximum) maximum = value;
-        total += value;
       }
       return (row, index) => {
         const value = Number(row.metric_value || 0);
-        const share = total > 0 ? value / total * 100 : 0;
-        return `<button type="button" class="bar-row chart-hit" data-drill-kind="${kind}" data-drill-index="${index}" data-tooltip-title="${escapeAttribute(row.label)}" data-tooltip-detail="${escapeAttribute(`現在庫 ${number.format(value)} / 構成比 ${number.format(share)}%`)}"><span class="bar-label">${escapeHtml(row.label)}</span><span class="bar-track"><span style="width:${barPct(value, maximum)}%"></span></span><b>${number.format(value)}</b><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button>`;
+        // ツールチップの比率は棒の内容（value/最大値）と同じ分母にする。合計基準の「構成比」を最大値
+        // 正規化の棒に添えると、ほぼ満杯の棒に小さな％が並び絵と数字が食い違う（INV-021）。棒長＝最大比％。
+        const maxShare = maximum > 0 ? value / maximum * 100 : 0;
+        return `<button type="button" class="bar-row chart-hit" data-drill-kind="${kind}" data-drill-index="${index}" data-tooltip-title="${escapeAttribute(row.label)}" data-tooltip-detail="${escapeAttribute(`現在庫 ${number.format(value)} / 最大比 ${number.format(maxShare)}%`)}"><span class="bar-label">${escapeHtml(row.label)}</span><span class="bar-track"><span style="width:${barPct(value, maximum)}%"></span></span><b>${number.format(value)}</b><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button>`;
       };
     }
 
@@ -1107,9 +1137,10 @@
     return `${String(itemCode || '').trim().toUpperCase()}::${String(locationCode || '').trim().toUpperCase()}`;
   }
 
-  /** is_shortage を真偽へ正規化する（DataSetは boolean と 'true' 文字列が混在しうる）。 */
+  /** is_shortage を真偽へ正規化する（DataSetは boolean と 'true' 文字列が混在しうる）。集計（domo-access）
+   *  と同一判定にするため共有定義へ委譲する（バイト重複＝ドリフトの罠を塞ぐ・INV-041）。 */
   function isShortageRow(row) {
-    return row.is_shortage === true || String(row.is_shortage).toLowerCase() === 'true';
+    return dataApi.isShortage(row);
   }
 
   /**
@@ -1245,14 +1276,14 @@
     let emptyColspan;
     let emptyMessage;
     if (state.historyMode === 'alerts') {
-      elements['history-type'].closest('label').hidden = true;
+      elements['history-type-filter'].hidden = true;  // INV-040: 安定 id で参照（closest は不要）
       elements['history-head'].innerHTML = '<tr><th scope="col">日時</th><th scope="col">イベント</th><th scope="col">品目</th><th scope="col">ロケーション</th><th scope="col">在庫 / 基準</th><th scope="col">通知</th><th scope="col">件名</th><th scope="col" aria-label="詳細"></th></tr>';
       rows = [...state.data.alerts].filter((row) => !query || `${row.item_code || ''} ${row.item_name || ''} ${row.location_code || ''} ${row.location_name || ''} ${row.notification_subject || ''} ${row.created_at || ''} ${formatDate(row.created_at)} ${formatDisplayDate(row.created_at)} ${row.alert_id || ''}`.toLocaleLowerCase('ja-JP').includes(query)).sort(sortNewest('created_at'));
       renderRow = (row, index) => `<tr class="drilldown-row" data-history-index="${index}"><td>${formatDate(row.created_at)}</td><td><span class="status-pill ${row.event_type === 'RECOVERY' ? 'recovery' : 'shortage'}">${escapeHtml(row.event_type === 'RECOVERY' ? '回復' : '不足')}</span></td><td>${escapeHtml(row.item_name || row.item_code)}</td><td>${escapeHtml(row.location_name || row.location_code)}</td><td>${number.format(Number(row.current_quantity || 0))} / ${number.format(Number(row.minimum_quantity || 0))}</td><td><span class="status-pill ${statusClass(row.notification_status)}">${escapeHtml(statusLabel(row.notification_status))}</span></td><td>${escapeHtml(row.notification_subject || '—')}</td><td class="drill-cell"><button type="button" class="drill-btn" aria-label="${escapeAttribute(row.item_name || row.item_code)}の明細を開く"><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button></td></tr>`;
       emptyColspan = 8;
       emptyMessage = '通知履歴がありません。';
     } else {
-      elements['history-type'].closest('label').hidden = false;
+      elements['history-type-filter'].hidden = false;
       elements['history-head'].innerHTML = '<tr><th scope="col">日時</th><th scope="col">種別</th><th scope="col">品目</th><th scope="col">ロケーション</th><th scope="col">数量</th><th scope="col">残高</th><th scope="col">担当者</th><th scope="col">理由</th><th scope="col" aria-label="詳細"></th></tr>';
       rows = [...state.data.transactions].filter((row) => (!type || row.transaction_type === type) && (!query || `${row.item_code || ''} ${row.item_name || ''} ${row.location_code || ''} ${row.location_name || ''} ${row.operator_name || ''} ${row.reason || ''} ${row.occurred_at || ''} ${formatDate(row.occurred_at)} ${formatDisplayDate(row.occurred_at)} ${row.transaction_id || ''} ${row.request_id || ''}`.toLocaleLowerCase('ja-JP').includes(query))).sort(sortNewest('occurred_at'));
       renderRow = (row, index) => {
@@ -2322,16 +2353,20 @@
   }
 
   function isDomoMobileHost() {
+    // モバイル専用ペルソナ（.admin-only を全消しし、マスタCRUDタブをメニューから外す）へ落とす判定。
+    // 影響が大きい（PCの管理者がマスタ編集面を無言で失う）ため、まず Domo SDK の明示シグナルを正とする。
     const domoEnvironment = global.domo && global.domo.env ? global.domo.env : {};
     const platform = String(domoEnvironment.platform || '').trim().toLowerCase();
+    if (platform === 'mobile') return true;
+    if (platform === 'desktop' || platform === 'web') return false;
+    if (domoEnvironment.isMobile === true || domoEnvironment.mobile === true) return true;
+    // 明示シグナルが埋まらないホスト向けの UA フォールバック。素の 'Domo' 部分一致にはしない——UA に
+    // 'Domo' を含むだけのデスクトップ/埋め込みラッパまでモバイル扱いし、管理者から編集面を奪うため
+    // （INV-039）。「Domo マーカー」かつ「標準モバイルOSトークン」が揃うときだけモバイルと見なす。
     const userAgent = String(global.navigator?.userAgent || '');
-    return platform === 'mobile' || Boolean(domoEnvironment.isMobile || domoEnvironment.mobile) || /Domo/i.test(userAgent);
+    return /Domo/i.test(userAgent) && /Mobi|Android|iPhone|iPad|iPod/i.test(userAgent);
   }
 
-  function isMobile() {
-    const userAgent = String(global.navigator?.userAgent || '');
-    return isDomoMobileHost() || global.matchMedia('(max-width: 767px)').matches || /Android|iPhone|iPad/i.test(userAgent);
-  }
 
   function sortNewest(field) {
     return (a, b) => new Date(b[field] || 0).getTime() - new Date(a[field] || 0).getTime();

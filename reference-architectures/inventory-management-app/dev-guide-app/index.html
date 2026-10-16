@@ -83,7 +83,7 @@
       <div><dt>所要</dt><dd>約 3 時間・ステップ順</dd></div>
       <div><dt>対象</dt><dd>在庫入出庫管理アプリの開発者・配布先</dd></div>
       <div><dt>題材</dt><dd>在庫入出庫管理（Domo All-in-One・汎用配布）</dd></div>
-      <div><dt>版</dt><dd>v2.1.0（2026-10-15）</dd></div>
+      <div><dt>版</dt><dd>v2.1.3（2026-10-17）</dd></div>
     </dl>
 
     <div class="abstract">
@@ -131,7 +131,7 @@
           <li><a href="#s7"><span class="toc__n"></span><span class="toc__t">ハンズオン実習</span><span class="toc__d">名札で隔離コピー→編集→公開→確認</span></a></li>
           <li><a href="#s8"><span class="toc__n"></span><span class="toc__t">安全ガード</span><span class="toc__d">名札ガードで本番を守る線引き</span></a></li>
           <li><a href="#s9"><span class="toc__n"></span><span class="toc__t">もっと深く</span><span class="toc__d">スキル・MCP・次の一歩</span></a></li>
-          <li><a href="#s10"><span class="toc__n"></span><span class="toc__t">付録</span><span class="toc__d">用語集・FAQ・困ったとき</span></a></li>
+          <li><a href="#s10"><span class="toc__n"></span><span class="toc__t">付録</span><span class="toc__d">チートシート・セルフチェック・用語集・FAQ</span></a></li>
         </ol>
       </nav>
       <!-- 読み方 -->
@@ -232,8 +232,8 @@
         <li class="step">
           <span class="step__icon"><svg class="ic ic--lg" aria-hidden="true" focusable="false"><use href="#ic-git"/></svg></span>
           <span class="step__num">STEP 6</span>
-          <h4>土台（starter）</h4>
-          <p><code>domo-ai-toolkit</code> を clone して同じ場所に置く。</p>
+          <h4>土台（starter）＝同じクローン内</h4>
+          <p>STEP 1 で clone した <code>domo-ai-toolkit</code> のルートに <code>AGENTS.md</code>・<code>skills/</code>・<code>templates/</code>（土台）が既にある（アプリは <code>reference-architectures/inventory-management-app</code>）。<b>別の clone は不要</b>＝この土台をエージェントに読ませる（詳細は下の「土台を置く」）。</p>
         </li>
       </ol>
       <figcaption>そろえる 6 つ ― 上から順に進めれば、最後はエージェントに頼める状態になる</figcaption>
@@ -248,7 +248,7 @@
             <tr><th scope="row" class="role">STEP 3</th><td>エージェント拡張＋サインイン</td><td class="memo">2〜3 分</td></tr>
             <tr><th scope="row" class="role">STEP 4</th><td>Node・Python・Git</td><td class="memo">5〜10 分（導入待ち）</td></tr>
             <tr><th scope="row" class="role">STEP 5</th><td>Domo CLI ＋ <code>domo login</code></td><td class="memo">約 5 分</td></tr>
-            <tr><th scope="row" class="role">STEP 6</th><td>starter を clone</td><td class="memo">1〜2 分</td></tr>
+            <tr><th scope="row" class="role">STEP 6</th><td>同じクローン内の土台（AGENTS.md・skills）を確認（別の clone は不要）</td><td class="memo">1 分</td></tr>
           </tbody>
         </table>
       </div>
@@ -386,7 +386,7 @@ domo login -i your-company.domo.com</pre>
     </figure>
 
     <h3 class="sub">土台を置く ― domo-ai-toolkit</h3>
-    <p class="sec__lead">どのエージェントにも同じ「土台」を渡すための、Domo 社員が実戦で育てた公開ツールキット（非公式・MIT・英/日）。アプリと同じ場所に clone して置くと、エージェントが Domo の認証・API・作法を把握し、<b>UI を触らず自然文で Domo を調べ・作れる</b>ようになる。入手先は <code>github.com/taichan7/domo-ai-toolkit</code>（MIT・英/日 両対応）。URL は下のボタンでコピー（下の clone コマンドにも含まれる）。</p>
+    <p class="sec__lead">どのエージェントにも同じ「土台」を渡すための、Domo 社員が実戦で育てた公開ツールキット（非公式・MIT・英/日）。<b>STEP 1 で clone したこのツールキットのルートが「土台」</b>で、アプリは <code>reference-architectures/inventory-management-app</code>、規約・スキルはルートにある（＝<b>別の clone は不要</b>）。ルートの <code>AGENTS.md</code>／<code>skills</code> をエージェントに読ませると、Domo の認証・API・作法を把握し、<b>UI を触らず自然文で Domo を調べ・作れる</b>ようになる。入手先は <code>github.com/taichan7/domo-ai-toolkit</code>（MIT・英/日 両対応）。URL は下のボタンでコピー。</p>
     <div class="cmd">
       <div class="cmd__bar">
         <span><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-git"/></svg>domo-ai-toolkit の URL</span>
@@ -422,12 +422,12 @@ domo login -i your-company.domo.com</pre>
         <span><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-cli"/></svg>ターミナル</span>
         <button class="copy-btn" type="button" data-copy="cmd-s1-starter">コピー</button>
       </div>
-      <pre class="cmd__body" id="cmd-s1-starter"><span class="c"># アプリと同じ（親）フォルダに clone し、疎通を確認（CLI 導入・login は上の手順）
+      <pre class="cmd__body" id="cmd-s1-starter"><span class="c"># STEP 1 で clone 済みの domo-ai-toolkit をそのまま使う（別の clone は不要）
+# アプリは reference-architectures/inventory-management-app、土台スクリプトはルートの scripts/
 # Windows は Git Bash で実行（PowerShell に bash が無い場合）</span>
-cd ..   <span class="c"># アプリの親フォルダへ出てから（toolkit をアプリの中に入れない。親に inventory-management-app と並ぶ）</span>
-git clone https://github.com/taichan7/domo-ai-toolkit
-bash domo-ai-toolkit/scripts/authenticate.sh your-company.domo.com
-bash domo-ai-toolkit/scripts/list-datasets.sh      <span class="c"># 先頭50件が出れば疎通OK</span></pre>
+cd ../..   <span class="c"># アプリから domo-ai-toolkit のルートへ（reference-architectures/ の親）</span>
+bash scripts/authenticate.sh your-company.domo.com
+bash scripts/list-datasets.sh      <span class="c"># 先頭50件が出れば疎通OK</span></pre>
     </div>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-bulb"/></svg>エージェントへの頼み方の例：「行数の多いデータセット上位 10 件を挙げて」「失敗している Magic ETL をエラーコード別にまとめて」「dataflow 92 の不具合と直し方は？」。長時間の無人作業では、1 時間で失効する SID でなく <code>DOMO_DEVELOPER_TOKEN</code>（開発者トークン・別名 <code>DOMO_TOKEN</code> も可）を使う。</p>
 
@@ -489,7 +489,7 @@ bash domo-ai-toolkit/scripts/list-datasets.sh      <span class="c"># 先頭50件
           <div class="vs__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-key"/></svg>開発者トークン＋REST だけが届く面</div>
           <ul class="vs__list">
             <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-grid"/></svg><b>App Studio 埋め込み</b>（ページ・カード・レイアウト・データ紐付け）＝唯一「開ける URL」を作る</li>
-            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-stack"/></svg><b>Magic ETL（DataFlow）</b>の作成・更新・実行（このアプリでは残高を集計し、残高 1 件ごとに AI 在庫コメントを付けて <code>Inventory Management ｜ Dashboard</code> へ出力）</li>
+            <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-stack"/></svg><b>Magic ETL（DataFlow）</b>の作成・更新・実行（このアプリでは残高を集計し、残高 1 件ごとに AI 在庫コメントを付けて <code>Inventory Management | Dashboard</code> へ出力）</li>
             <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-refresh"/></svg><b>Workflow</b>（承認・通知・AI）の配線（このアプリでは在庫不足の<b>通知 Workflow</b>＝Start → AI Agent → End で、AI Agent が本文を組み立て Send Email）</li>
             <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shield"/></svg><b>Code Engine</b> パッケージの deploy（このアプリでは<b>公開 1 関数 <code>inventory_api</code></b>＝関数の実行は別・Domo 内で動く）</li>
             <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-clock"/></svg><b>無人・長時間・CI</b>（付属スクリプトは SID を読まないため）</li>
@@ -583,7 +583,7 @@ export DOMO_DEVELOPER_TOKEN="&lt;発行したトークン&gt;"</pre>
 足りないものがあれば、私の OS（Windows＝PowerShell／macOS＝ターミナル）向けのコマンドを 1 つずつ提示して。
 
 準備ができたら、権限も読取のみで点検してください:
-- 出力 DataSet（Inventory Management ｜ Dashboard）を読めるか
+- 出力 DataSet（Inventory Management | Dashboard）を読めるか
 - Code Engine の公開関数 inventory_api に AUTH で疎通できるか（読取のみ・登録や変更はしない）
 - 自分で DataApp を作れるか（§1 の②のトークンで埋め込みできるか）
 
@@ -629,7 +629,7 @@ node --version / python3 --version / git --version / domo --version
     <div class="cmd">
       <div class="cmd__bar"><span><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-database"/></svg>④ Domo を読む（調査）</span><button class="copy-btn" type="button" data-copy="prompt-s1-t4">コピー</button></div>
       <pre class="cmd__body" id="prompt-s1-t4">このインスタンスで行数の多いデータセット上位 10 件を、名前・行数・更新日で一覧にして。
-あわせて、このアプリの出力「Inventory Management ｜ Dashboard」が既にあるかも確認して（あれば行数・更新日も）。
+あわせて、このアプリの出力「Inventory Management | Dashboard」が既にあるかも確認して（あれば行数・更新日も）。
 ※読み取りだけ。何も変更・実行しないこと。</pre>
     </div>
     <div class="cmd">
@@ -763,12 +763,12 @@ hello-domo.txt を1つ作り、「準備OK」と書いて、中身を読み直�
     <figure class="fig fig--table">
       <div class="tablewrap">
         <table class="demotable demotable--sm demotable--wrap" aria-labelledby="tblcap-fb">
-          <thead><tr><th scope="col">やりたいこと</th><th scope="col">✗ こうしない</th><th scope="col">✓ こうする</th><th scope="col">なぜ</th></tr></thead>
+          <thead><tr><th scope="col">やりたいこと</th><th scope="col"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-alert"/></svg>こうしない</th><th scope="col"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-check"/></svg>こうする</th><th scope="col">なぜ</th></tr></thead>
           <tbody>
             <tr><th scope="row" class="role">何万行の合算・GROUP BY</th><td>画面の埋め込み SQL で集計</td><td><b>Magic ETL</b> で事前集計</td><td class="memo">埋め込みは集約クエリを 400（＝HTTP エラー）で弾く。重い計算はバックで</td></tr>
             <tr><th scope="row" class="role">入力の検証・権限の最終判断</th><td>画面の JS だけで判断</td><td><b>Code Engine</b>（サーバー関数）</td><td class="memo">画面は書き換えられる。守る判断はサーバーに集約</td></tr>
             <tr><th scope="row" class="role">1 件を書いてすぐ読む記録<br>（レポート／設定／状態）</th><td>そのたびに DataSet を新規作成</td><td><b>AppDB</b>（即時 CRUD）</td><td class="memo">文書単位で即時に読み書きできる。<b>このアプリの基準在庫（RULE）・通知状態（ALERT_STATE）</b>がこれ</td></tr>
-            <tr><th scope="row" class="role">分析・可視化する大きな表<br>（10 万行級）</th><td>AppDB に大量に溜める</td><td><b>DataSet</b>（＋ETL／コネクタ）</td><td class="memo">列スキーマ＋大量行の集計・カード向き。<b>分析 DataFlow が出す「Inventory Management ｜ Dashboard」</b>がこれ</td></tr>
+            <tr><th scope="row" class="role">分析・可視化する大きな表<br>（10 万行級）</th><td>AppDB に大量に溜める</td><td><b>DataSet</b>（＋ETL／コネクタ）</td><td class="memo">列スキーマ＋大量行の集計・カード向き。<b>分析 DataFlow が出す「Inventory Management | Dashboard」</b>がこれ</td></tr>
             <tr><th scope="row" class="role">時間のかかる長文 AI レポート</th><td>画面表示時にその場で生成</td><td><b>Workflow＋AI Agent</b> で事前生成→AppDB 保存</td><td class="memo">待たせない・課金を平準化（生成と表示の分離）</td></tr>
             <tr><th scope="row" class="role">一覧の要点を短く AI 要約</th><td>重い AI Agent を 1 件ずつ呼ぶ</td><td>DataFlow の <b>TextGeneration</b> タイル</td><td class="memo">短文バッチは軽く安い・即時表示に向く</td></tr>
             <tr><th scope="row" class="role">外部システムのデータを定期取込</th><td>手で CSV をアップロード</td><td><b>Connector／Account</b>（スケジュール）</td><td class="memo">認証付き・自動更新できる</td></tr>
@@ -855,7 +855,7 @@ domo dev</pre>
             <tr><th scope="row" class="role">AppDB</th><td class="memo">単一コレクション <code>inventory_management_records</code>・<code>record_type</code> で 7 種</td><td class="memo"><code>appdb/</code></td></tr>
             <tr><th scope="row" class="role">Magic ETL</th><td class="memo">1 入力・7 タイル・3 セクション（Python タイル 2 枚を含む）・残高 1 件ごとに TextGeneration</td><td class="memo"><code>dataflow/</code></td></tr>
             <tr><th scope="row" class="role">通知 Workflow</th><td class="memo">Start → AI Agent → End の 3 タイル＋Send Email</td><td class="memo"><code>workflow/</code></td></tr>
-            <tr><th scope="row" class="role">出力 DataSet</th><td class="memo">「Inventory Management ｜ Dashboard」1 本</td><td class="memo"><code>datasets/</code></td></tr>
+            <tr><th scope="row" class="role">出力 DataSet</th><td class="memo">「Inventory Management | Dashboard」1 本</td><td class="memo"><code>datasets/</code></td></tr>
           </tbody>
         </table>
       </div>
@@ -1068,7 +1068,7 @@ domo dev</pre>
         <div class="flow__arrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></div>
         <div class="tile tile--step"><span class="tile__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-stack"/></svg><b>③ 出力</b></span><span>UnionAll で 1 本に</span></div>
         <div class="flow__arrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></div>
-        <div class="tile tile--output"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>Inventory Management ｜ Dashboard</div>
+        <div class="tile tile--output"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>Inventory Management | Dashboard</div>
       </div>
       <figcaption>Magic ETL の流れ（準備 → AI 要約 → 出力。全 7 タイル・3 セクション）</figcaption>
     </figure>
@@ -1076,7 +1076,7 @@ domo dev</pre>
       <ol class="proc">
         <li><span class="ph">準備</span>Python タイル（<code>dataflow/dashboard_transform.py</code>）が同期 DataSet を 1 回の処理で、KPI・品目別・ロケーション別・7 日推移・不足・滞留の行へ整形する。</li>
         <li><span class="ph">AI</span>品目×ロケーション残高 <b>1 件ごと</b>に、<code>TextGeneration</code> で <b>per-entity の AI 在庫コメント</b>（補充/滞留の着眼点）を生成する。</li>
-        <li><span class="ph">出力</span>集計行と AI コメント行を <code>UnionAll</code> で<b>同居</b>させ、1 本の DataSet「Inventory Management ｜ Dashboard」へ発行する。</li>
+        <li><span class="ph">出力</span>集計行と AI コメント行を <code>UnionAll</code> で<b>同居</b>させ、1 本の DataSet「Inventory Management | Dashboard」へ発行する。</li>
       </ol>
       <figcaption>3 セクションの中身 ― 準備（整形）→ AI 要約（per-entity コメント）→ 出力（UnionAll で 1 本）</figcaption>
     </figure>
@@ -1220,7 +1220,7 @@ domo dev</pre>
           <p>承認・通知・AI の自動化。</p>
         </div>
         <div class="surface">
-          <div class="surface__head"><span class="surface__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-store"/></svg></span><span class="surface__name">AppDB</span><span class="surface__badge b-api">API</span></div>
+          <div class="surface__head"><span class="surface__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-database"/></svg></span><span class="surface__name">AppDB</span><span class="surface__badge b-api">API</span></div>
           <p>アプリ専用の JSON 文書 DB。取引・残高・通知状態を記録。</p>
         </div>
         <div class="surface">
@@ -1236,7 +1236,7 @@ domo dev</pre>
           <p>組込 LLM（生成・要約・OCR）。<b>このアプリ</b>＝残高 1 件ごとに在庫コメントを生成（TextGeneration）。</p>
         </div>
         <div class="surface">
-          <div class="surface__head"><span class="surface__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-store"/></svg></span><span class="surface__name">App Studio / Pages</span><span class="surface__badge b-api">API</span></div>
+          <div class="surface__head"><span class="surface__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-grid"/></svg></span><span class="surface__name">App Studio / Pages</span><span class="surface__badge b-api">API</span></div>
           <p>複数ページ＝開ける URL。</p>
         </div>
         <div class="surface">
@@ -1346,7 +1346,7 @@ domo dev</pre>
       </div>
       <figcaption>AppDB＝即時の小さな記録／DataSet＝分析用の大きな表。用途で使い分ける</figcaption>
     </figure>
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-info"/></svg>このアプリ：取引（<code>TRANSACTION</code>）・残高（<code>BALANCE</code>）・通知状態（<code>ALERT_STATE</code>）は <b>AppDB</b>（即時 CRUD）、品目×ロケーション残高の集計は <b>DataSet</b>（出力「Inventory Management ｜ Dashboard」）。AppDB は標準同期で DataSet 化され、両者は橋渡しできる。</p>
+    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-info"/></svg>このアプリ：取引（<code>TRANSACTION</code>）・残高（<code>BALANCE</code>）・通知状態（<code>ALERT_STATE</code>）は <b>AppDB</b>（即時 CRUD）、品目×ロケーション残高の集計は <b>DataSet</b>（出力「Inventory Management | Dashboard」）。AppDB は標準同期で DataSet 化され、両者は橋渡しできる。</p>
 
     <h3 class="sub">詳細②：Code Engine（サーバー側の関数）</h3>
     <p class="sec__lead">Pro Code・Workflow・プロンプトから呼ぶサーバー関数。画面は書き換えられる前提とし、<b>守るべき判断（検証・権限・記録）をサーバーに集約</b>する。</p>
@@ -1452,10 +1452,10 @@ domo dev</pre>
     <div class="cmd">
       <div class="cmd__bar"><span><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-eye"/></svg>① 調べる（読取・最初の一歩・安全）</span><button class="copy-btn" type="button" data-copy="prompt-s4-read" aria-label="① 調べる（読取）のプロンプトをコピー">コピー</button></div>
       <pre class="cmd__body" id="prompt-s4-read">このインスタンスで行数の多いデータセット上位 10 件を一覧にして。
-次に、在庫入出庫管理が読む出力 DataSet（Inventory Management ｜ Dashboard）の
+次に、在庫入出庫管理が読む出力 DataSet（Inventory Management | Dashboard）の
 行数と主な列も教えて。※読み取りだけで、何も変更しないこと。</pre>
     </div>
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-check"/></svg><b>うまくいくとこう返る</b>（自分の出力の成否を自己判定するための見本）：前半は<b>〈名前／行数〉の表</b>が、行数の多い順に最大 10 行（更新日などの付随情報が付くこともある）。後半は出力 DataSet「Inventory Management ｜ Dashboard」の<b>行数</b>と<b>主な列</b>（総在庫数・品目数・不足件数など）が表か箇条書きで並ぶ。<b>具体的な数値や列名は環境で変わる</b>ので、この<b>形</b>どおりに返れば成功とみなしてよい。読取だけのはずが実行・変更をしていたり、実在しない列名を創作していたら要注意（→ §6）。</p>
+    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-check"/></svg><b>うまくいくとこう返る</b>（自分の出力の成否を自己判定するための見本）：前半は<b>〈名前／行数〉の表</b>が、行数の多い順に最大 10 行（更新日などの付随情報が付くこともある）。後半は出力 DataSet「Inventory Management | Dashboard」の<b>行数</b>と<b>主な列</b>（総在庫数・品目数・不足件数など）が表か箇条書きで並ぶ。<b>具体的な数値や列名は環境で変わる</b>ので、この<b>形</b>どおりに返れば成功とみなしてよい。読取だけのはずが実行・変更をしていたり、実在しない列名を創作していたら要注意（→ §6）。</p>
     <div class="cmd">
       <div class="cmd__bar"><span><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-code"/></svg>② 画面を直す（Pro Code）</span><button class="copy-btn" type="button" data-copy="prompt-s4-ui" aria-label="② 画面を直す（Pro Code）のプロンプトをコピー">コピー</button></div>
       <pre class="cmd__body" id="prompt-s4-ui">~/handson-inventory/pro-code/index.html で、画面トップの大見出し（h1「入出庫を登録」）の文言を
@@ -1500,7 +1500,7 @@ publish 自体は私が確認してから（手順だけ先に説明して・勝
     <h3 class="sub">さらに例（頼み方の型・一覧）</h3>
     <figure class="fig">
       <dl class="defs">
-        <dt>調べる（読取・安全）</dt><dd>「行数の多いデータセット上位 10 件は？」／「失敗している Magic ETL をエラーコード別にまとめて」／「このアプリが読む出力 DataSet（Inventory Management ｜ Dashboard）の列を一覧にして」</dd>
+        <dt>調べる（読取・安全）</dt><dd>「行数の多いデータセット上位 10 件は？」／「失敗している Magic ETL をエラーコード別にまとめて」／「このアプリが読む出力 DataSet（Inventory Management | Dashboard）の列を一覧にして」</dd>
         <dt>画面（Pro Code）</dt><dd>「画面トップの大見出し（「入出庫を登録」）を『◯◯』に変えて」／「KPI カードを不足件数の多い順に並べ替えて」／「アクセント色を少し濃くして」／「スマホ幅で崩れていないか <code>shoot.mjs</code> で確認して」</dd>
         <dt>集計（Magic ETL）</dt><dd>「<code>dataflow/dashboard_transform.py</code>（Python タイル本体）の残高系に『補充推奨フラグ』列を足して」／「差分（git diff）を確認し、名札付きサンドボックスで <code>provision_domo.py apply</code> → <code>verify</code> で行数を確認（本番では実行しない）」</dd>
         <dt>サーバー（Code Engine）</dt><dd>「保存前の検証を 1 つ追加し、<code>_</code> 始まりの private ヘルパも書いて。publish 後に公開が inventory_api 1 関数のままか確認して」</dd>
@@ -1528,11 +1528,11 @@ publish 自体は私が確認してから（手順だけ先に説明して・勝
     <h3 class="sub">3 つの段</h3>
     <figure class="fig">
       <div class="flow">
-        <div class="tile tile--step"><span class="tile__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-upload"/></svg><b>配備1 publish</b></span><span>design を配布</span><em>まだ URL なし</em></div>
+        <div class="tile tile--step"><span class="tile__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-upload"/></svg><b>publish</b></span><span>design を配布</span><em>まだ URL なし</em></div>
         <div class="flow__arrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></div>
-        <div class="tile tile--step"><span class="tile__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-grid"/></svg><b>配備2 埋め込み</b></span><span>カードとして埋め込み</span><em>ここで開ける</em></div>
+        <div class="tile tile--step"><span class="tile__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-grid"/></svg><b>埋め込み</b></span><span>カードとして埋め込み</span><em>ここで開ける</em></div>
         <div class="flow__arrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></div>
-        <div class="tile tile--output"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-database"/></svg><b>配備3 data</b><br>AppDB・CE・DataFlow・通知WF<br>（apply で構築）</div>
+        <div class="tile tile--output"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-database"/></svg><b>data</b><br>AppDB・CE・DataFlow・通知WF<br>（apply で構築）</div>
       </div>
       <figcaption>publish（配布）→ App Studio（埋め込み）→ data（集計・AI）の 3 段。<b>これは「考え方」の順</b>で、実際にコマンドを流す順は <b>data（<code>apply</code>）が先頭</b>＝下のコピーのとおり <code>apply</code> → <code>sync-manifest</code> → <code>publish</code> → <code>app-studio</code> → <code>verify</code>。</figcaption>
     </figure>
@@ -1546,33 +1546,33 @@ publish 自体は私が確認してから（手順だけ先に説明して・勝
       <pre class="cmd__body" id="cmd-s5-deploy"><span class="c"># 準備: Python スクリプトは環境変数から認証を読む（§1 の ② を実行済みにする）
 #   Windows: $env:DOMO_INSTANCE / $env:DOMO_DEVELOPER_TOKEN
 #   macOS  : export DOMO_INSTANCE / DOMO_DEVELOPER_TOKEN
-# 認証は 2 系統（詳細は §1）＝下の 配備3(画面) の domo publish だけは domo login のセッションで動き、
+# 認証は 2 系統（詳細は §1）＝下の ③ publish(画面) の domo publish だけは domo login のセッションで動き、
 #   python3 scripts/provision_domo.py はこの開発者トークンで動く（この 2 つの取り違えが最大のつまずき）
 
 # 名札（最重要）＝これ以降の全オブジェクトに効き、本番や他参加者と別名にする
 #   ※ <あなたの氏名> を自分の名前に置換（未設定だと本番名のまま＝書込みを拒否）</span>
 export INVENTORY_SANDBOX_SUFFIX="検証・<あなたの氏名>"
 
-<span class="c"># 配備1(データ・ロジック)  AppDB・CE・DataFlow・出力DataSet・通知WF を名札付きで発見/作成
+<span class="c"># ① apply(データ・ロジック)  AppDB・CE・DataFlow・出力DataSet・通知WF を名札付きで発見/作成
 #   冪等＝名称で「発見」できれば再利用し、無ければ作成する（何度流しても重複を作らない）
 #   DataFlow の実行と残高 1 件ごとの AI 在庫コメント生成まで含むため、ここだけ特に重い（→ 末尾の注意）</span>
 python3 scripts/provision_domo.py apply
 
-<span class="c"># 配備2(配線)  apply が作った実IDを manifest の alias 配線へ合わせる（publish の前に実行）
+<span class="c"># ② sync-manifest(配線)  apply が作った実IDを manifest の alias 配線へ合わせる（publish の前に実行）
 #   Domo へは書き込まない読取り系＝ローカル manifest.json の ID 欄だけを更新する（名札なしでも通る）</span>
 python3 scripts/provision_domo.py sync-manifest
 
-<span class="c"># 配備3(画面)  design を発行（直前の sync-manifest＝名札付きがコピー側 manifest の id を外す＝新規採番で本番 design と衝突しない）</span>
+<span class="c"># ③ publish(画面)  design を発行（直前の sync-manifest＝名札付きがコピー側 manifest の id を外す＝新規採番で本番 design と衝突しない）</span>
 cd pro-code &amp;&amp; domo publish &amp;&amp; cd -
 
-<span class="c"># 配備4(埋め込み)  App Studio にページ1=業務／ページ2=開発ガイドを確保（/app-studio/&lt;id&gt; が開ける）</span>
+<span class="c"># ④ app-studio(埋め込み)  App Studio にページ1=業務／ページ2=開発ガイドを確保（/app-studio/&lt;id&gt; が開ける）</span>
 python3 scripts/provision_domo.py app-studio
 
-<span class="c"># 検証  ok:true なら配備完了。verify は読取りのみ＝何度流しても壊さない（成功サインの形は下の表）</span>
+<span class="c"># ⑤ verify(検証)  ok:true なら配備完了。verify は読取りのみ＝何度流しても壊さない（成功サインの形は下の表）</span>
 python3 scripts/provision_domo.py verify</pre>
     </div>
 
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-check"/></svg><b>成功の見分け方</b>（配備2 の成否を自分で判定する）。この<b>形</b>どおりなら成功とみなしてよい（<code>&lt;id&gt;</code> など具体値は環境で変わる）。</p>
+    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-check"/></svg><b>成功の見分け方</b>（<code>apply</code> / <code>app-studio</code> / <code>verify</code> の成否を自分で判定する）。この<b>形</b>どおりなら成功とみなしてよい（<code>&lt;id&gt;</code> など具体値は環境で変わる）。</p>
     <figure class="fig fig--table">
       <div class="tablewrap">
         <table class="demotable demotable--sm demotable--wrap" aria-labelledby="tblcap-s5-ok">
@@ -1584,7 +1584,7 @@ python3 scripts/provision_domo.py verify</pre>
           </tbody>
         </table>
       </div>
-      <figcaption id="tblcap-s5-ok">配備2 の成功サイン ― <code>DOMO_DEVELOPER_TOKEN/DOMO_TOKEN が未設定です</code> などで止まったら → §10 FAQ</figcaption>
+      <figcaption id="tblcap-s5-ok">各コマンド（<code>apply</code> / <code>app-studio</code> / <code>verify</code>）の成功サイン ― <code>DOMO_DEVELOPER_TOKEN/DOMO_TOKEN が未設定です</code> などで止まったら → §10 FAQ</figcaption>
     </figure>
     <h3 class="sub">更新したとき、何が自動で追従するか</h3>
     <div class="callouts">
@@ -1643,7 +1643,7 @@ python3 scripts/provision_domo.py verify</pre>
       <dl class="defs">
         <dt>画面を直す</dt><dd><code>pro-code/</code> ＋ この開発ガイド <b>§3・§5</b>、編集→公開のループは <b>§7</b>（検証は <code>tests/layout/shoot.mjs</code>）</dd>
         <dt>サーバー関数（登録・通知・再計算）</dt><dd><code>code-engine/</code> ＋ <code>README.md</code>。公開関数は <code>inventory_api</code> <b>1 本</b>で、<code>operation</code>（<code>REGISTER</code>／<code>NOTIFY_NOW</code>／<code>RECALCULATE</code> ほか全 8 種）で中身が分かれる（→ <b>§4</b>）</dd>
-        <dt>集計・AI コメントを足す</dt><dd><code>dataflow/</code> ＋ <code>README.md</code>。Magic ETL は <b>1 入力・7 タイル・3 セクション</b>で、残高 <b>1 件ごと</b>に <code>TextGeneration</code> で在庫コメントを付け、「Inventory Management ｜ Dashboard」へ出力する（→ <b>§4</b>）</dd>
+        <dt>集計・AI コメントを足す</dt><dd><code>dataflow/</code> ＋ <code>README.md</code>。Magic ETL は <b>1 入力・7 タイル・3 セクション</b>で、残高 <b>1 件ごと</b>に <code>TextGeneration</code> で在庫コメントを付け、「Inventory Management | Dashboard」へ出力する（→ <b>§4</b>）</dd>
         <dt>配備で迷う</dt><dd><code>AGENTS.md</code> ＋ <b>§5・§7・§8</b></dd>
         <dt>通知を直す</dt><dd><code>code-engine/</code>（<code>NOTIFY_NOW</code>＝CE が起動・<code>NOTIFICATION_STATUS</code>＝監査用の互換面）＋ <code>workflow/</code>。メールは <code>NORMAL</code>⇄<code>SHORTAGE</code> を<b>またいだ時だけ</b>飛び、起動のたびに CE が最新の有効版を実行時に解決する（Workflow を改版してもカードの再埋め込みは不要。→ <b>§4</b>）</dd>
         <dt>残高・在庫数がずれる</dt><dd><code>code-engine/</code>（<code>RECALCULATE</code>）＋ <b>§3</b>。<code>BALANCE</code> は投影なので、<code>TRANSACTION</code> から作り直して直す</dd>
@@ -1656,7 +1656,7 @@ python3 scripts/provision_domo.py verify</pre>
     <figure class="fig">
       <div class="vs">
         <div class="vs__panel">
-          <div class="vs__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-alert"/></svg>✗ 悪い頼み方</div>
+          <div class="vs__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-alert"/></svg>悪い頼み方</div>
           <ul class="vs__list">
             <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-doc"/></svg><b>「在庫入出庫管理をいい感じに改善して」</b></li>
             <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-alert"/></svg>対象があいまい（どのファイル・どの要素？）</li>
@@ -1664,7 +1664,7 @@ python3 scripts/provision_domo.py verify</pre>
           </ul>
         </div>
         <div class="vs__panel vs__panel--accent">
-          <div class="vs__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-check"/></svg>✓ 良い頼み方</div>
+          <div class="vs__head"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-check"/></svg>良い頼み方</div>
           <ul class="vs__list">
             <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-doc"/></svg><b>「<code>~/handson-inventory/pro-code/index.html</code> の大見出し「入出庫を登録」を『◯◯』に変更。<code>node tests/layout/shoot.mjs</code> で PNG 目視まで。publish は私の確認後。これは書込み」</b></li>
             <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-check"/></svg>①対象を名指す（<code>index.html</code> の大見出し）</li>
@@ -1756,7 +1756,7 @@ publish（公開）は私が確認してから。これは書込み作業です�
       </div>
       <figcaption>サンドボックス ― 画面もバックエンドも自分専用。名札（<code>INVENTORY_SANDBOX_SUFFIX</code>）で本番・他参加者と完全分離</figcaption>
     </figure>
-    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-clock"/></svg><b>所要 約 30 分</b>（初回はコピー作成＋構築＋publish＋埋め込みで 10〜15 分／2 周目以降は <code>domo publish</code> とブラウザ更新だけ）。<b>やること＝下の図の 6 ステップ</b>（コピー → 名札を付ける → 構築 → 編集 → ローカル確認 → publish → 反映確認）。</p>
+    <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-clock"/></svg><b>所要 約 30 分</b>（初回はコピー作成＋構築＋publish＋埋め込みで 10〜15 分／2 周目以降は <code>domo publish</code> とブラウザ更新だけ）。<b>やること＝下の図の 6 ステップ</b>（コピー → 名札を付ける → 構築 → 編集・確認 → publish → 反映確認）。</p>
     <p class="sec__note sec__note--strong"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-refresh"/></svg><b>再開時チェック（休憩後・ターミナルを開き直したら必ず）</b>：①<code>domo login -i your-company.domo.com</code>（SID は約 1 時間で失効）②トークンの環境変数（<code>DOMO_INSTANCE</code> / <code>DOMO_DEVELOPER_TOKEN</code>）と③名札 <code>INVENTORY_SANDBOX_SUFFIX</code> を再設定（ターミナルを閉じると消える）。この 3 つを先に済ませてから構築／publish／埋め込みへ。<b>名札は前回とまったく同じ文字列に</b>（1 文字でも違うと別のサンドボックスとして新規作成され、前回のコピーを掴めなくなる）。</p>
 
     <h3 class="sub">実習の流れ</h3>
@@ -2332,7 +2332,7 @@ node --check pro-code/app.js と node tests/layout/shoot.mjs を通し、差分�
 
   <!-- ══ §10 付録 ═══════════════════════════════════════════════ -->
   <section class="sec" id="s10" data-title="付録">
-    <header class="sec__head"><span class="sec__no"></span><h2 class="sec__title">付録：用語集・FAQ・困ったとき</h2></header>
+    <header class="sec__head"><span class="sec__no"></span><h2 class="sec__title">付録：チートシート・セルフチェック・用語集・FAQ</h2></header>
     <p class="sec__lead">迷ったら戻ってくる早見表。用語と、よくある詰まりの対処をまとめた。</p>
 
     <h3 class="sub">1 枚チートシート（当日これだけ手元に）</h3>
@@ -2432,7 +2432,7 @@ node --check pro-code/app.js と node tests/layout/shoot.mjs を通し、差分�
             <tr><th scope="row" class="role">エージェントの変更を取り消したい／コピーがおかしくなった</th><td class="memo">①エージェントに「<b>直前の変更を取り消して</b>」と頼む ②VS&nbsp;Code の<b>タイムライン</b>（エクスプローラでファイル右クリック →「タイムライン」）で前の状態へ戻す ③<code>~/handson-inventory</code> は使い捨てのコピー。最悪は元フォルダから作り直す（Windows <code>Copy-Item -Recurse</code>／mac <code>cp -R</code>）。<b>本番 design・共有資産には触れない</b>。</td></tr>
             <tr><th scope="row" class="role">自分のコピーを壊れた状態で publish してしまった</th><td class="memo">検証コピーは<b>使い捨て</b>。良いコードに直して <code>domo publish</code> し直せば上書きされる（FOLLOW_LATEST は<b>常に最新</b>を配る＝旧版へ戻す UI は無い）。元フォルダから作り直して再 publish でも可。<b>本番（名札なし）の design には触れない</b>。</td></tr>
             <tr><th scope="row" class="role">publish 成功なのに変更が見えない</th><td class="memo"><b>まず publish したか</b>（PNG・<code>domo dev</code> は<b>手元のファイル</b>、ブラウザの DataApp は<b>最後に publish した版</b>を見る＝別もの）。した上で、ハードリロード（<code>Ctrl/⌘+Shift+R</code>）→ 数十秒待って再読込 → それでも駄目なら version を上げて再 publish。App Studio のカードもキャッシュ表示することがある。</td></tr>
-            <tr><th scope="row" class="role">カードは出るが中身が空・スピナーのまま</th><td class="memo">①自分の Domo ユーザーが出力 DataSet（Inventory Management ｜ Dashboard）を閲覧できるか ②初回は埋め込み（<code>provision_domo.py app-studio</code>）で context を同期したか ③§4①の読取プロンプトでデータが返るか、を順に確認。</td></tr>
+            <tr><th scope="row" class="role">カードは出るが中身が空・スピナーのまま</th><td class="memo">①自分の Domo ユーザーが出力 DataSet（Inventory Management | Dashboard）を閲覧できるか ②初回は埋め込み（<code>provision_domo.py app-studio</code>）で context を同期したか ③§4①の読取プロンプトでデータが返るか、を順に確認。</td></tr>
             <tr><th scope="row" class="role">入出庫を記録したのに現在庫（残高）が変わらない</th><td class="memo">残高（<code>BALANCE</code>）は<b>投影</b>。更新は必ず CE 経由の <code>REGISTER</code> を通す（画面の直書き不可）。ずれていれば <code>RECALCULATE</code>（取引から再構築・保守権限）で作り直す（→ <a href="#s3">§3</a>）。</td></tr>
             <tr><th scope="row" class="role">同じ入出庫を 2 回押して二重に計上した</th><td class="memo"><code>TRANSACTION</code> は<b>追記専用</b>で消さない。訂正は<b>逆仕訳</b>（反対方向の IN/OUT）を追記する。CE は同じ <code>request_id</code> なら二重に効かない（冪等）ので、まず重複登録かを確認（→ <a href="#s3">§3</a>）。</td></tr>
             <tr><th scope="row" class="role">在庫不足なのに通知メールが来ない／来すぎる</th><td class="memo">通知は <code>NORMAL</code>⇄<code>SHORTAGE</code> を<b>またいだ瞬間だけ</b>（<code>ALERT_STATE</code> が連投を防ぐ）。手動送信は <code>NOTIFY_NOW</code>。サンドボックスでは<b>名札付き・<code>sync-manifest</code> 済み</b>で宛先（<code>recipient_email</code>）が自分向けかを確認（→ <a href="#s3">§3</a>）。</td></tr>
@@ -2498,7 +2498,7 @@ git config --global http.proxy http://proxy.example.co.jp:8080</pre>
 </main>
 
 <footer class="sitefoot">
-  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-box"/></svg>在庫入出庫管理 ・ 開発ガイド ― 開発ハンズオン ・ v2.1.0
+  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-box"/></svg>在庫入出庫管理 ・ 開発ガイド ― 開発ハンズオン ・ v2.1.3
 </footer>
 
 <!-- トースト（コピー等のフィードバック） -->

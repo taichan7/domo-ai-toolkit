@@ -134,7 +134,7 @@ python3 scripts/provision_domo.py verify
 - `appStudioStandardPageBreakY: 82`, `appStudioCompactPageBreakY: 29`
 - `legacyCollectionsRemaining: []`
 - `standardSyncDatasetId` と `dashboardDatasetId` が空でない
-- ITEM 30、LOCATION 6、RULE 30、TRANSACTION 136以上、BALANCE 131以上（BALANCEはAIテキスト生成タイルの100行下限を満たすためのシード規模）
+- ITEM 30、LOCATION 6、RULE 30、TRANSACTION 135以上、BALANCE 131以上（下限は `scripts/provision_domo.py` の `required` 件数が正。BALANCEはAIテキスト生成タイルの100行下限を満たすためのシード規模）
 
 DataFlow出力はQuery APIで `record_type` ごとの行数とKPI値を確認できる。運用画面の即時反映と分析画面の同期後反映には時間差がある。
 

@@ -358,10 +358,10 @@
     const transactions = source.transactions || [];
     const alerts = source.alerts || [];
     const total = balances.reduce((sum, row) => sum + Number(row.quantity || 0), 0);
-    const shortage = balances.filter((row) => row.is_shortage === true || String(row.is_shortage).toLowerCase() === 'true');
+    const shortage = balances.filter((row) => isShortage(row));
     // 物理削除されたマスタの取引には CE が archived 印を付け、canonical な集計はそれを本日入出庫
     // KPI・7日トレンドから除外する。台帳ビューは監査証跡として残すので、集計用の作業配列だけ絞り込む。
-    const activeTransactions = transactions.filter((row) => !(row.archived === true || String(row.archived).toLowerCase() === 'true'));
+    const activeTransactions = transactions.filter((row) => !isArchived(row));
     rows.push({record_type: 'KPI', metric_key: 'TOTAL_QUANTITY', metric_value: total, label: '総在庫数'});
     rows.push({record_type: 'KPI', metric_key: 'ITEM_COUNT', metric_value: new Set(balances.map((row) => row.item_code)).size, label: '在庫品目'});
     rows.push({record_type: 'KPI', metric_key: 'SHORTAGE_COUNT', metric_value: shortage.length, label: '在庫不足'});
@@ -449,12 +449,24 @@
   // 公開面は app.js の実行時入口（loadInitialData / loadDashboard / callFunction）と、
   // 単体テストが直接叩く継ぎ目（mode / getCollection / buildDashboardRows＝削除するとテストが壊れる）に限る。
   // 通知Workflowの起動はフロントでは行わない（Code Engine がサーバー側で最新版を解決して開始する）。
+  // archived / is_shortage の真偽正規化は、集計（domo-access）とドリルダウン再導出（app.js）で
+  // 必ず一致させる必要がある。両所でバイト重複させずここを唯一の定義源とし、凍結エクスポートで公開する
+  // （ドリフトの罠を塞ぐ・INV-041）。bool と文字列 'true' の両表現を受ける。
+  function isArchived(row) {
+    return row.archived === true || String(row.archived).toLowerCase() === 'true';
+  }
+  function isShortage(row) {
+    return row.is_shortage === true || String(row.is_shortage).toLowerCase() === 'true';
+  }
+
   global.InventoryData = Object.freeze({
     mode: runtimeMode,
     loadInitialData,
     loadDashboard,
     getCollection,
     callFunction,
-    buildDashboardRows
+    buildDashboardRows,
+    isArchived,
+    isShortage
   });
 })(window);

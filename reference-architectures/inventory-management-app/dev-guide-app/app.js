@@ -226,7 +226,7 @@
     if (btn.dataset.flashTimer) clearTimeout(Number(btn.dataset.flashTimer));
     if (btn.dataset.origLabel == null) btn.dataset.origLabel = btn.textContent;
     btn.classList.add("is-copied");
-    btn.textContent = "✓ コピー済み";
+    btn.textContent = "コピー済み";
     btn.setAttribute("aria-label", "コピー済み");
     btn.dataset.flashTimer = String(setTimeout(function () {
       btn.classList.remove("is-copied");

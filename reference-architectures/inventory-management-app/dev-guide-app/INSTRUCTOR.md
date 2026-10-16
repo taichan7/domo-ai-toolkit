@@ -15,7 +15,7 @@
 0) 公開toolkitをcloneし、`reference-architectures/inventory-management-app/` を開く（以降すべての前提）
 1) VS Code を入れて、コーディングエージェント拡張（Claude Code / Codex / GitHub Copilot のどれか）にサインイン
 2) Node・Python・Git と Domo CLI（npm install -g ryuu）を入れ、`domo login -i <自社>.domo.com` まで通す
-3) domo-ai-toolkit を clone（dev-guide §1「土台を置く」、または starter リポジトリの README）
+3) 0) の同じクローンのルートに AGENTS.md・skills・templates（土台）があることを確認（別の clone は不要・dev-guide §1「土台を置く」）
 4) 開発者トークンを発行し、環境変数（DOMO_INSTANCE / DOMO_DEVELOPER_TOKEN）に設定
    （運営が参加者ぶんのサンドボックスを用意する回はトークン不要）
 5) Google Chrome を入れ、`node tests/layout/shoot.mjs` を1回動かして PNG が出ることを確認（業務アプリ本体の目視）
@@ -30,12 +30,12 @@
 | 0:00 | ねらい・全体像 | — | ゴール 1 枚が伝わった（端末→可視化の流れ） |
 | 0:10 | 環境点検（各自） | §1 | **全員が「起点プロンプト」をエージェントに渡し、足りないものが出ない**（出る→サポート）。時間が余れば §1 末尾のミニ実習を数本 |
 | 0:35 | 開発モデル | §2 | — |
-| 0:50 | アプリの構造（3層・2経路・データモデル） | §3 | — |
-| 1:10 | 作れるもの／デプロイの 3 段階 | §4・§5 | — |
-| 1:30 | 休憩 | — | **休憩前に「全端末が緑」を宣言**（赤い人が残っていれば 10 分延長可） |
-| 1:40 | エージェントの回し方と規律 | §6 | — |
-| 2:00 | 実習（手を動かす） | §7 | **各自の名札付きサンドボックスが配備・publish され、1 変更が画面に映る** |
-| 2:40 | 安全・片付け・まとめ | §8（安全）／§7 末尾（片付け）／§10（付録：セルフチェック・FAQ） | **全員が本番保護の線（名札 `INVENTORY_SANDBOX_SUFFIX` 必須／本番 design 上書き禁止／名札なしの書込コマンドは拒否／AI クレジットの扱い／dev-guide publish 禁止／他参加者の名札付き資産禁止／エージェントの「常に許可」を選ばない）を復唱** → dev-guide §10 のセルフチェック → クリーンアップの号令 → 各自の検証資産を削除（任意） |
+| 0:55 | アプリの構造（3層・2経路・データモデル） | §3 | — |
+| 1:20 | 休憩 | — | **休憩前に「全端末が緑」を宣言**（赤い人が残っていれば 10 分延長可）。構築重の後半（§4–§7）の前に置く |
+| 1:30 | 作れるもの／デプロイの 3 段階 | §4・§5 | — |
+| 2:00 | エージェントの回し方と規律 | §6 | — |
+| 2:20 | 実習（手を動かす） | §7 | **各自の名札付きサンドボックスが配備・publish され、1 変更が画面に映る** |
+| 2:50 | 安全・片付け・まとめ | §8（安全）／§7 末尾（片付け）／§10（付録：セルフチェック・FAQ） | **全員が本番保護の線（名札 `INVENTORY_SANDBOX_SUFFIX` 必須／本番 design 上書き禁止／名札なしの書込コマンドは拒否／AI クレジットの扱い／dev-guide publish 禁止／他参加者の名札付き資産禁止／エージェントの「常に許可」を選ばない）を復唱** → dev-guide §10 のセルフチェック → クリーンアップの号令 → 各自の検証資産を削除（任意） |
 
 ## 2. 開始前に埋めるもの（環境・権限チェック）
 
@@ -97,7 +97,7 @@
 - 受講者が止まったら、まず「起点プロンプト」を再掲→エージェントに点検させる。
 - 各節の所要が押したら、dev-guide §4 の詳細（詳解カード）を飛ばして dev-guide §7 を優先（実習が本体）。
 - 詰まった人・早く終わった人には dev-guide §10「理解度セルフチェック」(1 分) を回させ、理解を自己確認させる（講師の口頭確認の代替）。
-- デプロイの正順（dev-guide §5）は **`provision_domo.py apply` →（別インスタンスのみ）`sync-manifest` →（`cd pro-code && domo publish`）→（`cd dev-guide-app && domo publish`）→ `provision_domo.py app-studio` → `verify`（ok:true）**。`domo publish` は design を配るだけで開ける URL は作らない＝`app-studio` の埋め込みで初めて開ける、を強調する。
+- デプロイの正順（dev-guide §5）は **`provision_domo.py apply` → `sync-manifest` →（`cd pro-code && domo publish`）→（`cd dev-guide-app && domo publish`）→ `provision_domo.py app-studio` → `verify`（ok:true）**。`sync-manifest` は名札サンドボックス（同一インスタンス）でも必須＝`apply` が作った隔離コピーの実 ID を manifest の alias 配線へ書き戻し、publish 前にコピー側 manifest の design id を外して本番 design との衝突を防ぐ（受講者ガイド §5／§7／§10 の無条件の正順と一致。飛ばすと publish が committed design id を再利用し衝突・FEが誤 alias に束縛される）。`domo publish` は design を配るだけで開ける URL は作らない＝`app-studio` の埋め込みで初めて開ける、を強調する。
 
 ## 8. 公開ソースの取得と接続確認
 

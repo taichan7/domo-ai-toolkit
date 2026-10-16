@@ -13,6 +13,8 @@ function element(overrides = {}) {
     dispatch(type) { if (listeners[type]) listeners[type](); },
     click() {},
     setAttribute(name, value) { this[name] = value; },
+    setCustomValidity() {},
+    reportValidity() {},
     pause() {},
     ...overrides
   };
@@ -376,4 +378,42 @@ test('フォールバックは共通メッセージの文言を更新する', ()
 
   scanner.showFallbackMessage('fallback');
   assert.equal(scanner.message.textContent, 'fallback');
+});
+
+test('手入力は接頭辞なしの素のコードを対象種別から補完して受理する（INV-019）', () => {
+  const scanner = scannerEnvironment();
+  scanner.sessionId = 1;
+  scanner.expectedType = 'location';
+  scanner.manualInput.value = 'LOC-01';  // 棚ラベル表記＝接頭辞なしの素のコード
+  let resolved = null;
+  scanner.resolve = (payload) => { resolved = payload; };
+  scanner.acceptManual();
+  assert.ok(resolved, '素のコードでも受理される（以前は「このアプリ用ではない」で弾かれた）');
+  assert.equal(resolved.rawValue, 'LOC:LOC-01');  // expectedType から LOC: を補ってから parse 委譲
+  assert.equal(resolved.expectedType, 'location');
+});
+
+test('手入力で既に接頭辞があればそのまま＝種別不一致は受理しない（INV-019 は補完のみ・parse 契約は不変）', () => {
+  const scanner = scannerEnvironment();
+  scanner.sessionId = 1;
+  scanner.expectedType = 'item';
+  scanner.manualInput.value = 'LOC:LOC-01';  // 接頭辞あり→補完しない→ロケーションQR＝品目期待に不一致
+  let resolved = null;
+  scanner.resolve = (payload) => { resolved = payload; };
+  scanner.acceptManual();
+  assert.equal(resolved, null, '接頭辞付きで種別不一致は補完で曲げず、従来どおり受理しない');
+});
+
+test('scanner は解決済みペイロード（code/qr_type）を返し、消費側の再パースを不要にする（INV-060）', () => {
+  const scanner = scannerEnvironment();
+  scanner.sessionId = 1;
+  scanner.expectedType = 'location';
+  let resolved = null;
+  scanner.resolve = (payload) => { resolved = payload; };
+  scanner.acceptDetectedValue('LOC:LOC-01', 1);
+  assert.ok(resolved, '一致型は解決される');
+  assert.equal(resolved.code, 'LOC-01');       // 解決済み code を直接消費できる
+  assert.equal(resolved.qr_type, 'location');  // qr_type も返す
+  assert.equal(resolved.rawValue, 'LOC:LOC-01'); // 後方互換
+  assert.equal(resolved.expectedType, 'location');
 });

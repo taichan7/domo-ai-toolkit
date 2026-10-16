@@ -26,7 +26,7 @@
     <header class="topbar">
       <div class="brand">
         <span class="brand-mark" aria-hidden="true"><svg class="ui-icon"><use href="#icon-brand"></use></svg></span>
-        <div><strong>在庫入出庫管理</strong><small>Inventory operations</small></div>
+        <div><strong>在庫入出庫管理</strong><small>Inventory management</small></div>
       </div>
       <div class="topbar-actions">
         <span id="sync-status" class="sync-status" role="status" hidden><span class="status-dot"></span><span id="sync-status-label">接続を確認中</span></span>
@@ -41,8 +41,8 @@
         <button class="nav-item" data-view="dashboard" type="button"><svg class="nav-icon" aria-hidden="true"><use href="#icon-dashboard"></use></svg><em>ダッシュボード</em></button>
         <button class="nav-item" data-view="history" type="button"><svg class="nav-icon" aria-hidden="true"><use href="#icon-history"></use></svg><em>履歴・管理</em></button>
       </nav>
-      <div class="sidebar-help">
-        <strong>QR形式（テスト用）</strong>
+      <div class="sidebar-help" id="test-qr-help" hidden>
+        <strong>動作確認用QR</strong>
         <p class="sidebar-help-note">カメラでスキャンして動作を試せます。</p>
         <ul class="qr-samples">
           <li class="qr-sample" data-qr="LOC:LOC-01"></li>
@@ -74,6 +74,10 @@
         </div>
 
         <div class="step-status" aria-live="polite"><span id="step-count">ステップ 1 / 4</span><strong id="step-action">ロケーションを選択</strong></div>
+        <div id="masters-empty-guide" class="empty-guide" role="note" hidden>
+          <p>入出庫を始めるには、品目とロケーションのマスタ登録が必要です。「履歴・管理」から登録できます。</p>
+          <button type="button" id="goto-master-register" class="secondary-button"><svg class="button-icon" aria-hidden="true"><use href="#icon-history"></use></svg>「履歴・管理」をひらく</button>
+        </div>
         <ol class="stepper" aria-label="登録手順">
           <li class="active" data-step="1"><button type="button" data-step-nav="1" aria-controls="step-panel-1" aria-current="step" disabled><span>1</span><b data-short="場所">ロケーション</b></button></li>
           <li data-step="2"><button type="button" data-step-nav="2" aria-controls="step-panel-2" disabled><span>2</span><b data-short="品目">品目</b></button></li>
@@ -161,7 +165,7 @@
         </div>
         <div class="panel filter-panel" id="history-filter">
           <label for="history-search">検索<input id="history-search" type="search" placeholder="品目、ロケーション、担当者、日付"></label>
-          <label for="history-type">種別<select id="history-type"><option value="">すべて</option><option value="IN">入庫</option><option value="OUT">出庫</option></select></label>
+          <label for="history-type" id="history-type-filter">種別<select id="history-type"><option value="">すべて</option><option value="IN">入庫</option><option value="OUT">出庫</option></select></label>
           <button id="history-refresh" class="secondary-button" type="button">更新</button>
           <button id="history-clear" class="secondary-button" type="button">条件をクリア</button>
         </div>

@@ -78,7 +78,7 @@ test('チューニング値は config.js に集約され、消費側はベタ書
   const configKeys = [
     'quantityMinimum:', 'quantityMaximum:',
     'network:', 'requestTimeoutMs:', 'dashboardRowLimit:', 'queryPageSize:',
-    'ui:', 'toastDurationDefault:', 'toastDurationLong:', 'optionListLimit:',
+    'ui:', 'searchDebounceMs:', 'toastDurationDefault:', 'toastDurationLong:', 'optionListLimit:',
     'detailTransactionLimit:', 'topStockLimit:', 'recentCardLimit:', 'aiNoteCardLimit:',
     'dashboardPanelPageSize:', 'listPageSize:',
     'analytics:', 'trendWindowDays:', 'dormantThresholdDays:', 'alertHistoryLimit:'
@@ -180,9 +180,10 @@ test('集計ドリルダウン・直近一覧は archived 取引を除外し、�
   // 物理削除マスタの取引には CE が archived 印を付け、canonical DataFlow / フォールバック集計は
   // 本日KPI・トレンドから除外する。カード値と食い違わないよう、その内訳ドリルダウン・「直近の登録」も
   // 同じ基準で archived を落とす。一方で台帳（履歴）ビューは監査証跡として archived 取引も表示する。
-  // ヘルパが定義され、archived を真偽値・文字列 'true' の両方で弾くこと。
+  // ヘルパが定義され、archived 判定は共有の dataApi.isArchived へ委譲する（集計=domo-access と同一基準＝
+  // INV-041。述語の真偽値/文字列 'true' 両対応の内容は test_frontend_transforms が isArchived で固定）。
   assert.match(app, /function activeTransactions\(\)\s*\{/);
-  assert.match(app, /row\.archived === true \|\| String\(row\.archived\)\.toLowerCase\(\) === 'true'/);
+  assert.match(app, /return state\.data\.transactions\.filter\(\(row\) => !dataApi\.isArchived\(row\)\);/);
   // 集計/内訳の消費側（renderRecent・KPI/品目/棚/トレンドの各ドリルダウン・不足/滞留明細）が
   // 生の state.data.transactions ではなく activeTransactions() を使う（呼び出しが6か所以上）。
   const activeCalls = (app.match(/activeTransactions\(\)/g) || []).length;
@@ -436,14 +437,19 @@ test('QRはライブ映像を全端末の既定にし、全画面化しても継
   assert.match(css, /\.scanner-modal \.modal-heading\s*\{[^}]*position:\s*sticky/s);
   assert.match(css, /min-height:\s*clamp\(160px,\s*32vh,\s*240px\)/);
   assert.match(qr, /\.filter\(Boolean\)\.join\('\+'\)/);
-  assert.match(app, /state\.scanner\.parse\(scanResult\.rawValue\)/);
+  // INV-060: scan() はスキャナ解決済み code を直接使い、再パース（越境 parse）と到達不能な型不一致 throw を持たない。
+  assert.match(app, /scanResult\.code/);
+  assert.doesNotMatch(app, /state\.scanner\.parse\(scanResult/);
   assert.doesNotMatch(app, /callFunction\('parse_qr'/);
-  assert.match(app, /品目QRを読み取りました。現在はロケーション選択です/);
-  assert.match(app, /ロケーションQRを読み取りました。現在は品目選択です/);
+  // 型不一致の案内は到達可能なスキャナ側（acceptDetectedValue）に存在する。
+  assert.match(qr, /品目QRを読み取りました。現在はロケーション選択です/);
+  assert.match(qr, /ロケーションQRを読み取りました。現在は品目選択です/);
   assert.match(qr, /ロケーションQRを読み取る/);
   assert.match(qr, /品目QRを読み取る/);
   assert.match(qr, /下のコード入力/);
-  assert.match(qr, /acceptManual\(\)[\s\S]*acceptDetectedValue\(value, this\.sessionId\)/);
+  // INV-019: 接頭辞なしの素のコードは expectedType から LOC:/ITEM: を補って（candidate）から委譲する。
+  assert.match(qr, /acceptManual\(\)[\s\S]*acceptDetectedValue\(candidate, this\.sessionId\)/);
+  assert.match(qr, /const candidate = \/\^\(LOC\|ITEM\):\/\.test\(upper\) \? value : `\$\{this\.expectedType === 'location' \? 'LOC' : 'ITEM'\}:\$\{value\}`;/);
   assert.match(css, /\.scanner-actions\s*\{/);
   assert.match(css, /touch-action:\s*pan-y pinch-zoom/);
   assert.match(css, /\.camera-frame video\s*\{[^}]*pointer-events:\s*none/s);
@@ -474,9 +480,23 @@ test('スマホアプリはハンディ端末を想定して不要導線を隠�
   assert.match(css, /html\[data-domo-platform="mobile"\]\s+\.selection-card\s*\{[^}]*min-height:\s*74px/s);
 });
 
+test('モバイル判定は明示シグナルを主にし、UAフォールバックは素の Domo 部分一致にしない（INV-039）', () => {
+  const fn = app.match(/function isDomoMobileHost\(\)\s*\{[\s\S]*?\n  \}/);
+  assert.ok(fn, 'isDomoMobileHost 関数が存在する');
+  const body = fn[0];
+  // 明示シグナルを主判定にする：platform==='mobile' は即 true、platform==='desktop'/'web' は即 false。
+  assert.match(body, /if \(platform === 'mobile'\) return true;/);
+  assert.match(body, /if \(platform === 'desktop' \|\| platform === 'web'\) return false;/);
+  assert.match(body, /if \(domoEnvironment\.isMobile === true \|\| domoEnvironment\.mobile === true\) return true;/);
+  // UAフォールバックは Domo マーカー ∧ 標準モバイルOSトークンの両立時のみ（素の /Domo/i 単独 return を禁止）。
+  assert.match(body, /\/Domo\/i\.test\(userAgent\)\s*&&\s*\/Mobi\|Android\|iPhone\|iPad\|iPod\/i\.test\(userAgent\)/);
+  assert.doesNotMatch(body, /return[^;&]*\/Domo\/i\.test\(userAgent\)\s*;/);
+});
+
 test('PC表示は業務画面向けの高密度レイアウトを使う', () => {
   assert.match(css, /@media\s*\(min-width:\s*981px\)/);
-  assert.match(css, /\.view\s*\{\s*max-width:\s*1680px/);
+  // INV-064: .view の max-width（1480/1680px）は --app-gutter に打ち消される死にコードとして撤去済み。
+  // 内容幅は --app-max を単一レバーに（desktop の高密度化は workflow-panel 等の padding で表す）。
   assert.match(css, /\.workflow-panel\s*\{\s*padding:\s*14px 18px 16px/);
   assert.match(css, /@media\s*\(min-width:\s*1200px\)[\s\S]*\.option-list\s*\{\s*grid-template-columns:\s*repeat\(2,/);
   // ダッシュボードは幅で列が畳まれる auto-fit グリッド（.dashboard-row、最小260px）で組む。
@@ -517,6 +537,21 @@ test('ダッシュボードは各行を最も低いカードへ高さ揃え＋�
   assert.doesNotMatch(css, /display:\s*contents/s);
   // 1パネルの表示件数を絞り、各パネルを短く保つ。
   assert.match(configSource, /dashboardPanelPageSize:\s*6/);
+});
+
+test('細スクロールバーはダッシュボードだけでなく全スクロール枠に共有適用する（INV-063）', () => {
+  // 細く淡いバー（Firefox: scrollbar-width:thin／WebKit: 7px・var(--line-strong) サム）を、
+  // 候補リスト・履歴/マスタ表・明細ペイン・明細表・モーダル本文へもまとめて効かせる。
+  const containers = ['\\.dash-scroll', '\\.option-list', '\\.table-scroll', '\\.master-list', '\\.modal-card', '\\.detail-content', '\\.detail-table-wrap'];
+  // scrollbar-width:thin のグループ宣言に全枠が含まれる。
+  const thinRule = css.match(/([^\n{}]*)\{\s*scrollbar-width:\s*thin;\s*scrollbar-color:\s*var\(--line-strong\)\s*transparent;\s*\}/);
+  assert.ok(thinRule, 'scrollbar-width:thin のグループ宣言が存在する');
+  for (const c of containers) assert.match(thinRule[1], new RegExp(c));
+  // WebKit サムも同じ枠群へ（横軸 height も付与）。
+  const thumbRule = css.match(/([^\n{}]*)::-webkit-scrollbar-thumb\s*\{\s*border-radius:\s*4px;\s*background:\s*var\(--line-strong\);\s*\}/);
+  assert.ok(thumbRule, 'WebKit サム宣言が存在する');
+  for (const c of containers) assert.match(thumbRule[1], new RegExp(c));
+  assert.match(css, /::-webkit-scrollbar\s*\{\s*width:\s*7px;\s*height:\s*7px;\s*\}/);
 });
 
 test('ダッシュボード上部のツールバーに横断検索とWorkflow起動を常設する（NEW-P）', () => {
@@ -976,8 +1011,14 @@ test('サイドバーのQR形式にスキャン可能なテスト用QRを内製�
   assert.match(html, /<script src="qr-generator\.js"><\/script>/);
   assert.ok(html.indexOf('qr-generator.js') < html.indexOf('app.js'), 'qr-generator.js は app.js より前に読み込む');
   // サイドバーのテストQR領域は data-qr を単一の情報源にして LOC/ITEM を描く。
-  assert.match(html, /class="sidebar-help"[\s\S]*?data-qr="LOC:LOC-01"[\s\S]*?data-qr="ITEM:ITEM-001"/);
-  assert.match(html, /QR形式（テスト用）/);
+  assert.match(html, /class="sidebar-help" id="test-qr-help" hidden[\s\S]*?data-qr="LOC:LOC-01"[\s\S]*?data-qr="ITEM:ITEM-001"/);
+  // INV-071: 見出しは「今すぐ試せる見本」と分かる名に（旧「QR形式（テスト用）」は形式名に読める）。
+  assert.match(html, /<strong>動作確認用QR<\/strong>/);
+  assert.doesNotMatch(html, /QR形式（テスト用）/);
+  // INV-068: 固定コードのサンプルは本番の実マスタでは必ず失敗するため、demo モードのときだけ表示する
+  // （既定 hidden、本番=domo/error では隠す）。
+  assert.match(html, /<div class="sidebar-help" id="test-qr-help" hidden>/);
+  assert.match(app, /if \(dataApi\.mode !== 'demo'\) \{ block\.hidden = true; return; \}/);
   // 起動時に一度だけ描画し、生成には内製の InventoryQR.toSvg を使う。
   assert.match(app, /function renderTestQrCodes\(\)/);
   assert.match(app, /global\.InventoryQR\.toSvg/);
@@ -1267,4 +1308,85 @@ test('全テーブルにアクセシブル名（sr-only caption）を与える�
   assert.match(app, /'在庫明細'\)/);
   assert.match(app, /'取引明細'\)/);
   assert.match(app, /'不足一覧'\)/);
+});
+
+test('ブランドのサブタイトルはアプリ全体を表す（INV-072）', () => {
+  // operations は3領域（入出庫/ダッシュボード/履歴・マスタ）の1つに過ぎず過小。全体を表す語にする。
+  assert.match(html, /<strong>在庫入出庫管理<\/strong><small>Inventory management<\/small>/);
+  assert.doesNotMatch(html, /Inventory operations/);
+});
+
+test('横棒のツールチップ比率は棒長と同じ分母（最大値）で絵と数字を一致させる（INV-021）', () => {
+  // 棒幅 barPct(value, maximum) に対し、ツールチップも value/maximum＝「最大比」を表示する。
+  // 合計基準の「構成比」を最大値正規化の棒に添えると、ほぼ満杯の棒に小さな％が並び矛盾する。
+  assert.match(app, /const maxShare = maximum > 0 \? value \/ maximum \* 100 : 0;/);
+  assert.match(app, /最大比 \$\{number\.format\(maxShare\)\}%/);
+  assert.doesNotMatch(app, /構成比 \$\{number\.format/);  // 旧「構成比」表示は残さない
+  assert.doesNotMatch(app, /const share = total > 0/);     // 合計基準の share 計算は撤去
+});
+
+test('候補リストはキャップ超過時に非対話の注記を出す（INV-012）', () => {
+  // 単一キャップ（ページングしない）は維持しつつ、超過件数と次の行動を伝え、沈黙打ち切りで
+  // 「登録されていない」と誤認させない。
+  assert.match(app, /function optionMoreNote\(total\)/);
+  assert.match(app, /const hidden = total - config\.ui\.optionListLimit;/);
+  assert.match(app, /ほか \$\{number\.format\(hidden\)\} 件の候補があります。検索語を追加して絞り込んでください。/);
+  // 両レンダラはフィルタ総数(matched)を保持し、スライス後に注記を付ける（超過0なら空文字）。
+  assert.match(app, /const matched = state\.data\.locations\.filter/);
+  assert.match(app, /const matched = state\.data\.items\.filter/);
+  assert.doesNotMatch(app, /\.includes\(query\)\)\)\.slice\(0, config\.ui\.optionListLimit\)/);  // 旧「filter(...).slice」直結は無い
+  // 注記は <p>（非 .option-button）なので選択バインドの対象外。
+  assert.match(app, /<p class="option-note" role="note">/);
+  assert.match(css, /\.option-note\s*\{/);
+});
+
+test('履歴の種別フィルタ切替は closest に頼らず安定 id を参照する（INV-040）', () => {
+  // ラッパ <label id="history-type-filter"> を直接キャッシュ参照＝マークアップのネストが変わっても
+  // null.hidden で履歴ビュー全体が落ちない。
+  assert.match(html, /<label for="history-type" id="history-type-filter">/);
+  assert.match(app, /'history-type-filter'/);
+  assert.match(app, /elements\['history-type-filter'\]\.hidden = true;/);
+  assert.match(app, /elements\['history-type-filter'\]\.hidden = false;/);
+  assert.doesNotMatch(app, /\.closest\('label'\)/);  // 脆い closest 依存は残さない
+});
+
+test('取引監査の登録元ラベルはアプリ共通の解決済みプラットフォーム判定を使う（INV-059）', () => {
+  // source は isMobileHostActive()（domoPlatform dataset）で決める＝狭幅PC-Web/iPad を
+  // DOMO_MOBILE と誤記しない。独自の広域 isMobile()（UA/matchMedia）は廃止。
+  assert.match(app, /source: isMobileHostActive\(\) \? 'DOMO_MOBILE' : 'DOMO_WEB'/);
+  assert.doesNotMatch(app, /function isMobile\(\)/);          // 別判定の重複は残さない
+  assert.doesNotMatch(app, /source: isMobile\(\)/);
+});
+
+test('マスタ空の入出庫は空状態ガイドで登録先へ導き、aria-busy は読み込み中だけ（INV-020）', () => {
+  // 行き止まりにせず「履歴・管理」への導線を出す（bootReady で表示トグル・ボタンは switchView('history')）。
+  assert.match(html, /<div id="masters-empty-guide" class="empty-guide" role="note" hidden>/);
+  assert.match(html, /id="goto-master-register"/);
+  assert.match(app, /elements\['goto-master-register'\]\.addEventListener\('click', \(\) => switchView\('history'\)\)/);
+  assert.match(app, /elements\['masters-empty-guide'\]\.hidden = state\.bootReady;/);
+  assert.match(css, /\.empty-guide\[hidden\]\s*\{\s*display:\s*none/);  // 作者 display が UA [hidden] を打ち消さない
+  // aria-busy は busy のときだけ付け、不可用（マスタ空・エラー）は disabled のみ＝「読込中」を居座らせない。
+  assert.match(app, /function setQrControlsReady\(ready, busy = false\)/);
+  assert.match(app, /if \(busy\) button\.setAttribute\('aria-busy', 'true'\);\s*\n\s*else button\.removeAttribute\('aria-busy'\);/);
+  assert.match(app, /setQrControlsReady\(false, true\)/);   // 読み込み中は busy=true
+  assert.match(app, /setQrControlsReady\(state\.bootReady\)/); // 読込後は busy 既定 false
+});
+
+test('横断検索の input はデバウンスし、毎キーストローク全再描画を避ける（INV-042）', () => {
+  // 履歴・ダッシュボードの input ハンドラを debounce(fn, config.ui.searchDebounceMs) で包む。
+  // 種別は change（1回発火）なので即時のまま、候補リスト（30件上限）も即時のまま。
+  assert.match(app, /function debounce\(fn, wait\)/);
+  assert.match(app, /elements\['history-search'\]\.addEventListener\('input', debounce\(\(\) => \{ state\.historyPage = 0; renderHistory\(\); \}, config\.ui\.searchDebounceMs\)\)/);
+  assert.match(app, /elements\['dashboard-search'\]\.addEventListener\('input', debounce\(/);
+  assert.match(app, /config\.ui\.searchDebounceMs/);
+  assert.match(configSource, /searchDebounceMs:\s*160/);
+  // 種別フィルタは change ＝デバウンスしない（即時）。
+  assert.match(app, /elements\['history-type'\]\.addEventListener\('change', \(\) => \{ state\.historyPage = 0; renderHistory\(\); \}\)/);
+});
+
+test('内容幅の単一レバーは --app-max。.view の死に max-width は持たない（INV-064）', () => {
+  // ガター(--app-gutter)＋main padding が内容箱をキャップするため、.view 自前の max-width は効かない。
+  assert.match(css, /--app-max:\s*1200px/);
+  assert.doesNotMatch(css, /\.view\s*\{[^}]*max-width/);     // 基底 .view に max-width を残さない
+  assert.doesNotMatch(css, /\.view \{ max-width: 1680px/);   // desktop 上書きの死にコードも無い
 });

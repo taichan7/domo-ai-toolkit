@@ -43,8 +43,9 @@
 | `source` | STRING | ○ | `DOMO_WEB`, `DOMO_MOBILE`, `DEMO_SEED` など |
 | `occurred_at` | DATETIME | ○ | 業務上の発生時刻、UTC ISO 8601 |
 | `created_at` | DATETIME | ○ | AppDBへの登録時刻 |
+| `archived` | STRING |  | 物理削除（ITEM/LOCATION）されたマスタ由来の取引に付く印（`true`）。追記専用の台帳には行として残すが、残高再計算（RECALCULATE）とダッシュボード集計から除外する＝削除したマスタを同コードで再作成しても旧在庫が復活しない唯一の砦。印が無い通常取引は空のまま。未同期の環境では既定 `""`（空）となり全行が有効扱いで無害 |
 
-`request_id` は `TRANSACTION` 内で検索し、同じ値がある場合は新規書込みを行わず先行結果を返す。
+`request_id` は `TRANSACTION` 内で検索し、同じ値がある場合は新規書込みを行わず先行結果を返す。物理削除時に Code Engine が `archived` に加えて `archived_at`（削除時刻）も書くが、これは `appdb/schemas.json` に宣言された列ではないため標準同期DataSetには現れない（スキーマ上の業務列ではない）。
 
 ## 残高投影列
 
@@ -83,7 +84,7 @@
 
 ### 標準同期DataSet
 
-AppDBスキーマの44業務列に、Domoが管理する `__documentId__`, `__createdBy__`, `__created__`, `__modifiedBy__`, `__modified__` が加わる。AppDBコレクションの標準同期のみで生成され、コードから書き込まない。
+AppDBスキーマの45業務列（列数と物理型は [appdb/schemas.json](../appdb/schemas.json) を正とする）に、Domoが管理する `__documentId__`, `__createdBy__`, `__created__`, `__modifiedBy__`, `__modified__` が加わる。AppDBコレクションの標準同期のみで生成され、コードから書き込まない。
 
 ### ダッシュボードDataSet
 
@@ -99,3 +100,5 @@ AppDBスキーマの44業務列に、Domoが管理する `__documentId__`, `__cr
 | `AI_NOTE` | 品目×ロケーション×1行 | `item_code`, `location_code`, `ai_summary`（AI要約タイルが生成） |
 
 KPIは `TOTAL_QUANTITY`, `ITEM_COUNT`, `SHORTAGE_COUNT`, `TODAY_IN_COUNT`, `TODAY_OUT_COUNT` の5種。出力物理列と型は [datasets/contracts.json](../datasets/contracts.json) と [dataflow/dashboard_transform.py](../dataflow/dashboard_transform.py) を参照する。
+
+> **集計ウィンドウ定数は2ファイルで二重維持**: `TREND`（7日 = `TREND_WINDOW_DAYS`）・`DORMANT`（30日超 = `DORMANT_THRESHOLD_DAYS`）・`ALERT` のダッシュボード掲載上限（最新100件 = `ALERT_HISTORY_LIMIT`）の正準定義は [dataflow/dashboard_transform.py](../dataflow/dashboard_transform.py) にあり、[pro-code/config.js](../pro-code/config.js) の `analytics.*`（`trendWindowDays` / `dormantThresholdDays` / `alertHistoryLimit`）はDataFlow未到達時のAppDBフォールバック集計（`domo-access.js` の `buildDashboardRows`）を揃えるための鏡である。**窓を変えるときは必ず両方を同値に更新する**（片方だけ変えると、DataFlow到達時の表示とフォールバック集計の数字が食い違う）。

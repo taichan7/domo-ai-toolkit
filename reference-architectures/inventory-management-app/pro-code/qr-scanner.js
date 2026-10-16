@@ -432,7 +432,7 @@
           : 'ロケーションQRを読み取りました。現在は品目選択です。品目QRを枠内へ合わせてください。');
         return false;
       }
-      this.complete(rawValue, sessionId);
+      this.complete(rawValue, sessionId, parsed);  // 解決済み {code, qr_type} を渡す（消費側の再パースを無くす・INV-060）
       return true;
     }
 
@@ -444,10 +444,22 @@
         this.manualInput.setCustomValidity('');
         return;
       }
-      this.acceptDetectedValue(value, this.sessionId);
+      // 棚ラベルの表記は接頭辞なしのコード本体（例 LOC-01）が普通。接頭辞が無ければ現在の対象種別
+      // （expectedType）から LOC:／ITEM: を補ってから parse へ委譲する＝素のコードを弾かない（INV-019）。
+      // parse() は接頭辞・形式の唯一定義源のまま。ここでは「補完だけ」で判定ロジックは複製しない。
+      const upper = value.normalize('NFKC').toUpperCase();
+      const candidate = /^(LOC|ITEM):/.test(upper) ? value : `${this.expectedType === 'location' ? 'LOC' : 'ITEM'}:${value}`;
+      const accepted = this.acceptDetectedValue(candidate, this.sessionId);
+      if (!accepted) {
+        // 失敗（形式不正・種別不一致）は映像域のフォールバックに加え、入力欄の近くでも知らせる
+        // （エラーが画面上部に出て入力欄＝画面下部から離れる問題を補う）。
+        this.manualInput.setCustomValidity('この内容では読み取れませんでした。表示中のメッセージをご確認ください。');
+        this.manualInput.reportValidity();
+        this.manualInput.setCustomValidity('');
+      }
     }
 
-    complete(rawValue, sessionId = this.sessionId) {
+    complete(rawValue, sessionId = this.sessionId, parsed = null) {
       if (!this.isSessionActive(sessionId)) return;
       const resolver = this.resolve;
       this.resolve = null;
@@ -455,7 +467,10 @@
       this.stopCamera();
       this.exitFullscreen();
       this.dialog.close('success');
-      if (resolver) resolver({rawValue: String(rawValue).trim(), expectedType: this.expectedType});
+      // 解決済みペイロードを返す（INV-060）: 消費側は再パース不要で code/qr_type を直接使える。
+      // rawValue/expectedType は後方互換で残す。parsed 未指定（直接 complete 呼び）は自分の parse で導出。
+      const payload = parsed || this.parse(rawValue);
+      if (resolver) resolver({rawValue: String(rawValue).trim(), expectedType: this.expectedType, code: payload.code, qr_type: payload.qr_type});
     }
 
     showFallbackMessage(text) {

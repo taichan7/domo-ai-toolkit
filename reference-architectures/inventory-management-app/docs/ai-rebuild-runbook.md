@@ -99,10 +99,9 @@ ls ~/.config/configstore/ryuu/   # <instance>.json が対象インスタンス�
 
 **ローカル事前検証（Domoへ触れる前に必ず緑にする）**:
 
+自動テストの正本手順は [検証](test-results.md#自動テストローカル) §自動テスト（ローカル）の5コマンドに一本化（`pip install` → `node --test` → 全 `pro-code/*.js` の `node --check` → `unittest` → `node dev-guide-app/tests/check.mjs`）。デプロイ前はこれを緑にしたうえで、デプロイ用JSONの妥当性も確認する:
+
 ```bash
-node --test tests/test_*.js                 # フロント／SDK契約／Manifest／QR
-for f in pro-code/*.js; do node --check "$f"; done
-python3 -m unittest discover -s tests        # 業務サービス・DataFlow変換・プロビジョナ契約
 python3 -m json.tool pro-code/manifest.json >/dev/null
 python3 -m json.tool dev-guide-app/manifest.json >/dev/null   # 開発ガイド(ページ2)
 python3 -m json.tool domo-assets.json >/dev/null
@@ -143,7 +142,7 @@ python3 -m json.tool domo-assets.json >/dev/null
   layout寸法には過剰適合しない（自己フィットの縦スクロール文書のため）。
 - **AppDB単一化**: `legacyCollectionsRemaining: []`、`standardSyncDatasetId` と
   `dashboardDatasetId` が空でない。
-- **シード最小件数**: ITEM 30 / LOCATION 6 / RULE 30 / TRANSACTION 136以上 / BALANCE 131以上
+- **シード最小件数**: ITEM 30 / LOCATION 6 / RULE 30 / TRANSACTION 135以上 / BALANCE 131以上（下限は `scripts/provision_domo.py` の `required` 件数が正）
   （BALANCEはAIテキスト生成タイルの100行下限を満たすための規模）。
 
 ## 3. 手順（各ステップにゲート）

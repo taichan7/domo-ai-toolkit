@@ -38,11 +38,12 @@ instructions and authorization policy.
 
 ## Verification
 
-```bash
-python3 -m unittest discover -s tests
-node --test tests/test_*.js
-node dev-guide-app/tests/check.mjs
-```
+Run the single canonical local test sequence in
+[docs/test-results.md](docs/test-results.md#自動テストローカル) §自動テスト（ローカル）
+(`pip install` → `node --test` → `node --check` on all `pro-code/*.js` → `unittest`
+→ `node dev-guide-app/tests/check.mjs`). Do not duplicate the command list here —
+one source prevents the skipped-DataFlow / missing-dev-guide drift that four partial
+copies cause.
 
 Deployment completion requires `provision_domo.py verify` returning `ok: true`.
 A passing reference test suite does not establish atomic stock reservations,

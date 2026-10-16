@@ -211,7 +211,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .qr-sample code { margin-top: 0; font-size: 11px; word-break: break-all; }
 
 main { min-width: 0; min-height: 100vh; padding: calc(var(--header) + 24px) calc(24px + var(--app-gutter)) 36px calc(var(--app-gutter) + var(--sidebar) + 40px); }
-.view { display: none; width: 100%; min-width: 0; max-width: 1480px; margin: 0 auto; }
+/* 内容幅の単一レバーは --app-max（+ --app-gutter と main の水平 padding）。ガターが 1200px 超でも
+   内容箱を実質一定幅へキャップするため、.view 自前の max-width は決して効かない死にコードだった
+   （INV-064）。広い内側上限が要るときは --app-max を上げる（二重キャップを足さない）。 */
+.view { display: none; width: 100%; min-width: 0; margin: 0 auto; }
 .view.active { display: block; animation: view-in .18s ease-out; }
 @keyframes view-in { from { opacity: 0; transform: translateY(3px); } }
 
@@ -315,6 +318,12 @@ button[disabled] { cursor: not-allowed; opacity: .55; }
    一段濃い共通トークン --muted(#626e7d) に寄せて本文 AA を満たす。 */
 .option-meta { color: var(--muted); font-size: 12px; }
 .empty-state { padding: 24px 15px; color: var(--muted); text-align: center; border: 1px dashed var(--line-strong); border-radius: 7px; background: var(--surface-muted); }
+/* 候補キャップ超過の非対話注記（INV-012）。候補ボタンとは別に、超過件数と次の行動だけ控えめに伝える。 */
+.option-note { margin: 2px 2px 0; padding: 7px 10px; color: var(--muted); font-size: 11px; line-height: 1.5; border: 1px dashed var(--line); border-radius: 6px; background: var(--surface-muted); }
+/* マスタ空（初回起動）の空状態ガイド（INV-020）。行き止まりにせず登録先への導線を添える。 */
+.empty-guide { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 14px; padding: 12px 14px; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; background: var(--surface-muted); }
+.empty-guide p { margin: 0; font-size: 12px; line-height: 1.6; }
+.empty-guide[hidden] { display: none; }
 
 .quantity-control { display: grid; grid-template-columns: 52px minmax(120px, 190px) 52px; justify-content: center; align-items: end; gap: 10px; margin: 20px 0; }
 .quantity-control button { height: 50px; color: var(--teal-700); border: 1px solid #bcc9e0; border-radius: 6px; background: var(--teal-100); font-size: 22px; }
@@ -400,9 +409,11 @@ button[disabled] { cursor: not-allowed; opacity: .55; }
    スクロールが効かない（既知の落とし穴）。ページャはこの枠の外にあるため常に見える。 */
 .dashboard-row > .panel > .dash-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
 /* 内部スクロールバーは細く淡い色にして上品・地味に保つ。 */
-.dash-scroll { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
-.dash-scroll::-webkit-scrollbar { width: 7px; }
-.dash-scroll::-webkit-scrollbar-thumb { border-radius: 4px; background: var(--line-strong); }
+/* 細く淡いスクロールバー（上品・地味）を、ダッシュボードだけでなく全スクロール枠に適用する（INV-063）＝
+   候補リスト・履歴/マスタ表・明細ペイン・明細表・モーダル本文も既定の太いバーにしない。横軸(height)も付与。 */
+.dash-scroll, .option-list, .table-scroll, .master-list, .modal-card, .detail-content, .detail-table-wrap { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+.dash-scroll::-webkit-scrollbar, .option-list::-webkit-scrollbar, .table-scroll::-webkit-scrollbar, .master-list::-webkit-scrollbar, .modal-card::-webkit-scrollbar, .detail-content::-webkit-scrollbar, .detail-table-wrap::-webkit-scrollbar { width: 7px; height: 7px; }
+.dash-scroll::-webkit-scrollbar-thumb, .option-list::-webkit-scrollbar-thumb, .table-scroll::-webkit-scrollbar-thumb, .master-list::-webkit-scrollbar-thumb, .modal-card::-webkit-scrollbar-thumb, .detail-content::-webkit-scrollbar-thumb, .detail-table-wrap::-webkit-scrollbar-thumb { border-radius: 4px; background: var(--line-strong); }
 .chart-panel, .shortage-panel, .dormant-panel, .ai-note-panel { min-height: 0; padding: 14px 15px; }
 .panel-action-hint { align-self: center; color: var(--teal-700); font-size: 11px; font-weight: 700; white-space: nowrap; }
 .panel-action-hint::after { margin-left: 4px; content: "›"; }
@@ -843,7 +854,6 @@ html[data-domo-platform="mobile"] .step-status strong { font-size: 14px; }
   .nav-item { min-height: 38px; padding: 6px 9px; }
   .sidebar-help { padding: 10px; }
   main { padding: calc(var(--header) + 16px) calc(18px + var(--app-gutter)) 18px calc(var(--app-gutter) + var(--sidebar) + 36px); }
-  .view { max-width: 1680px; }
   .page-heading { gap: 16px; margin-bottom: 10px; }
   .page-heading h1 { margin-top: 0; font-size: 23px; }
   .page-heading p:not(.eyebrow) { font-size: 11.5px; }

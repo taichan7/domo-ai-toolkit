@@ -53,16 +53,16 @@ const SOURCE = fs.readFileSync(APP_PATH, 'utf8');
  * @param {string} name 関数名
  * @returns {string} `function name(...){...}` の全文
  */
-function extractFunction(name) {
+function extractFunction(name, src = SOURCE) {
   const sig = new RegExp('function\\s+' + name + '\\s*\\(');
-  const start = SOURCE.search(sig);
-  assert.ok(start >= 0, `関数 ${name} が app.js に見つからない`);
-  const open = SOURCE.indexOf('{', start);
+  const start = src.search(sig);
+  assert.ok(start >= 0, `関数 ${name} がソースに見つからない`);
+  const open = src.indexOf('{', start);
   assert.ok(open > start, `関数 ${name} の本体開始 { が見つからない`);
   let depth = 0;
   let end = -1;
-  for (let i = open; i < SOURCE.length; i++) {
-    const ch = SOURCE[i];
+  for (let i = open; i < src.length; i++) {
+    const ch = src[i];
     if (ch === '{') depth++;
     else if (ch === '}') {
       depth--;
@@ -70,23 +70,41 @@ function extractFunction(name) {
     }
   }
   assert.ok(end > open, `関数 ${name} の本体終了 } が見つからない`);
-  const text = SOURCE.slice(start, end);
+  const text = src.slice(start, end);
   assert.ok(text.endsWith('}'), `関数 ${name} の抽出が } で終わっていない（抽出ミス）`);
   return text;
 }
 
 /** 引数のみの純関数を vm で取り出す（String/RegExp の intrinsics だけに依存）。 */
-function loadPureFn(name) {
+function loadPureFn(name, src = SOURCE) {
   const ctx = {};
   vm.createContext(ctx);
-  const fn = vm.runInContext(extractFunction(name) + '\n' + name + ';', ctx);
+  const fn = vm.runInContext(extractFunction(name, src) + '\n' + name + ';', ctx);
   assert.equal(typeof fn, 'function', `${name} を関数として取り出せない`);
   return fn;
 }
 
+// INV-041: 不足フラグの真偽正規化は app.js と domo-access で重複させず domo-access.isShortage を唯一の
+// 定義源にした（app.js の isShortageRow は dataApi.isShortage へ委譲＝純関数でなくなった）。ロジックの
+// 住処である domo-access.js の isShortage を直接抽出して実挙動を固定する。
+const DA_SOURCE = fs.readFileSync(path.join(__dirname, '..', 'pro-code', 'domo-access.js'), 'utf8');
 const normalizedSearch = loadPureFn('normalizedSearch');
 const aiNoteKey = loadPureFn('aiNoteKey');
-const isShortageRow = loadPureFn('isShortageRow');
+const isShortage = loadPureFn('isShortage', DA_SOURCE);
+const isArchived = loadPureFn('isArchived', DA_SOURCE);
+
+// ---- isArchived（archived フラグの真偽正規化・domo-access が唯一の定義源。INV-041）----
+test('isArchived は boolean true / 文字列 "true"/"TRUE" を archived と見なす', () => {
+  assert.equal(isArchived({ archived: true }), true);
+  assert.equal(isArchived({ archived: 'true' }), true);
+  assert.equal(isArchived({ archived: 'TRUE' }), true);
+});
+
+test('isArchived は false・未設定・数値を archived にしない（default 脚）', () => {
+  assert.equal(isArchived({ archived: false }), false);
+  assert.equal(isArchived({}), false);
+  assert.equal(isArchived({ archived: 1 }), false);
+});
 
 // ---- normalizedSearch（検索入力の正規化: falsy→''・trim・小文字化）----
 test('normalizedSearch は前後空白を trim する（既に小文字の入力で trim 脚を単独固定）', () => {
@@ -119,21 +137,21 @@ test('aiNoteKey は falsy な各辺を "" にする（`|| \'\'` sentinel・両 f
   assert.equal(aiNoteKey('', ''), '::');
 });
 
-// ---- isShortageRow（不足フラグの真偽正規化: boolean true / 文字列 'true' の2脚）----
-test('isShortageRow は boolean true を不足と見なす（第1論理項）', () => {
-  assert.equal(isShortageRow({ is_shortage: true }), true);
+// ---- isShortage（不足フラグの真偽正規化: boolean true / 文字列 'true' の2脚。domo-access が唯一の定義源）----
+test('isShortage は boolean true を不足と見なす（第1論理項）', () => {
+  assert.equal(isShortage({ is_shortage: true }), true);
 });
 
-test('isShortageRow は文字列 "true"/"TRUE" を不足と見なす（第2論理項＝AppDB 型ゆらぎ吸収・大小無視）', () => {
+test('isShortage は文字列 "true"/"TRUE" を不足と見なす（第2論理項＝AppDB 型ゆらぎ吸収・大小無視）', () => {
   // ★中核の未踏脚: 既存テストは静的 match のみで、文字列 'true' を実際に流して不足判定させたことが
   //   一度も無い。退行（第2脚 or toLowerCase 脱落）で文字列型行の不足が黙って見逃される。
-  assert.equal(isShortageRow({ is_shortage: 'true' }), true);
-  assert.equal(isShortageRow({ is_shortage: 'TRUE' }), true);
+  assert.equal(isShortage({ is_shortage: 'true' }), true);
+  assert.equal(isShortage({ is_shortage: 'TRUE' }), true);
 });
 
-test('isShortageRow は false・未設定・数値・文字列 "false" を不足にしない（default 脚）', () => {
-  assert.equal(isShortageRow({ is_shortage: false }), false);
-  assert.equal(isShortageRow({}), false);                 // 未設定＝undefined→'undefined'!=='true'
-  assert.equal(isShortageRow({ is_shortage: 1 }), false); // 数値 1 は不足にしない（true/'true' のみ）
-  assert.equal(isShortageRow({ is_shortage: 'false' }), false);
+test('isShortage は false・未設定・数値・文字列 "false" を不足にしない（default 脚）', () => {
+  assert.equal(isShortage({ is_shortage: false }), false);
+  assert.equal(isShortage({}), false);                 // 未設定＝undefined→'undefined'!=='true'
+  assert.equal(isShortage({ is_shortage: 1 }), false); // 数値 1 は不足にしない（true/'true' のみ）
+  assert.equal(isShortage({ is_shortage: 'false' }), false);
 });

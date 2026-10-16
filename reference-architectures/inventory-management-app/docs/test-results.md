@@ -16,7 +16,11 @@ node --test tests/test_*.js
 for f in pro-code/*.js; do node --check "$f"; done
 # 業務サービス・DataFlow変換・プロビジョナ（Python）
 python3 -m unittest discover -s tests
+# 開発ガイド（App Studio ページ2）の静的検査
+node dev-guide-app/tests/check.mjs
 ```
+
+> この5コマンドが**ローカル自動テストの唯一の正本**。README・AGENTS.md・AI再構築ランブックは手順を複製せず本節へリンクする（コマンド列を複数箇所に写すとドリフトし、どれか1つを辿ると `pip install` 抜けで pandas DataFlow テストが黙ってskip・一部JSの構文チェック漏れ・開発ガイド検査の丸ごと欠落が起きる）。
 
 - Node テストは `app.js` / `app.css` / `index.html` / `qr-scanner.js` / `qr-generator.js` /
   `domo-access.js` / `config.js` / `manifest.json` を対象に、Domoランタイム判定・Code Engine
