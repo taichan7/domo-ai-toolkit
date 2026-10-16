@@ -30,11 +30,15 @@
     }
   }
 
-  function renderStatus(message, error) {
+  function renderStatus(message, error, quiet) {
     els.status.textContent = message;
     els.status.classList.toggle("workflow-error", error === true);
+    // 非エラーの実行中/完了/開始メッセージも晴眼者に見せる（穏やかな info 変種）。
+    // quiet=true の説明文（アイドル）だけは従来どおり sr-only のまま。SR は aria-live で常時取得。
+    els.status.classList.toggle("workflow-info", error !== true && quiet !== true && !!message);
     els.run.disabled = state.requesting || state.running || state.unknown;
-    els.run.textContent = state.running ? "更新中…" : state.unknown ? "開始結果を確認中" : "AIレポートを更新";
+    // idle ラベルは静的HTML（PL-011 の「全社AIレポートを更新」）と一致させる（実行時に戻さない）。
+    els.run.textContent = state.running ? "更新中…" : state.unknown ? "開始結果を確認中" : "全社AIレポートを更新";
     els.run.setAttribute("aria-busy", String(state.requesting || state.running));
     els.check.disabled = !state.progressPath;
   }
@@ -60,7 +64,7 @@
       renderStatus("メインWorkflowは完了しました。個別のAIレポートは順次反映されます。");
       if (wasRunning) window.dispatchEvent(new Event("pl-workflow-completed"));
     } else if (result.status === "IDLE") {
-      renderStatus("全店舗・全社の長文AIレポートを手動で更新します。");
+      renderStatus("全店舗・全社の長文AIレポートを手動で更新します。", false, true);
     } else {
       renderStatus("前回の実行状態: " + result.status + "。詳細は実行状況を別タブで確認してください。", true);
     }

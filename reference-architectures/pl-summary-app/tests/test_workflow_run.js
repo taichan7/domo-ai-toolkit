@@ -157,6 +157,18 @@ test('frontend contains no direct workflow start URL or production model id', ()
   assert.match(html, /value="cancel" autofocus/);
 });
 
+test('status surface shows non-error states visibly, and the idle button label matches the HTML (PL-005 / PL-011)', () => {
+  const css = fs.readFileSync(path.join(__dirname, '../pro-code/app.css'), 'utf8');
+  // PL-005: renderStatus は非エラー（実行中/完了/開始）に可視 info 変種を付ける（quiet=説明文は sr-only 維持）。
+  assert.match(source, /classList\.toggle\("workflow-info", error !== true && quiet !== true/);
+  assert.match(css, /\.workflow-status\.workflow-info\{[^}]*clip-path: none/);
+  // PL-011 実行時整合: renderStatus が idle 時にボタン文字を静的HTMLの「全社AIレポートを更新」と同じにする
+  //（旧実装は "AIレポートを更新" へ戻し、静的HTMLの範囲ラベルを実行時に取り消していた）。
+  assert.match(source, /: "全社AIレポートを更新";/);
+  const html = fs.readFileSync(path.join(__dirname, '../pro-code/index.html'), 'utf8');
+  assert.match(html, />全社AIレポートを更新</);
+});
+
 test('progress opens the server-resolved relative child Workflow path in a new tab without execution', async () => {
   const h = harness();
   await settle();

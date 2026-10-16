@@ -8,6 +8,10 @@
   "fileName": "manifest.json",
   "datasetsMapping": [],
   "ignore": [
-    "vendor/ryuu.js-4.6.0.LICENSE"
+    "vendor/*.LICENSE",
+    "vendor/README.md",
+    "README.md",
+    "INSTRUCTOR.md",
+    "tests/**"
   ]
 }
