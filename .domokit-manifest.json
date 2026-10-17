@@ -5,6 +5,7 @@
     "docs/ai-agent-setup.md": "754a89c51a82e171a60524d09d249d978f9bf5bb1bce8b376132e793fa7fb10a",
     "docs/api-reference.ja.md": "a8e4e1c078f865eca6540aff34b8713a206fdcf6516c366f1acb5c1ea9d138fa",
     "docs/api-reference.md": "48447c75d78b52703b13b9a9f91f0ea3d1b385238aa8c32d414ad4b75e5046c1",
+    "docs/domo-auth.ja.md": "e1fa21816f853ba34b7ffbf532788b1a3f7661aa074fbcbacd7c0c0c8e36fbd4",
     "docs/domo-auth.md": "0f06e728fe9c3a0f84398fbb46c0b8a5f272adb6c9af5862596d1c948207e2fc",
     "docs/domo-cards-configuration.ja.md": "751d30d33b29339f8b5903d9351e90cbebc8a97f9b6394548b975c8b622cd603",
     "docs/domo-cards-configuration.md": "d16d1447838a80cfb2ba69da0520cc89d0996a30a354a913e92b62ddfae4f639",
@@ -15,8 +16,8 @@
     "docs/domo-mcp.ja.md": "d38de62403a5ca5e8ead39d3055236352fbb2a47ac0b1d807416caa23c411892",
     "docs/domo-mcp.md": "6c686c8779d8496be0d70a95345965c60c23ccd46221edb89abef701ad9aee78",
     "docs/domo-workflow-reference.md": "96ea73a059955f1417a52077f9136f25aa3a3bfbd36c6f181f62e44b647b222c",
-    "docs/quickstart.ja.md": "7c3437b011332f91fdc5d53adfeac385294d7ed3165c22155976215e61a0b580",
-    "docs/quickstart.md": "27a44abf807bd79832c57553bb8a898e53f733175b99d4163b221cf229532a41",
+    "docs/quickstart.ja.md": "c716e668f43e42fff30aa1551e67bfdfcdccc1ffd86ac6fad60fcc684f4a851b",
+    "docs/quickstart.md": "76446eabe0aae068b4a0dc1a71991889e774f9de157b275714822dc0cd37c7f2",
     "docs/reference/adr-dataflow-clone.md": "546d1ff5578208dcf5b7cd58a519535246d7f9be55954a0ec892a102a3947f0b",
     "docs/reference/app-studio-clone.md": "556f79ec9db481a7d05f780bcd63be34262dc266069d445a5020b607a9ff4839",
     "docs/reference/dataset-bridging.md": "e0291f898dfe47e1730c87f59ba3dc18aa4926a700061d34bd061746894d5ad4",
@@ -242,12 +243,12 @@
     "skills/magic-etl-graph-ui-layout.md": "c8b9a5efc4894104ae19fd922e3a34caaacd924fc3d340a26263e836622db9f2",
     "skills/refactoring.md": "b0ac1d29626393f50ce0a330c1b387c0a4d7dcc4026dee64c156808edcac0a7e",
     "skills/testing.md": "f15bf791897ab8c88b0b9b6d7a741a9d109fdf2103b8708da4657828713a6e3b",
-    "templates/pro-code-app/README.ja.md": "b6b198da80f33c15b393f997f41de6bb899b70af07147786e7459c7aad389816",
-    "templates/pro-code-app/README.md": "92acd792e6a68f064fb385b7d93b11e81969158a13afa3299c5db9053645dacc",
-    "templates/pro-code-app/app.js": "dce565cf62cace0c983fb416ad8d53a896b41c1f0e53e3c52cd5ec5efe05e9ae",
-    "templates/pro-code-app/index.html": "bf7cb6829aef9bd551a5e77fde526e0f477b921c8bcc1de9ded344987e8ae10c",
+    "templates/pro-code-app/README.ja.md": "84b23f17b0ee53a5e73ffef79a261478bb99ae8a48fca23a075539761cba64b2",
+    "templates/pro-code-app/README.md": "2ea6fa73016501a804997712c6884383ef837bb5fb01d10a6a846d623208922c",
+    "templates/pro-code-app/app.js": "2c4b8981db3ff61d0ffa8309f14e0c3a75e4362d291ff8bdac6013036943199d",
+    "templates/pro-code-app/index.html": "defc1cb5ed1fe32f52c889f1b5fe096f6f9ff3deedf62eae9da721444b0f1822",
     "templates/pro-code-app/manifest.json": "21ea13cfb17386b4a82c96868b5fde4306783ac77ec65a5bc6163e1f52df41e1",
-    "templates/pro-code-app/styles.css": "30a5795f83d4adb14dc5a627ea34c63c920abc9cba8eddd11c49a4d7a468fa7d",
-    "templates/pro-code-app/tests/test_frontend_guards.js": "155d3d6b6e6f8327c968acf8563ceb55158354dbdc851419f71ea30489c91a4c"
+    "templates/pro-code-app/styles.css": "5e74b4fab970494042d9149fccd89904dfe6ff0f68c8ee2ef33beeb8ae18cf71",
+    "templates/pro-code-app/tests/test_frontend_guards.js": "b324425f0ec216887f9337492b05796fa334a404950d28564455dd5c775024d2"
   }
 }

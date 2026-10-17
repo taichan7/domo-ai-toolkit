@@ -1,12 +1,15 @@
-# Quickstart - 15 minutes from zero to your first AI-powered Domo workflow
+# Quickstart - 15 minutes: inspect your Domo data and hand it to an AI agent
 
 > Japanese: [quickstart.ja.md](quickstart.ja.md)
 
-This guide walks you through the first three things you can do with this repo. By the end, you will have:
+This guide gets you hands-on with your Domo data from this repo. By the end, you will have:
 
 1. Authenticated to your Domo instance from the terminal
 2. Listed and queried a dataset
-3. Asked an AI agent to do the same thing for you, in plain English
+3. Diagnosed a failing Magic ETL dataflow
+4. Handed the same tasks to an AI agent, in plain English
+
+Building your first Pro Code app is the natural next step — see **What's next** at the end.
 
 ---
 

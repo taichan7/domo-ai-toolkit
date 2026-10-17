@@ -34,7 +34,9 @@ xdg-open index.html
 start index.html
 ```
 
-The app will show placeholder data and the design system will render correctly.
+Opened locally (no Domo session), the app renders the full layout and design
+system with a **"Local preview (not connected)"** state — real data appears once
+the app is published and bound to a dataset. (It does not show fake rows.)
 
 ---
 

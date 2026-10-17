@@ -7,6 +7,14 @@
 const ALIAS = 'mainDs';
 const PREVIEW_SQL = 'SELECT * FROM table LIMIT 50';
 
+// 実際の Domo ランタイム上か判定する。ryuu.js は CDN から読めると domo / domo.env 自体は
+// 定義される（env は中身が空のオブジェクト）ため、`typeof domo` や `!domo.env` だけでは
+// ローカル（file:// / ブラウザ直開き）と区別できない。実アプリでは domo.env.customer
+// （インスタンス名）が入るので、それを「本物のランタイムか」の信号に使う。
+function inDomoRuntime() {
+  return typeof domo !== 'undefined' && !!domo.env && !!domo.env.customer;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initEnvDisplay();
   wireButtons();
@@ -18,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================================
 
 function initEnvDisplay() {
-  if (typeof domo === 'undefined' || !domo.env) {
-    // Running outside Domo (e.g., file://) — show placeholder text.
+  if (!inDomoRuntime()) {
+    // Running outside a real Domo runtime (file:// / browser preview) — label it clearly.
     document.getElementById('userName').textContent = 'Local';
     document.getElementById('instanceName').textContent = 'preview';
     return;
@@ -34,6 +42,17 @@ function initEnvDisplay() {
 
 async function loadPreview() {
   setEmptyState('Loading dataset preview...');
+
+  // ローカル（file:// やブラウザ直開き）では Domo セッションが無く SQL を取得できない。赤いエラー
+  // ではなく「未接続」状態を見せ、レイアウト／デザインシステムが正しく描画されることを示す。
+  if (!inDomoRuntime()) {
+    setEmptyState(
+      `<strong>ローカルプレビュー（未接続）</strong>
+       レイアウトとデザインシステムはこのとおり描画されます。実データは Domo に公開して
+       データセットを割り当てると表示されます。`
+    );
+    return;
+  }
 
   try {
     // Try mapped-alias SQL first (preferred — uses manifest binding).
@@ -108,11 +127,24 @@ function wireButtons() {
   document.getElementById('refreshBtn').addEventListener('click', loadPreview);
 
   document.getElementById('runSqlBtn').addEventListener('click', async () => {
-    const sql = window.prompt(
-      'Enter SQL to run against this dataset (table name is always "table"):',
-      PREVIEW_SQL
-    );
-    if (!sql) return;
+    // SQL は card 内のインライン <textarea> から読む（window.prompt は iframe サンドボックスで
+    // 無反応になりうるうえ、キーボード/スクリーンリーダー非対応でデザインシステムから外れる）。
+    const input = document.getElementById('sqlInput');
+    const errBox = document.getElementById('sqlError');
+    const sql = (input.value || '').trim();
+    errBox.hidden = true;
+    errBox.textContent = '';
+    if (!sql) {
+      errBox.textContent = 'SQL を入力してください。';
+      errBox.hidden = false;
+      input.focus();
+      return;
+    }
+    if (!inDomoRuntime()) {
+      errBox.textContent = 'ローカルでは実行できません。Domo に公開してから実行してください。';
+      errBox.hidden = false;
+      return;
+    }
     setEmptyState('Running query...');
     try {
       const result = await domo.post(`/sql/v1/${ALIAS}`, sql, { contentType: 'text/plain' });
@@ -120,8 +152,8 @@ function wireButtons() {
       updateStats(result);
     } catch (err) {
       console.error('Query failed:', err);
-      // err.message は失敗した SQL（window.prompt のユーザー入力）やサーバのエラー文を
-      // 反映しうる動的値。innerHTML へ入れる前に必ず escapeHtml() を通す（上の invariant）。
+      // err.message は失敗した SQL（textarea のユーザー入力）やサーバのエラー文を反映しうる
+      // 動的値。innerHTML へ入れる前に必ず escapeHtml() を通す（上の invariant）。
       setEmptyState(`<strong>Query failed</strong>${escapeHtml(err.message || String(err))}`);
     }
   });

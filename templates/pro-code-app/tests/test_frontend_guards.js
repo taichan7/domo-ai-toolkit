@@ -22,7 +22,7 @@
  *     textContent 不変条件）。この関数の innerHTML は `thead.innerHTML=''` / `tbody.innerHTML=''` の
  *     クリアだけで補間は無い。ガードは textContent 経由を positive で要求し、innerHTML 代入へ `${...}`
  *     補間が混入しない（＝untrusted データが innerHTML に乗らない）ことを doesNotMatch で固定する。
- *   - wireButtons の "Query failed" … err.message は失敗した SQL（window.prompt のユーザー入力）や
+ *   - wireButtons の "Query failed" … err.message は失敗した SQL（textarea #sqlInput のユーザー入力）や
  *     サーバのエラー文を反映しうる動的値。innerHTML を書く setEmptyState へ渡す前に
  *     `escapeHtml(err.message || String(err))` を通す。ガードは escapeHtml 経由を positive で要求し、
  *     生の `${err.message}` / `${err}`（escapeHtml 非経由）補間を doesNotMatch で禁止する。

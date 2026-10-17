@@ -232,6 +232,39 @@ tbody tr:hover {
   color: var(--primary);
 }
 
+.action-hint.error-hint {
+  color: #b23a48;
+  font-weight: 600;
+  margin-top: 0;
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: -4px;
+}
+
+.sql-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  resize: vertical;
+}
+
+.sql-input:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  border-color: var(--primary);
+}
+
 /* ============================================================
    空・ローディング状態
    ============================================================ */
