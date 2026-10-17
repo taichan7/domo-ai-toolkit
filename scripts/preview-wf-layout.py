@@ -3,8 +3,12 @@
 
 使い方:
   python3 scripts/preview-wf-layout.py <definition.json> <out.html>
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless \
-    --screenshot=out.png --window-size=1500,1150 out.html
+
+生成した out.html は任意のブラウザで開ける。PNG が要るときは任意の Chromium/Chrome を
+--headless --screenshot で呼ぶ（OS 別の実行ファイル例）:
+  macOS:   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --screenshot=out.png --window-size=1500,1150 out.html
+  Linux:   google-chrome --headless --screenshot=out.png --window-size=1500,1150 out.html
+  Windows: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --headless --screenshot=out.png --window-size=1500,1150 out.html
 
 ノード（200x60・type別色）・エッジ（path 折れ線＋矢頭）・条件エッジのラベルチップ（200x40・data.position）を
 描画する。`domo-workflow-canvas-layout.md` の §4 オフライン検証（機械チェック validate_layout）と対で、
@@ -12,7 +16,12 @@
 """
 
 import json, sys, html
-d=json.load(open(sys.argv[1]))
+
+if len(sys.argv) < 3:
+    sys.exit("usage: preview-wf-layout.py <definition.json> <out.html>")
+
+with open(sys.argv[1]) as _f:
+    d = json.load(_f)
 if isinstance(d.get("savedJson"),str): d=json.loads(d["savedJson"])
 els=d["designElements"]
 nodes=[e for e in els if e.get("type") not in ("defaultEdge","conditionEdge")]
@@ -20,6 +29,8 @@ edges=[e for e in els if e.get("type") in ("defaultEdge","conditionEdge")]
 COL={"rootNode":"#2e7d32","endNode":"#c62828","conditionalGatewayNode":"#f9a825",
      "intermediateCatchEventNode":"#5c6bc0","SUB_FLOW":"#1565c0","DATASET_QUERY_TASK":"#4a90d9",
      "serviceTaskNode":"#90a4ae"}
+if not nodes:
+    sys.exit("no non-edge nodes in the definition — nothing to render.")
 maxx=max((n["position"]["x"]+220) for n in nodes); maxy=max((n["position"]["y"]+120) for n in nodes)
 # also account for label chips
 for e in edges:
@@ -44,5 +55,5 @@ for n in nodes:
     S.append(f'<rect x="{p["x"]}" y="{p["y"]}" width="8" height="{dim["height"]}" rx="2" fill="{c}"/>')
     S.append(f'<text x="{p["x"]+100}" y="{p["y"]+35}" font-size="14" text-anchor="middle" fill="#263238">{t}</text>')
 S.append('</svg>')
-open(sys.argv[2],"w").write("<!doctype html><meta charset=utf-8><body style=margin:0>"+"".join(S))
+with open(sys.argv[2],"w") as _o: _o.write("<!doctype html><meta charset=utf-8><body style=margin:0>"+"".join(S))
 print("wrote",sys.argv[2],"size",maxx,"x",maxy)

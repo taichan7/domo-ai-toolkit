@@ -24,8 +24,8 @@ Domo の Pro Code、AppDB、Magic ETL、Code Engine、Workflows、App Studio を
 
 1. [配布品質と適用範囲](docs/distribution-readiness.ja.md)を確認する。
 2. [AI向け入口プロンプト](prompts/deploy-with-agent.ja.md)を渡す。
-3. [セットアップガイド](docs/setup-guide.md)の順に配備・検証する。
-4. 変更を加えるAIは [AGENT.md](AGENT.md) の不変契約を守る。
+3. [デプロイ・ランブック](docs/ai-rebuild-runbook.md)の順に配備・検証する。
+4. 変更を加えるAIは [AGENTS.md](AGENTS.md) の不変契約を守る。
 
 接続先は `DOMO_INSTANCE=<your-instance>.domo.com` で明示します。ハンズオンには
 `PL_SANDBOX_SUFFIX='検証・氏名'` を使います。名札なしの配備は全インスタンスで
@@ -64,12 +64,12 @@ AppDB seed → 標準同期 DataSet → Magic ETL → summary / detail / trend /
 | 文書 | 役割 |
 |---|---|
 | [配布品質と適用範囲](docs/distribution-readiness.ja.md) | 配布前チェックと適用範囲（English: [distribution-readiness.md](docs/distribution-readiness.md)） |
-| [セットアップガイド](docs/setup-guide.md) | ゼロから自分の Domo へ配備・検証する単一の手順書（着手前の「AIが陥りやすい誤り」を先頭に）|
+| [デプロイ・ランブック](docs/ai-rebuild-runbook.md) | ゼロから自分の Domo へ配備・検証する単一の手順書（着手前の「AIが陥りやすい誤り」を先頭に）|
 | [設計原則](docs/design-principles.md) | 優先順位・レイヤー・公開関数を1つにした理由・UI設計・採用しなかった設計 |
 | [アーキテクチャと設計判断](docs/architecture.md) | 出力ハブ型2経路・レイヤー境界・単一ディスパッチャCE・保存順・AI HTML 許可リスト |
 | [データモデル](docs/data-model.md) | 出力DataSet列・勘定科目レベル・状態ラベル5値・AppDBレポート文書 |
 | [Domoアセット台帳](docs/domo-assets.md) | 名称・alias・個数の ID 非依存な契約（配備後の個数照合） |
-| [AGENT.md](AGENT.md) | 変更を加える AI が守る不変契約 |
+| [AGENTS.md](AGENTS.md) | 変更を加える AI が守る不変契約 |
 | [prompts/](prompts/) | AI への入口プロンプトと共通規約の正本 |
 
 店舗・全社レポートは親Workflowから生成します。画面の更新ボタンは確認後に**全店舗＋全社**を

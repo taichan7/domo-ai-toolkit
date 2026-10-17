@@ -10,7 +10,7 @@ Flow (released versions are immutable, so we must create a fresh draft):
   6. GET  /versions/{d}/definition  -> verify round-trip
   7. POST /versions/{d}/release -> release; capture the assigned version
 
-Env: INSTANCE, SID (set via `domo login` + the session-SID helper in docs/setup-guide.md), RELEASE=1 to actually release.
+Env: INSTANCE, SID (set via `domo login` + the session-SID helper in docs/ai-rebuild-runbook.md), RELEASE=1 to actually release.
 Args: MODEL_ID  RELEASED_VERSION  PROMPT_MD  TARGET_VERSION
 Prints the released version number on the last line as: RELEASED=<version>
 """

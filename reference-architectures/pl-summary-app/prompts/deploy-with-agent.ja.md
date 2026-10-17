@@ -4,8 +4,8 @@
 > コーディングエージェント（Claude Code / Cursor / Copilot 等）へそのまま渡す**ための入口プロンプトです。
 > エージェントは以下を上から順に実行してください。
 >
-> このプロンプトは手順を複製しません。**認証を整えたら `docs/setup-guide.md` を開き、その STEP 0→7 を上から
-> 実行する**のが基本です。ここでは「環境準備 → インスタンスの確認 → 認証 → セットアップガイド実行 → 検証」を束ねます。
+> このプロンプトは手順を複製しません。**認証を整えたら `docs/ai-rebuild-runbook.md` を開き、その STEP 0→7 を上から
+> 実行する**のが基本です。ここでは「環境準備 → インスタンスの確認 → 認証 → デプロイ・ランブック実行 → 検証」を束ねます。
 
 ## 0. このプロンプトでできること
 
@@ -16,15 +16,15 @@
 **正直な範囲（必ず理解すること）**:
 
 - **データ層＋ Pro-Code ＋ ETL 短文 AI サマリー ＋ App Studio 埋め込み**は、このフォルダのスクリプトだけで
-  **きれいにデプロイできます**（`docs/setup-guide.md` STEP 1〜5）。これだけで概要／事業部別タブ
+  **きれいにデプロイできます**（`docs/ai-rebuild-runbook.md` STEP 1〜5）。これだけで概要／事業部別タブ
   （KPI・チャート・短文サマリー）が動きます。
 - **AI 長文レポート（サマリータブの経営インサイト HTML）**は**ワークフロー層**（`provision_workflows.py`）が
   必要です。新規インスタンスへは `python3 scripts/provision_workflows.py provision --apply --release` が
   保存 CE・統合サブWF・WF-01 を**名称で発見または新規作成**し、束縛（AppDB コレクション・クエリ対象データセット・
-  子WF参照）を対象環境の実 ID へ張り替えて**ゼロから配備**します（`docs/setup-guide.md` STEP 6）。配備後は
+  子WF参照）を対象環境の実 ID へ張り替えて**ゼロから配備**します（`docs/ai-rebuild-runbook.md` STEP 6）。配備後は
   WF-01 を手動実行し、AppDB に `analysis_html` が生成されるまで待ちます（約 25 分・AI クレジットを消費）。
 - **開発ガイド（App Studio ページ2「開発ガイド」）**は `cd dev-guide-app && domo publish` →
-  `python3 scripts/provision_domo.py embed-guide` で**タブ**として追加できます（`docs/setup-guide.md` STEP 7・
+  `python3 scripts/provision_domo.py embed-guide` で**タブ**として追加できます（`docs/ai-rebuild-runbook.md` STEP 7・
   ページ1＝本体カードは不変）。複数人で同一インスタンスを使うハンズオンは `PL_SANDBOX_SUFFIX="検証・氏名"` で
   バックエンドごと隔離します（受講者入口＝`prompts/handson-with-agent.ja.md`）。
 
@@ -106,11 +106,11 @@ set -a; . config/secrets.env; set +a
 > 補足: `pl-summary-app` を配布しているワークスペース（社内保守用リポジトリ）には「無確認で `domo publish`」という
 > ルールがありますが、**それは配布元の社内運用専用**です。配布先であるあなたのインスタンスには適用しません。
 
-## 4. 実行（セットアップガイドを上から順に）
+## 4. 実行（デプロイ・ランブックを上から順に）
 
-1. `AGENT.md`（プロジェクト内）と `README.md` を読み、全体像（データフロー出力ハブ・4面の AI サマリー・
+1. `AGENTS.md`（プロジェクト内）と `README.md` を読み、全体像（データフロー出力ハブ・4面の AI サマリー・
    ワークフロー2本＋保存CE）を把握する。
-2. `docs/setup-guide.md` を開き、**STEP 0 → 7 を上から順に**実行する:
+2. `docs/ai-rebuild-runbook.md` を開き、**STEP 0 → 7 を上から順に**実行する:
    - **STEP 0.5** プリフライト（配備前の無停止検証）— `python3 -m unittest discover -s tests` ／
      `node --test tests/test_*.js` ／ `node dev-guide-app/tests/check.mjs` を実行し、**すべて緑を確認してから STEP 1 へ**。
      配布キットの編集が壊れていないかを、実インスタンスに触れてクレジットを使う前に捕まえる。
@@ -144,7 +144,7 @@ python3 scripts/provision_domo.py verify   # → ok: true
 - `ok: true` が出れば**データ層＋ Pro-Code ＋ ETL 短文 AI サマリー ＋ App Studio 埋め込み**は完了です。
   ブラウザで App Studio ページを開き、Pro-Code カードの概要／事業部別タブ（KPI・チャート・短文サマリー）を確認します。
 - **サマリータブの AI 長文レポート**は STEP 6（ワークフロー層）を回し、WF-01 を手動実行して AppDB に
-  `analysis_html` が生成された後に表示されます（手順は `docs/setup-guide.md` STEP 6 と `AGENT.md`）。
+  `analysis_html` が生成された後に表示されます（手順は `docs/ai-rebuild-runbook.md` STEP 6 と `AGENTS.md`）。
 
 ## 6. 配布物の取り扱い（厳守）
 

@@ -11,6 +11,7 @@
   --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
   --shadow-md: 0 8px 24px rgba(0,0,0,.08);  /* .05 はほぼ不可視だった＝実際に効く浮上に（PL-023/056で統一） */
   --radius: 12px;
+  --icon-stroke: 1.7;         /* 単線SVGアイコン共通ストローク幅（inventory と統一・PL-058） */
   /* 本テーマは明色専用（light-only by design）。ダークテーマは配布スコープ外＝feature creep ゆえ
      出荷しない。散っていた中間色・白を下にトークン化し、再テーマ時の単一レバーにする（PL-020）。 */
   --on-accent: #fff;        /* アクセント/濃色面に乗る前景（白文字・白塗り） */
@@ -51,7 +52,11 @@ body{
   gap: 20px; padding: 14px 24px;
 }
 .brand{ display: flex; flex-direction: row; align-items: center; gap: 12px; }
-.brand-logo{ width: 46px; height: 46px; border-radius: 10px; display: block; box-shadow: var(--shadow-sm); }
+/* ニュートラルで再着色可能なブランドマーク（inventory と同手法・PL/X-013）。架空小売ブランドの
+   ラスター logo.png を廃し、enji（--accent）で塗る単線SVGマークに統一＝採用者が自社ロゴへ
+   差し替えやすく、ラスター誤認（実在顧客ロゴに見える）やパレット非追従も解消。寸法は従来 46px を踏襲。 */
+.brand-mark{ display: grid; place-items: center; width: 46px; height: 46px; border-radius: 10px; color: var(--on-accent); background: var(--accent); box-shadow: var(--shadow-sm); }
+.brand-mark .ui-icon{ width: 26px; height: 26px; }
 .brand-text{ display: flex; flex-direction: column; gap: 2px; }
 .logo{ font-weight: 700; font-size: 17px; letter-spacing: .04em; color: var(--ink); }
 .brand-sub{ font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-muted); }
@@ -82,7 +87,8 @@ body{
 .workflow-confirm-head{ display: flex; align-items: flex-start; gap: 16px; }
 .workflow-kicker{ margin: 0 0 8px; font-size: 13px; color: var(--accent); font-weight: 600; }
 .workflow-confirm h2{ margin: 0; font-size: 21px; line-height: 1.6; }
-.workflow-close{ flex-shrink: 0; width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 8px; color: var(--ink-muted); background: var(--surface); font: inherit; font-size: 24px; cursor: pointer; }
+.workflow-close{ display: inline-grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 8px; color: var(--ink-muted); background: var(--surface); font: inherit; font-size: 20px; cursor: pointer; }
+.workflow-close:hover{ color: var(--accent); }
 .workflow-scope{ margin: 20px 0 14px; padding: 12px 14px; background: var(--bg); font-size: 14px; line-height: 1.8; }
 .workflow-recipient{ margin: 0 0 14px; font-size: 14px; line-height: 1.8; color: var(--ink); }
 .workflow-recipient span{ font-weight: 600; color: var(--accent); word-break: break-all; }
@@ -98,11 +104,20 @@ body{
   .workflow-actions{ justify-content: flex-end; }
   .workflow-confirm{ padding: 18px; }
 }
+/* 単線アイコン共通（ハウス規約・inventory と同一）。スプライトは視覚的に隠す。 */
+.icon-sprite{ position: absolute; width: 0; height: 0; overflow: hidden; }
+.ui-icon{
+  width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor;
+  stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round;
+}
 .selector-label{ font-size: 13px; color: var(--ink-muted); }
 .select-shell{ position: relative; }
+/* セレクトのシェブロンも単線SVGで統一（PL-058）。擬似要素のため currentColor を data-URI に
+   注入できず、アクセント #7F1D2D を焼き込む＝色相変更時は --accent と合わせて更新する。 */
 .select-shell::after{
-  content: "▾"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-  color: var(--accent); pointer-events: none; font-size: 12px;
+  content: ""; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  width: 12px; height: 12px; pointer-events: none;
+  background: no-repeat center / 12px 12px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237F1D2D' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 #store-select{
   -webkit-appearance: none; appearance: none;
@@ -469,6 +484,7 @@ body{
   background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
   padding: 3px 10px; cursor: pointer; transition: color .15s, border-color .15s;
 }
+.drill-reset{ display: inline-flex; align-items: center; gap: 5px; }
 .drill-btn:hover{ color: var(--accent); border-color: rgba(127,29,45,.35); }
 .drill-btn:focus-visible{ outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(127,29,45,.18); }
 .drill-path{ display: inline-flex; align-items: center; gap: 3px; flex-wrap: wrap; min-width: 0; }

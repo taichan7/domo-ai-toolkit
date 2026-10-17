@@ -14,7 +14,7 @@ API, but the version contract is fiddly (verified against the live package):
 Modes:
   create  NAME  DESCRIPTION  CODE_FILE  "fnName:fnDesc"        -> new package, v1.0.0
   version PACKAGE_ID  CODE_FILE  TARGET_VERSION                -> new version on existing pkg
-Env: INSTANCE, SID (set via `domo login` + the session-SID helper in docs/setup-guide.md), RELEASE=1 to release after create.
+Env: INSTANCE, SID (set via `domo login` + the session-SID helper in docs/ai-rebuild-runbook.md), RELEASE=1 to release after create.
 
 The function is declared with a single `collection_id` text input and an object
 output - matching dedupe_appdb_documents. Adjust fn_object for other signatures.

@@ -268,7 +268,7 @@ def _service() -> dict:
                         if name not in ("collection_id", "operation", "report_type", "executor_email")}
         report = _coerce_document(document)
         # BK-011: 入れ子 document パスでも平坦フォールバック（上）と同じルーティング/PII キーを落とす。
-        # executor_email は実行時 PII（AGENT.md が永続禁止）、report_type/operation/collection_id は
+        # executor_email は実行時 PII（AGENTS.md が永続禁止）、report_type/operation/collection_id は
         # ルーティング用。万一 document 内に紛れても共有 AppDB レポートへ焼き込まず、両パスで保存形を
         # 一致させる（defense-in-depth。現行プロンプトは §8.3 固定スキーマで出さないが将来のドリフト保険）。
         for routing_key in ("collection_id", "operation", "report_type", "executor_email"):

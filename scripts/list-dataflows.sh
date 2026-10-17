@@ -29,7 +29,18 @@ PYTHON_BIN="$(domo_find_python)"
 RESPONSE=$(curl -sS --max-time 30 "${DOMO_CURL_AUTH_ARGS[@]}" \
   "https://$INSTANCE/api/dataprocessing/v1/dataflows") || domo_neterr
 echo "$RESPONSE" | "$PYTHON_BIN" -c "
-import json, sys
+import json, sys, unicodedata
+# 全角(W/F)は端末で2桁ぶん占めるため表示幅でパディング/切り詰めする（TK-007）。
+def _dw(s): return sum(2 if unicodedata.east_asian_width(c) in ('W','F') else 1 for c in str(s))
+def _pad(s, n):
+    s=str(s)
+    if _dw(s)>n:
+        out=''
+        for c in s:
+            if _dw(out)+_dw(c)>n-1: break
+            out+=c
+        s=out+'…'
+    return s+' '*max(0,n-_dw(s))
 
 flows = json.load(sys.stdin)
 # /dataflows は成功時に配列を返すが、認証切れ/エラー時はエラーオブジェクト（dict）を返す。
@@ -42,7 +53,7 @@ if not isinstance(flows, list):
     sys.exit(0)
 filter_mode = '$FILTER'
 
-print('{:<8}  {:<60}  {:<10}  {:<10}  {}'.format('ID', 'NAME', 'STATE', 'FAILED', 'LAST_ERROR'))
+print('{}  {}  {}  {}  {}'.format(_pad('ID',8), _pad('NAME',60), _pad('STATE',10), _pad('FAILED',10), 'LAST_ERROR'))
 print('-' * 120)
 
 for f in flows:
@@ -52,11 +63,11 @@ for f in flows:
         continue
     errors = le.get('errors', []) or []
     last_err = errors[0].get('code', '') if errors else ''
-    print('{:<8}  {:<60}  {:<10}  {:<10}  {}'.format(
-        str(f.get('id','')),
-        (f.get('name','') or '')[:60],
-        (f.get('runState','') or '')[:10],
-        'YES' if failed else 'no',
+    print('{}  {}  {}  {}  {}'.format(
+        _pad(f.get('id',''), 8),
+        _pad(f.get('name','') or '', 60),
+        _pad(f.get('runState','') or '', 10),
+        _pad('YES' if failed else 'no', 10),
         last_err,
     ))
 

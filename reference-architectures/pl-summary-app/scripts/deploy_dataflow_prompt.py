@@ -19,7 +19,7 @@ edit safe with a full backup + surgical single-field edits + strict round-trip v
 
 On any verify failure the backup is PUT back (restore) and the script exits non-zero.
 
-Env: INSTANCE, SID (set via `domo login` + the session-SID helper in docs/setup-guide.md); RUN=1 to also trigger a re-run.
+Env: INSTANCE, SID (set via `domo login` + the session-SID helper in docs/ai-rebuild-runbook.md); RUN=1 to also trigger a re-run.
      BACKUP defaults to /tmp/df_<id>_backup.json.
 Args: DATAFLOW_ID  TILE_NAME PROMPT_MD  [TILE_NAME PROMPT_MD ...]
 

@@ -32,7 +32,18 @@ while (( FETCHED < MAX )); do
     "https://$INSTANCE/api/data/v3/datasources?limit=$PAGELIMIT&offset=$OFFSET") || domo_neterr
 
   echo "$RESPONSE" | "$PYTHON_BIN" -c "
-import json, sys
+import json, sys, unicodedata
+# 全角(W/F)は端末で2桁ぶん占めるため、len() でなく表示幅でパディング/切り詰めする（TK-007）。
+def _dw(s): return sum(2 if unicodedata.east_asian_width(c) in ('W','F') else 1 for c in str(s))
+def _pad(s, n):
+    s=str(s)
+    if _dw(s)>n:
+        out=''
+        for c in s:
+            if _dw(out)+_dw(c)>n-1: break
+            out+=c
+        s=out+'…'
+    return s+' '*max(0,n-_dw(s))
 data = json.load(sys.stdin)
 # 認証切れ/エラー時、/api/data/v3/datasources は 'dataSources' を持たないエラー dict を返す。
 # bare な data.get('dataSources', []) だと空リストに化けて '0 datasets' と黙って成功に見え、
@@ -46,12 +57,12 @@ if not isinstance(data, dict) or 'dataSources' not in data:
 rows = data['dataSources']
 for d in rows:
     owner = d.get('owner', {}) or {}
-    print('{:<40}  {:<50}  {:<20}  {:>12,}  {:<25}'.format(
-        d.get('id','')[:40],
-        (d.get('name','') or '')[:50],
-        (d.get('type','') or '')[:20],
+    print('{}  {}  {}  {:>12,}  {}'.format(
+        _pad(d.get('id',''), 40),
+        _pad(d.get('name','') or '', 50),
+        _pad(d.get('type','') or '', 20),
         d.get('rowCount', 0) or 0,
-        (owner.get('name','') or '')[:25],
+        _pad(owner.get('name','') or '', 25),
     ))
 "
 

@@ -1,9 +1,9 @@
 # P/L reference app — agent contract
 
-Read [README.md](README.md), [docs/setup-guide.md](docs/setup-guide.md) and
+Read [README.md](README.md), [docs/ai-rebuild-runbook.md](docs/ai-rebuild-runbook.md) and
 [docs/distribution-readiness.md](docs/distribution-readiness.md) before editing.
-The setup guide is the single deployment runbook; this file contains only
-project-specific invariants. Follow the enclosing repository's current user
+The rebuild runbook (docs/ai-rebuild-runbook.md) is the single deployment
+procedure; this file contains only project-specific invariants. Follow the enclosing repository's current user
 instructions and authorization policy.
 
 ## Deployment

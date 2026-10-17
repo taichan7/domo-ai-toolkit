@@ -869,7 +869,7 @@
         esc(frameCrumb(f)) + "</button>");
     });
     parts.push("</span>");
-    parts.push('<button type="button" class="drill-btn drill-reset" data-drill-act="reset" aria-label="ドリルを解除してトップへ戻る">✕ 解除</button>');
+    parts.push('<button type="button" class="drill-btn drill-reset" data-drill-act="reset" aria-label="ドリルを解除してトップへ戻る"><svg class="ui-icon" aria-hidden="true"><use href="#icon-close"></use></svg> 解除</button>');
     bar.innerHTML = parts.join("");
   }
 
@@ -1189,6 +1189,10 @@
 
   // 汎用ドーナツ描画。items = [{label,color,value,key?}]。中央ラベルは centerLabel、中央値は合計。
   // opts.drill でスライスをクリック可能にし、opts.highlight（key）で他スライスを減光する。
+  // ⚠ viewBox は固定 300×300 で CSS width:100% によりカード幅へ拡大する＝広幅カードでは中央値/凡例の
+  // 文字も一緒に拡大して読みやすくなる（ユーザーFBで確定した正しい挙動）。かつて「文字がネイティブ px で
+  // 固定されず肥大/スマホで11px割れ」を懸念して viewBox=実px 化したが、実機では文字が小さくなり凡例が
+  // 読めなくなる改悪だったため revert 済み。**この viewBox 300 固定を実px化して縮小し直さないこと**（PL-029）。
   function donutInto(host, costs, centerLabel, opts) {
     opts = opts || {};
     var items = (costs || []).filter(function (c) { return c.value > 0; });

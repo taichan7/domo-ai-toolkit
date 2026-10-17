@@ -12,11 +12,19 @@
   <link rel="stylesheet" href="app.css">
 </head>
 <body>
+  <!-- 単線アイコンスプライト（ハウス規約 = inventory-management-app と同一: viewBox 0 0 24 24・
+       stroke=currentColor・1.7px・丸端）。対話的アイコン（外部リンク/閉じる/解除/セレクトの
+       シェブロン）をフォントグリフから揃った単線SVGへ統一する（PL-058）。アセット数は増やさない。 -->
+  <svg class="icon-sprite" aria-hidden="true">
+    <symbol id="icon-brand" viewBox="0 0 24 24"><path d="M4 7.5 12 3l8 4.5-8 4.5-8-4.5Z"/><path d="m4 12 8 4.5 8-4.5M4 16.5 12 21l8-4.5"/></symbol>
+    <symbol id="icon-external" viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5 11 13"/><path d="M18 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"/></symbol>
+  </svg>
   <a class="skip-link" href="#main-content">本文へ移動</a>
   <header id="header">
     <div class="header-content container">
       <div class="brand">
-        <img class="brand-logo" src="logo.png" alt="シンプルスタイル" width="46" height="46">
+        <span class="brand-mark" aria-hidden="true"><svg class="ui-icon"><use href="#icon-brand"></use></svg></span>
         <div class="brand-text">
           <div class="logo">店舗別損益 AIインサイト</div>
           <div class="brand-sub">Store P/L AI Insights</div>
@@ -28,7 +36,7 @@
           <select id="store-select" disabled><option>読み込み中…</option></select>
         </div>
       </div>
-      <div class="workflow-actions"><button id="workflow-run" class="workflow-button" type="button" disabled>全社AIレポートを更新</button><button id="workflow-check" class="workflow-progress" type="button" disabled aria-label="詳しい進捗（Domoの画面）を新しいタブで開く">実行状況 <span aria-hidden="true">↗</span></button></div></div>
+      <div class="workflow-actions"><button id="workflow-run" class="workflow-button" type="button" disabled>全社AIレポートを更新</button><button id="workflow-check" class="workflow-progress" type="button" disabled aria-label="詳しい進捗（Domoの画面）を新しいタブで開く">実行状況 <svg class="ui-icon" aria-hidden="true"><use href="#icon-external"></use></svg></button></div></div>
     </div>
   </header>
 
@@ -43,7 +51,7 @@
 
     <dialog id="workflow-confirm" class="workflow-confirm" aria-labelledby="workflow-confirm-title" aria-describedby="workflow-confirm-note">
       <form method="dialog">
-        <div class="workflow-confirm-head"><div><p class="workflow-kicker">実行前の確認</p><h2 id="workflow-confirm-title">全店舗・全社のAIレポートを更新しますか？</h2></div><button class="workflow-close" type="submit" value="cancel" aria-label="確認を閉じる">×</button></div>
+        <div class="workflow-confirm-head"><div><p class="workflow-kicker">実行前の確認</p><h2 id="workflow-confirm-title">全店舗・全社のAIレポートを更新しますか？</h2></div><button class="workflow-close" type="submit" value="cancel" aria-label="確認を閉じる"><svg class="ui-icon" aria-hidden="true"><use href="#icon-close"></use></svg></button></div>
         <p class="workflow-scope">対象は全店舗と全社です。店舗セレクターの選択には限定されません。</p>
         <p class="workflow-recipient">通知先（実行者）: <span id="workflow-recipient-email">確認中…</span></p>
         <p id="workflow-confirm-note">最新の損益データをもとに長文レポートを作成し、結果を保存します。<b>全店舗＋全社ぶんのAIクレジットを使用します</b>。全社レポートのメール通知は上記の通知先（および設定済みの宛先）に送信します。<b>店舗数により数十分かかることがあります</b>が、現在のレポートは引き続き閲覧できます。定期実行は行いません。</p>

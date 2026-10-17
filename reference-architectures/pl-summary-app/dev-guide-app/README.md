@@ -70,7 +70,7 @@ PL_SANDBOX_SUFFIX="検証・<氏名>" python3 scripts/provision_domo.py embed-gu
 （ページ1＝本体カードは触らない・純静的なので context mapping の同期は不要＝カード作成＋レイアウト整形のみ）。
 先に `cd dev-guide-app && domo publish` で design を発行していないと（manifest に id が無い、または対象
 インスタンスで未公開だと）**明確なエラーで止まる**（門番）。ゼロからのデプロイ正典は
-`../docs/setup-guide.md` STEP 7。
+`../docs/ai-rebuild-runbook.md` STEP 7。
 
 ## ローカル確認（Domo 非接続・`pl-summary-app/dev-guide-app/` 内で実行）
 
@@ -84,7 +84,7 @@ node tests/make-thumbnail.mjs  # thumbnail.png を再生成（版を bump した
 - `tests/check.mjs` が決定的な関門（空レンダ・壊れた参照・版ドリフトを Chrome 無しで機械検知）。
   `tests/shoot.mjs` は目視補助で、**この開発ガイド自身**を撮る（メンテナ用）。
 - 本体 Pro-Code アプリ（`pl-summary-app/pro-code/`）のローカルテストはこれとは別物
-  （`tests/test_drill_helpers.js` 等）。親 `README.md` / `docs/setup-guide.md` 参照。
+  （`tests/test_drill_helpers.js` 等）。親 `README.md` / `docs/ai-rebuild-runbook.md` 参照。
 
 ## 版を上げるとき（単一ソース＝手書き4箇所）
 
@@ -132,6 +132,6 @@ DataSet〔summary/detail/trend/dept〕・統合サブWF・WF-01・App Studio Dat
 
 ## 関連ドキュメント
 
-- `../docs/setup-guide.md` STEP 7 — 公開＋埋め込みの正典（ゼロからのデプロイ手順）
-- `../AGENT.md` — pl-summary-app 全体の引き継ぎノート（重要 ID 一覧・サンドボックス隔離の詳細）
+- `../docs/ai-rebuild-runbook.md` STEP 7 — 公開＋埋め込みの正典（ゼロからのデプロイ手順）
+- `../AGENTS.md` — pl-summary-app 全体の引き継ぎノート（重要 ID 一覧・サンドボックス隔離の詳細）
 - `../README.md` — 本体アプリの全体像とデプロイ

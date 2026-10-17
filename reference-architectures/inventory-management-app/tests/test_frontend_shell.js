@@ -363,12 +363,25 @@ test('登録ステップは現在の作業を説明し、完了済み画面へ�
   assert.match(app, /byId\(`step-title-\$\{state\.step\}`\)\?\.focus/);
   assert.match(css, /\.stepper\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)[^}]*overflow:\s*hidden/s);
   assert.match(css, /\.stepper button\s*\{[^}]*min-height:\s*44px/s);
-  // INV-038: 狭幅短縮は font-size:0＋::after の二重読み上げを避け、実テキスト2本の display 切替。
   assert.doesNotMatch(css, /\.stepper b::after\s*\{[^}]*content:\s*attr\(data-short\)/s);
   assert.doesNotMatch(css, /\.stepper b\s*\{[^}]*font-size:\s*0/s);
+  // ステップ名は常にフル表記「ロケーション」。桁に収まらないときは text-overflow で「ロケ」に中途半端
+  // クリップせず折り返して全文を見せる（短縮「場所」は使わない）。
+  assert.match(css, /\.stepper b\s*\{[^}]*white-space:\s*normal[^}]*overflow-wrap:\s*anywhere/s);
+  assert.doesNotMatch(css, /\.stepper b\s*\{[^}]*text-overflow:\s*ellipsis/s);
+  assert.match(css, /\.stepper \.step-full\s*\{\s*display:\s*inline;\s*\}/);
   assert.match(css, /\.stepper \.step-short\s*\{\s*display:\s*none;\s*\}/);
-  assert.match(css, /@media \(max-width:\s*980px\)\s*\{[\s\S]*\.stepper \.step-full\s*\{\s*display:\s*none;\s*\}[\s\S]*\.stepper \.step-short\s*\{\s*display:\s*inline;\s*\}/);
   assert.match(html, /<b><span class="step-full">ロケーション<\/span><span class="step-short">場所<\/span><\/b>/);
+  // 丸囲み(border-radius:50%)は手順番号バッジ＝button直下spanだけ。ステップ名を囲む
+  // <b> 内の step-full span に当たると紺色の楕円線が文字に重なる（INV-038 regression）。
+  // バッジ規則は子結合子で限定し、ラベル span を巻き込む裸の `.stepper span{…50%}` を禁止する。
+  assert.match(css, /\.stepper button > span\s*\{[^}]*border-radius:\s*50%/s);
+  assert.doesNotMatch(css, /(^|[^>])\s\.stepper span\s*\{[^}]*border-radius:\s*50%/s);
+  // active/done の色塗りも番号バッジ(button直下span)限定。`.stepper li.active span{…}` の
+  // ままだとステップ名 span まで塗って「ロケーション」が白文字＋紺背景になる。
+  assert.match(css, /\.stepper li\.active button > span\s*\{/);
+  assert.match(css, /\.stepper li\.done button > span\s*\{/);
+  assert.doesNotMatch(css, /\.stepper li\.(active|done) span\s*\{/);
 });
 
 test('確認内容の陳腐化を防ぎ、モバイルでも選択内容を確認できる', () => {

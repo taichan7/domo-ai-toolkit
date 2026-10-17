@@ -30,7 +30,7 @@
 しない（旧 active 版は無傷）。`--dry-run` は PUT せず、組み立てた定義をファイルへ書き出すだけ。
 
 認証: 環境変数 INSTANCE＋SID、または DOMO_DEVELOPER_TOKEN（SID より優先）。SID は
-`domo login -i <instance>` 後に docs/setup-guide.md のセッションSID取得手順で設定する（ワークスペース非依存）。
+`domo login -i <instance>` 後に docs/ai-rebuild-runbook.md のセッションSID取得手順で設定する（ワークスペース非依存）。
 """
 from __future__ import annotations
 
@@ -179,7 +179,7 @@ def request(method: str, path: str, body: Any = None) -> Any:
             raise SystemExit("SID belongs to a different INSTANCE; authenticate for DOMO_INSTANCE.")
         headers = {"X-Domo-Authentication": SID, "Accept": "application/json"}
     else:
-        raise SystemExit("認証情報がありません。DOMO_DEVELOPER_TOKEN または SID を環境変数で設定してください（取得は docs/setup-guide.md 参照）。")
+        raise SystemExit("認証情報がありません。DOMO_DEVELOPER_TOKEN または SID を環境変数で設定してください（取得は docs/ai-rebuild-runbook.md 参照）。")
     data = None
     if body is not None:
         data = json.dumps(body, ensure_ascii=False).encode()
@@ -670,7 +670,7 @@ def send_email_tool() -> Dict[str, Any]:
         print("  ⚠ PL_EMAIL_PERSON_RECIPIENTS 未設定 — 全社レポートのメール通知は送信されません"
               "（宛先なし。AI は宛先を創作せずスキップ）。メールを送るには person ID をカンマ区切りで "
               "`export PL_EMAIL_PERSON_RECIPIENTS=<id1,id2>` を設定して再配備してください"
-              "（person ID の調べ方は docs/setup-guide.md STEP 6）。", flush=True)
+              "（person ID の調べ方は docs/ai-rebuild-runbook.md STEP 6）。", flush=True)
     return tool
 
 

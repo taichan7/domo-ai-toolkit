@@ -27,7 +27,7 @@ Offline tests cover save validation and preservation of newer reports, HTML
 allowlisting, chart drill paths, manual start/cancellation, provisioning, geometry
 and sandbox isolation. A clean checkout must run without local deployment state.
 
-Follow the setup guide on the destination. Verify data and Workflow bindings,
+Follow the deploy runbook on the destination. Verify data and Workflow bindings,
 release pins, grants, available AI models/consumption, actual report completeness,
 and intended email recipients/delivery — including the operator who ran it, whose
 address is resolved at runtime from the signed-in user and added to the company

@@ -258,14 +258,23 @@ main { min-width: 0; min-height: 100vh; padding: calc(var(--header) + 24px) calc
    旧 #7f8a97(3.51:1)ではなくトークン --muted(4.5:1超)で判読性を確保する。 */
 .stepper button { display: flex; width: 100%; min-width: 0; min-height: 40px; align-items: center; justify-content: center; gap: 7px; padding: 5px 8px; color: var(--muted); border: 0; background: transparent; font-size: 11px; }
 .stepper button:disabled { cursor: default; opacity: 1; }
-.stepper span { display: grid; flex: none; width: 23px; height: 23px; place-items: center; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface-muted); font-size: 11px; font-weight: 700; }
-.stepper b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* 既定（広幅）はフル表記のみ。短縮語は狭幅メディアクエリでのみ出す（INV-038）。 */
+/* 丸囲みは手順番号バッジ（button 直下の span）だけに適用する。ステップ名を囲む
+   <b><span class="step-full">…</span></b> の span には当てない＝ラベル文字の上に
+   紺色の楕円線が重なる不具合（INV-038 で step-full/short span 導入時に `.stepper span`
+   が広すぎて誤マッチ）を防ぐ。 */
+.stepper button > span { display: grid; flex: none; width: 23px; height: 23px; place-items: center; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface-muted); font-size: 11px; font-weight: 700; }
+/* ステップ名は常にフル表記（ロケーション）を表示する。桁に収まらないときは text-overflow で
+   「ロケ」に中途半端クリップせず**折り返して全文を見せる**＝全端末で正式名が読める。短縮「場所」は使わない。 */
+.stepper b { overflow: hidden; white-space: normal; overflow-wrap: anywhere; text-align: center; line-height: 1.25; }
+.stepper .step-full { display: inline; }
 .stepper .step-short { display: none; }
 .stepper li.active button { color: var(--navy-950); background: var(--teal-100); font-weight: 700; }
-.stepper li.active span { color: #fff; border-color: var(--teal-700); background: var(--teal-700); }
+/* active/done の色塗りも番号バッジ（button 直下 span）だけに限定する。`.stepper li.active span`
+   のままだと <b> 内のステップ名 span まで塗って「ロケーション」が白文字＋紺背景になる
+   （楕円線と同根の広すぎセレクタ）。ステップ名は品目/数量と同じ素のテキストにする。 */
+.stepper li.active button > span { color: #fff; border-color: var(--teal-700); background: var(--teal-700); }
 .stepper li.done button { color: var(--navy-900); }
-.stepper li.done span { color: var(--navy-900); border-color: #bcc8df; background: var(--teal-100); }
+.stepper li.done button > span { color: var(--navy-900); border-color: #bcc8df; background: var(--teal-100); }
 .stepper li.available button:hover { background: var(--surface-muted); }
 
 .operation-grid { display: grid; min-width: 0; grid-template-columns: minmax(0, 1.65fr) minmax(280px, .72fr); align-items: start; gap: 16px; }
@@ -991,12 +1000,7 @@ html[data-domo-platform="mobile"] .step-status strong { font-size: 14px; }
   .step-status strong { font-size: 13px; }
   .stepper { margin-bottom: 12px; }
   .stepper button { min-height: 44px; gap: 4px; padding: 4px; }
-  .stepper span { width: 21px; height: 21px; }
-  /* INV-038: 狭幅ではステップ1だけ短縮（ロケーション→場所）。font-size:0＋::after は本来テキストが
-     アクセシビリティツリーに残り ::after 生成語も読まれて二重読み上げになるため、実テキスト2本の
-     display 切替にする＝隠れた側は a11y ツリーからも外れ、読み上げは常に1語。 */
-  .stepper .step-full { display: none; }
-  .stepper .step-short { display: inline; }
+  .stepper button > span { width: 21px; height: 21px; }
   .operation-grid { grid-template-columns: 1fr; }
   .workflow-panel { min-height: 0; padding: 20px 16px; }
   .context-panel { position: static; order: -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 10px; }

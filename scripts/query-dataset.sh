@@ -42,7 +42,19 @@ RESPONSE=$(curl -sS --max-time 30 -X POST \
   -d "{\"sql\": $ESCAPED_SQL}" \
   "https://$INSTANCE/api/query/v1/execute/$DATASET_ID") || domo_neterr
 echo "$RESPONSE" | "$PYTHON_BIN" -c "
-import json, sys
+import json, sys, unicodedata
+# 全角(W/F)は端末で2桁ぶん占める。len() ではなく表示幅で列幅計算・パディングしないと
+# 日本語を含む列が右へずれて桁が揃わない（TK-007）。
+def _dw(s): return sum(2 if unicodedata.east_asian_width(c) in ('W','F') else 1 for c in str(s))
+def _pad(s, n):
+    s=str(s)
+    if _dw(s)>n:
+        out=''
+        for c in s:
+            if _dw(out)+_dw(c)>n-1: break
+            out+=c
+        s=out+'…'
+    return s+' '*max(0,n-_dw(s))
 
 resp = json.load(sys.stdin)
 cols = resp.get('columns', [])
@@ -53,17 +65,17 @@ if not cols:
     print(json.dumps(resp, indent=2)[:1000])
     sys.exit(0)
 
-# Compute column widths
-widths = [max(len(str(c)), max((len(str(r[i])) for r in rows), default=0)) for i, c in enumerate(cols)]
+# Compute column widths by display width (全角=2桁)
+widths = [max(_dw(c), max((_dw(r[i]) for r in rows), default=0)) for i, c in enumerate(cols)]
 widths = [min(w, 40) for w in widths]
 
-# Print header
-print('  '.join(c[:widths[i]].ljust(widths[i]) for i, c in enumerate(cols)))
+# Print header（セパレータは表示幅ぶんのハイフン＝各桁1列で一致）
+print('  '.join(_pad(c, widths[i]) for i, c in enumerate(cols)))
 print('  '.join('-' * w for w in widths))
 
 # Print rows
 for r in rows:
-    print('  '.join(str(r[i])[:widths[i]].ljust(widths[i]) for i in range(len(cols))))
+    print('  '.join(_pad(r[i], widths[i]) for i in range(len(cols))))
 
 print()
 print(f'{len(rows)} row(s).')

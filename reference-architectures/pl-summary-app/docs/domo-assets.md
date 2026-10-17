@@ -19,7 +19,7 @@
 | 開発ガイド | `dev-guide-app/`（同梱ランタイムで公開） | App Studio ページ2の教材 |
 
 名札運用（`PL_SANDBOX_SUFFIX`）ではオブジェクト名にサフィックスを付けます。alias は変えません。
-詳しい手順は [セットアップガイド](setup-guide.md) を参照してください。
+詳しい手順は [デプロイ・ランブック](ai-rebuild-runbook.md) を参照してください。
 
 ## 状態の保存先
 

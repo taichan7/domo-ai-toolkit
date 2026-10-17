@@ -26,8 +26,19 @@ if [[ -z "$FLOW_ID" ]]; then
   RESPONSE=$(curl -sS --max-time 30 "${DOMO_CURL_AUTH_ARGS[@]}" \
     "https://$INSTANCE/api/dataprocessing/v1/dataflows") || domo_neterr
   echo "$RESPONSE" | "$PYTHON_BIN" -c "
-import json, sys
+import json, sys, unicodedata
 from collections import Counter
+# 全角(W/F)は端末で2桁ぶん占めるため表示幅でパディング/切り詰めする（TK-007）。
+def _dw(s): return sum(2 if unicodedata.east_asian_width(c) in ('W','F') else 1 for c in str(s))
+def _pad(s, n):
+    s=str(s)
+    if _dw(s)>n:
+        out=''
+        for c in s:
+            if _dw(out)+_dw(c)>n-1: break
+            out+=c
+        s=out+'…'
+    return s+' '*max(0,n-_dw(s))
 
 flows = json.load(sys.stdin)
 # /dataflows は成功時に配列を返すが、認証切れ/エラー時は dict を返す。dict を
@@ -60,16 +71,16 @@ for code, count in codes.most_common():
 print()
 
 print('Failing dataflows:')
-print('{:<8}  {:<60}  {:<14}  {}'.format('ID', 'NAME', 'CODE', 'MESSAGE'))
+print('{}  {}  {}  {}'.format(_pad('ID',8), _pad('NAME',60), _pad('CODE',14), 'MESSAGE'))
 print('-' * 120)
 for f in failed:
     errors = (f.get('lastExecution') or {}).get('errors', []) or []
     code = errors[0].get('code', '') if errors else ''
     msg = errors[0].get('localizedMessage', '')[:60] if errors else ''
-    print('{:<8}  {:<60}  {:<14}  {}'.format(
-        str(f.get('id','')),
-        (f.get('name','') or '')[:60],
-        code,
+    print('{}  {}  {}  {}'.format(
+        _pad(f.get('id',''), 8),
+        _pad(f.get('name','') or '', 60),
+        _pad(code, 14),
         msg,
     ))
 print()

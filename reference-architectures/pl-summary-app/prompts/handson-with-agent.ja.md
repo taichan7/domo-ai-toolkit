@@ -7,7 +7,7 @@
 > **最初に自分の OS をエージェントへ伝える**（例：「私の PC は Windows です。コマンドは PowerShell で
 > 提示してください」）。以下の例は macOS / Git Bash と Windows PowerShell の両方を併記する。
 
-> **エージェントへ：** まず同梱の `AGENT.md` と `README.md` を読み、以降は**上から 1 ステップずつ**案内する。
+> **エージェントへ：** まず同梱の `AGENTS.md` と `README.md` を読み、以降は**上から 1 ステップずつ**案内する。
 > 各ステップで「私がやること（コピペするコマンド）」と「あなたがやること」を分け、私の「できた」を待って次へ進む。
 > 本番への `domo publish`・データ変更・削除は**毎回**ユーザーの確認を取る。専門用語は短く補足する。
 
@@ -137,7 +137,7 @@ python3 scripts/provision_workflows.py sync-manifest   # plReportApiを対象イ
 cd pro-code && domo publish && cd -                   # Pro-Code 公開（§5(3) と同じ・id は外してある）
 python3 scripts/provision_domo.py app-studio          # 自分専用 DataApp にカード埋め込み
 python3 scripts/provision_domo.py verify              # ok: true
-# AI 長文レポートを出すには WF-01 を手動実行（手順は [docs/setup-guide.md](../docs/setup-guide.md) の STEP 6「ワークフロー層の配備・実行」）→ 約25分で AppDB に生成
+# AI 長文レポートを出すには WF-01 を手動実行（手順は [docs/ai-rebuild-runbook.md](../docs/ai-rebuild-runbook.md) の STEP 6「ワークフロー層の配備・実行」）→ 約25分で AppDB に生成
 ```
 
 > 開発ガイドのタブ（App Studio ページ2）まで自分の DataApp に足すなら:
