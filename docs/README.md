@@ -19,6 +19,8 @@ Guides and references. Most guides have a Japanese twin (`*.ja.md`).
 | [domo-magic-etl-reference.md](domo-magic-etl-reference.md) | Per-tile / per-engine Magic ETL feature reference |
 | [domo-workflow-reference.md](domo-workflow-reference.md) | Per-shape / per-action Domo Workflows reference |
 | [domo-cards-reference.md](domo-cards-reference.md) | Standard card / chart types |
+| [domo-cards-configuration.md](domo-cards-configuration.md) / [ja](domo-cards-configuration.ja.md) | Native-card bindings, properties, definition authoring and app placement |
+| [domo-card-config-catalog.json](reference/domo-card-config-catalog.json) | Searchable role/property metadata for 71 observed chart codes; query with `scripts/domo-card-tools.py` |
 
 ## Deep references (clone & migration work)
 

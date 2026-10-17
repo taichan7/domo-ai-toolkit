@@ -1,179 +1,120 @@
-# Domo Standard Cards Skill
+---
+name: domo-cards
+description: Analyze, select, create, or configure native Domo standard cards from real definitions, and choose native cards versus Pro Code when building apps or dashboards.
+---
 
-Use this when creating, editing, or reasoning about **standard Domo cards** (the built-in chart
-types added from a Dataset — *not* Pro Code / custom apps). Companion background + full catalog:
-[`../docs/domo-cards-reference.md`](../docs/domo-cards-reference.md). To put standard cards **inside a
-Pro Code app / App Studio page**, see [`domo-procode-embedded-cards.md`](domo-procode-embedded-cards.md).
+# Domo Standard Cards
 
-## What "standard card" means (verified live on maintenance-instance, 2026-09-05)
+Use native cards for requirements they can satisfy. Deliver a Domo app as an App Studio container
+with standard KPI cards, adding Pro Code for demonstrated gaps such as transactional write-back,
+custom interactions, or unsupported diagrams. Native cards are separate Domo objects, not resources
+inside a Pro Code `manifest.json`; a Phoenix chart drawn by custom JavaScript is still Pro Code.
 
-- Standard card = `cardType: "kpi"`. Its chart is chosen by `metadata.chartType`, always in the
-  **`badge_*`** family. Four codes are confirmed live here (`badge_vert_bar` = Vertical Bar,
-  `badge_pie` = Pie, `badge_singlevalue` = Single Value, `badge_basic_table` = a basic table). The full
-  set of `badge_*` codes **is published** `[DOC]` — the open-source `domo-phoenix` `CHART_TYPE` enum
-  (`src/enums/phoenix-chart-type.ts`, GitHub `DomoApps/domo-phoenix`) lists ~196 of them as its enum
-  *values*. So look a code up in that enum rather than inventing one — but still confirm the exact code a
-  given chart uses by reading it off a real card of that type (enum membership ≠ proof that a specific
-  instance's card carries that exact code).
-- `cardType: "domoapp"` = **Pro Code** custom app (out of scope for this skill).
-  `cardType: "document"` = an uploaded file. Neither is a standard card.
-- `metadata.chartVersion` is a per-chart schema version (seen: `6`, `12`, …). It matters: on modern
-  cards (`chartVersion ≥ 12`) `metadata.inputTable` is **null** and the column→axis/series/aggregation
-  config is **not** exposed through the content API — it lives in the internal Analyzer graph definition.
+## Read only what the task needs
 
-## How many chart types really exist (don't say "hundreds")
+| Task | Resource |
+|---|---|
+| Pick a chart family or find a native alternative | [Chart reference](../docs/domo-cards-reference.md) |
+| Inspect a dashboard, map columns, configure properties, create/update from a template | [Configuration and authoring guide](../docs/domo-cards-configuration.md) |
+| Find exact required/optional mappings, property values and dependencies | Query [the offline catalog](../docs/reference/domo-card-config-catalog.json) using `domo-card-tools.py` below |
+| Place native cards and Pro Code together; filters, SDK and embedding | [Native cards plus Pro Code](domo-procode-embedded-cards.md) and [App Studio](domo-appstudio.md) |
+| Cross-instance creation/migration | [Native KPI clone recipe](domo-cross-instance-clone.md#section-11--native-kpi-cards) |
+| Calculated fields or host Variables/filters | [Beast Modes](domo-beast-mode.md) / [Variables and filters](domo-variables-filters.md) |
 
-The "hundreds of card types" framing is an artifact of counting picker entries, not distinct charts.
-Grounded numbers:
+## Requirement to working card
 
-- **~196 selectable picker entries** — Domo's own charting-engine enum (`domo-phoenix` `CHART_TYPE`)
-  has ~196 members. That is what the "Add a Chart" picker offers.
-- **Domo markets "150+"** chart types `[DOC]` (domo.com visualizations-and-dashboards page).
-- **A few dozen genuinely *distinct* chart types** (~40–70 depending on how strictly you split families).
+1. State the analytic question, dimensions/measures, aggregation, date grain/range, target units,
+   and required interactions. Check real dataset/formula types. Choose the native family first.
+2. Find the closest **exact chart code and binding shape** in the catalog and actual template
+   definitions. Inspect the supplied pages/cards rather than inventorying unrelated instance assets.
+3. Read the template's full v3 definition. Record main projections/roles, formulas, filters,
+   grouping/order, date configuration, summary subscription, overrides, controls, and drill behavior.
+4. Reuse/copy a known graph. For deeper edits/new cards, follow the v3 read→write transformations in
+   the guide; map all references explicitly. A metadata title update alone does not retarget a graph.
+5. Re-read the resulting target card, verify bindings and edited settings, then validate data,
+   rendering and host interactions through the authorized verification workflow. State what was
+   verified: retrieval, save, data correctness and visual behavior are separate evidence levels.
+6. Put the result on the app's page and verify layout/content registration. Use Pro Code only for
+   the remaining requirement. Lack of an example does not establish a native-card limitation.
 
-The picker count is inflated by: **orientation twins** (~44 `HORIZ_*` horizontal copies — orientation is
-a property, not a new chart), **preinstalled map geographies** (one map type × ~37 regions), and
-**render-style variants** (curved / stepped / symbol / running-total flavors of the same base). Design
-by choosing a *family* and a variant, not by memorizing 196 names.
-
-## Chart type families (for selection)
-
-Pick the family by the question the card answers; pick the variant for shape. Full per-variant lists are
-in the companion reference. This is for *selection* — the exact per-chart config is authored through the
-Analyzer / clone-and-retarget, not hand-written JSON.
-
-| Family | Use for | Representative variants |
-|---|---|---|
-| **Bar / Column** | compare categories | vertical/horizontal, grouped, stacked, 100% stacked, waterfall, bullet, Pareto, Marimekko, histogram, running-total |
-| **Line** | trend over time | line, curved, step, symbol, multi-line, running-total |
-| **Area** | trend + magnitude | area, stacked, 100% stacked, curved, step, stream |
-| **Combo (bar + line)** | two measures, different scales | grouped/stacked bar with line or symbols |
-| **Pie / Donut** | part-to-whole (few slices) | pie, donut, Nightingale rose, nautilus |
-| **Funnel** | stage drop-off | funnel, folded, stream funnel, funnel bars |
-| **Treemap** | nested part-to-whole | treemap |
-| **Table / Pivot** | detail + cross-tab | Mega Table, Pivot, Flex Table, HTML Table, Heatmap Table |
-| **Single value / Gauge** | one KPI vs target | single-value, multi-value, radial, filled, progress-bar, comparative-fill, face, waffle, shape |
-| **Map / Geo** | value by geography | country, world, regional, U.S. county, lat-long point/route |
-| **Scatter / Bubble** | correlation of 2–3 measures | scatter, XY line, category scatter |
-| **Data science** | stats / prediction | forecasting, predictive, outliers, box plot, SPC, correlation/confusion matrix |
-| **Lollipop** | ranked categories | grouped/stacked, ± line |
-| **Period-over-Period** | this period vs last | bar-line, variance, trendline (PoP flavors of the above) |
-| **Filter / selector cards** | dashboard controls | slicer, checkbox, radio, range slider, date selector, dropdown |
-| **Misc** | specialized | radar, word cloud, heat map, calendar, Gantt, candlestick, high-low, Sankey, symbol |
-
-Exhaustive per-variant catalog + evidence tiers: [`../docs/domo-cards-reference.md`](../docs/domo-cards-reference.md).
-
-Discover what actually exists on an instance (there is **no** chart-type catalog endpoint —
-`/api/content/v1/cards/kpi/definitions`, `/kpi/types`, `/charttypes` all 404/405). Enumerate from live
-data instead:
+## Discovery and exact configuration
 
 ```bash
-# POST /api/search/v1/query — page through cards, tally distinct standard chartTypes
-curl -sS -X POST -H "X-Domo-Authentication: $SID" -H 'Content-Type: application/json' \
-  -d '{"count":200,"offset":0,"query":"*","entityList":[["card"]]}' \
-  "https://$INSTANCE/api/search/v1/query"
-# each searchObject: cardType (keep "kpi") + chartType (the badge_*). Page offset by 200.
+# Offline, no authentication: inspect one family/property at a time.
+python3 scripts/domo-card-tools.py catalog --search gauge
+python3 scripts/domo-card-tools.py catalog badge_line_bar --property format
+python3 scripts/domo-card-tools.py catalog badge_pivot_table --property subtotal
+
+# Authenticated read-only inspection; INSTANCE and DOMO_TOKEN or SID must be exported.
+python3 scripts/domo-card-tools.py inspect --page https://example.domo.com/page/123
+python3 scripts/domo-card-tools.py inspect --card 456
 ```
 
-## Card CRUD API (verified live, `X-Domo-Authentication: <SID>`; no admin PAT needed)
+Repeat `--page` / `--card` for a supplied set. The tool skips non-KPI cards, deduplicates IDs and
+reports retrieval failures. It omits source titles, column names, formulas, values and annotations;
+its structural report is not a write body. Read the guide for authentication/full-body retrieval.
 
-| Op | Call | Result |
+The 2026-10-17 study read **154 cards / 71 chart codes / 110 configured property keys**. The catalog
+also contains public Phoenix mapping/property metadata: **820 distinct property keys**, including
+types, value lists, prerequisites, feature flags and per-chart variations. Distinguish [LIVE] stored
+settings from [DOC] possibilities. No save/render test was performed in that study.
+
+## The configuration traps that matter
+
+- Standard charts normally have `type/cardType: "kpi"` and a `badge_*` chart code. `domoapp` and
+  `document` are different card types. A separate `Text` card is different from the KPI chart
+  `badge_textbox`. `badge_basic_table` is Mega Table [DOC]; do not equate it with every table code.
+- **Modern definitions are readable.** V1 metadata may show `inputTable:null`, but
+  `PUT /api/content/v3/cards/kpi/definition` with `{dynamicText:true,variables:true,urn:"<id>"}`
+  retrieves `definition.subscriptions` and `definition.charts`. All 154 retrieved definitions had
+  chartVersion 12 and `inputTable:false`. Null/false does not mean the bindings are unavailable.
+- Presentation lives in `definition.charts.main.overrides`; data roles and aggregation live in
+  `definition.subscriptions.main.columns[]`. Query filters/order/grouping/dates, conditional formats,
+  card controls, and page filters/Variables are separate layers. Do not rewrite one as another.
+- Do not force ITEM/VALUE onto every chart: filled gauges use CURRENT; modern bubbles use XTIME for
+  X and BUBBLESIZE for size; Gantt needs START_DATE/END_DATE; calendar needs DATE/EVENT; pivot uses
+  ROW/COLUMN/VALUE. The catalog gives per-code required slots and maxima.
+  Those documented slots describe Phoenix input; Analyzer projections can differ (the observed
+  `badge_line_bar` templates use numeric SERIES columns without VALUE). Preserve the real graph.
+- Stored overrides were strings, including `"true"`, `"false"` and numbers. Preserve representation,
+  casing, dependencies and missing/default distinctions. `overrides:null` means defaults, not lack
+  of configurable properties. A setting's schema/value list can differ between chart codes.
+- Source formula lists may contain unused dataset formulas; inspect actual `formulaId` references
+  and transitive Beast Mode dependencies. Never leave a reference without a definition/resolution.
+- Do not invent a summary subscription: preserve a template with `main` only when it has no
+  `big_number`. Where present, the summary query can differ from the plotted query.
+
+## Instance API operations
+
+These are internal instance routes [REPO/LIVE], with SID verified in the earlier CRUD work and full
+definition reads verified in the 2026-10-17 study. Follow the current repository's authorization for
+writes; endpoint existence does not authorize changing a supplied source dashboard.
+
+| Purpose | Operation | Evidence / caveat |
 |---|---|---|
-| **Read** | `GET /api/content/v1/cards?urns={id,id}&parts=metadata,datasources,conditionalFormats,slicers,drillPath,dateInfo` | `200` — array of card objects. |
-| **Clone** | `POST /api/content/v1/cards/{id}/copy` body `{}` | `200` — **persists a NEW card owned by the caller**; returns the full new card. The reliable authoring primitive. |
-| **Update** | `PUT /api/content/v1/cards/{id}` body `{"title":"…", …}` | `200` — partial merge (an empty `{}` body is a no-op). |
-| **Delete** | `DELETE /api/content/v1/cards/{id}` | `200`; a subsequent read returns an empty array. |
-| Raw create | `POST /api/content/v1/cards` | `400` without a correct body — the endpoint exists but the full-definition body is undocumented and version-brittle; **do not hand-roll it** (see Limitations). |
+| Supplied page inventory | `GET /api/content/v1/pages/{pageId}/cards` | [LIVE] list; includes non-KPI objects |
+| Metadata | `GET /api/content/v1/cards?urns={ids}&parts=metadata,datasources,conditionalFormats,slicers,drillPath,dateInfo` | [REPO] lightweight properties, not the full graph |
+| Full definition **read** | `PUT /api/content/v3/cards/kpi/definition` | [LIVE] body `{dynamicText:true,variables:true,urn:"<id>"}`; retrieves without saving |
+| Independent copy | `POST /api/content/v1/cards/{id}/copy` with `{}` | [REPO] creates a new card; source remains unchanged |
+| Simple metadata update | `PUT /api/content/v1/cards/{id}` | [REPO] title partial-merge verified; not proof of arbitrary graph retargeting |
+| New native KPI on a page | `PUT /api/content/v3/cards/kpi?pageId={pageId}` | [REPO] full transformed definition, not the raw read response |
+| Update a native KPI | `PUT /api/content/v3/cards/kpi/{urn}` | [REPO] read target first; preserve modification/identity fields |
+| Delete a disposable copy | `DELETE /api/content/v1/cards/{id}` | [REPO] source selection/authorization must be explicit |
 
-A card object's shape: top-level `id/urn/type/title/description/ownerId/creatorId/datasources[]`, plus a
-`metadata` blob (`chartType`, `chartVersion`, `columnFormats`, `columnAliases`, `SummaryNumberFormat`,
-`calendar`, `dynamicTitle/Description`). Read parts you don't need out, not in.
+The [authoring guide](../docs/domo-cards-configuration.md#authoring-reuse-a-graph-then-verify-the-saved-result)
+explains formula/conditional-format wrappers, read-only fields, dataProvider, and preservation
+requirements. Reuse that procedure instead of constructing a new graph from guessed JSON.
 
-## Public Platform Cards API (`api.domo.com`, OAuth2 — 7 ops, experimental) `[DOC]`
+## Public API and boundaries
 
-Distinct from the internal content API above (different host, different auth). The **public** Platform Cards API
-is **not create-only** — the dev-portal spec documents a **7-op** surface. Auth is OAuth2 `clientCredentials`
-(`tokenUrl /oauth/token`, empty `scopes {}`). Treat the **whole** surface as **experimental**: the same
-403/500/"Network Error" reliability caveat in Limitations applies to every op — probe per-instance before relying
-on it. Types/shapes below; do **not** hand-build a `CardDefinition` (that invites the brittle authoring this skill
-steers away from — see clone-and-retarget).
+The distinct OAuth API on `api.domo.com` documents **seven Cards operations**, including read/create/
+update definitions and drill operations; see [the public API reference](../docs/domo-cards-reference.md#public-platform-cards-api).
+Its `CardDefinition` is not the v3 instance definition shape. Historical create failures do not prove
+every public operation fails; verify the selected operation on the target before depending on it.
+`domo publish` creates Pro Code cards, not native KPI cards. A render-image endpoint provides a
+snapshot, not a live embedded card; use [the image skill](domo-get-kpi-card-image.md) for that surface.
 
-- **List** — `GET /v1/cards` (query `limit` default 35, `offset` default 0) → `CardSummaryList{cards[]:CardSummary, totalCardCount:int64}`; `CardSummary = {cardTitle, cardUrn, lastModified:int64, ownerId:int64, ownerName, pages:int64[], type}`. Overlaps the already-charted internal `POST /api/search/v1/query` enumeration.
-- **Get** — `GET /v1/cards/{cardUrn}` → `CardSummary`.
-- **Create** — `POST /v1/cards/chart` (body `CardDefinition` → `CardDefinition`); optional `pageId` (int64) query param inserts the new card into a Page/Dashboard.
-- **Get definition** — `GET /v1/cards/chart/{cardUrn}` → the full `CardDefinition` whose `chartBody` is the column→axis/aggregation query model (a `Component`: `columns[]`/`groupBy`/`orderBy`/`filters`/`limit`/`offset`, columns carrying `aggregation`). This is the documented (**if experimental**) way to **READ** the equivalent of the graph the internal content API withholds as `inputTable: null` on `chartVersion ≥ 12` (nuances the top Limitation below).
-- **Update definition** — `PUT /v1/cards/chart/{cardUrn}` (body `CardDefinition` → `CardDefinition`). Takes a full hand-constructed `CardDefinition`, so **clone-and-retarget** (internal `PUT /api/content/v1/cards/{id}`) stays the preferred edit path — not this.
-- **Add drill view** — `POST /v1/cards/chart/{cardUrn}/drill` (body `CardDefinition`); also needs a hand-rolled `CardDefinition`.
-- **Get drill properties** — `GET /v1/cards/chart/{cardUrn}/drillpath` → `DrillPathProperties{allowTableDrill:bool, drillOrder[]:string}`. Drill info is already reachable via the internal read op's `parts=…,drillPath`.
-
-## Recommended authoring path: clone-and-retarget (round-trip verified 2026-09-05)
-
-Building a card's chart definition from raw JSON is undocumented and brittle. The maintainable,
-AI-friendly path is to **start from a known-good template card and mutate it**:
-
-1. **Clone** a template card of the right `chartType` → `POST /api/content/v1/cards/{templateId}/copy`.
-   You now own the copy.
-2. **Retarget / edit** via `PUT /api/content/v1/cards/{newId}` — change `title`, formatting, and
-   (where applicable) datasource. Deeper column/series edits are done in the **Analyzer UI**, which is
-   the supported editor for the graph definition.
-3. **Verify** by reading it back; **delete** disposable test cards when done.
-
-Verified end-to-end on a self-owned card: clone → `PUT {"title":…}` (the read-back confirmed the title
-actually changed) → delete → gone; the source card was untouched. Keep test cards named `zz-…` and
-delete them.
-
-## Picking the right chart
-
-Match the *question* to the family (table above), then pick the variant for shape. Rules of thumb:
-
-- **Trend over time →** Line (many points) or Area (magnitude matters). Don't use Pie for time.
-- **Compare categories →** Bar/Column. Horizontal when labels are long; grouped for a second dimension,
-  stacked for part-to-whole *within* each bar.
-- **Part-to-whole →** Pie/Donut only for ≤5 slices; Treemap or 100%-stacked Bar for more.
-- **One KPI vs a target →** Single value / Gauge. Add a comparison (PoP) instead of a second card when
-  the point is "vs last period."
-- **Detail / cross-tab →** Table / Pivot. Reach for a chart only when a shape reveals more than numbers.
-- **Correlation →** Scatter (2 measures) or Bubble (3). **By geography →** a Map family.
-- **Dashboard controls →** selector cards (slicer/dropdown/date) drive other cards on the page; they are
-  standard cards too.
-
-## Authoring paths, ranked for a headless agent
-
-| Path | Reliable headless? | Notes |
-|---|---|---|
-| **Clone a golden template + retarget** (`POST …/copy` then `PUT`) | **Yes — recommended** | Inherits a correct modern-card graph you can't hand-write. Cleanest when the clone reuses the template's dataset. |
-| Analyzer UI | No (not headless) | The canonical human path and the *source of truth* for a modern card's graph. Build your golden templates here. |
-| Public Platform Cards API `POST /v1/cards/chart` (OAuth2, api.domo.com) | Experimental | **Documented** from-scratch path with a `CardDefinition` (chartType, dataSetId, `columns[]` with axis/series mapping + aggregation). But 2025 community reports show 403/500/"Network Error" against the documented sample — verify per-instance before relying on it. |
-| pydomo SDK | N/A | Has **no** cards module (datasets/streams/pages/users only). |
-| `ryuu` / `domo publish` CLI | Yes, but wrong object | Creates **Pro Code** (`domoapp`) cards, not standard KPI cards. |
-
-**Beast Mode** (CASE/aggregation calculated fields) is a *component* of a card, not a create method —
-generate the formula text with AI, but wire it in via the Analyzer or a cloned template.
-
-## Limitations (be honest about these)
-
-- **The *internal* content API does not expose a modern card's chart definition.** For
-  `chartVersion ≥ 12`, `/api/content/v1/cards` (SID auth) returns `metadata.inputTable: null` and no
-  writable column→axis/series/aggregation config — that graph lives in the internal Analyzer definition.
-  This is why clone-and-retarget (not raw create against this API) is the reliable path. (The **public**
-  `GET /v1/cards/chart/{cardUrn}` op is the documented — *if experimental* — way to READ the equivalent
-  graph as a `CardDefinition.chartBody`; see the Public Platform Cards API section.)
-- **A documented *public* from-scratch API does exist, but is unreliable in practice.** The Platform
-  Cards API `POST /v1/cards/chart` (OAuth2, api.domo.com) defines a `CardDefinition` with column
-  mapping + aggregation — so "there is no documented way" is *false*. However, multiple 2025 community
-  reports show it returning 403/500/"Network Error" against Domo's own sample body. Treat it as
-  documented-but-experimental: probe it on the target instance before designing around it.
-- `POST /api/query/v1/execute/{cardId}` is the data-query/render pipeline (`400` without a body); it is
-  for *reading* card data, not authoring the chart. `PUT /api/content/v1/cards/kpi/{urn}/render` is a
-  documented endpoint but returns a **static image** (needs a developer token), not a live card.
-- There is no chart-type *catalog* endpoint — enumerate from live cards, the family table above, or the
-  `domo-phoenix` `CHART_TYPE` enum.
-
-## Safety (shared instances such as `maintenance-instance`)
-
-- Create only clearly-named disposable cards you own (`zz-…-verify-*`) and delete them when done.
-- **Never** modify, delete, or inventory a card you did not create. `POST …/copy` makes you the owner of
-  the *copy* only — the source is unchanged; still don't clone others' cards except as a throwaway you
-  immediately delete.
-- Never commit the SID, developer tokens, or raw card exports. Treat live card content as sensitive
-  (real cards carry customer column names) — summarize, don't paste into commits/handoffs.
+Do not infer universal endpoint absence from a few 404s. No chart-catalog route is established by
+this study; use primary enum/property documentation and supplied card definitions. Keep credentials,
+raw definitions, source IDs, customer labels and annotation content out of public skill artifacts.
+Analyze authorized sources without modifying them; use a separate owned target when authoring.

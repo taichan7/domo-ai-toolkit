@@ -1,54 +1,106 @@
 # Domo Standard Cards — Chart Type Reference
 
-Exhaustive companion to the [`domo-cards.md`](../skills/domo-cards.md) skill: the full family catalog of
+Companion to the [`domo-cards.md`](../skills/domo-cards.md) skill: a family catalog of
 standard (`cardType: "kpi"`) chart variants, with an explicit evidence tier on every load-bearing
 claim. Read the skill first for the CRUD API and the authoring recipe; use this doc when you need to
 know whether a given chart exists and which family it belongs to.
 
 ## Evidence tiers (what to trust)
 
-- **[LIVE]** — verified on a real instance (maintenance-instance, 2026-09-05) via the card CRUD API.
-- **[ENUM]** — from Domo's charting-engine enum `domo-phoenix` `CHART_TYPE` (~196 members) and Domo KB
+- **[LIVE]** — retrieved from real cards; 2026-10-17 coverage is definition reads, not save/render testing.
+- **[ENUM]** — from Domo's charting-engine enum `domo-phoenix` `CHART_TYPE` (versioned snapshot) and Domo KB
   "Chart Types" articles. Reliable for *names*, but a picker entry ≠ a distinct chart.
 - **[DOC]** — from Domo product/developer documentation.
 - **[INFER]** — reasoned inference, not independently confirmed; flagged so it is not mistaken for fact.
 
-## The count, honestly [ENUM]
+## Observed chart codes and required mappings
 
-There are **not "hundreds" of distinct chart types.** Domo's engine enum exposes **~196 selectable
-picker entries**; Domo markets **"150+"** `[DOC]`; the number of genuinely *distinct* chart types is **a few
-dozen (~40–70)**. A naive family-by-family sum of documented picker entries lands near **~170** before
-removing cross-listed types. The gap between "170 picker entries" and "a few dozen distinct charts" is
-inflation from three sources:
+The 2026-10-17 study retrieved 154 unique KPI definitions across five supplied dashboards,
+covering **71 chart codes**. This is observed coverage, not the total number Domo supports.
+Picker variants include orientations, region maps and rendering styles; select a family and
+then the exact variant without relying on a fixed platform-wide count.
 
-- **Orientation twins** — ~44 `HORIZ_*` horizontal copies of vertical charts. Orientation is a property.
-- **Preinstalled map geographies** — one map chart type multiplied across ~37 regions/countries.
-- **Render-style variants** — curved / stepped / symbol / running-total flavors of the same base chart.
+Names and required slots below come from the public Phoenix documentation [DOC]; counts come
+from full live definitions [LIVE]. Code-derived names are identified, and the UI label of
+`badge_table` remains unverified. Optional mappings, maxima, property keys/value lists and
+dependencies are in the [configuration guide](domo-cards-configuration.md) and
+[queryable catalog](reference/domo-card-config-catalog.json). Read-time evidence is not save/render evidence.
+The required mappings describe Phoenix inputs; actual Analyzer subscription roles may differ.
+Preserve a valid template projection rather than enforcing this table as a save validator.
 
-Cross-listing further inflates any raw total: Spark Bar sits under Bar *and* Misc; Spark Line under Line
-*and* Misc; Box Plot under Data Science *and* Misc; Funnel Bars under Bar *and* Pie/Funnel; the
-"…with Line/Symbols" combos under both Bar and Line. The catalog also shifts release to release (Bubble
-was folded into Scatter; Correlation/Confusion Matrix were added later). Treat the lists below as the
-current shape, not a frozen contract.
-
-## `badge_*` internal codes [4 LIVE-confirmed; full set in the `domo-phoenix` enum]
-
-`metadata.chartType` on a KPI card is a `badge_*` code. **Only four are confirmed from a live card:**
-
-| chartType | Chart |
-|---|---|
-| `badge_vert_bar` | Vertical Bar |
-| `badge_pie` | Pie |
-| `badge_singlevalue` | Single Value |
-| `badge_basic_table` | a basic table (exact label unconfirmed — could be HTML Table or Mega Table) [INFER] |
-
-The four above are confirmed from a live card. The **full set of `badge_*` codes is published** in the
-open-source `domo-phoenix` `CHART_TYPE` enum (`src/enums/phoenix-chart-type.ts`, GitHub
-`DomoApps/domo-phoenix`) as its enum *values* `[ENUM]` — so look a code up there rather than inventing
-one. Still confirm the exact code a given chart actually uses by reading `metadata.chartType` off a real
-card of that type via `GET /api/content/v1/cards?urns=<id>&parts=metadata` (enum membership ≠ proof a
-specific instance's card carries that exact code). **Never fabricate a `badge_*` code that is not in the
-enum.**
+| Exact chart code | Name | Cards | Required mappings [DOC] |
+|---|---|---:|---|
+| `badge_basic_table` | Mega Table | 1 | VALUE |
+| `badge_bubble` | Bubble (legacy) | 1 | XTIME, VALUE, SERIES |
+| `badge_bullet` | Bullet | 1 | ITEM, VALUE |
+| `badge_calendar` | Calendar | 2 | DATE, EVENT |
+| `badge_checkbox_selector` | Checkbox selector | 2 | ITEM |
+| `badge_curved_symbolline` | Curved symbol line | 2 | ITEM, VALUE |
+| `badge_curvedline` | Curved line | 3 | ITEM, VALUE |
+| `badge_donut` | Donut | 2 | ITEM, VALUE |
+| `badge_dropdown_selector` | Dropdown selector (code-derived label) | 1 | ITEM |
+| `badge_facegauge` | Face | 1 | VALUE |
+| `badge_filledgauge` | Filled | 4 | CURRENT |
+| `badge_funnel` | Funnel | 1 | ITEM, VALUE |
+| `badge_funnel_bars` | Funnel bars | 1 | ITEM, VALUE |
+| `badge_funnel_swing` | Folded funnel | 1 | ITEM, VALUE |
+| `badge_gantt` | Gantt | 3 | ITEM, START_DATE, END_DATE |
+| `badge_gauge` | Radial | 1 | VALUE |
+| `badge_heatmap` | Heat map | 4 | ITEM, VALUE, SERIES |
+| `badge_heatmap_table` | Heatmap table (code-derived label) | 1 | VALUE |
+| `badge_highlow` | High low | 2 | CATEGORY, HIGH, LOW |
+| `badge_horiz_100pct` | 100% Stacked bar (Horizontal) | 1 | ITEM, VALUE, SERIES |
+| `badge_horiz_bar` | Bar (Horizontal) | 7 | ITEM, VALUE |
+| `badge_horiz_boxplot` | Box plot (Horizontal) | 1 | ITEM, VALUE |
+| `badge_horiz_dual_stackedbar` | Grouped and stacked (Horizontal) | 1 | ITEM, VALUE, SERIES |
+| `badge_horiz_line_clusterbar` | Line + grouped and stacked (Horizontal) | 1 | ITEM, VALUE, SERIES |
+| `badge_horiz_line_stackedbar` | Line + stacked bar (Horizontal) | 1 | ITEM, VALUE, SERIES |
+| `badge_horiz_multibar` | Grouped bar (Horizontal) | 1 | ITEM, VALUE, SERIES |
+| `badge_horiz_nestedbar` | Nested bar (Horizontal) | 1 | ITEM, VALUE, SERIES |
+| `badge_horiz_percentbar` | Percent of total (Horizontal) | 1 | ITEM, VALUE |
+| `badge_horiz_stackedbar` | Stacked bar (Horizontal) | 4 | ITEM, VALUE |
+| `badge_line_bar` | Line + grouped bar | 6 | ITEM, VALUE, SERIES |
+| `badge_line_clusterbar` | Line + grouped and stacked | 1 | ITEM, VALUE, SERIES |
+| `badge_line_stackedbar` | Line + stacked bar | 1 | ITEM, VALUE, SERIES |
+| `badge_map` | Map United States | 1 | ITEM, VALUE |
+| `badge_map_australia` | Map Australia | 1 | ITEM, VALUE |
+| `badge_map_canada` | Map Canada | 1 | ITEM, VALUE |
+| `badge_map_japan` | Map Japan | 2 | ITEM, VALUE |
+| `badge_multi_value` | Multi-value | 7 | VALUE |
+| `badge_pareto` | Pareto | 1 | ITEM, VALUE |
+| `badge_pie` | Pie | 4 | ITEM, VALUE |
+| `badge_pivot_table` | Pivot table | 1 | VALUE |
+| `badge_radar` | Radar | 1 | ITEM, VALUE, SERIES |
+| `badge_rttrendline` | Running total line | 5 | ITEM, VALUE |
+| `badge_singlevalue` | Single value | 3 | VALUE |
+| `badge_slicer` | Slicer | 1 | ITEM |
+| `badge_stackedtrend` | Stacked area | 1 | ITEM, VALUE, SERIES |
+| `badge_stepline` | Step line | 1 | ITEM, VALUE |
+| `badge_symbol_bar` | Symbol + grouped bar | 1 | ITEM, VALUE, SERIES |
+| `badge_symbol_stackedbar` | Symbol + stacked bar | 1 | ITEM, VALUE, SERIES |
+| `badge_symbolline` | Symbol line | 2 | ITEM, VALUE |
+| `badge_table` | Table (legacy code; UI label unverified) | 9 | VALUE |
+| `badge_textbox` | Textbox | 1 | ITEM |
+| `badge_treemap` | Treemap | 3 | ITEM, VALUE |
+| `badge_trendline` | Line | 3 | ITEM, VALUE |
+| `badge_two_trendline` | Multi-line | 6 | ITEM, VALUE |
+| `badge_vert_100pct` | 100% Stacked bar | 1 | ITEM, VALUE, SERIES |
+| `badge_vert_bar` | Bar | 5 | ITEM, VALUE |
+| `badge_vert_boxplot` | Box plot | 3 | ITEM, VALUE |
+| `badge_vert_bullet` | Bullet (Vertical) | 1 | ITEM, VALUE |
+| `badge_vert_dual_stackedbar` | Grouped and stacked | 1 | ITEM, VALUE, SERIES |
+| `badge_vert_multibar` | Grouped bar | 1 | ITEM, VALUE, SERIES |
+| `badge_vert_nestedbar` | Nested bar | 1 | ITEM, VALUE, SERIES |
+| `badge_vert_percentbar` | Percent of total | 1 | ITEM, VALUE |
+| `badge_vert_rtbar` | Running total bar | 1 | ITEM, VALUE |
+| `badge_vert_rtmultibar` | Running total grouped bar | 1 | ITEM, VALUE, SERIES |
+| `badge_vert_rtstackedbar` | Running total stacked bar | 1 | ITEM, VALUE, SERIES |
+| `badge_vert_stackedbar` | Stacked bar | 5 | ITEM, VALUE |
+| `badge_word_cloud` | Word cloud | 5 | ITEM, VALUE |
+| `badge_world_map` | Map World | 3 | ITEM, VALUE |
+| `badge_xy_line` | XY line | 1 | XTIME, VALUE |
+| `badge_xybubble` | Bubble | 3 | XTIME, VALUE |
+| `badge_xyscatterplot` | Scatter plot (legacy) | 3 | XTIME, VALUE, SERIES |
 
 ## Family catalog [ENUM]
 
@@ -111,16 +163,39 @@ Scatter, Symbol (vertical/horizontal), Symbol Overlay (vertical/horizontal), San
 
 ## Not standard chart cards
 
-- **Textbox / Note** and **Document / uploaded file** are card *types* (`cardType` ≠ `kpi`), not chart
-  badges. Included for completeness; excluded from the ~196 chart count.
+- A standalone **Text/Note** object and **Document/uploaded file** have non-KPI card types.
+  The separate `badge_textbox` is a KPI chart, observed in the study; do not conflate the two.
 - **Pro Code / custom app** = `cardType: "domoapp"` — see [`domo-procode-embedded-cards.md`](../skills/domo-procode-embedded-cards.md).
 
 ## Known uncertainties
 
-- `badge_*` codes beyond the four [LIVE] ones come from the `domo-phoenix` `CHART_TYPE` enum [ENUM]; confirm the exact code by reading it off a real card.
+- Codes outside the 71 observed types require additional live examples. Public enum/property membership alone does not prove target-instance save compatibility.
 - Whether each orientation/curve/step permutation is a truly separate picker entry vs. a property toggle
   is not always explicit in Domo docs; the KB lists them separately, so they are listed separately here.
 - Niche picker entries (e.g. "3-Metric Bar", standalone "100 Percent Stacked Bar" articles) appear in KB
   indexes but could not all be cross-checked against a family table [INFER].
 - Salesforce-hosted `domo-support.domo.com` pages are JS-rendered and were cross-checked against the
   static `www.domo.com/docs/s/article/*` mirror and search snippets, not scraped directly.
+
+## Public Platform Cards API
+
+[DOC] This is the distinct OAuth2 `clientCredentials` API on `api.domo.com` (`/oauth/token`,
+empty declared `scopes {}`). Its `CardDefinition` schema is different from the internal instance
+v3 definition. Historical community failures concern create requests; they do not establish that
+all seven operations fail. None of these public operations was exercised by the dashboard study.
+
+| Operation | Path | Documented shape / use |
+|---|---|---|
+| List | `GET /v1/cards` | `limit` default 35, `offset` default 0; `CardSummaryList{cards[], totalCardCount}` |
+| Get | `GET /v1/cards/{cardUrn}` | `CardSummary` |
+| Create | `POST /v1/cards/chart` | `CardDefinition` body/response; optional `pageId` query inserts into a dashboard |
+| Read definition | `GET /v1/cards/chart/{cardUrn}` | `CardDefinition`; `chartBody` contains columns/aggregation, grouping, ordering, filters and pagination |
+| Update definition | `PUT /v1/cards/chart/{cardUrn}` | Full `CardDefinition` body/response |
+| Add drill view | `POST /v1/cards/chart/{cardUrn}/drill` | `CardDefinition` body |
+| Read drill properties | `GET /v1/cards/chart/{cardUrn}/drillpath` | `DrillPathProperties{allowTableDrill, drillOrder[]}` |
+
+`CardSummary` declares `cardTitle`, `cardUrn`, `lastModified`, `ownerId`, `ownerName`, `pages[]`,
+and `type`. Do not infer extra list/search parameters or timestamp semantics from field names.
+For authoring in this workspace, the reusable v3 template-definition recipe in the
+[configuration guide](domo-cards-configuration.md) has repository precedent. Verify whichever
+API/auth world the target actually supports; do not mix host, credential, or definition shapes.
