@@ -13,7 +13,7 @@
 </head>
 <body>
   <a class="skip-link" href="#main-content">本文へ移動</a>
-  <div id="header">
+  <header id="header">
     <div class="header-content container">
       <div class="brand">
         <img class="brand-logo" src="logo.png" alt="シンプルスタイル" width="46" height="46">
@@ -25,16 +25,16 @@
       <div class="header-actions"><div class="selector">
         <label for="store-select" class="selector-label">店舗</label>
         <div class="select-shell">
-          <select id="store-select" aria-label="店舗を選択"></select>
+          <select id="store-select" disabled><option>読み込み中…</option></select>
         </div>
       </div>
-      <div class="workflow-actions"><button id="workflow-run" class="workflow-button" type="button" disabled>全社AIレポートを更新</button><button id="workflow-check" class="workflow-progress" type="button" disabled aria-label="レポート作成の進捗を新しいタブで開く">実行状況 <span aria-hidden="true">↗</span></button></div></div>
+      <div class="workflow-actions"><button id="workflow-run" class="workflow-button" type="button" disabled>全社AIレポートを更新</button><button id="workflow-check" class="workflow-progress" type="button" disabled aria-label="詳しい進捗（Domoの画面）を新しいタブで開く">実行状況 <span aria-hidden="true">↗</span></button></div></div>
     </div>
-  </div>
+  </header>
 
-  <div class="main-content container" id="main-content" role="main" tabindex="-1">
+  <main class="main-content container" id="main-content" tabindex="-1">
     <p id="workflow-status" class="workflow-status" role="status" aria-live="polite">AIレポートの更新状況を確認しています…</p>
-    <div id="message-container"></div>
+    <div id="message-container" role="alert"></div>
 
     <div id="loading" class="loading">
       <div class="spinner"></div>
@@ -46,7 +46,7 @@
         <div class="workflow-confirm-head"><div><p class="workflow-kicker">実行前の確認</p><h2 id="workflow-confirm-title">全店舗・全社のAIレポートを更新しますか？</h2></div><button class="workflow-close" type="submit" value="cancel" aria-label="確認を閉じる">×</button></div>
         <p class="workflow-scope">対象は全店舗と全社です。店舗セレクターの選択には限定されません。</p>
         <p class="workflow-recipient">通知先（実行者）: <span id="workflow-recipient-email">確認中…</span></p>
-        <p id="workflow-confirm-note">最新の損益データをもとに長文レポートを作成し、結果を保存します。AIクレジットを使用します。全社レポートのメール通知は上記の通知先（および設定済みの宛先）に送信します。店舗数に応じて時間がかかりますが、現在のレポートは引き続き閲覧できます。定期実行は行いません。</p>
+        <p id="workflow-confirm-note">最新の損益データをもとに長文レポートを作成し、結果を保存します。<b>全店舗＋全社ぶんのAIクレジットを使用します</b>。全社レポートのメール通知は上記の通知先（および設定済みの宛先）に送信します。<b>店舗数により数十分かかることがあります</b>が、現在のレポートは引き続き閲覧できます。定期実行は行いません。</p>
         <div class="workflow-confirm-actions"><button id="workflow-cancel" class="workflow-check" type="submit" value="cancel" autofocus>キャンセル</button><button id="workflow-confirm-yes" class="workflow-button" type="submit" value="default">はい、更新を実行する</button></div>
       </form>
     </dialog>
@@ -71,24 +71,25 @@
 
       <section id="panel-overview" class="view-panel active" role="tabpanel" aria-labelledby="tab-overview">
         <div id="kpis" class="kpi-grid"></div>
+        <p class="dept-foot">※ 純利益＝売上−営業費用（商品原価・総人件費・施設費・マケ費用・管理費用）。税金・営業外損益は含みません（会計上の当期純利益とは異なります）。</p>
 
         <div id="ai-quick" class="ai-quick hidden"></div>
 
         <div class="charts-grid">
           <section class="chart-card span-2">
-            <h2 class="chart-title" id="title-trend">売上・利益トレンド<span class="chart-note">直近24ヶ月</span></h2>
-            <div id="chart-trend" class="chart-body"></div>
+            <h2 class="chart-title" id="title-trend">売上・純利益トレンド<span class="chart-note">直近24ヶ月</span></h2>
+            <div id="chart-trend" class="chart-body" role="group" aria-labelledby="title-trend"></div>
             <div id="legend-trend" class="legend"></div>
           </section>
 
           <section class="chart-card">
-            <h2 class="chart-title" id="title-donut">費用構成<span class="chart-note"></span></h2>
-            <div id="chart-donut" class="chart-body donut-body"></div>
+            <h2 class="chart-title" id="title-donut">費用内訳<span class="chart-note"></span></h2>
+            <div id="chart-donut" class="chart-body donut-body" role="group" aria-labelledby="title-donut"></div>
           </section>
 
           <section class="chart-card span-3">
             <h2 class="chart-title" id="rank-title">店舗別 純利益ランキング</h2>
-            <div id="chart-rank" class="chart-body"></div>
+            <div id="chart-rank" class="chart-body" role="group" aria-labelledby="rank-title"></div>
             <div id="legend-rank" class="legend"></div>
           </section>
         </div>
@@ -103,24 +104,24 @@
           </div>
           <div class="charts-grid">
             <section class="chart-card span-2">
-              <h2 class="chart-title" id="title-dept-bar">事業部別 売上・粗利<span class="chart-note">積み上げ＝売上原価＋粗利益</span></h2>
-              <div id="chart-dept-bar" class="chart-body"></div>
+              <h2 class="chart-title" id="title-dept-bar">事業部別 売上・粗利益<span class="chart-note">積み上げ＝売上原価＋粗利益</span></h2>
+              <div id="chart-dept-bar" class="chart-body" role="group" aria-labelledby="title-dept-bar"></div>
               <div id="legend-dept-bar" class="legend"></div>
             </section>
 
             <section class="chart-card">
               <h2 class="chart-title" id="title-dept-donut">売上構成比<span class="chart-note"></span></h2>
-              <div id="chart-dept-donut" class="chart-body donut-body"></div>
+              <div id="chart-dept-donut" class="chart-body donut-body" role="group" aria-labelledby="title-dept-donut"></div>
             </section>
 
             <section class="chart-card span-3">
               <h2 class="chart-title" id="title-dept-trend">事業部別 月次売上トレンド<span class="chart-note">2025年度・月次の季節変動を確認</span></h2>
-              <div id="chart-dept-trend" class="chart-body"></div>
+              <div id="chart-dept-trend" class="chart-body" role="group" aria-labelledby="title-dept-trend"></div>
               <div id="legend-dept-trend" class="legend"></div>
             </section>
 
             <section class="chart-card span-3">
-              <h2 class="chart-title">予算達成状況<span class="chart-note">粗利ベース・実績 vs 予算</span></h2>
+              <h2 class="chart-title">予算達成状況<span class="chart-note">粗利益ベース・実績 vs 予算</span></h2>
               <div id="dept-budget-table"></div>
               <p class="dept-foot">※ 粗利益＝売上−売上原価。人件費・賃料等の間接費は全社共通のため事業部には配賦していません。予算差異＝実績−予算。</p>
             </section>
@@ -130,13 +131,13 @@
 
       <section id="panel-summary" class="view-panel" role="tabpanel" aria-labelledby="tab-summary">
         <section class="insight-card">
-          <h2 class="chart-title">AI 経営インサイト<span class="chart-note" id="insight-note"></span></h2>
+          <h2 class="insight-heading">AI経営インサイト<span class="chart-note" id="insight-note"></span></h2>
           <p class="insight-disclaimer">AIが生成したレポートです。重要な判断の前に数値をご確認ください。</p>
           <div id="analysis-container"></div>
         </section>
       </section>
     </div>
-  </div>
+  </main>
 
   <!-- Bundled snapshot data (window.__TREND__ / window.__DEPT__) は app.js 冒頭に統合済み -->
   <!-- Domo SDK -->

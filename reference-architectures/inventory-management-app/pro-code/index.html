@@ -29,7 +29,7 @@
         <div><strong>在庫入出庫管理</strong><small>Inventory management</small></div>
       </div>
       <div class="topbar-actions">
-        <span id="sync-status" class="sync-status" role="status" hidden><span class="status-dot"></span><span id="sync-status-label">接続を確認中</span></span>
+        <span id="sync-status" class="sync-status" hidden><span class="status-dot"></span><span id="sync-status-label">接続を確認中</span></span>
         <button id="refresh-button" class="icon-button" type="button" aria-label="データを更新" title="更新"><svg class="ui-icon" aria-hidden="true"><use href="#icon-refresh"></use></svg></button>
         <div class="user-chip"><span id="user-initial">利</span><span id="user-name">利用者</span></div>
       </div>
@@ -79,23 +79,24 @@
           <button type="button" id="goto-master-register" class="secondary-button"><svg class="button-icon" aria-hidden="true"><use href="#icon-history"></use></svg>「履歴・管理」をひらく</button>
         </div>
         <ol class="stepper" aria-label="登録手順">
-          <li class="active" data-step="1"><button type="button" data-step-nav="1" aria-controls="step-panel-1" aria-current="step" disabled><span>1</span><b data-short="場所">ロケーション</b></button></li>
-          <li data-step="2"><button type="button" data-step-nav="2" aria-controls="step-panel-2" disabled><span>2</span><b data-short="品目">品目</b></button></li>
-          <li data-step="3"><button type="button" data-step-nav="3" aria-controls="step-panel-3" disabled><span>3</span><b data-short="数量">数量</b></button></li>
-          <li data-step="4"><button type="button" data-step-nav="4" aria-controls="step-panel-4" disabled><span>4</span><b data-short="確認">確認</b></button></li>
+          <li class="active" data-step="1"><button type="button" data-step-nav="1" aria-controls="step-panel-1" aria-current="step" disabled><span>1</span><b><span class="step-full">ロケーション</span><span class="step-short">場所</span></b></button></li>
+          <li data-step="2"><button type="button" data-step-nav="2" aria-controls="step-panel-2" disabled><span>2</span><b>品目</b></button></li>
+          <li data-step="3"><button type="button" data-step-nav="3" aria-controls="step-panel-3" disabled><span>3</span><b>数量</b></button></li>
+          <li data-step="4"><button type="button" data-step-nav="4" aria-controls="step-panel-4" disabled><span>4</span><b>確認</b></button></li>
         </ol>
+        <span id="scan-disabled-reason" class="sr-only"></span>
 
         <div class="operation-grid">
           <div class="panel workflow-panel">
             <section id="step-panel-1" class="form-step active" data-step-panel="1">
-              <div class="panel-heading"><div><span class="step-label">STEP 1</span><h2 id="step-title-1" tabindex="-1">ロケーション</h2></div><button class="scan-button" data-scan="location" type="button" disabled aria-busy="true"><svg class="button-icon" aria-hidden="true"><use href="#icon-qr"></use></svg>QRを読む</button></div>
+              <div class="panel-heading"><div><span class="step-label">STEP 1</span><h2 id="step-title-1" tabindex="-1">ロケーション</h2></div><button class="scan-button" data-scan="location" type="button" disabled><svg class="button-icon" aria-hidden="true"><use href="#icon-qr"></use></svg>QRを読む</button></div>
               <label for="location-search">ロケーション名またはコード</label>
               <div class="search-wrap"><svg class="search-icon" aria-hidden="true"><use href="#icon-search"></use></svg><input id="location-search" autocomplete="off" placeholder="例: LOC-01 / 東京倉庫"></div>
               <div id="location-options" class="option-list" role="group" aria-label="ロケーション候補"></div>
             </section>
 
             <section id="step-panel-2" class="form-step" data-step-panel="2">
-              <div class="panel-heading"><div><span class="step-label">STEP 2</span><h2 id="step-title-2" tabindex="-1">品目</h2></div><button class="scan-button" data-scan="item" type="button" disabled aria-busy="true"><svg class="button-icon" aria-hidden="true"><use href="#icon-qr"></use></svg>QRを読む</button></div>
+              <div class="panel-heading"><div><span class="step-label">STEP 2</span><h2 id="step-title-2" tabindex="-1">品目</h2></div><button class="scan-button" data-scan="item" type="button" disabled><svg class="button-icon" aria-hidden="true"><use href="#icon-qr"></use></svg>QRを読む</button></div>
               <label for="item-search">品目名またはコード</label>
               <div class="search-wrap"><svg class="search-icon" aria-hidden="true"><use href="#icon-search"></use></svg><input id="item-search" autocomplete="off" placeholder="例: ITEM-001 / 安全手袋"></div>
               <div id="item-options" class="option-list" role="group" aria-label="品目候補"></div>
@@ -128,16 +129,16 @@
             <button id="selected-location-card" class="selection-card" type="button" aria-label="ロケーション選択へ戻る"><span>ロケーション</span><strong id="selected-location">未選択</strong><small id="selected-location-code">QRまたは一覧から選択</small></button>
             <button id="selected-item-card" class="selection-card" type="button" aria-label="品目選択へ戻る" disabled><span>品目</span><strong id="selected-item">未選択</strong><small id="selected-item-code">QRまたは一覧から選択</small></button>
             <div class="inventory-card"><span>現在庫</span><strong id="current-stock">—</strong><small id="minimum-stock">基準在庫: —</small></div>
-            <div id="recent-operations"><h3>直近の登録</h3><div class="empty-compact">データを読み込み中</div></div>
+            <div id="recent-operations"><h3>直近の登録</h3><div class="empty-compact is-loading" aria-busy="true">データを読み込み中…</div></div>
           </aside>
         </div>
       </section>
 
       <section id="view-dashboard" class="view" tabindex="-1" aria-labelledby="dashboard-title">
-        <div class="page-heading"><div><p class="eyebrow">アナリティクス</p><h1 id="dashboard-title">在庫ダッシュボード</h1><p>集計から品目・ロケーション・日付を選び、現在庫と取引明細を確認できます。</p></div><div class="dashboard-actions"><span class="interaction-note"><svg class="ui-icon" aria-hidden="true"><use href="#icon-info"></use></svg>カーソルで内訳・クリックで明細</span></div></div>
+        <div class="page-heading"><div><p class="eyebrow">アナリティクス</p><h1 id="dashboard-title">在庫ダッシュボード</h1><p>集計から品目・ロケーション・日付を選び、現在庫と取引明細を確認できます。</p></div><div class="dashboard-actions"><span class="interaction-note"><svg class="ui-icon" aria-hidden="true"><use href="#icon-info"></use></svg><span class="note-hover">カーソルで内訳・クリックで明細</span><span class="note-touch">タップで明細</span></span></div></div>
         <div class="dashboard-toolbar">
           <div class="search-wrap dashboard-search-wrap"><svg class="search-icon" aria-hidden="true"><use href="#icon-search"></use></svg><input id="dashboard-search" type="search" autocomplete="off" aria-label="品目・ロケーション・不足・滞留を検索" placeholder="品目・ロケーション・不足・滞留を検索"></div>
-          <div class="toolbar-workflow"><span class="toolbar-workflow-hint">在庫不足サマリーを実行ユーザー宛てにメール通知するWorkflowを実行</span><button id="run-notification" class="secondary-button" type="button" title="現在の在庫不足サマリーを、実行ユーザー（あなた）のメールアドレス宛てにその場で送信します。"><svg class="button-icon" aria-hidden="true"><use href="#icon-bell"></use></svg>AI在庫通知を実行</button></div>
+          <div class="toolbar-workflow"><span class="toolbar-workflow-hint">在庫不足サマリーを実行ユーザー宛てにメール通知する通知フローを実行</span><button id="run-notification" class="secondary-button" type="button" title="現在の在庫不足サマリーを、実行ユーザー（あなた）のメールアドレス宛てにその場で送信します。"><svg class="button-icon" aria-hidden="true"><use href="#icon-bell"></use></svg>AI在庫通知を実行</button></div>
         </div>
         <div id="kpi-grid" class="kpi-grid"></div>
         <article class="panel ai-note-panel"><div class="panel-heading"><div><h2>AI在庫コメント</h2><p>生成AIが品目ごとに要約</p></div><span class="ai-note-tag">AI生成</span></div><div id="ai-note-list"></div></article>
@@ -176,7 +177,7 @@
             <nav id="history-pager" class="pager" aria-label="取引履歴のページ送り" hidden></nav>
           </div>
           <aside class="panel md-detail" id="detail-pane" aria-labelledby="detail-title">
-            <header class="detail-pane-heading"><span id="detail-eyebrow" class="step-label">DETAIL</span><h2 id="detail-title" tabindex="-1">明細</h2><p id="detail-subtitle">一覧から選択</p></header>
+            <header class="detail-pane-heading"><span id="detail-eyebrow" class="step-label">DETAIL</span><h2 id="detail-title" tabindex="-1">明細</h2><p id="detail-subtitle">一覧から選択</p><button id="detail-close" class="detail-close" type="button">一覧へ戻る</button></header>
             <div id="detail-content" class="detail-content"></div>
           </aside>
         </div>
@@ -207,7 +208,7 @@
                   <label>基準在庫数<input id="master-rule-minimum" type="number" min="0" step="1" inputmode="numeric" placeholder="10"></label>
                 </div>
                 <label class="master-active-toggle" id="master-active-row" hidden><input id="master-active" type="checkbox"><span>入出庫で選択できるようにする（オフにすると停止中・元に戻せます）</span></label>
-                <p class="master-note" id="master-note">「削除」はこの項目をAppDBから完全に削除します（取り消せません）。基準在庫や現在庫などの関連データも一緒に削除されますが、入出庫・通知の履歴は監査証跡として残ります。一時的に止めたいだけなら、チェックボックス「入出庫で選択できるようにする」をオフにしてください（元に戻せます）。</p>
+                <p class="master-note" id="master-note">「削除」はこの項目のデータを完全に削除します（取り消せません）。基準在庫や現在庫などの関連データも一緒に削除されますが、入出庫・通知の履歴は監査証跡として残ります。一時的に止めたいだけなら、チェックボックス「入出庫で選択できるようにする」をオフにしてください（元に戻せます）。</p>
                 <div class="button-row">
                   <button id="master-delete" class="secondary-button danger" type="button" hidden>削除</button>
                   <button id="master-submit" class="primary-button" type="submit">登録する</button>
@@ -266,10 +267,14 @@
     </form>
   </dialog>
 
-  <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
+  <div id="chart-tooltip" class="chart-tooltip" role="tooltip" aria-hidden="true" hidden></div>
 
+  <!-- INV-035: 常設の読み上げ領域。接続状態・処理中は hidden トグルの可視要素（#sync-status/#loading-overlay）
+       ではなく、この常時DOMに在るポライトなライブ領域へ書き込んで確実に通知する（display:none の領域を
+       可視化と同時に書き換えても初回変化は読まれないことが多いため）。可視要素は純視覚に徹し role=status を持たない。 -->
+  <p id="a11y-status" class="sr-only" role="status" aria-live="polite"></p>
   <div id="toast-region" class="toast-region"></div>
-  <div id="loading-overlay" class="loading-overlay" role="status" hidden><div class="spinner"></div><p>処理しています</p></div>
+  <div id="loading-overlay" class="loading-overlay" hidden><div class="spinner"></div><p>処理しています</p></div>
 
   <script src="boot-diagnostics.js"></script>
   <script src="vendor/domo.js"></script>

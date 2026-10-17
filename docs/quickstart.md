@@ -16,6 +16,7 @@ This guide walks you through the first three things you can do with this repo. B
 - A terminal (Terminal on macOS, PowerShell or Git Bash on Windows, any shell on Linux)
 - Node.js installed (for the Domo CLI)
 - Python 3 installed (the helper scripts use it)
+- `curl` installed (the helper scripts use it; preinstalled on macOS and most Linux, and available in Git Bash on Windows)
 - Either the **Domo CLI** logged in, OR a **developer token** from your Admin panel
 
 ---

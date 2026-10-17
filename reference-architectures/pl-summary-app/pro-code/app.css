@@ -5,12 +5,22 @@
   --ink: #2E2E2A;
   --ink-muted: #5A5A56;
   --border: #E6E2DC;
-  --accent: #7F1D2D;          /* enji */
+  --accent: #7F1D2D;          /* enji ／ == JS BRAND.enji（app.js・色相変更時は両方） */
   --accent-weak: #9B2C3A;
-  --profit: #5F7A64;          /* muted sage for profit line/positive */
+  --profit: #4C6552;          /* muted sage for profit line/positive (AA ≥4.5:1 at 11–12px small text) ／ == JS BRAND.sage（app.js） */
   --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
-  --shadow-md: 0 8px 24px rgba(0,0,0,.05);
+  --shadow-md: 0 8px 24px rgba(0,0,0,.08);  /* .05 はほぼ不可視だった＝実際に効く浮上に（PL-023/056で統一） */
   --radius: 12px;
+  /* 本テーマは明色専用（light-only by design）。ダークテーマは配布スコープ外＝feature creep ゆえ
+     出荷しない。散っていた中間色・白を下にトークン化し、再テーマ時の単一レバーにする（PL-020）。 */
+  --on-accent: #fff;        /* アクセント/濃色面に乗る前景（白文字・白塗り） */
+  --surface-2: #FCFBFA;     /* 最淡の面・ゼブラ奇数行 */
+  --surface-3: #FAF9F7;     /* 淡い面・表ヘッダ/注記ボックス */
+  --surface-sum: #F5F2ED;   /* 合計行の強調面（やや暖色） */
+  --wash-rose: #FBF3F4;     /* ローズ寄りの淡色面 */
+  --warn: #8A6D3B;          /* 注意（琥珀） */
+  --line-faint: #C9C3BA;    /* ゼロ基準線など最も淡い罫 */
+  --dept-cogs: #C97B84;     /* 事業部 売上原価ローズ ／ == JS BRAND.rose・BAR_COGS（app.js） */
 }
 
 *{ box-sizing: border-box; }
@@ -22,7 +32,8 @@ body{
                "Yu Gothic", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   color: var(--ink);
   background: var(--bg);
-  letter-spacing: .02em;
+  /* PL-057: 本文は実質ほぼ全て CJK。全角は字送り不要で、正のトラッキングは数字グループを
+     緩めるため既定は normal とし、ラテンのアイブロウ/ブランド副題など必要箇所だけ局所指定する。 */
 }
 
 .container{ max-width: 1120px; margin: 0 auto; }
@@ -51,15 +62,17 @@ body{
 .workflow-button{ font-weight: 600; font-size: 13px; }
 .workflow-button:disabled, .workflow-check:disabled{ cursor: default; opacity: .55; }
 /* スキップリンク（キーボード/SR 用・focus 時のみ可視・enji 面）。inventory 本体と同じ作法。 */
-.skip-link{ position: fixed; top: -60px; left: 16px; z-index: 1000; padding: 10px 16px; color: #fff; background: var(--accent); border-radius: 8px; text-decoration: none; }
+.skip-link{ position: fixed; top: -60px; left: 16px; z-index: 1000; padding: 10px 16px; color: var(--on-accent); background: var(--accent); border-radius: 8px; text-decoration: none; }
 .skip-link:focus{ top: 8px; outline: 2px solid transparent; outline-offset: 2px; }
 .workflow-button:focus-visible, .workflow-check:focus-visible, .workflow-close:focus-visible{ outline: 2px solid var(--accent); outline-offset: 3px; }
 .workflow-actions{ display: flex; align-items: center; gap: 12px; }
-.workflow-progress{ padding: 8px 0; border: 0; background: transparent; color: var(--ink-muted); cursor: pointer; font: inherit; font-size: 13px; white-space: nowrap; }
+.workflow-progress{ display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 4px; border: 0; background: transparent; color: var(--ink-muted); cursor: pointer; font: inherit; font-size: 13px; white-space: nowrap; }
 .workflow-progress:hover{ color: var(--accent); }
 .workflow-progress:disabled{ cursor: default; opacity: .55; }
 .workflow-progress:focus-visible{ outline: 2px solid var(--accent); outline-offset: 3px; }
 .workflow-status{ position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* PL-017: 動的生成の明細表に programmatic な名前（caption）を与える。カード見出しと重複させないため視覚非表示。 */
+.sr-only{ position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .workflow-status.workflow-error{ position: static; width: auto; height: auto; margin: 0 0 18px; padding: 12px 14px; clip-path: none; white-space: normal; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-muted); font-size: 13px; }
 /* 実行中/完了/開始の非エラー状態を晴眼者に見せる穏やかな変種（成功=サージュ緑の細い左罫）。*/
 .workflow-status.workflow-info{ position: static; width: auto; height: auto; margin: 0 0 18px; padding: 12px 14px; clip-path: none; white-space: normal; border-left: 3px solid var(--profit); background: var(--surface); color: var(--ink-muted); font-size: 13px; }
@@ -113,7 +126,7 @@ body{
   color: var(--ink-muted); box-shadow: var(--shadow-sm);
 }
 #message-container .message-text{ margin: 0; }
-.retry-button{ margin-top: 10px; min-height: 40px; padding: 8px 16px; font: inherit; font-size: 13px; font-weight: 600; color: #fff; background: var(--accent); border: 0; border-radius: 8px; cursor: pointer; }
+.retry-button{ margin-top: 10px; min-height: 40px; padding: 8px 16px; font: inherit; font-size: 13px; font-weight: 600; color: var(--on-accent); background: var(--accent); border: 0; border-radius: 8px; cursor: pointer; }
 .retry-button:hover{ filter: brightness(1.05); }
 .retry-button:focus-visible{ outline: 2px solid var(--accent); outline-offset: 3px; }
 
@@ -138,11 +151,11 @@ body{
 .badges{ display: flex; gap: 8px; flex-wrap: wrap; }
 .badge{
   font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 999px;
-  border: 1px solid var(--border); background: #fff; color: var(--ink-muted);
+  border: 1px solid var(--border); background: var(--surface); color: var(--ink-muted);
 }
 .badge.pos{ color: var(--profit); border-color: rgba(95,122,100,.35); background: rgba(95,122,100,.08); }
 .badge.neg{ color: var(--accent); border-color: rgba(127,29,45,.3); background: rgba(127,29,45,.06); }
-.badge.mid{ color: #8A6D3B; border-color: rgba(138,109,59,.3); background: rgba(138,109,59,.07); }
+.badge.mid{ color: var(--warn); border-color: rgba(138,109,59,.3); background: rgba(138,109,59,.07); }
 
 /* ---------- KPI grid ---------- */
 .kpi-grid{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
@@ -151,7 +164,8 @@ body{
   padding: 16px 18px; box-shadow: var(--shadow-sm);
   transition: transform .18s ease, box-shadow .18s ease;
 }
-.kpi:hover{ transform: translateY(-2px); box-shadow: var(--shadow-md); }
+/* PL-023: KPI タイルは静的 div（role/handler なし）。ホバーで浮かせるとクリック可能に見えて
+   実際は何も起きず信頼を損なうため、浮上・影スワップは付けず常にフラットに保つ。 */
 .kpi-label{ font-size: 12px; color: var(--ink-muted); letter-spacing: .04em; }
 .kpi-value{ margin-top: 6px; font-size: 24px; font-weight: 700; color: var(--ink); letter-spacing: .01em; }
 .kpi-value.pos{ color: var(--profit); }
@@ -160,14 +174,14 @@ body{
 /* ---------- Quick AI summary ---------- */
 .ai-quick{
   display: flex; gap: 14px; align-items: flex-start;
-  background: #FBF3F4;
+  background: var(--wash-rose);
   border: 1px solid rgba(127,29,45,.18); border-radius: var(--radius);
   padding: 16px 18px; margin-bottom: 20px; box-shadow: var(--shadow-sm);
 }
 .ai-quick-mark{
   flex: 0 0 auto; width: 34px; height: 34px; border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
-  background: var(--accent); color: #fff; font-weight: 700; font-size: 13px; letter-spacing: .05em;
+  background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 13px; letter-spacing: .05em;
 }
 .ai-quick-body{ font-size: 14px; line-height: 1.85; color: var(--ink); }
 .ai-quick-body p{ margin: 0 0 6px; }
@@ -191,6 +205,9 @@ body{
   display: flex; align-items: baseline; gap: 10px;
 }
 .chart-note{ font-size: 12px; font-weight: 500; color: var(--ink-muted); letter-spacing: .02em; }
+/* AI インサイト節の見出し。注入される小見出し（#analysis-container h2＝16px）より大きくし、
+   このアプリの主役セクションが「小チャートラベル」より上位に読めるようにする（PL-025）。 */
+.insight-heading{ margin: 0 0 12px; font-size: 19px; font-weight: 700; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
 .chart-body{ width: 100%; }
 .chart-body .svg{ width: 100%; height: auto; display: block; }
 .donut-body{ display: block; }
@@ -200,21 +217,22 @@ body{
 .legend{ display: flex; gap: 18px; justify-content: center; margin-top: 6px; }
 .legend .lg{ display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-muted); }
 .legend .sw{ width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.legend .sw-line{ flex: none; display: inline-block; vertical-align: middle; }
 .legend .sw-rev{ background: var(--accent); }
 .legend .sw-profit{ background: var(--profit); }
 
 /* ---------- SVG chart primitives ---------- */
 .svg .grid{ stroke: var(--border); stroke-width: 1; }
-.svg .zero{ stroke: #C9C3BA; stroke-width: 1; stroke-dasharray: 3 3; }
+.svg .zero{ stroke: var(--line-faint); stroke-width: 1; stroke-dasharray: 3 3; }
 .svg .axis-y{ fill: var(--ink-muted); font-size: 12px; text-anchor: end; }
 .svg .axis-x{ fill: var(--ink-muted); font-size: 12px; text-anchor: middle; }
 .svg .line-rev{ fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
-.svg .line-profit{ fill: none; stroke: var(--profit); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.svg .line-profit{ fill: none; stroke: var(--profit); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 7 4; }
 .svg .dot-rev{ fill: var(--accent); }
 .svg .dot-profit{ fill: var(--profit); }
 
 /* Donut */
-.svg .donut-slice{ stroke: #fff; stroke-width: 1.5; }
+.svg .donut-slice{ stroke: var(--surface); stroke-width: 1.5; }
 .svg .donut-center-label{ text-anchor: middle; fill: var(--ink-muted); font-size: 12px; }
 .svg .donut-center-value{ text-anchor: middle; fill: var(--ink); font-size: 20px; font-weight: 700; }
 .svg .donut-legend{ fill: var(--ink-muted); font-size: 12px; }
@@ -236,7 +254,7 @@ body{
 .svg .rank-hit:hover{ fill: rgba(127,29,45,.06); }
 .svg .trend-hit{ fill: transparent; cursor: crosshair; }
 .svg .trend-guide{ stroke: var(--accent); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; pointer-events: none; transition: opacity .12s ease; }
-.svg .trend-focus{ opacity: 0; pointer-events: none; stroke: #fff; stroke-width: 2; transition: opacity .12s ease; }
+.svg .trend-focus{ opacity: 0; pointer-events: none; stroke: var(--surface); stroke-width: 2; transition: opacity .12s ease; }
 .svg .focus-rev{ fill: var(--accent); }
 .svg .focus-profit{ fill: var(--profit); }
 
@@ -244,15 +262,15 @@ body{
 .chart-tip{
   position: absolute; left: 0; top: 0; z-index: 20; pointer-events: none;
   min-width: 92px; max-width: 240px; padding: 9px 11px;
-  background: rgba(38,38,34,.96); color: #fff; border-radius: 9px;
-  box-shadow: 0 8px 22px rgba(0,0,0,.22);
+  background: rgba(38,38,34,.96); color: var(--on-accent); border-radius: 9px;
+  box-shadow: var(--shadow-md);  /* PL-056: 重い .22 影をカードと同じ --shadow-md に揃える（濃色チップのまま浮きすぎを解消） */
   font-size: 12px; line-height: 1.5; letter-spacing: .02em;
   transform: translate(-50%, calc(-100% - 14px));
   opacity: 0; transition: opacity .12s ease; white-space: nowrap;
 }
 .chart-tip.show{ opacity: 1; }
-.chart-tip .tip-head{ font-weight: 700; margin-bottom: 5px; font-size: 12.5px; }
-.chart-tip .tip-row{ display: flex; align-items: center; gap: 7px; margin-top: 2px; }
+.chart-tip .tip-head{ font-weight: 700; margin-bottom: 5px; font-size: 13px; white-space: normal; overflow-wrap: anywhere; } /* 長い店舗/事業部名は max-width 内で折り返す（PL-063） */
+.chart-tip .tip-row{ display: flex; align-items: center; gap: 7px; margin-top: 2px; white-space: nowrap; }
 .chart-tip .tip-sw{ width: 9px; height: 9px; border-radius: 2px; flex: 0 0 auto; }
 .chart-tip .tip-val{ margin-left: auto; padding-left: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
 
@@ -264,22 +282,23 @@ body{
   padding-left: 12px; border-left: 4px solid var(--accent);
 }
 .dept-sub{ font-size: 12px; color: var(--ink-muted); letter-spacing: .04em; }
-.dept-foot{ margin: 12px 2px 0; font-size: 11.5px; line-height: 1.7; color: var(--ink-muted); letter-spacing: .01em; }
+.dept-foot{ margin: 12px 2px 0; font-size: 12px; line-height: 1.7; color: var(--ink-muted); letter-spacing: .01em; }
 
 /* Department stacked bar */
-.svg .bar-cogs{ fill: #C97B84; }
+.svg .bar-cogs{ fill: var(--dept-cogs); } /* == JS BRAND.rose / BAR_COGS（app.js） */
 .svg .bar-gross{ fill: var(--profit); }
 .svg .bar-hit{ fill: transparent; cursor: pointer; }
-.svg .bar-total{ fill: var(--ink); font-size: 12.5px; font-weight: 700; text-anchor: middle; }
-.svg .bar-inpct{ fill: #fff; font-size: 11.5px; font-weight: 600; text-anchor: middle; }
+.svg .bar-total{ fill: var(--ink); font-size: 13px; font-weight: 700; text-anchor: middle; }
+.svg .bar-inpct{ fill: var(--on-accent); font-size: 12px; font-weight: 600; text-anchor: middle; }
+.svg .bar-neg{ fill: var(--accent); font-size: 12px; font-weight: 700; text-anchor: middle; } /* 粗利マイナス（原価>売上）の明示 */
 .svg .bar-xlabel{ fill: var(--ink); font-size: 13px; text-anchor: middle; }
-.legend .sw-cogs{ background: #C97B84; }
+.legend .sw-cogs{ background: var(--dept-cogs); } /* == JS BRAND.rose / BAR_COGS（app.js） */
 .legend .sw-gross{ background: var(--profit); }
 .legend .sw-dot{ width: 10px; height: 10px; border-radius: 2px; }
 
 /* Department multi-line trend */
 .svg .dline{ fill: none; stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
-.svg .dfocus{ opacity: 0; pointer-events: none; stroke: #fff; stroke-width: 1.5; transition: opacity .12s ease; }
+.svg .dfocus{ opacity: 0; pointer-events: none; stroke: var(--surface); stroke-width: 1.5; transition: opacity .12s ease; }
 
 /* Budget-variance table */
 #dept-budget-table{ overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -290,14 +309,14 @@ body{
 }
 .dept-table th, .dept-table td{ padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: right; }
 .dept-table thead th{
-  background: #FAF9F7; color: var(--ink);
+  background: var(--surface-3); color: var(--ink);
   font-weight: 700; font-size: 12px; letter-spacing: .04em; border-bottom: 2px solid var(--accent-weak);
 }
 .dept-table th:first-child, .dept-table td:first-child{ text-align: left; }
 .dept-table td:first-child, .dept-table tbody th{ font-weight: 600; color: var(--ink); }
 .dept-table .dept-swatch{ display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: baseline; }
-.dept-table tbody tr:nth-child(odd){ background: #FCFBFA; }
-.dept-table tbody tr.total{ background: #F5F2ED; font-weight: 700; }
+.dept-table tbody tr:nth-child(odd){ background: var(--surface-2); }
+.dept-table tbody tr.total{ background: var(--surface-sum); font-weight: 700; }
 .dept-table tbody tr.total td, .dept-table tbody tr.total th{ border-bottom: none; border-top: 2px solid var(--accent-weak); color: var(--ink); }
 .dept-table td.num{ font-variant-numeric: tabular-nums; }
 .dept-table td.pos{ color: var(--profit); font-weight: 600; }
@@ -334,7 +353,10 @@ body{
   transition: color .18s, background .18s, box-shadow .18s;
 }
 .view-tab:hover{ color: var(--accent); }
-.view-tab.active{ color: #fff; background: var(--accent); box-shadow: var(--shadow-sm); }
+/* 事業部別タブは全社ビュー限定。隠さずレイアウトを保ったまま無効化し理由を示す（PL-035）。 */
+.view-tab.is-disabled{ opacity: .45; cursor: not-allowed; }
+.view-tab.is-disabled:hover{ color: var(--ink-muted); }
+.view-tab.active{ color: var(--on-accent); background: var(--accent); box-shadow: var(--shadow-sm); }
 .view-tab:focus-visible{ outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(127,29,45,.2); }
 
 .view-panel{ display: none; }
@@ -353,7 +375,7 @@ body{
 }
 #analysis-container h2::before{ content: none; }
 #analysis-container h3{
-  margin: 22px 0 10px; font-weight: 700; font-size: 14.5px; color: var(--ink);
+  margin: 22px 0 10px; font-weight: 700; font-size: 15px; color: var(--ink);
   padding: 2px 0 2px 10px; border-left: 3px solid var(--accent-weak);
   background: none; border-radius: 0;
 }
@@ -364,7 +386,7 @@ body{
 #analysis-container > p.report-meta{
   display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px;
   max-width: none; margin: 0 0 8px; padding: 9px 14px;
-  background: #FAF9F7; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface-3); border: 1px solid var(--border); border-radius: 10px;
   font-size: 13px; line-height: 1.7;
 }
 
@@ -372,7 +394,7 @@ body{
 #analysis-container ol{ counter-reset: report-item; list-style: none; margin: 14px 0 22px; padding-left: 0; }
 #analysis-container > ol > li{
   position: relative; margin: 10px 0; padding: 13px 18px 13px 46px;
-  background: #FCFBFA; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
   counter-increment: report-item;
 }
 #analysis-container > ol > li::before{
@@ -381,11 +403,11 @@ body{
   background: rgba(127,29,45,.08); color: var(--accent);
   font-size: 11px; font-weight: 700; line-height: 20px; text-align: center;
 }
-#analysis-container li{ color: var(--ink-muted); line-height: 1.85; font-size: 14.5px; margin: 8px 0; position: relative; }
+#analysis-container li{ color: var(--ink-muted); line-height: 1.85; font-size: 15px; margin: 8px 0; position: relative; }
 
 #analysis-container ul{ padding-left: 0; margin: 16px 0 24px; }
 #analysis-container > ul > li{
-  margin: 8px 0; padding: 12px 16px 12px 40px; background: #FCFBFA;
+  margin: 8px 0; padding: 12px 16px 12px 40px; background: var(--surface-2);
   border: 1px solid var(--border); border-radius: 10px; box-shadow: none; list-style: none;
 }
 #analysis-container > ul > li::before{ content: "●"; color: var(--accent); font-size: 11px; position: absolute; left: 18px; top: 16px; }
@@ -419,16 +441,16 @@ body{
   border-bottom: 1px solid var(--border);
 }
 #analysis-container th{
-  background: #FAF9F7; color: var(--ink);
+  background: var(--surface-3); color: var(--ink);
   font-weight: 700; font-size: 12px; letter-spacing: .04em; border-bottom: 2px solid var(--accent-weak);
 }
 #analysis-container td{ font-variant-numeric: tabular-nums; }
-#analysis-container tr:nth-child(even) td{ background: #FCFBFA; }
+#analysis-container tr:nth-child(even) td{ background: var(--surface-2); }
 #analysis-container tr:last-child td{ border-bottom: none; }
 #analysis-container td:first-child{ font-weight: 600; color: var(--ink); }
 
 #analysis-container blockquote{
-  margin: 18px 0; padding: 12px 18px; background: #FAF9F7;
+  margin: 18px 0; padding: 12px 18px; background: var(--surface-3);
   border: 1px solid var(--border); border-left: 4px solid var(--accent);
   color: var(--ink-muted); border-radius: 0 10px 10px 0; box-shadow: none; font-style: normal;
 }
@@ -439,12 +461,12 @@ body{
   margin: 0 0 10px; min-height: 24px;
 }
 .drill-bar.idle{ margin-bottom: 6px; }
-.drill-hint{ font-size: 11.5px; color: var(--ink-muted); letter-spacing: .02em; }
+.drill-hint{ font-size: 12px; color: var(--ink-muted); letter-spacing: .02em; }
 .drill-hint::before{ content: "▸ "; color: var(--accent); }
 .drill-btn{
   -webkit-appearance: none; appearance: none; font-family: inherit;
-  font-size: 11.5px; font-weight: 600; color: var(--ink-muted);
-  background: #fff; border: 1px solid var(--border); border-radius: 999px;
+  font-size: 12px; font-weight: 600; color: var(--ink-muted);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
   padding: 3px 10px; cursor: pointer; transition: color .15s, border-color .15s;
 }
 .drill-btn:hover{ color: var(--accent); border-color: rgba(127,29,45,.35); }
@@ -452,16 +474,16 @@ body{
 .drill-path{ display: inline-flex; align-items: center; gap: 3px; flex-wrap: wrap; min-width: 0; }
 .drill-crumb{
   -webkit-appearance: none; appearance: none; font-family: inherit;
-  font-size: 11.5px; font-weight: 600; color: var(--accent);
+  font-size: 12px; font-weight: 600; color: var(--accent);
   background: rgba(127,29,45,.06); border: 1px solid rgba(127,29,45,.18);
   border-radius: 999px; padding: 3px 10px; cursor: pointer; max-width: 220px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .drill-crumb:hover{ background: rgba(127,29,45,.12); }
 .drill-crumb:focus-visible{ outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(127,29,45,.18); }
-.drill-crumb.current{ color: #fff; background: var(--accent); border-color: var(--accent); cursor: default; }
+.drill-crumb.current{ color: var(--on-accent); background: var(--accent); border-color: var(--accent); cursor: default; }
 .drill-sep{ color: var(--ink-muted); font-size: 11px; }
-.drill-foot{ margin: 10px 2px 0; font-size: 11.5px; line-height: 1.7; color: var(--ink-muted); letter-spacing: .01em; }
+.drill-foot{ margin: 10px 2px 0; font-size: 12px; line-height: 1.7; color: var(--ink-muted); letter-spacing: .01em; }
 
 /* Drillable chart elements: keyboard focus ring + generic hit band */
 .svg [data-drill]{ cursor: pointer; }
@@ -490,8 +512,20 @@ body{
   #store-select{ min-width: 180px; }
   .view-title{ font-size: 22px; }
   .insight-card{ padding: 18px 16px 22px; }
-  #analysis-container h1{ font-size: 24px; }
-  #analysis-container h2{ font-size: 18px; padding: 10px 14px; }
+  /* PL-026: 死んだ h1 上書き（h1 は stripReportTitle で除去・base も 24px）と、
+     デスクトップ(16px 細バー)より大きい旧 boxed 名残の h2 上書きを削除＝モバイルも base を継承。 */
   .view-tabs{ display: flex; width: 100%; }
   .view-tab{ flex: 1; text-align: center; padding: 10px 12px; }
+}
+
+/* PL-019: OS の「視差効果を減らす」設定を尊重する。無限回転スピナー・入場 fadeUp・ホバー変形など
+   連続/移動アニメは前庭系の不快を招くため、reduced-motion 時はアニメを実質即時化（spinner は初期姿勢で
+   静止）し transition も即時化する。描画結果（最終状態）は変えず、動きだけを止める。 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

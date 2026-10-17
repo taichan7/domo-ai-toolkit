@@ -268,10 +268,10 @@ test('detailMeta は監査参照値（取引ID/リクエストID/通知ID）を 
 
 test('barRowHtml は品目/ロケーションの棒ラベル row.label（表示名＝数値でない）を escapeHtml/escapeAttribute 経由で差し込む', () => {
   const src = extractFunction('barRowHtml');
-  // row.label は品目名/ロケーション名（untrusted）。line 913 の trend チャート（number.format/formatDisplayDate）とは別物。
-  assert.match(src, /class="bar-label">\$\{escapeHtml\(\s*row\.label\s*\)\}/, 'bar-label の row.label が escape されていない');
+  // row.label は品目名/ロケーション名（untrusted）。INV-025 で label は .bar-name へ入る（.bar-label 直下から1段内側）。
+  assert.match(src, /class="bar-name">\$\{escapeHtml\(\s*row\.label\s*\)\}/, 'bar-name の row.label が escape されていない');
   assert.match(src, /data-tooltip-title="\$\{escapeAttribute\(\s*row\.label\s*\)\}/, 'tooltip-title の row.label が escapeAttribute されていない');
-  assert.doesNotMatch(src, /class="bar-label">\$\{\s*row\.label\s*\}/, '生の row.label を bar-label へ差し込んでいる（XSS 退行）');
+  assert.doesNotMatch(src, /class="bar-name">\$\{\s*row\.label\s*\}/, '生の row.label を bar-name へ差し込んでいる（XSS 退行）');
   assert.doesNotMatch(src, /data-tooltip-title="\$\{\s*row\.label\s*\}/, '生の row.label を tooltip-title へ差し込んでいる（属性ブレイクアウト）');
 });
 
@@ -304,7 +304,7 @@ test('日付の形式が不正でもトレンドのHTMLは実行可能な要素�
       dashboardEmpty: (markup) => markup, emptyHtml: () => '',
       renderAiNotes: () => {}, scheduleDashboardEqualize: () => {},
     };
-    vm.runInNewContext(['formatDisplayDate', 'formatShortDate', 'barPct', 'renderDashboard'].map(extractFunction).join('\n') + '\nrenderDashboard();', context);
+    vm.runInNewContext(['formatDisplayDate', 'formatShortDate', 'barPct', 'isActive', 'renderDashboard'].map(extractFunction).join('\n') + '\nrenderDashboard();', context);
     return context.elements['trend-chart'].innerHTML;
   }
   const hostile = render(payload);

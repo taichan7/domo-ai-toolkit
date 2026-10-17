@@ -72,15 +72,15 @@
 
   <!-- ══ 標題・要旨・目次（フロントマター） ══════════════════ -->
   <section class="masthead">
-    <p class="masthead__eyebrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-doc"/></svg>店舗別損益AI分析 ・ 開発ハンズオン</p>
+    <p class="masthead__eyebrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-doc"/></svg>店舗別損益AIインサイト ・ 開発ハンズオン</p>
     <h1 class="masthead__title">VS&nbsp;Code × コーディングエージェントで、Domo を開発する</h1>
     <p class="masthead__lead"><b>店舗別損益</b>（Store PL AI Insights・このアプリ）を題材に、環境準備からコピー・編集・公開・確認までを<b>実際に手を動かして</b>学ぶ。VS&nbsp;Code と<b>コーディングエージェント</b>（Claude&nbsp;Code／Codex／GitHub&nbsp;Copilot）を使って<b>Domo の外側</b>で作り、<b>Domo の中へデプロイ</b>する流れを、上から順に辿る 3 時間。</p>
 
     <dl class="colophon">
       <div><dt>文書種別</dt><dd>ハンズオン教材（手を動かす）</dd></div>
       <div><dt>所要</dt><dd>約 3 時間・ステップ順</dd></div>
-      <div><dt>対象</dt><dd>店舗別損益AIデモ 開発者</dd></div>
-      <div><dt>版</dt><dd>v0.3.5（2026-10-16）</dd></div>
+      <div><dt>対象</dt><dd>店舗別損益AIインサイト 開発者</dd></div>
+      <div><dt>版</dt><dd>v0.3.7（2026-10-17）</dd></div>
     </dl>
 
     <div class="abstract">
@@ -173,7 +173,7 @@
         <li><b>公開toolkit</b>をcloneし、<code>reference-architectures/</code> 内の<code>pl-summary-app</code> フォルダを分かる場所に置く（§1「そろえる 6 つ」STEP 1）。</li>
         <li>VS&nbsp;Code とエージェント拡張を入れて、サインインできる（§1「VS&nbsp;Code を入れて、フォルダを開く」「エージェント拡張を入れる」）。</li>
         <li>Node・Python・Git・Domo CLI を入れて、<code>domo login</code> まで通す（§1「Node・Python・Git を入れる」「Domo CLI を入れて、ログインする」）。</li>
-        <li><code>domo-ai-toolkit</code> を clone して、疎通スクリプトが通る（§1「土台を置く」）。</li>
+        <li>STEP 1 で clone した <code>domo-ai-toolkit</code> のルート（＝<code>pl-summary-app</code> の <code>../../</code>）で疎通スクリプトが通る（§1「土台を知る」）。</li>
         <li><code>domo login -i your-company.domo.com</code>（ブラウザ SSO）まで通す。<b>データ層・Pro Code・App Studio 埋め込みはこのログインだけで動く</b>＝トークン不要。<b>開発者トークンはワークフロー層（AI 長文レポート）だけに要る任意</b>で、使う回のみ §1「②の認証を整える」で発行（<b>管理者権限が要る</b>・無ければ運営へ）。</li>
         <li><code>domo dev</code> で Pro Code のローカルプレビューがブラウザで開けることを確認（任意・<code>domo login</code> だけで動く）。</li>
         <li><b>（任意・人数が多い回は推奨）</b><code>~/handson-pl</code> へコピー → <code>pro-code/manifest.json</code> の <code>id</code> を外す → <code>domo publish</code> まで済ませる（§7）。</li>
@@ -199,7 +199,7 @@
           <span class="step__icon"><svg class="ic ic--lg" aria-hidden="true" focusable="false"><use href="#ic-download"/></svg></span>
           <span class="step__num">STEP 1</span>
           <h4>アプリのソースコード</h4>
-          <p><code>git clone https://github.com/taichan7/domo-ai-toolkit.git</code> で取得し、<code>reference-architectures/pl-summary-app</code> フォルダを開く（直下に <code>pro-code</code>/<code>dataflow</code>/… が並ぶ階層を使う）。</p>
+          <p><code>git clone https://github.com/taichan7/domo-ai-toolkit.git</code> で取得し、<code>reference-architectures/pl-summary-app</code> フォルダを開く（直下に <code>pro-code</code>/<code>dataflow</code>/… が並ぶ階層を使う）。<b><code>git</code> が未導入なら先に STEP 4（Node・Python・Git）を済ませてから戻る。</b></p>
         </li>
         <li class="step">
           <span class="step__icon"><svg class="ic ic--lg" aria-hidden="true" focusable="false"><use href="#ic-vscode"/></svg></span>
@@ -228,8 +228,8 @@
         <li class="step">
           <span class="step__icon"><svg class="ic ic--lg" aria-hidden="true" focusable="false"><use href="#ic-git"/></svg></span>
           <span class="step__num">STEP 6</span>
-          <h4>土台（starter）</h4>
-          <p><code>domo-ai-toolkit</code> を clone して同じ場所に置く。</p>
+          <h4>土台（starter）を確認</h4>
+          <p>STEP 1 で clone 済みの <code>domo-ai-toolkit</code> がそのまま土台＝<code>AGENT.md</code>／<code>prompts</code>／API リファレンス。<b>改めて clone せず</b>、中身（エージェントへの指示・プロンプト）に目を通す。</p>
         </li>
       </ol>
       <figcaption>そろえる 6 つ ― 上から順に進めれば、最後はエージェントに頼める状態になる</figcaption>
@@ -244,7 +244,7 @@
             <tr><th scope="row" class="role">STEP 3</th><td>エージェント拡張＋サインイン</td><td class="memo">2〜3 分</td></tr>
             <tr><th scope="row" class="role">STEP 4</th><td>Node・Python・Git</td><td class="memo">5〜10 分（導入待ち）</td></tr>
             <tr><th scope="row" class="role">STEP 5</th><td>Domo CLI ＋ <code>domo login</code></td><td class="memo">約 5 分</td></tr>
-            <tr><th scope="row" class="role">STEP 6</th><td>starter を clone</td><td class="memo">1〜2 分</td></tr>
+            <tr><th scope="row" class="role">STEP 6</th><td>starter を確認（STEP 1 の clone に含まれる）</td><td class="memo">1〜2 分</td></tr>
           </tbody>
         </table>
       </div>
@@ -433,8 +433,8 @@ git config --global --get http.proxy
 <span class="c"># export NODE_EXTRA_CA_CERTS="/path/to/company-ca.pem"</span></pre>
     </div>
 
-    <h3 class="sub">土台を置く ― domo-ai-toolkit</h3>
-    <p class="sec__lead">どのエージェントにも同じ「土台」を渡すための、Domo 社員が実戦で育てた公開ツールキット（非公式・MIT・英/日）。アプリと同じ場所に clone して置くと、エージェントが Domo の認証・API・作法を把握し、<b>UI を触らず自然文で Domo を調べ・作れる</b>ようになる。入手先は <code>github.com/taichan7/domo-ai-toolkit</code>（MIT・英/日 両対応）。URL は下のボタンでコピー（下の clone コマンドにも含まれる）。</p>
+    <h3 class="sub">土台を知る ― domo-ai-toolkit</h3>
+    <p class="sec__lead">どのエージェントにも同じ「土台」を渡すための、Domo 社員が実戦で育てた公開ツールキット（非公式・MIT・英/日）。<b>これは STEP 1 で clone 済み</b>＝<code>pl-summary-app</code> はこの toolkit の <code>reference-architectures/</code> 配下にあり、<b>改めて clone する必要はない</b>。ルートにある規約・API・作法をエージェントに読ませると、<b>UI を触らず自然文で Domo を調べ・作れる</b>ようになる。入手先は <code>github.com/taichan7/domo-ai-toolkit</code>（MIT・英/日 両対応）。</p>
     <div class="cmd">
       <div class="cmd__bar">
         <span><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-git"/></svg>domo-ai-toolkit の URL</span>
@@ -470,11 +470,11 @@ git config --global --get http.proxy
         <span><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-cli"/></svg>ターミナル</span>
         <button class="copy-btn" type="button" data-copy="cmd-s1-starter">コピー</button>
       </div>
-      <pre class="cmd__body" id="cmd-s1-starter"><span class="c"># アプリと同じ（親）フォルダに clone し、疎通を確認（CLI 導入・login は上の手順）
+      <pre class="cmd__body" id="cmd-s1-starter"><span class="c"># STEP 1 で clone 済み。pl-summary-app は toolkit の中（reference-architectures/）にある
+# 土台（規約・API 参照・skills）は toolkit のルート＝アプリから見て ../../
 # Windows は Git Bash で実行（PowerShell に bash が無い場合）</span>
-cd ..   <span class="c"># アプリの親フォルダへ出てから（toolkit をアプリの中に入れない。親に pl-summary-app と並ぶ）</span>
-git clone https://github.com/taichan7/domo-ai-toolkit
-bash domo-ai-toolkit/scripts/authenticate.sh your-company.domo.com
+cd ../..   <span class="c"># pl-summary-app → reference-architectures → domo-ai-toolkit ルートへ</span>
+bash scripts/authenticate.sh your-company.domo.com   <span class="c"># 疎通を確認（CLI 導入・login は上の手順）</span>
 bash domo-ai-toolkit/scripts/list-datasets.sh      <span class="c"># 先頭50件が出れば疎通OK</span></pre>
     </div>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-bulb"/></svg>エージェントへの頼み方の例：「行数の多いデータセット上位 10 件を挙げて」「失敗している Magic ETL をエラーコード別にまとめて」「dataflow 92 の不具合と直し方は？」。長時間の無人作業では、1 時間で失効する SID でなく <code>DOMO_DEVELOPER_TOKEN</code>（開発者トークン・<code>config/secrets.env</code> に置いて読み込む）を使う。</p>
@@ -679,7 +679,7 @@ set -a; . config/secrets.env; set +a</pre>
             <tr><th scope="row" class="role">Node・Python・Git</th><td><code>node --version</code>／<code>python3 --version</code>／<code>git --version</code> が下限を満たして出る</td></tr>
             <tr><th scope="row" class="role">Domo CLI</th><td><code>domo --version</code> が出る（出なければ <code>npm install -g ryuu</code>）</td></tr>
             <tr><th scope="row" class="role">ログイン</th><td><code>domo login -i your-company.domo.com</code> がブラウザ SSO で通る</td></tr>
-            <tr><th scope="row" class="role">土台（starter）</th><td>アプリと同じ親フォルダに <code>domo-ai-toolkit</code> を clone 済み</td></tr>
+            <tr><th scope="row" class="role">土台（starter）</th><td><code>domo-ai-toolkit</code>（STEP 1 の clone）＝<code>pl-summary-app</code> はその <code>reference-architectures/</code> 配下</td></tr>
             <tr><th scope="row" class="role">（任意）トークン</th><td>AI 長文レポートまで作る回だけ、<code>config/secrets.env</code> に 2 変数を設定</td></tr>
           </tbody>
         </table>
@@ -1423,7 +1423,7 @@ node tests/test_drill_helpers.js</pre>
       <dl class="defs">
         <dt>① 確実に動く（可用性・保守）</dt><dd>Pro Code は Domo に埋め込まれて動く。中核の SDK（<code>vendor/domo.js</code>）を外部 CDN から読むと、<b>CDN 障害や版の食い違い</b>で <code>window.domo</code> が初期化されず、アプリが Domo と話せなくなる（→「Domo App Frameworkへ接続できませんでした」）。同梱なら<b>版が固定</b>され、社内プロキシ／ファイアウォールが外部を遮断していても動く。</dd>
         <dt>② 安全（セキュリティ）</dt><dd>企業データを扱うアプリで、外部から取り寄せた<b>第三者のコードをそのまま実行しない</b>。CDN が乗っ取られれば自分のアプリに悪意あるコードが混入し得る（サプライチェーン攻撃）。同梱＝<b>持ち込むコードを自分で把握・固定</b>できる。</dd>
-        <dt>③ JS も CSS も（フォントは例外）</dt><dd>アプリの動作に必要な <b>JS・CSS は同梱</b>（この題材も <code>app.css</code>＋<code>vendor/domo.js</code> はローカル。チャートも外部ライブラリに頼らず手描き SVG）。<b>例外はフォント</b>＝読み込めなくても OS 標準へ<b>フォールバック</b>できるので、Google Fonts 等は<b>代替指定つきなら使ってよい</b>（この開発ガイド自身がそう）。原則＝<b>失敗でアプリが壊れるもの（特に SDK）は必ず同梱／失敗しても見た目が少し変わるだけのもの（フォント）は外部でも可</b>。</dd>
+        <dt>③ JS・CSS・フォントまで自己完結（CDN 非依存）</dt><dd>アプリの動作に必要な <b>JS・CSS は同梱</b>（この題材も <code>app.css</code>＋<code>vendor/domo.js</code> はローカル。チャートも外部ライブラリに頼らず手描き SVG）。<b>フォントも外部 CDN を読まず</b>、OS 標準の日本語フォントへ<b>フォールバック</b>する（Noto Sans JP はローカルにあれば使う）。原則＝<b>配布物を自己完結に保つ（CDN 非依存）。失敗でアプリが壊れるもの（特に SDK）は必ず同梱</b>。姉妹アプリ（在庫入出庫管理）の開発ガイドと同じ基準。</dd>
       </dl>
       <figcaption>「同梱（CDN 禁止）」の理由 ― ①確実に動く（可用性）／②安全（セキュリティ）／③必要な JS・CSS は同梱、フォントは代替つきなら外部可</figcaption>
     </figure>
@@ -1928,7 +1928,7 @@ provision_domo.py app-studio で同期する手順（空マッピングは manif
         <div class="flow__arrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></div>
         <div class="tile tile--output"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-check"/></svg><b>verify</b><br>ok: true<br>（成功ゲート）</div>
       </div>
-      <figcaption><code>apply → データのsync-manifest → Workflow配備・CEのsync-manifest → publish → app-studio → verify</code>。初回は手動更新に使うCE/親子Workflowを<b>Pro Code公開より前</b>に確保する。開発ガイド埋め込み（<code>embed-guide</code>）は任意。各段には必ずゲート（成否判定）があり、緑になってから次へ進む</figcaption>
+      <figcaption>最小の既定経路は <code>apply → データのsync-manifest → publish → app-studio → verify</code>（<b>SSO だけで1周</b>）。<b>AI長文レポートを作る回だけ</b>、公開より前に Workflow 配備＋CEの sync-manifest を挟む（<b>任意・開発者トークン要</b>＝WFのモデルIDを manifest へ焼き込むため）。開発ガイド埋め込み（<code>embed-guide</code>）も任意。各段には必ずゲート（成否判定）があり、緑になってから次へ進む</figcaption>
     </figure>
     <p class="sec__note"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-refresh"/></svg><b><code>sync-manifest</code> の位置が肝</b>。<code>apply</code> が確定した実 ID を <code>pro-code/manifest.json</code> の alias→<code>dataSetId</code>／コレクション <code>id</code> に書き込む冪等処理で、<b>必ず <code>domo publish</code> より前</b>に走らせる。先に publish すると、配布 design が別インスタンスの ID を抱えたまま出てしまい、<code>verify</code> が「manifest の ID が live と不一致」で赤くなる（対応は下の〈つまずいたら〉表）。列を足しただけなら ID は変わらないので差分は出ない。</p>
 
@@ -1951,11 +1951,13 @@ export PL_SANDBOX_SUFFIX="検証・<あなたの氏名>"
 python3 scripts/provision_domo.py apply
 python3 scripts/provision_domo.py sync-manifest   <span class="c"># 出力4本・AppDB の実IDを manifest へ</span>
 
-<span class="c"># 配備2  初回公開より前に手動起動のCE/親子Workflowを配備（認証は§1の②）</span>
+<span class="c"># 配備2（任意・AI長文レポートを作る回だけ／開発者トークン要＝§1②）
+#   SSO だけの回・FEやデータ層だけ試す回は、この4行を飛ばして publish へ。
+#   作る場合のみ公開より前に実行し、WFのモデルIDを manifest へ焼き込む</span>
 set -a; . config/secrets.env; set +a
 python3 scripts/provision_workflows.py provision --apply --release
 python3 scripts/provision_workflows.py sync-manifest
-<span class="c"># Pro Code を publish（design を配布・開ける URL はまだ無い）</span>
+<span class="c"># Pro Code を publish（design を配布・開ける URL はまだ無い／ここは SSO だけで動く）</span>
 cd pro-code &amp;&amp; domo publish &amp;&amp; cd -
 
 <span class="c"># 配備3  App Studio にカードを埋め込む（/app-studio/&lt;id&gt; が開ける・SSO で可）</span>
@@ -3184,7 +3186,7 @@ node --check pro-code/app.js と node tests/test_drill_helpers.js を通し、�
         <dt>AI の指示文（正本）</dt><dd><code>prompts/</code>（店舗／全社の DataFlow サマリー・統合サブWF の店舗／全社ブランチ・共通規約）。<b>AI の挙動を変えるときはここ</b></dd>
         <dt>決定的ゲート</dt><dd><code>dev-guide-app/tests/check.mjs</code>（この開発ガイドの参照整合チェック）／アプリ本体は <code>tests/</code>（<code>test_report_api.py</code>・<code>test_sandbox_isolation.py</code> ほか）。トークン雛形は <code>config/secrets.env.example</code></dd>
         <dt>このソース内</dt><dd><code>AGENT.md</code>（規約）／<code>README.md</code>（全体像）／<code>prompts/</code>／この開発ガイド</dd>
-        <dt>スターターキット</dt><dd><code>github.com/taichan7/domo-ai-toolkit</code>（規約 <code>AGENTS.md</code>／<code>CLAUDE.md</code>・API リファレンス・55 のスキル集・診断スクリプト・Pro Code 雛形・参照アプリ 2 本。MIT・英/日。URL のコピーは §1「土台を置く」）</dd>
+        <dt>スターターキット</dt><dd><code>github.com/taichan7/domo-ai-toolkit</code>（規約 <code>AGENTS.md</code>／<code>CLAUDE.md</code>・API リファレンス・55 のスキル集・診断スクリプト・Pro Code 雛形・参照アプリ 2 本。MIT・英/日。詳細は §1「土台を知る」）</dd>
         <dt>公式</dt><dd>Domo Developer Portal（Apps CLI・API）／各製品ドキュメント</dd>
       </dl>
       <figcaption>深掘りの入口 ― まずソース内の資料（正典 <code>docs/setup-guide.md</code>・引き継ぎ <code>AGENT.md</code>）、次にスターターキット、最後に公式</figcaption>
@@ -3292,6 +3294,7 @@ python3 scripts/provision_domo.py apply</pre>
     <h3 class="sub">用語集</h3>
     <figure class="fig">
       <dl class="defs">
+        <dt>アプリ名の対応</dt><dd>同じアプリが文脈で別名に見えるため対応を一本化する。<b>アプリ名＝店舗別損益AIインサイト</b>／Pro-Code カード名＝<code>Store PL AI Insights</code>（英名）／App Studio DataApp 名＝店舗別損益AIインサイト。いずれも<b>同一アプリ</b>を指す（AppDB コレクション「店舗別損益AI要約」は別オブジェクト）。</dd>
         <dt>Pro Code</dt><dd>ブラウザで動く独自アプリ（<code>manifest.json</code>＋html/js/css）。</dd>
         <dt>SDK（<code>domo.js</code>）</dt><dd>画面から Domo を呼ぶ部品（<code>window.domo</code>）。<code>vendor/</code> に<b>同梱</b>する。</dd>
         <dt>同梱／CDN 禁止</dt><dd>使う JS・CSS・SDK をアプリに<b>同梱</b>し外部 CDN から読まない原則。理由＝①CDN 障害や版違いで壊れない（可用性）②外部の第三者コードを実行しない（安全）。フォントは代替指定つきなら外部可（詳細は §3）。</dd>
@@ -3342,7 +3345,7 @@ python3 scripts/provision_domo.py apply</pre>
         <dt>SSO / MFA</dt><dd>会社の統合ログイン（シングルサインオン）／多要素認証。<code>domo login</code> はこれに乗る。</dd>
         <dt>~（チルダ）／$HOME</dt><dd>あなたの<b>ホームフォルダ</b>。mac/Linux は <code>/Users/あなた</code>、Windows は <code>C:\Users\あなた</code>。<code>~/handson-pl</code> と <code>$HOME\handson-pl</code> は<b>同じ場所</b>を指す。</dd>
         <dt><code>~/handson-pl</code></dt><dd>ハンズオンで作る<b>使い捨ての自分用コピー</b>の既定置き場。壊れても元フォルダから作り直せる。本番フォルダのまま操作しないための隔離先。</dd>
-        <dt>v0.2.1</dt><dd>本アプリ（Pro-Code カード／ドリルダウン）の版。版は <code>manifest.json</code> を単一ソースとする（画面には出さない）。</dd>
+        <dt>版（バージョン）</dt><dd>本アプリ（Pro-Code カード）の版。<code>manifest.json</code> を単一ソースとし、colophon／footer にのみ表示する（カード UI には出さない）。</dd>
       </dl>
       <figcaption>主要な用語 ― これだけ押さえれば本書は読める（必要に応じて追加）</figcaption>
     </figure>
@@ -3465,7 +3468,7 @@ git config --global http.proxy http://proxy.example.co.jp:8080</pre>
 </main>
 
 <footer class="sitefoot">
-  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>店舗別損益 ・ 開発ガイド ― 店舗別損益AI分析 ・ v0.3.5
+  <svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-chart"/></svg>店舗別損益 ・ 開発ガイド ― 店舗別損益AIインサイト ・ v0.3.7
 </footer>
 
 <!-- トースト（コピー等のフィードバック） -->

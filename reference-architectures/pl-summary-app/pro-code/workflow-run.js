@@ -57,17 +57,17 @@
     if (/^\/workflows\/instances\/[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\/$/i.test(result.progress_path || "")) state.progressPath = result.progress_path;
     if (state.running || (result.created_on && result.created_on >= state.beganAt)) state.unknown = false;
     if (state.unknown) {
-      renderStatus("開始結果はまだ未確認です。再実行せず、実行状況を別タブで確認してください。", true);
+      renderStatus("開始結果はまだ未確認です。再実行せず、実行状況を新しいタブで確認してください。", true);
     } else if (state.running) {
       renderStatus("全店舗・全社のAIレポートを更新中です。現在のレポートは引き続き閲覧できます。");
     } else if (result.status === "COMPLETED") {
       renderStatus("レポートの更新が完了しました。個別のAIレポートは順次反映されます。");
       if (wasRunning) window.dispatchEvent(new Event("pl-workflow-completed"));
     } else if (result.status === "IDLE") {
-      renderStatus("全店舗・全社の長文AIレポートを手動で更新します。", false, true);
+      renderStatus("AIレポートは手動更新です。「全社AIレポートを更新」で全店舗・全社を再生成します。", false, true);
     } else {
       console.warn("[pl] 想定外の実行状態:", result.status);
-      renderStatus("前回の更新状態を確認できませんでした。実行状況を別タブで確認してください。", true);
+      renderStatus("前回の更新状態を確認できませんでした。実行状況を新しいタブで確認してください。", true);
     }
     saveState();
     schedulePoll();

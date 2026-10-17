@@ -30,12 +30,26 @@
     "店舗別AIサマリー"
   ];
 
+  // ブランド色の単一の真実源（PL-021）。色相を変える時はここだけを編集する。CSS は JS を読めないため、
+  // app.css の対応リテラルには「== JS BRAND.xxx」コメントを付け、手動同期の対象を明示している。
+  var BRAND = {
+    enji:      "#7F1D2D",  // プライマリ臙脂（売上 / 商品原価 / APPA / CSS --accent）
+    enjiLight: "#B23A48",  // 明臙脂（総人件費 / LIFE）
+    enjiDeep:  "#5A0F1C",  // 濃臙脂（ランキング選択ハイライト）
+    rose:      "#C97B84",  // ローズ（施設費 / 売上原価棒 / CSS .bar-cogs・.sw-cogs）
+    roseLight: "#D8A7AC",  // 明ローズ（マケ費用）
+    rosePale:  "#E4C9CC",  // 淡ローズ（管理費用）
+    sage:      "#4C6552",  // セージ（純利益 / CSS --profit）
+    sageAlt:   "#5F7A64",  // セージ（FOOD 事業部・カテゴリ別の識別色）
+    gold:      "#B8863B"   // ゴールド（NEW 事業部）
+  };
+
   var COST_KEYS = [
-    { key: "商品原価", label: "商品原価", color: "#7F1D2D" },
-    { key: "総人件費", label: "総人件費", color: "#B23A48" },
-    { key: "施設費",   label: "施設費",   color: "#C97B84" },
-    { key: "マケ費用", label: "マケ費用", color: "#D8A7AC" },
-    { key: "管理費用", label: "管理費用", color: "#E4C9CC" }
+    { key: "商品原価", label: "商品原価", color: BRAND.enji },
+    { key: "総人件費", label: "総人件費", color: BRAND.enjiLight },
+    { key: "施設費",   label: "施設費",   color: BRAND.rose },
+    { key: "マケ費用", label: "マケ費用", color: BRAND.roseLight },
+    { key: "管理費用", label: "管理費用", color: BRAND.rosePale }
   ];
 
   var COMPANY_AI_FIELD = "全社AIサマリー";  // DataFlow TextGeneration 列。行ごと実行のため僅かに異なる複数バリアントが混在しうる（全て全社視点で等価）→ 表示側で最頻値を決定的に選択
@@ -44,7 +58,7 @@
   var TREND_FIELDS = ["period", "store_id", "store", "region", "rev", "profit"];
   var DEPT_FIELDS = ["period", "code", "name", "rev", "cogs", "variance"];
   // 事業部の配色（コード→色）。旧 window.__DEPT__ に焼き込まれていた色を FE 定数へ移設。
-  var DEPT_COLORS = { APPA: "#7F1D2D", LIFE: "#B23A48", FOOD: "#5F7A64", NEW: "#B8863B" };
+  var DEPT_COLORS = { APPA: BRAND.enji, LIFE: BRAND.enjiLight, FOOD: BRAND.sageAlt, NEW: BRAND.gold };
 
   // 24ヶ月トレンド（店舗×月×{rev,profit}）と事業部別損益。いずれも DataFlow の集計出力データセットから
   // live 取得する（旧 window.__TREND__ / window.__DEPT__ の静的同梱は廃止）。ブートストラップで代入。
@@ -57,11 +71,11 @@
   // ※ トレンド線/棒の実体は app.css の .line-rev / .line-profit 等。ツールチップ・ランキングの
   //    swatch 色は下記で CSS と一致させること（片方だけ変えると凡例と本体がズレる）。
   var PALETTE = {
-    rev: "#7F1D2D",     // 売上・プライマリ臙脂
-    profit: "#5F7A64",  // 純利益・グリーン
-    rankSel: "#5A0F1C"  // 選択店ハイライト
+    rev: BRAND.enji,       // 売上・プライマリ臙脂
+    profit: BRAND.sage,    // 純利益・グリーン（CSS --profit と一致。凡例/ツールチップ swatch が本体とズレないよう同一hex）
+    rankSel: BRAND.enjiDeep // 選択店ハイライト
   };
-  var BAR_COGS = "#C97B84", BAR_GROSS = PALETTE.profit; // 事業部積み上げ棒: 売上原価ローズ / 粗利益グリーン
+  var BAR_COGS = BRAND.rose, BAR_GROSS = PALETTE.profit; // 事業部積み上げ棒: 売上原価ローズ / 粗利益グリーン
 
   var els = {};
   var state = { stores: [], byId: {}, period: "", companyAi: "", reqSeq: 0, sel: ALL_LABEL, isAll: true, view: null };
@@ -330,6 +344,7 @@
       html.push("</optgroup>");
     });
     els.select.innerHTML = html.join("");
+    els.select.disabled = false; // 初期の「読み込み中…」プレースホルダを解除（PL-060）
     els.select.addEventListener("change", function () {
       render(this.value === "__ALL__" ? ALL_LABEL : this.value);
     });
@@ -348,7 +363,7 @@
     state.view = view;
     DRILL_KEYS.forEach(function (k) { DRILL[k].length = 0; }); // 店舗/全社の切替でドリル状態をリセット
 
-    els.eyebrow.textContent = (state.period ? state.period + " 時点" : "") + (isAll ? " ・ " + state.stores.length + "店舗" : " ・ " + view.region);
+    els.eyebrow.textContent = (state.period ? longPeriod(state.period) + " 時点" : "") + (isAll ? " ・ " + state.stores.length + "店舗" : " ・ " + view.region);
     els.title.textContent = view.title;
     renderBadges(view);
     renderKpis(view, isAll);
@@ -364,7 +379,7 @@
     // a stale response must not overwrite the current store's report.
     var myReq = ++state.reqSeq;
     els.analysis.classList.remove("ready");
-    els.analysis.innerHTML = '<div class="ai-pending"><div class="spinner sm"></div><p>AI インサイトを読み込み中…</p></div>';
+    els.analysis.innerHTML = '<div class="ai-pending"><div class="spinner sm"></div><p>AIインサイトを読み込み中…</p></div>';
     var lookup = isAll ? ALL_STORE_ID : view.id;
     queryAppDb(lookup).then(function (content) {
       if (myReq !== state.reqSeq) return; // a newer selection superseded this request
@@ -380,10 +395,10 @@
         stripReportTitle(els.analysis);
         markReportMeta(els.analysis);
         els.analysis.classList.add("ready");
-        els.insightNote.textContent = content.generated_at ? "生成: " + String(content.generated_at).slice(0, 10) : "";
+        els.insightNote.textContent = content.generated_at ? longDate(content.generated_at) + " 生成" + reportFreshness(content.generated_at, state.period) : "";
       } else {
-        els.analysis.innerHTML = '<div class="ai-pending"><p><b>AI 詳細インサイトは準備中です。</b></p>' +
-          '<p>この店舗の詳細分析は次回の AI 分析更新後に表示されます。上部の AI サマリーで最新の要点をご確認ください。</p></div>';
+        els.analysis.innerHTML = '<div class="ai-pending"><p><b>AI詳細インサイトは準備中です。</b></p>' +
+          '<p>この店舗の詳細分析は次回のAI分析更新後に表示されます。上部のAIサマリーで最新の要点をご確認ください。</p></div>';
         els.insightNote.textContent = "";
       }
     });
@@ -517,7 +532,8 @@
       summary: document.getElementById("panel-summary")
     };
     function visibleTabs() {
-      return tabs.filter(function (t) { return !t.classList.contains("hidden"); });
+      // 無効化タブ（事業部別＠店舗ビュー）は矢印キーのローテーションから除外する（PL-035）。
+      return tabs.filter(function (t) { return !t.classList.contains("hidden") && t.getAttribute("aria-disabled") !== "true"; });
     }
     function activate(name) {
       tabs.forEach(function (t) {
@@ -533,7 +549,10 @@
     }
     activateTab = activate; // モジュールスコープへ公開（updateDeptTab から呼ぶ）
     tabs.forEach(function (t) {
-      t.addEventListener("click", function () { activate(t.getAttribute("data-tab")); });
+      t.addEventListener("click", function () {
+        if (t.getAttribute("aria-disabled") === "true") return; // 無効化タブはアクティブ化しない（PL-035）
+        activate(t.getAttribute("data-tab"));
+      });
       t.addEventListener("keydown", function (e) {
         var vis = visibleTabs(), idx = vis.indexOf(t), ni = idx;
         if (idx < 0) return; // 隠しタブ上のキー入力は無視
@@ -557,14 +576,17 @@
     if (!tab) return;
     var show = isAll && DEPT && DEPT.divisions && DEPT.divisions.length;
     if (show) {
-      tab.classList.remove("hidden");
-      tab.removeAttribute("aria-hidden");
+      tab.classList.remove("is-disabled");
+      tab.removeAttribute("aria-disabled");
+      tab.removeAttribute("title");
     } else {
+      // 全社ビュー限定。隠してレイアウトを揺らすのではなく、理由付きで無効化して面を保つ（PL-035）。
       var wasActive = tab.classList.contains("active");
-      tab.classList.add("hidden");
-      tab.setAttribute("aria-hidden", "true");
+      tab.classList.add("is-disabled");
+      tab.setAttribute("aria-disabled", "true");
+      tab.setAttribute("title", "全社ビューで表示できます");
       tab.tabIndex = -1;
-      if (wasActive && activateTab) activateTab("overview"); // 隠すタブが表示中なら概要へフォールバック
+      if (wasActive && activateTab) activateTab("overview"); // 無効化タブが表示中なら概要へフォールバック
     }
   }
 
@@ -573,7 +595,9 @@
   function clearChartTips() {
     [els.tipTrend, els.tipDonut, els.tipRank, els.tipDeptBar, els.tipDeptDonut, els.tipDeptTrend]
       .forEach(function (t) { if (t) hideTip(t); });
-    [els.trend, els.deptTrend].forEach(function (host) {
+    // guide/focus は折れ線が宿るホストに出るが、rank カードはドリルで折れ線を宿す（cardTarget('rank')）
+    // ため、6ホスト全てを走査して取りこぼし（タブ切替後に残る破線ガイド/フォーカス点）を防ぐ（PL-066）。
+    [els.trend, els.donut, els.rank, els.deptBar, els.deptDonut, els.deptTrend].forEach(function (host) {
       if (!host) return;
       var fade = host.querySelectorAll(".trend-guide, .trend-focus, .dfocus");
       Array.prototype.forEach.call(fade, function (n) { n.style.opacity = 0; });
@@ -965,15 +989,16 @@
   function renderTrendCard() {
     var top = topFrame("trend");
     if (!top) {
-      drawTrend(state.view.trend, { drill: true, title: "売上・利益トレンド", note: "直近24ヶ月" });
+      drawTrend(state.view.trend, { drill: true, title: "売上・純利益トレンド", note: "直近24ヶ月" });
     } else if (top.type === "storesForPeriod") {
       drawDivergingBars(els.trend, pickTopBottom(storeRowsForPeriod(top.period), 8, 5), { drillKind: "store" });
       setChartTitle(els.titleTrend, "店舗別 純利益", longPeriod(top.period) + "・上位8 / 下位5");
-      els.legendTrend.innerHTML =
-        '<span class="lg"><i class="sw sw-dot" style="background:' + PALETTE.profit + '"></i>黒字</span>' +
-        '<span class="lg"><i class="sw sw-dot" style="background:' + PALETTE.rev + '"></i>赤字</span>';
+      els.legendTrend.innerHTML = dotLegend([
+        { color: PALETTE.profit, label: "黒字" },
+        { color: PALETTE.rev, label: "赤字" }
+      ]);
     } else if (top.type === "storeTrend") {
-      drawTrend(trendFor(top.storeId), { drill: true, title: top.storeName + " 売上・利益トレンド", note: "直近24ヶ月" });
+      drawTrend(trendFor(top.storeId), { drill: true, title: top.storeName + " 売上・純利益トレンド", note: "直近24ヶ月" });
     } else if (top.type === "monthDetail") {
       drawMonthDetail(top, cardTarget("trend"));
     }
@@ -988,12 +1013,12 @@
       });
       var total = costs.reduce(function (a, c) { return a + c.value; }, 0);
       donutInto(els.donut, costs, "総費用", { drill: true });
-      setChartTitle(els.titleDonut, "費用構成", (state.isAll ? "" : state.view.name + "・") + jpMoney(total));
+      setChartTitle(els.titleDonut, "費用内訳", (state.isAll ? "" : state.view.name + "・") + jpMoney(total));
     } else if (top.type === "storesForCategory") {
       var cat = categoryStoreRows(top.catKey);
       drawHBars(els.donut, cat.rows, {
         tip: "slice", total: cat.total, valueFmt: jpMoney, drillKind: "cat-store",
-        aria: function (r) { return r.name + " の費用構成を表示"; }
+        aria: function (r) { return r.name + " の費用内訳を表示"; }
       });
       setChartTitle(els.titleDonut, top.catLabel + " の店舗別金額", "上位10店舗・全社");
     } else if (top.type === "storeCosts") {
@@ -1003,7 +1028,7 @@
         var items = costsOfStore(store);
         var sumv = items.reduce(function (a, c) { return a + c.value; }, 0);
         donutInto(els.donut, items, "総費用", { drill: true, highlight: top.catKey });
-        setChartTitle(els.titleDonut, top.storeName + " の費用構成", "総費用 " + jpMoney(sumv));
+        setChartTitle(els.titleDonut, top.storeName + " の費用内訳", "総費用 " + jpMoney(sumv));
       }
     } else if (top.type === "storeCostTable") {
       drawStoreCostTable(top);
@@ -1016,7 +1041,7 @@
     if (!top) {
       drawRanking(state.isAll ? null : state.view.id);
     } else if (top.type === "storeTrend") {
-      drawTrend(trendFor(top.storeId), { target: cardTarget("rank"), drill: true, title: top.storeName + " 売上・利益トレンド", note: "直近24ヶ月" });
+      drawTrend(trendFor(top.storeId), { target: cardTarget("rank"), drill: true, title: top.storeName + " 売上・純利益トレンド", note: "直近24ヶ月" });
     } else if (top.type === "monthDetail") {
       drawMonthDetail(top, cardTarget("rank"));
     }
@@ -1075,7 +1100,7 @@
     opts = opts || {};
     var target = opts.target || cardTarget("trend");
     var host = target.host, legend = target.legend;
-    if (!data || !data.length) { host.innerHTML = emptyChart(); if (legend) legend.innerHTML = ""; setChartTitle(target.titleEl, opts.title || "売上・利益トレンド", opts.note || ""); return; }
+    if (!data || !data.length) { host.innerHTML = emptyChart(); if (legend) legend.innerHTML = ""; setChartTitle(target.titleEl, opts.title || "売上・純利益トレンド", opts.note || ""); return; }
     // カード幅に合わせて実寸描画（viewBox 幅＝CSS px）。文字は縮小されない。
     var W = chartWidth(host);
     var H = Math.max(300, Math.min(420, Math.round(W * 0.45)));
@@ -1097,7 +1122,7 @@
       var gv = min + (max - min) * t / ticks;
       var gy = y(gv);
       svg.push(line(ml, gy, W - mr, gy, "grid"));
-      svg.push(text(ml - 8, gy + 4, jpCompact(gv), "axis-y"));
+      svg.push(text(ml - 8, gy + 4, axisFmt(gv, max), "axis-y"));
     }
     if (min < 0 && max > 0) svg.push(line(ml, y(0), W - mr, y(0), "zero"));
     var xStep = W < 480 ? 6 : 3; // 狭いカードでは月ラベルを間引く
@@ -1133,13 +1158,34 @@
     host.innerHTML = svg.join("");
     if (legend) {
       legend.innerHTML =
-        '<span class="lg"><i class="sw sw-rev"></i>売上</span>' +
-        '<span class="lg"><i class="sw sw-profit"></i>純利益</span>';
+        '<span class="lg">' + lineKey(PALETTE.rev, "", "circle") + '売上</span>' +
+        '<span class="lg">' + lineKey(PALETTE.profit, "7 4", "circle") + '純利益</span>';
     }
-    setChartTitle(target.titleEl, opts.title || "売上・利益トレンド", opts.note || "");
+    setChartTitle(target.titleEl, opts.title || "売上・純利益トレンド", opts.note || "");
   }
 
   /* ---------------- SVG: donut ---------------- */
+
+  // 構成比の表示整数を最大剰余法（Hamilton）で合計100%へ揃える（PL-027）。各スライスを個別に
+  // 四捨五入すると和が99/101になり、可視スライスが「0%」表記になる不信を生むため。戻り値は
+  // 「%」を付けない文字列配列（各表示点で "%" を付す）。正値で1%未満は "<1" を返す。
+  function pctDisplay(values) {
+    var total = values.reduce(function (a, v) { return a + (v > 0 ? v : 0); }, 0);
+    if (total <= 0) return values.map(function () { return "0"; });
+    var exact = values.map(function (v) { return (v > 0 ? v : 0) / total * 100; });
+    var floors = exact.map(function (x) { return Math.floor(x); });
+    var used = floors.reduce(function (a, x) { return a + x; }, 0);
+    var leftover = Math.round(100 - used);
+    var order = exact.map(function (x, i) { return { i: i, rem: x - Math.floor(x) }; })
+      .sort(function (a, b) { return b.rem - a.rem; });
+    var bump = {};
+    for (var k = 0; k < leftover && k < order.length; k++) bump[order[k].i] = 1;
+    return exact.map(function (x, i) {
+      var n = floors[i] + (bump[i] ? 1 : 0);
+      if (values[i] > 0 && n === 0) return "<1"; // 正値だが1%未満＝「0%」と誤解させない
+      return String(n);
+    });
+  }
 
   // 汎用ドーナツ描画。items = [{label,color,value,key?}]。中央ラベルは centerLabel、中央値は合計。
   // opts.drill でスライスをクリック可能にし、opts.highlight（key）で他スライスを減光する。
@@ -1150,29 +1196,30 @@
     if (!sumv) { host.innerHTML = emptyChart(); return; }
     var W = 300, H = 300, cx = 150, cy = 140, r = 104, rin = 64;
     var svg = ['<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="xMidYMid meet" class="svg">'];
+    var pcts = pctDisplay(items.map(function (c) { return c.value; }));
     var ang = -Math.PI / 2;
-    items.forEach(function (c) {
+    items.forEach(function (c, i) {
       var frac = c.value / sumv;
       var a2 = ang + frac * Math.PI * 2;
       var attrs = 'data-slice="1" data-label="' + esc(c.label) + '" data-value="' + c.value +
-        '" data-pct="' + Math.round(frac * 100) + '" data-color="' + c.color + '"';
+        '" data-pct="' + pcts[i] + '" data-color="' + c.color + '"';
       if (opts.drill) {
         attrs += ' data-drill="slice" data-key="' + esc(c.key || "") +
           '" tabindex="0" role="button" aria-label="' +
-          esc(c.label + "、" + jpMoney(c.value) + "、構成比 " + Math.round(frac * 100) + "%。内訳を表示") + '"';
+          esc(c.label + "、" + jpMoney(c.value) + "、構成比 " + pcts[i] + "%。内訳を表示") + '"';
       }
       if (opts.highlight && c.key && c.key !== opts.highlight) attrs += ' style="opacity:.35"';
       svg.push(donutArc(cx, cy, r, rin, ang, a2, c.color, attrs));
       ang = a2;
     });
     svg.push('<text x="' + cx + '" y="' + (cy - 4) + '" class="donut-center-label">' + esc(centerLabel) + '</text>');
-    svg.push('<text x="' + cx + '" y="' + (cy + 20) + '" class="donut-center-value">' + esc(jpCompact(sumv)) + "</text>");
+    svg.push('<text x="' + cx + '" y="' + (cy + 20) + '" class="donut-center-value">' + esc(jpMoney(sumv)) + "</text>");
     var ly = 250;
     items.forEach(function (c, i) {
       var col = i % 2, row = Math.floor(i / 2);
       var lx = 18 + col * 150, yy = ly + row * 20;
       svg.push('<rect x="' + lx + '" y="' + (yy - 9) + '" width="10" height="10" rx="2" fill="' + c.color + '"/>');
-      svg.push('<text x="' + (lx + 16) + '" y="' + yy + '" class="donut-legend">' + esc(c.label) + " " + Math.round(c.value / sumv * 100) + "%</text>");
+      svg.push('<text x="' + (lx + 16) + '" y="' + yy + '" class="donut-legend">' + esc(c.label) + " " + pcts[i] + "%</text>");
     });
     svg.push("</svg>");
     host.innerHTML = svg.join("");
@@ -1213,8 +1260,11 @@
       var bw = Math.max(half, 1);
       var fill = isSel ? PALETTE.rankSel : (pos ? PALETTE.profit : PALETTE.rev);
       svg.push('<rect x="' + (labelW - 8) + '" y="' + yy + '" width="' + (W - labelW + 8) + '" height="' + rowH + '" class="rank-row' + (isSel ? " sel" : "") + '"/>');
+      var rankStr = opts.rankOf ? (opts.rankOf[s.id] + ".") : "";
+      // 順位番号（"100." 等）の幅ぶん名前の文字数予算を減らし、下位(2〜3桁)で名前が棒域へはみ出すのを防ぐ（PL-064）
+      var nc = Math.max(4, nameChars - rankStr.length);
       svg.push('<text x="8" y="' + (yy + rowH / 2 + 4) + '" class="rank-name' + (isSel ? " sel" : "") + '">' +
-        (opts.rankOf ? '<tspan class="rank-num">' + opts.rankOf[s.id] + ".</tspan> " : "") + esc(trunc(s.name, nameChars)) + "</text>");
+        (rankStr ? '<tspan class="rank-num">' + rankStr + '</tspan> ' : "") + esc(trunc(s.name, nc)) + "</text>");
       svg.push('<rect x="' + bx + '" y="' + (yy + 6) + '" width="' + bw + '" height="' + (rowH - 12) + '" rx="3" fill="' + fill + '"/>');
       svg.push('<text x="' + (W - 8) + '" y="' + (yy + rowH / 2 + 4) + '" class="rank-val ' + (pos ? "pos" : "neg") + '">' + esc(jpMoney(s.profit)) + "</text>");
       hits.push('<rect class="rank-hit drill-hit"' +
@@ -1249,9 +1299,10 @@
     drawDivergingBars(els.rank, rows, { rankOf: rankOf, selectedId: selectedId, drillKind: "rank" });
     setChartTitle(els.rankTitle, "店舗別 純利益ランキング", selectedId ? "選択店をハイライト" : "上位8 / 下位5");
     if (els.legendRank) {
-      els.legendRank.innerHTML =
-        '<span class="lg"><i class="sw sw-dot" style="background:' + PALETTE.profit + '"></i>黒字</span>' +
-        '<span class="lg"><i class="sw sw-dot" style="background:' + PALETTE.rev + '"></i>赤字</span>';
+      els.legendRank.innerHTML = dotLegend([
+        { color: PALETTE.profit, label: "黒字" },
+        { color: PALETTE.rev, label: "赤字" }
+      ]);
     }
   }
 
@@ -1344,7 +1395,7 @@
     var H = Math.max(320, Math.min(430, Math.round(W * 0.5)));
     var ml = W < 480 ? 52 : 64, mr = 16, mt = 26, mb = 44;
     var iw = W - ml - mr, ih = H - mt - mb;
-    var yMax = Math.max.apply(null, divs.map(function (d) { return d.rev; })) * 1.12 || 1;
+    var yMax = Math.max.apply(null, divs.map(function (d) { return Math.max(d.rev, d.cogs); })) * 1.12 || 1; // 原価>売上でも軸に収める（PL-030）
     var band = iw / divs.length, bw = Math.min(96, band * 0.5);
     var y = function (v) { return mt + ih * (1 - v / yMax); };
     var y0 = y(0);
@@ -1354,7 +1405,7 @@
     for (var t = 0; t <= ticks; t++) {
       var gv = yMax * t / ticks, gy = y(gv);
       svg.push(line(ml, gy, W - mr, gy, "grid"));
-      svg.push(text(ml - 8, gy + 4, jpCompact(gv), "axis-y"));
+      svg.push(text(ml - 8, gy + 4, axisFmt(gv, yMax), "axis-y"));
     }
     var hits = [];
     divs.forEach(function (d, i) {
@@ -1362,10 +1413,14 @@
       var yCogs = y(d.cogs), yRev = y(d.rev);
       // 売上原価（下段）
       if (d.cogs > 0) svg.push('<rect x="' + bx + '" y="' + yCogs.toFixed(1) + '" width="' + bw + '" height="' + (y0 - yCogs).toFixed(1) + '" class="bar-cogs"/>');
-      // 粗利益（上段）
-      svg.push('<rect x="' + bx + '" y="' + yRev.toFixed(1) + '" width="' + bw + '" height="' + (yCogs - yRev).toFixed(1) + '" class="bar-gross"/>');
-      // 粗利率（上段が十分高いときのみ内側に表示）
-      if (yCogs - yRev > 22) svg.push('<text x="' + cx + '" y="' + ((yRev + yCogs) / 2 + 4).toFixed(1) + '" class="bar-inpct">' + Math.round(d.gross / d.rev * 100) + "%</text>");
+      // 粗利益（上段）＝原価より売上が高い分だけ。原価>売上（粗利マイナス）のときは負の高さを
+      // 0 に抑え、ブラウザが描けない壊れた矩形を出さない（PL-030）。
+      var grossH = Math.max(0, yCogs - yRev);
+      if (grossH > 0) svg.push('<rect x="' + bx + '" y="' + yRev.toFixed(1) + '" width="' + bw + '" height="' + grossH.toFixed(1) + '" class="bar-gross"/>');
+      // 粗利率（上段が十分高く、売上>0 かつ粗利>0 のときのみ内側に表示＝ゼロ割（rev=0→Infinity）や負率を出さない）
+      if (grossH > 22 && d.rev > 0 && d.gross > 0) svg.push('<text x="' + cx + '" y="' + ((yRev + yCogs) / 2 + 4).toFixed(1) + '" class="bar-inpct">' + Math.round(d.gross / d.rev * 100) + "%</text>");
+      // 粗利マイナス（原価>売上）を明示＝粗利セグメントが無言で消えて空の棒に見えるのを防ぐ
+      if (d.gross < 0) svg.push('<text x="' + cx + '" y="' + (yCogs - 8).toFixed(1) + '" class="bar-neg">粗利マイナス</text>');
       // 売上合計（棒上）
       svg.push('<text x="' + cx + '" y="' + (yRev - 8).toFixed(1) + '" class="bar-total">' + esc(jpCompact(d.rev)) + "</text>");
       // 事業部名（x軸）
@@ -1379,9 +1434,10 @@
     svg.push(hits.join(""));
     svg.push("</svg>");
     els.deptBar.innerHTML = svg.join("");
-    els.legendDeptBar.innerHTML =
-      '<span class="lg"><i class="sw sw-dot sw-cogs"></i>売上原価</span>' +
-      '<span class="lg"><i class="sw sw-dot sw-gross"></i>粗利益</span>';
+    els.legendDeptBar.innerHTML = dotLegend([
+      { cls: "sw-cogs", label: "売上原価" },
+      { cls: "sw-gross", label: "粗利益" }
+    ]);
     setChartTitle(els.titleDeptBar, "事業部別 売上・粗利", "積み上げ＝売上原価＋粗利益");
   }
 
@@ -1416,15 +1472,19 @@
     for (var t = 0; t <= ticks; t++) {
       var gv = max * t / ticks, gy = y(gv);
       svg.push(line(ml, gy, W - mr, gy, "grid"));
-      svg.push(text(ml - 8, gy + 4, jpCompact(gv), "axis-y"));
+      svg.push(text(ml - 8, gy + 4, axisFmt(gv, max), "axis-y"));
     }
     var xStep = W < 480 ? 3 : 2; // 狭いカードでは月ラベルを間引く
     for (var i = 0; i < n; i++) {
       if (i % xStep === 0 || i === n - 1) svg.push(text(x(i), H - 12, shortPeriod(periods[i]), "axis-x"));
     }
-    series.forEach(function (s) {
+    series.forEach(function (s, si) {
       var pts = s.rev.map(function (v, i) { return x(i) + "," + y(v); }).join(" ");
-      svg.push('<polyline points="' + pts + '" class="dline" style="stroke:' + s.color + '"/>');
+      var dash = SERIES_DASH[si % SERIES_DASH.length];
+      svg.push('<polyline points="' + pts + '" class="dline" style="stroke:' + s.color + '"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>');
+      // 終端に系列固有の形状を置き、色が近接していても線の終点から系列を同定できるようにする。
+      var li = s.rev.length - 1, lv = s.rev[li];
+      if (li >= 0 && isFinite(lv)) svg.push(endMarker(x(li), y(lv), SERIES_MARK[si % SERIES_MARK.length], s.color));
     });
     // hover guide + one focus dot per series (positioned by JS)
     svg.push('<line class="trend-guide" x1="0" y1="' + mt + '" x2="0" y2="' + (mt + ih) + '"/>');
@@ -1449,8 +1509,8 @@
     svg.push("</svg>");
     target.host.innerHTML = svg.join("");
     if (target.legend) {
-      target.legend.innerHTML = series.map(function (s) {
-        return '<span class="lg"><i class="sw" style="background:' + s.color + '"></i>' + esc(shortDept(s.name)) + "</span>";
+      target.legend.innerHTML = series.map(function (s, si) {
+        return '<span class="lg">' + lineKey(s.color, SERIES_DASH[si % SERIES_DASH.length], SERIES_MARK[si % SERIES_MARK.length]) + esc(shortDept(s.name)) + "</span>";
       }).join("");
     }
     setChartTitle(target.titleEl, opts.title || "事業部別 月次売上トレンド", opts.note || "");
@@ -1500,7 +1560,7 @@
         '<td class="num">' + momTxt + "</td>" +
         '<td class="num">' + (share == null ? "-" : fmtPct(share)) + "</td></tr>";
     }
-    target.host.innerHTML = '<div class="table-scroll"><table class="dept-table"><thead><tr>' +
+    target.host.innerHTML = '<div class="table-scroll"><table class="dept-table"><caption class="sr-only">' + esc(f.name) + ' 月次詳細</caption><thead><tr>' +
       '<th scope="col">区分</th><th scope="col">期間</th><th scope="col">売上</th><th scope="col">前月比</th><th scope="col">年度構成比</th>' +
       "</tr></thead><tbody>" +
       row("当月", longPeriod(m.period), m.rev, m.mom, m.share, true) +
@@ -1527,7 +1587,7 @@
       return '<tr><th scope="row">' + esc(label) + "</th>" + cell(cur) + cell(prev, momPct) + cell(yoy, yoyPct) + "</tr>";
     }
     var range = trendRange(f.storeId);
-    target.host.innerHTML = '<div class="table-scroll"><table class="dept-table"><thead><tr>' +
+    target.host.innerHTML = '<div class="table-scroll"><table class="dept-table"><caption class="sr-only">' + esc(f.storeName) + ' 月次詳細</caption><thead><tr>' +
       '<th scope="col">指標</th>' +
       '<th scope="col">' + esc(longPeriod(m.period)) + "</th>" +
       '<th scope="col">' + (m.prevPeriod ? "前月 " + esc(longPeriod(m.prevPeriod)) : "前月") + "</th>" +
@@ -1568,7 +1628,7 @@
     }).join("");
     rows += '<tr class="total"><th scope="row">合計</th><td class="num">' + esc(jpMoney(model.total)) +
       '</td><td class="num">100%</td><td class="num">' + fmtPct(model.sales ? (model.total / model.sales) * 100 : 0) + "</td></tr>";
-    els.donut.innerHTML = '<div class="table-scroll"><table class="dept-table"><thead><tr>' +
+    els.donut.innerHTML = '<div class="table-scroll"><table class="dept-table"><caption class="sr-only">' + esc(f.storeName) + ' の費用内訳</caption><thead><tr>' +
       '<th scope="col">費用区分</th><th scope="col">金額</th><th scope="col">構成比</th><th scope="col">対売上比</th>' +
       "</tr></thead><tbody>" + rows + "</tbody></table></div>" +
       '<p class="drill-foot">※ 構成比＝総費用に対する割合、対売上比＝総売上に対する割合。</p>';
@@ -1714,7 +1774,7 @@
     }).join("");
     rows += budgetRow(true, "合計", null, tr, tc, tg, (tr ? tg / tr * 100 : 0), tv, Math.round(tach * 10) / 10);
     els.deptTable.innerHTML =
-      '<table class="dept-table"><thead><tr>' +
+      '<table class="dept-table"><caption class="sr-only">予算達成状況（事業部別・粗利ベース）</caption><thead><tr>' +
       '<th scope="col">事業部</th><th scope="col">売上</th><th scope="col">売上原価</th><th scope="col">粗利益</th><th scope="col">粗利率</th><th scope="col">予算差異</th><th scope="col">達成率</th>' +
       "</tr></thead><tbody>" + rows + "</tbody></table>";
   }
@@ -1748,7 +1808,38 @@
   }
   function text(x, y, s, cls) { return '<text x="' + x + '" y="' + y + '" class="' + cls + '">' + esc(s) + "</text>"; }
   function dot(x, y, cls) { return '<circle cx="' + x + '" cy="' + y + '" r="3.5" class="' + cls + '"/>'; }
-  function emptyChart() { return '<div class="chart-empty">データがありません</div>'; }
+  function emptyChart() { return '<div class="chart-empty" role="status">データがありません</div>'; }
+
+  // ---- 系列を色だけに頼らず区別する第2チャネル（破線パターン＋終端マーカー形状）: WCAG 1.4.1 ----
+  // 系列インデックスで巡回。事業部トレンドは最大4系列で、うち APPA/LIFE が近接2赤（色相のみでは
+  // 重なると判別不能）。破線と終端の形状を足すことで、色覚特性や白黒印刷でも線を追える。
+  var SERIES_DASH = ["", "7 4", "2 4", "9 3 2 3"];       // 実線 / 破線 / 点線 / 一点鎖線
+  var SERIES_MARK = ["circle", "square", "triangle", "diamond"];
+  function endMarker(cx, cy, shape, color) {
+    var r = 4, st = ' style="fill:' + color + '"';
+    if (shape === "square") return '<rect x="' + (cx - r) + '" y="' + (cy - r) + '" width="' + (r * 2) + '" height="' + (r * 2) + '"' + st + '/>';
+    if (shape === "triangle") return '<polygon points="' + cx + ',' + (cy - r - 1) + ' ' + (cx - r - 1) + ',' + (cy + r) + ' ' + (cx + r + 1) + ',' + (cy + r) + '"' + st + '/>';
+    if (shape === "diamond") return '<polygon points="' + cx + ',' + (cy - r - 1) + ' ' + (cx + r + 1) + ',' + cy + ' ' + cx + ',' + (cy + r + 1) + ' ' + (cx - r - 1) + ',' + cy + '"' + st + '/>';
+    return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '"' + st + '/>';
+  }
+  // ドット凡例の単一定義（PL-065）。色は inline（it.color）または CSS クラス（it.cls）で与える。
+  // 複数箇所でインライン重複していた「黒字/赤字」「売上原価/粗利益」をここへ集約し、SSOT ドリフトを防ぐ。
+  function dotLegend(items) {
+    return items.map(function (it) {
+      var sw = it.cls
+        ? '<i class="sw sw-dot ' + it.cls + '"></i>'
+        : '<i class="sw sw-dot" style="background:' + it.color + '"></i>';
+      return '<span class="lg">' + sw + esc(it.label) + "</span>";
+    }).join("");
+  }
+
+  // 凡例の線キー（色＋破線＋終端マーカー）。色が近接していても線種・形状で系列を同定できる。
+  function lineKey(color, dash, shape) {
+    var d = dash ? ' stroke-dasharray="' + dash + '"' : '';
+    return '<svg class="sw-line" width="26" height="12" viewBox="0 0 26 12" aria-hidden="true">' +
+      '<line x1="1" y1="6" x2="25" y2="6" style="stroke:' + color + '" stroke-width="2.2" stroke-linecap="round"' + d + '/>' +
+      endMarker(13, 6, shape, color) + '</svg>';
+  }
 
   function donutArc(cx, cy, r, rin, a1, a2, color, attrs) {
     var large = (a2 - a1) > Math.PI ? 1 : 0;
@@ -1769,23 +1860,49 @@
   function sum(arr, k) { return arr.reduce(function (a, x) { return a + (x[k] || 0); }, 0); }
   function byProfitDesc(a, b) { return b.profit - a.profit; }
 
+  // jpMoney は詳細表示（ツールチップ/表）用。億帯は小数2桁＝百万単位まで保持する意図的な精度
+  // （万帯は整数＝万単位）。jpCompact（軸ラベル用）は億帯1桁で粗め。桁区切りは toLocaleString("ja-JP")
+  // で閲覧者ロケール非依存（PL-038/PL-068）。trimZero で末尾0は落とす（1.00億→1億）。
   function jpMoney(n) {
     var a = Math.abs(n), sign = n < 0 ? "-" : "";
     if (a >= 1e8) return sign + trimZero((a / 1e8).toFixed(2)) + "億円";
-    if (a >= 1e4) return sign + Math.round(a / 1e4).toLocaleString() + "万円";
-    return sign + Math.round(a).toLocaleString() + "円";
+    if (a >= 1e4) return sign + Math.round(a / 1e4).toLocaleString("ja-JP") + "万円";
+    return sign + Math.round(a).toLocaleString("ja-JP") + "円";
   }
   function jpCompact(n) {
     var a = Math.abs(n), sign = n < 0 ? "-" : "";
     if (a >= 1e8) return sign + trimZero((a / 1e8).toFixed(1)) + "億";
-    if (a >= 1e4) return sign + Math.round(a / 1e4).toLocaleString() + "万";
-    return sign + Math.round(a).toLocaleString();
+    if (a >= 1e4) return sign + Math.round(a / 1e4).toLocaleString("ja-JP") + "万";
+    return sign + Math.round(a).toLocaleString("ja-JP");
+  }
+  // 軸目盛り用。単位（億/万/円）を**軸の最大値から1つに固定**し、目盛りが万↔億をまたいで
+  // （例 3750万 / 1.1億）暗算を強いるのを防ぐ（PL-028）。符号つき・ロケール固定。
+  function axisFmt(v, maxVal) {
+    var a = Math.abs(v), sign = v < 0 ? "-" : "", m = Math.abs(maxVal);
+    if (m >= 1e8) return sign + trimZero((a / 1e8).toFixed(1)) + "億";
+    if (m >= 1e4) return sign + Math.round(a / 1e4).toLocaleString("ja-JP") + "万";
+    return sign + Math.round(a).toLocaleString("ja-JP");
   }
   function trimZero(s) { return s.replace(/\.?0+$/, ""); }
   function fmtPct(n) { return (Math.round(n * 10) / 10) + "%"; }
   function fmtSignedPct(n) { return (n >= 0 ? "+" : "") + (Math.round(n * 10) / 10) + "%"; }
   function shortPeriod(p) { var m = /^(\d{4})-(\d{2})$/.exec(p || ""); return m ? m[1].slice(2) + "/" + m[2] : (p || ""); }
   function longPeriod(p) { var m = /^(\d{4})-(\d{2})$/.exec(p || ""); return m ? m[1] + "年" + (+m[2]) + "月" : (p || ""); }
+  // ISO 日付（YYYY-MM-DD…）を '2025年10月15日' へ。表/チャートの longPeriod と表記系を揃える（PL-034）。
+  function longDate(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || "")); return m ? m[1] + "年" + (+m[2]) + "月" + (+m[3]) + "日" : String(iso || "").slice(0, 10); }
+  // レポートの鮮度補足（PL-037・表示専用）。生成からの相対経過と、データ時点（period "YYYY-MM"）より
+  // 古い場合の注意を「（約3ヶ月前・最新データより古い可能性）」の形で返す。nowMs はテスト用に差し替え可。
+  function reportFreshness(genIso, period, nowMs) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(genIso || ""));
+    if (!m) return "";
+    var parts = [];
+    var days = Math.floor(((nowMs == null ? Date.now() : nowMs) - Date.UTC(+m[1], +m[2] - 1, +m[3])) / 86400000);
+    if (days >= 1 && days < 31) parts.push("約" + days + "日前");
+    else if (days >= 31) parts.push("約" + Math.round(days / 30) + "ヶ月前");
+    var ym = m[1] + "-" + m[2];
+    if (period && /^\d{4}-\d{2}$/.test(period) && ym < period) parts.push("最新データより古い可能性");
+    return parts.length ? "（" + parts.join("・") + "）" : "";
+  }
   function trunc(s, n) { s = String(s || ""); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
   function shortDept(name) { return String(name || "").replace(/事業部$/, ""); }
 
@@ -1798,10 +1915,15 @@
     if (typeof s !== "string" || s.length > 200000) throw new Error("レポート本文の形式またはサイズが不正です。");
     var template = document.createElement("template");
     template.innerHTML = s;
+    // エスケープ済み HTML（実タグを含まず、本文がエスケープされた断片のみ）の復元は 1 段のみ。
+    // CE はレポートをアンエスケープ済みで保存するため、実タグとエスケープ断片が混在するケースは
+    // 想定しない（混在時はエスケープ断片をそのまま表示＝信頼面を広げない保守的挙動・PL-039）。
     if (!template.content.children.length && /<[a-z][\s\S]*>/i.test(template.content.textContent)) {
       template.innerHTML = template.content.textContent;
     }
-    var allowed = new Set("h1 h2 h3 h4 h5 h6 p div span section article header footer table thead tbody tfoot tr th td caption colgroup col ul ol li b strong em i u s small blockquote pre code hr br a details summary".split(" "));
+    // 'a' は許可タグから除外（PL-039）。href を安全に通すと信頼面が広がるため、リンクは描画しない方針。
+    // <a> はアンラップされ、リンク文字列はテキストとして残る（死にリンクの誤認を避ける）。
+    var allowed = new Set("h1 h2 h3 h4 h5 h6 p div span section article header footer table thead tbody tfoot tr th td caption colgroup col ul ol li b strong em i u s small blockquote pre code hr br details summary".split(" "));
     var blocked = new Set("script style iframe object embed link meta base svg math template img video audio form input button textarea select option noscript".split(" "));
     var attributes = new Set(["class", "title", "colspan", "rowspan", "scope", "aria-label"]);
     var removed = 0;

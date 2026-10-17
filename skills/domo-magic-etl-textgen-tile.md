@@ -74,6 +74,13 @@ walks `build_body()` output, keep it green.
 4. Exercise the **unchanged AI tiles** with a bounded preview and no Publish actions. Confirm each
    AI action succeeds, output row counts match input, values are substituted, and no `{{...}}`
    placeholders leak. Keep preview rows/private AI text outside Git and stdout.
+   Inspect `DOMO_AI_BATCH_ERROR` as well as the text: a successful preview action can return
+   `Text generation preview limit reached.` as nonempty output for rows beyond its generation cap.
+   Count only error-free generated texts. On one verified instance, 100 sampled rows from a
+   287-row action contained 20 real generations and 80 cap errors; a complete 33-row preview
+   contained 20 real generations and 13 cap errors.
+   A preview can therefore verify bindings and sampled quality, but cannot benchmark full-volume
+   BATCH throughput, even when `executionPreference` is BATCH.
 5. Require fresh typed-chip evidence before declaring the editor issue fixed. A code-equal historic
    design does not establish present UI correctness. If browser verification is unavailable, say so
    and obtain the user's confirmation; do not claim an unobserved visual fix.
@@ -85,6 +92,23 @@ walks `build_body()` output, keep it green.
 **Evidence discipline:** a `?` screenshot alone proves neither a broken runtime binding nor a
 provider-side latency cause. Successful small previews prove substitution on that sample, not
 full-volume performance. Distinguish observed facts, hypotheses and unresolved backend causes.
+
+### Variable batch runtimes
+
+[Domo's Product Manager explains](https://community-forums.domo.com/main/discussion/70930/magic-etl-ai-text-generation-tile/p1)
+that the tile's batching service uses idle compute and has variable runtimes; the reported same-size
+case changed from 55 minutes to 9 hours. This is primary evidence for the general behavior, not proof
+of the cause of a particular stopped job. Compare input **versions**, native timings and both complete
+AI objects before blaming the latest formula change. A prior 47-minute run is not a completion SLA.
+
+Read current model limits before proposing non-batch: the observed internal generation-model route is
+`GET /api/ai/v1/settings/services/text-generation/models`. Respect `maxNonBatchTotalRows`; a model's
+batch allowance does not authorize the same population in non-batch mode. A model-version trial with
+only preview success or no full completion is not a verified fix. Keep the full required population,
+respect user stops, clarify a missing hard time requirement once, and monitor the agreed full run to
+terminal state. Escalation evidence should identify DataFlow/execution/design/DAP execution IDs and
+the stalled action, without credentials or private prompt/row contents. Do not send it without explicit
+authorization to message others.
 
 ### Evidence discipline, in practice
 

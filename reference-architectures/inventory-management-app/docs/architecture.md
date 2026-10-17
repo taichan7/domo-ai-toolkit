@@ -61,7 +61,7 @@ UI (app.js)
   → Domo managed services
 ```
 
-UIはDomo APIパスや物理IDを知らない。ManifestのAppDB、DataSet、Code Engineエイリアスを通じて差し替える。Workflowも `lowStockNotification` → model の物理ID（`modelId`・実値は `manifest.json` が正）をManifestへ明示し、**起動はCode Engineがサーバー側で行う**（モデルの有効な最新版を実行時に解決し、フロントはWorkflow APIを直接呼ばない。Workflowを改版してもカードの再配線・再埋め込みは不要）。通知Workflowの**版**はインスタンス依存で動くため固定しない（`verify` の `ok` は `modelId` 一致とCEソースへの起動先modelIdの焼き込み `codeEngineWorkflowModelEmbedded` で判定し、版の乖離は非ブロッキング警告として可視化する。詳細は下の「バージョン配線」）。
+UIはDomo APIパスや物理IDを知らない。ManifestのAppDB、DataSet、Code Engineエイリアスを通じて差し替える。Workflowも `lowStockNotification` → model の物理ID（`modelId`・実値は `manifest.json` が正）をManifestへ明示し、**起動はCode Engineがサーバー側で行う**（モデルの有効な最新版を実行時に解決し、フロントはWorkflow APIを直接呼ばない。Workflowを改版してもカードの再配線・再埋め込みは不要）。通知Workflowの**版**はインスタンス依存で固定しない（仕組みと `verify` 条件の全体は [test-results.md](test-results.md) の「Workflow版解決」が正、本書の要点は下の「バージョン配線」）。
 
 ## バージョン配線
 
@@ -72,7 +72,7 @@ UIはDomo APIパスや物理IDを知らない。ManifestのAppDB、DataSet、Cod
 | Workflow mapping | alias `lowStockNotification` / 物理 model ID（`modelId`）を固定（解決済みの `modelId` は `manifest.json`。名称・aliasの契約は [domo-assets.md](domo-assets.md)＝実IDは持たない）。同じ modelId を `apply` がCode Engineソースへ焼き込み、CEが起動時に最新の有効版を解決する。**released version は固定しない**＝インスタンス依存で動くため `verify` の `ok` 条件に含めず、宣言版と live 版の乖離は `workflowWarnings` に可視化するだけ |
 | App Studio card | `designVersion: null` による最新公開版追従（実効版はManifest最新公開版に一致、`verify`で確認）。1×1／既定`fullpage:false`、compact 12×29、`fitToFrame:false`、カード操作は既定（`interaction`未設定＝操作許可、`editInAppViewer:true`）。card／outer proxy／inner context／design の実IDは `domo-assets.json`（ローカル生成・配布しない）が正（インスタンスごとに採番。名称・構造の契約は [domo-assets.md](domo-assets.md)＝実IDは持たない） |
 
-Code Engineはreleased versionを文字列で固定し、`latest`へ暗黙追従させない。通知Workflowは物理 model ID（`modelId`）だけを固定し、版はインスタンス依存で動くため固定しない（`verify` の `ok` は `modelId` 一致と `codeEngineWorkflowModelEmbedded`＝CEソースへの起動先焼き込みで判定）。App Studioカードだけは同一designの修正版を自動反映する既存contextを維持し、`provision_domo.py verify` が公開latest・Manifest・カード実効版の3者一致を検証する。
+Code Engineはreleased versionを文字列で固定し、`latest`へ暗黙追従させない。通知Workflowは物理 model ID（`modelId`）だけを固定し、版はインスタンス依存で動くため固定しない（`verify` の `ok` は `modelId` 一致と `codeEngineWorkflowModelEmbedded`＝CEソースへの起動先焼き込みで判定）。App Studioカードだけは同一designの修正版を自動反映する既存contextを維持し、`provision_domo.py verify` が公開latest・Manifest・カード実効版の3者一致を検証する。Workflow版がインスタンス依存である理由・`workflowWarnings` の扱い・改版時にカード再埋め込みが不要な仕組みの**全体は [test-results.md](test-results.md) の「Workflow版解決」が正**（本書は設計上の要点のみ）。
 
 ## AppDBとDataSetの使い分け
 

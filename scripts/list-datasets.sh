@@ -14,9 +14,9 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
 source "$SCRIPT_DIR/lib/common.sh"
 domo_load_auth
+domo_require curl
 
 MAX="${1:-50}"
-LIMIT=50
 OFFSET=0
 FETCHED=0
 
@@ -26,8 +26,10 @@ printf "%-40s  %-50s  %-20s  %12s  %-25s\n" "ID" "NAME" "TYPE" "ROWS" "OWNER"
 printf "%-40s  %-50s  %-20s  %12s  %-25s\n" "----------------------------------------" "--------------------------------------------------" "--------------------" "------------" "-------------------------"
 
 while (( FETCHED < MAX )); do
-  RESPONSE=$(curl -s "${DOMO_CURL_AUTH_ARGS[@]}" \
-    "https://$INSTANCE/api/data/v3/datasources?limit=$LIMIT&offset=$OFFSET")
+  # 今回ページで取る件数は「残り予算（MAX-FETCHED）」と 50 の小さい方＝引数 N を厳密な上限にする（TK-025）。
+  PAGELIMIT=$(( (MAX - FETCHED) < 50 ? (MAX - FETCHED) : 50 ))
+  RESPONSE=$(curl -sS --max-time 30 "${DOMO_CURL_AUTH_ARGS[@]}" \
+    "https://$INSTANCE/api/data/v3/datasources?limit=$PAGELIMIT&offset=$OFFSET") || domo_neterr
 
   echo "$RESPONSE" | "$PYTHON_BIN" -c "
 import json, sys
@@ -56,8 +58,8 @@ for d in rows:
   PAGE_COUNT=$(echo "$RESPONSE" | "$PYTHON_BIN" -c "import json,sys; print(len(json.load(sys.stdin).get('dataSources', [])))")
   FETCHED=$((FETCHED + PAGE_COUNT))
 
-  if (( PAGE_COUNT < LIMIT )); then break; fi
-  OFFSET=$((OFFSET + LIMIT))
+  if (( PAGE_COUNT < PAGELIMIT )); then break; fi
+  OFFSET=$((OFFSET + PAGE_COUNT))
 done
 
 echo ""

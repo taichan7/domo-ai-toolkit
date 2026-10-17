@@ -13,14 +13,22 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
 source "$SCRIPT_DIR/lib/common.sh"
 domo_load_auth
+domo_require curl
 
 FILTER="${1:-all}"
+# 引数は all / failed のみ受け付ける（TK-026）。これで (a) 任意値を Python ソースへ
+# 補間する脆弱さを断ち、(b) 'failures' のようなタイポが黙って all に化けて「失敗だけ」と
+# 誤認させる事故を防ぐ。
+if [[ "$FILTER" != "all" && "$FILTER" != "failed" ]]; then
+  echo "usage: list-dataflows.sh [all|failed]" >&2
+  exit 2
+fi
 
 PYTHON_BIN="$(domo_find_python)"
 
-curl -s "${DOMO_CURL_AUTH_ARGS[@]}" \
-  "https://$INSTANCE/api/dataprocessing/v1/dataflows" \
-  | "$PYTHON_BIN" -c "
+RESPONSE=$(curl -sS --max-time 30 "${DOMO_CURL_AUTH_ARGS[@]}" \
+  "https://$INSTANCE/api/dataprocessing/v1/dataflows") || domo_neterr
+echo "$RESPONSE" | "$PYTHON_BIN" -c "
 import json, sys
 
 flows = json.load(sys.stdin)

@@ -7,7 +7,7 @@ DataApp のページ2**に載る、純静的な Domo Pro Code アプリ。VS Cod
 縦スクロール1枚の視覚ガイド（図・表・ポンチ絵主体・全10節 §1〜§10）だけを表示する
 （データ接続を持たない静的 Pro Code アプリ）。
 
-- design 名: `店舗別損益｜開発ガイド`（manifest 版 **0.3.0**）
+- design 名: `店舗別損益｜開発ガイド`（現行版は `manifest.json` を参照＝単一ソース）
 - design id: `531a3c0f-bf42-500c-a4ce-87b60c743414`（**保守用 `maintenance-instance` 固有の実 id**・リポジトリに保持）。
   公開ソースには含めない。別インスタンスへ複製する時も `id` を外して採番し直す（下記「publish 方法」「注意」）。
 - 種別: Pro Code（純静的・`datasetsMapping` 空＝データに紐づかない）
@@ -98,7 +98,7 @@ node tests/make-thumbnail.mjs  # thumbnail.png を再生成（版を bump した
 その後 `node tests/make-thumbnail.mjs` で **thumbnail.png を再生成**する（版を画像へ焼き込むため）。
 `make-thumbnail.mjs` は `manifest.json` と `thumbnail.html` の版が食い違うと**描画前に失敗**し、
 `node tests/check.mjs` は版が `index.html` に**2回以上**（colophon＋footer）＋ `tests/thumbnail.html` に
-**1回**現れ `manifest.json` と一致するかを検査する（ズレたらデプロイ前に落ちる）。現行は全箇所 `v0.3.0`。
+**1回**現れ `manifest.json` と一致するかを検査する（ズレたらデプロイ前に落ちる）。現行版は `manifest.json` を単一ソースとする（この README に版番号を焼き込まない＝手書き面を増やさない）。
 
 ## バックエンド隔離（ハンズオン・同一インスタンス相乗り）
 

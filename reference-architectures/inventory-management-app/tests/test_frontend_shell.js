@@ -289,6 +289,13 @@ test('狭いiframeでもページ全体を横スクロールさせない', () =>
   assert.match(css, /\.table-scroll\s*\{[^}]*overflow-x:\s*auto[^}]*overscroll-behavior-x:\s*contain/s);
   assert.match(css, /@media\s*\(max-width:\s*767px\)/);
   assert.match(css, /\.bar-row\s*\{[^}]*minmax\(0,\s*1fr\)/s);
+  // INV-024/INV-025: ラベルは flex で［名前(2行clamp=.bar-name)＋不足チップ(.bar-flag)］。clamp は .bar-name。
+  assert.match(css, /\.bar-name\s*\{[^}]*-webkit-line-clamp:\s*2[^}]*\}/s);
+  assert.match(css, /\.bar-label\s*\{[^}]*display:\s*flex/s);
+  assert.doesNotMatch(css, /\.bar-name\s*\{[^}]*white-space:\s*nowrap/s);
+  assert.match(css, /\.bar-flag\s*\{[^}]*flex:\s*0 0 auto[^}]*color:\s*var\(--red-600\)/s);
+  // 広幅ではラベル列を広げて折返しそのものを減らす。
+  assert.match(css, /@media \(min-width:\s*1200px\)\s*\{[\s\S]*\.bar-row\s*\{[^}]*minmax\(92px,\s*168px\)/s);
 });
 
 test('Domo Mobileホストと回転・キーボード表示をレイアウトへ反映する', () => {
@@ -356,7 +363,12 @@ test('登録ステップは現在の作業を説明し、完了済み画面へ�
   assert.match(app, /byId\(`step-title-\$\{state\.step\}`\)\?\.focus/);
   assert.match(css, /\.stepper\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)[^}]*overflow:\s*hidden/s);
   assert.match(css, /\.stepper button\s*\{[^}]*min-height:\s*44px/s);
-  assert.match(css, /\.stepper b::after\s*\{[^}]*content:\s*attr\(data-short\)/s);
+  // INV-038: 狭幅短縮は font-size:0＋::after の二重読み上げを避け、実テキスト2本の display 切替。
+  assert.doesNotMatch(css, /\.stepper b::after\s*\{[^}]*content:\s*attr\(data-short\)/s);
+  assert.doesNotMatch(css, /\.stepper b\s*\{[^}]*font-size:\s*0/s);
+  assert.match(css, /\.stepper \.step-short\s*\{\s*display:\s*none;\s*\}/);
+  assert.match(css, /@media \(max-width:\s*980px\)\s*\{[\s\S]*\.stepper \.step-full\s*\{\s*display:\s*none;\s*\}[\s\S]*\.stepper \.step-short\s*\{\s*display:\s*inline;\s*\}/);
+  assert.match(html, /<b><span class="step-full">ロケーション<\/span><span class="step-short">場所<\/span><\/b>/);
 });
 
 test('確認内容の陳腐化を防ぎ、モバイルでも選択内容を確認できる', () => {
@@ -554,6 +566,44 @@ test('細スクロールバーはダッシュボードだけでなく全スク�
   assert.match(css, /::-webkit-scrollbar\s*\{\s*width:\s*7px;\s*height:\s*7px;\s*\}/);
 });
 
+test('操作ヒントはホバー環境とタッチ環境で文言を出し分ける（INV-067）', () => {
+  // ホバー向けは「カーソルで内訳・クリックで明細」、タッチ向けは「タップで明細」の二文言を持つ。
+  assert.match(html, /<span class="note-hover">カーソルで内訳・クリックで明細<\/span>/);
+  assert.match(html, /<span class="note-touch">タップで明細<\/span>/);
+  // 既定（ホバー可）では touch 文言を隠す。
+  assert.match(css, /\.interaction-note \.note-touch\s*\{\s*display:\s*none;\s*\}/);
+  // hover 不可（タッチ主体）では hover 文言を隠し touch 文言を出す＝できない『カーソルで内訳』を見せない。
+  assert.match(css, /@media \(hover:\s*none\)\s*\{[^}]*\.interaction-note \.note-hover\s*\{\s*display:\s*none;\s*\}[^}]*\.interaction-note \.note-touch\s*\{\s*display:\s*inline;\s*\}/s);
+  // tooltip は touch では出さない（文言と実挙動が一致）。
+  assert.match(app, /if \(event\.pointerType === 'touch'\) return;/);
+});
+
+test('履歴のインライン明細に「一覧へ戻る」導線がある（INV-066）', () => {
+  // 明細ヘッダに閉じるボタンがあり、狭幅＋明細表示中のみ出す。
+  assert.match(html, /<button id="detail-close" class="detail-close" type="button">一覧へ戻る<\/button>/);
+  assert.match(css, /\.detail-close\s*\{[^}]*display:\s*none/s);
+  assert.match(css, /@media \(max-width:\s*980px\)\s*\{[^}]*#detail-pane\.has-detail \.detail-close\s*\{[^}]*display:\s*inline-flex/s);
+  // クリックで選択解除＋一覧へ戻すハンドラを配線する。
+  assert.match(app, /function closeHistoryDetail\(\)/);
+  assert.match(app, /elements\['detail-close'\]\.addEventListener\('click', closeHistoryDetail\)/);
+  // ハンドラは resetDetailPane と選択強調の解除を呼ぶ（ダッシュボードのドロワーと同じ閉じ挙動）。
+  assert.match(app, /function closeHistoryDetail\(\)\s*\{[\s\S]*resetDetailPane\(\);[\s\S]*highlightSelectedHistoryRow\(\);/);
+});
+
+test('ロード中と空状態を視覚的に区別する（INV-065）', () => {
+  // 初期プレースホルダはロード中＝is-loading＋aria-busy で「本当に空」と別扱い。
+  assert.match(html, /<div class="empty-compact is-loading" aria-busy="true">データを読み込み中…<\/div>/);
+  // 本当の空状態（まだ取引がありません）は is-loading を付けない＝静止の muted テキストのまま。
+  assert.match(app, /class="empty-compact">まだ取引がありません。<\/div>/);
+  assert.doesNotMatch(app, /empty-compact is-loading">まだ取引がありません/);
+  // is-loading は teal の控えめな opacity パルス（グラデーション不可）。prefers-reduced-motion は
+  // グローバル規則（animation-duration .01ms）が自動で無効化するので個別記述は不要。
+  assert.match(css, /\.empty-compact\.is-loading\s*\{[^}]*color:\s*var\(--teal-700\)[^}]*animation:\s*empty-pulse/s);
+  assert.match(css, /@keyframes empty-pulse\s*\{[\s\S]*?opacity:\s*0\.55[\s\S]*?opacity:\s*1/);
+  // パルスは opacity のみ＝is-loading 宣言にグラデーションを使わない。
+  assert.doesNotMatch(css, /\.empty-compact\.is-loading\s*\{[^}]*gradient/s);
+});
+
 test('ダッシュボード上部のツールバーに横断検索とWorkflow起動を常設する（NEW-P）', () => {
   // 取引入力・履歴に続き、ダッシュボードにも小綺麗な検索ボックスを常設する（calm-blue 準拠）。
   assert.match(html, /<div class="search-wrap dashboard-search-wrap">[\s\S]*id="dashboard-search"/);
@@ -617,6 +667,51 @@ test('集計グラフとKPIがホバー情報とドリルダウンを提供す�
   assert.doesNotMatch(css, /\.detail-drawer/);
 });
 
+test('グラフ要素は trend 同様に自前の aria-label を持ち、tooltip は装飾（INV-057）', () => {
+  // 共有ツールチップは装飾（aria-hidden）＝情報は各要素の aria-label に畳む。
+  assert.match(html, /id="chart-tooltip"[^>]*aria-hidden="true"/);
+  // bar-row は content に無い「最大比」を aria-label で SR へ届ける（INV-022 で単位、INV-025 で不足も付記）。
+  assert.match(app, /class="bar-row chart-hit"[^`]*aria-label="\$\{escapeAttribute\(`\$\{row\.label\} 現在庫 \$\{number\.format\(value\)\}\$\{unitSuffix\} 最大比 \$\{number\.format\(maxShare\)\}%\$\{ariaShort\}`\)\}"/);
+  // 名前は .bar-name、不足チップ .bar-flag はラベルセル内に別要素で入る（clamp に巻き込まれない）。
+  assert.match(app, /<span class="bar-label"><span class="bar-name">\$\{escapeHtml\(row\.label\)\}<\/span>\$\{flag\}<\/span>/);
+  // shortage-row は content に無い「基準」を aria-label に含める（INV-022 で現在/基準/不足に単位 u を付記）。
+  assert.match(app, /class="shortage-row"[^`]*aria-label="\$\{escapeAttribute\(`[^`]*基準 \$\{min\}\$\{u\}[^`]*`\)\}"/);
+  // kpi-card・dormant-row も aria-label を持ち、同種要素で読み上げ品質を揃える。
+  assert.match(app, /class="kpi-card [^`]*aria-label="\$\{escapeAttribute\(`\$\{row\.label\} \$\{valueText\} \$\{note\}/);
+  assert.match(app, /class="dormant-row"[^`]*aria-label="\$\{escapeAttribute\(`[^`]*日取引なし`\)\}"/);
+});
+
+test('数量に品目マスタの単位を付記し、総在庫数の単位混在を明示する（INV-022）', () => {
+  // 品目マスタ（state.data.items）から item_code→単位のルックアップを作る。
+  assert.match(app, /const unitByItemCode = new Map\(\(state\.data\?\.items \|\| \[\]\)\.map\(\(i\) => \[i\.item_code, \(i\.unit \|\| ''\)\.trim\(\)\]\)\)/);
+  assert.match(app, /const unitFor = \(code\) => unitByItemCode\.get\(code\) \|\| ''/);
+  // 全有効品目が単一単位ならその単位、複数単位なら混在フラグ。
+  assert.match(app, /const distinctUnits = new Set\(\(state\.data\?\.items \|\| \[\]\)\.filter\(isActive\)/);
+  assert.match(app, /const totalUnitSuffix = distinctUnits\.size === 1 \? ' ' \+ \[\.\.\.distinctUnits\]\[0\] : ''/);
+  assert.match(app, /const totalUnitsMixed = distinctUnits\.size > 1/);
+  // 品目別棒だけ単位を引く（ロケーション別は品目横断なので付けない）。
+  assert.match(app, /const unit = kind === 'item' \? unitFor\(row\.item_code\) : ''/);
+  // 不足/滞留は item_code で単位を引く。
+  assert.match(app, /const unit = unitFor\(row\.item_code\);/);
+  // 可視テキストの単位はエスケープ、aria/tooltip は escapeAttribute 包みで素。
+  assert.match(app, /const ue = unit \? ' ' \+ escapeHtml\(unit\) : ''/);
+  // KPI 総在庫数は単一単位を付し、他KPIは件数ゆえ付けない。
+  assert.match(app, /const valueText = `\$\{number\.format\(value\)\}\$\{isTotalQty \? totalUnitSuffix : ''\}`/);
+});
+
+test('在庫棒に「不足Nか所/N品目」のチップで要対応を示す（棒は再着色しない）（INV-025）', () => {
+  // SHORTAGE 行を品目別・拠点別に数える（品目×拠点粒度を再定義しない）。
+  assert.match(app, /const shortageByItem = new Map\(\);\s*\n\s*const shortageByLocation = new Map\(\);/);
+  assert.match(app, /if \(r\.record_type !== 'SHORTAGE'\) continue;/);
+  // 棒行は kind で品目別=「不足Nか所」/ロケーション別=「不足N品目」のチップを添える。
+  assert.match(app, /const shortCount = kind === 'item' \? \(shortageByItem\.get\(row\.item_code\) \|\| 0\) : \(shortageByLocation\.get\(row\.location_code\) \|\| 0\)/);
+  assert.match(app, /不足\$\{number\.format\(shortCount\)\}か所/);
+  assert.match(app, /不足\$\{number\.format\(shortCount\)\}品目/);
+  // チップは赤テキスト＋ベルアイコンで、棒の再着色はしない（棒 fill は var(--navy-800) のまま）。
+  assert.match(app, /class="bar-flag"><svg class="ui-icon" aria-hidden="true"><use href="#icon-bell">/);
+  assert.match(css, /\.bar-track span\s*\{[^}]*background:\s*var\(--navy-800\)/s);
+});
+
 test('在庫不足KPIのドリルダウンは検索で絞らない全SHORTAGE行から件数を出す（カード面と一致）', () => {
   // KPIカードの数値は横断検索の影響を受けない全体集計(metric_value)。その内訳ドリルダウンも
   // 検索で絞り込まれた state.dashboardDrilldowns.shortage ではなく、全 SHORTAGE 行から導出する。
@@ -647,8 +742,9 @@ test('履歴・マスタの2ペインは同じ高さ枠で丈を揃える（NEW-
 });
 
 test('在庫不足KPIは色だけに頼らず状態語＋警告アイコンで示す（INV-002）／通知状態は日本語化（INV-003）', () => {
-  // INV-002: 不足>0 は「要補充 N件」＋ bell アイコン、0 は「基準内」、他KPIは「最新集計」。
-  assert.match(app, /isShortage \? \(isAlert \? `要補充 \$\{number\.format\(value\)\}件` : '基準内'\) : '最新集計'/);
+  // INV-002: 不足>0 は「要補充 N件」＋ bell アイコン、0 は「基準内」。他KPIは「最新集計」だが、
+  // 総在庫数が複数単位にまたがるときだけ「単位混在の合計」を出す（INV-022）。
+  assert.match(app, /isShortage \? \(isAlert \? `要補充 \$\{number\.format\(value\)\}件` : '基準内'\) : \(isTotalQty && totalUnitsMixed \? '単位混在の合計' : '最新集計'\)/);
   assert.match(app, /isAlert \? '<svg class="kpi-alert-icon" aria-hidden="true"><use href="#icon-bell">/);
   // 既定の注記色は muted、赤は本当のアラート時だけ（色のみ依存を解消しつつ赤を温存）。
   assert.match(css, /\.kpi-card small \{ color: var\(--muted\); \}/);
@@ -732,8 +828,14 @@ test('アクセシビリティ: 可視フォーカス・補足メタのコント
   // inert は hidden 化を待つ setTimeout より前（同期）で解除する。閉じた直後に呼び出し元
   // （.app-shell 内の行・グラフ）へフォーカスを戻すため、inert 状態のままだと focus() が無効化される。
   assert.match(app, /function closeContextDrawer[\s\S]*?setBackgroundInert\(false\)[\s\S]*?setTimeout/);
-  // ローディング面は role="status" の live region にし、処理中メッセージを支援技術へ読み上げる。
-  assert.match(html, /id="loading-overlay"[^>]*role="status"/);
+  // INV-035: 処理中/接続状態は hidden トグルの可視要素でなく、常設の sr-only ライブ領域(#a11y-status)で読み上げる。
+  // 可視オーバーレイ/チップは純視覚で role=status を持たない＝二重読み上げを避ける。
+  assert.match(html, /<p id="a11y-status" class="sr-only" role="status" aria-live="polite"><\/p>/);
+  assert.doesNotMatch(html, /id="loading-overlay"[^>]*role="status"/);
+  assert.doesNotMatch(html, /id="sync-status"[^>]*role="status"/);
+  assert.match(app, /function announce\(message\)\s*\{[^}]*byId\('a11y-status'\)/s);
+  assert.match(app, /announce\(active \? \(message \|\| \(text \? text\.textContent : '処理しています'\)\) : ''\)/);
+  assert.match(app, /announce\('サーバーに接続できません。接続エラーです。'\)/);
 });
 
 test('ミニマリズム: 未使用のフラグ・キャッシュ参照を復活させない', () => {
@@ -787,7 +889,7 @@ test('管理者はマスタCRUDを単一のCode Engine入口で操作し、削�
   assert.match(app, /'DELETE_RULE'/);
   // 削除は確認ダイアログ経由の物理削除で、不可逆かつ台帳(履歴)は残す旨を明示する。
   assert.match(app, /function confirmMasterDelete/);
-  assert.match(app, /AppDBから完全に削除します/);
+  assert.match(app, /この項目のデータを完全に削除します/);
   assert.match(app, /この操作は取り消せません/);
   // 復元(論理削除の巻き戻し)は廃止。停止は状態トグルによる可逆なUPDATEで代替する。
   assert.doesNotMatch(app, /function restoreMaster/);
@@ -827,6 +929,24 @@ test('管理者はマスタCRUDを単一のCode Engine入口で操作し、削�
   // 狭い画面ではフィールドを1カラムに折り返す。
   assert.match(css, /\.master-fields\s*\{[^}]*grid-template-columns:\s*repeat\(2,/s);
   assert.match(css, /@media\s*\(max-width:\s*767px\)[\s\S]*\.master-fields\s*\{\s*grid-template-columns:\s*1fr/s);
+});
+
+test('マスタ編集フォームの未保存入力は、行切替・タブ切替・新規の前に破棄確認を挟む（INV-018）', () => {
+  // 入力で dirty、代入ロード/初期化/保存成功で非 dirty。
+  assert.match(app, /masterDirty:\s*false/);
+  assert.match(app, /elements\['master-form'\]\.addEventListener\('input', \(\) => \{ state\.masterDirty = true; \}\)/);
+  assert.match(app, /elements\['master-form'\]\.addEventListener\('change', \(\) => \{ state\.masterDirty = true; \}\)/);
+  // guard は dirty のときだけ既存の showActionConfirmation を出し、「破棄して移動」確定時に proceed。
+  assert.match(app, /function guardMasterDirty\(proceed, trigger\)\s*\{\s*\n\s*if \(!state\.masterDirty\) \{ proceed\(\); return; \}/);
+  assert.match(app, /onConfirm:\s*\(\) => \{ state\.masterDirty = false; proceed\(\); \}/);
+  // 4つのユーザー起点入口（行クリック・新規ボタン・タブクリック・タブ矢印キー）が guard を通る。
+  assert.match(app, /guardMasterDirty\(\(\) => editMaster\(state\.masterTab, row\.dataset\.masterEdit\)/);
+  assert.match(app, /elements\['master-new'\]\.addEventListener\('click', \(\) => guardMasterDirty\(newMaster/);
+  assert.match(app, /button\.addEventListener\('click', \(\) => guardMasterDirty\(\(\) => setRecordTab\(button\.dataset\.record\), button\)\)/);
+  assert.match(app, /guardMasterDirty\(\(\) => \{ setRecordTab\(target\.dataset\.record\); target\.focus\(\); \}, target\)/);
+  // ロード/初期化で dirty を解消する（代入は input を発火しないため明示クリア）。
+  assert.match(app, /state\.masterDirty = false;\s*\/\/ INV-018: フォームを初期化/);
+  assert.match(app, /state\.masterDirty = false;\s*\/\/ INV-018: 行を読み込んだ直後/);
 });
 
 test('物理削除の確認は close 単一実行点で、確定時だけ1回実行する（ハンドラ蓄積による誤削除を防ぐ）', () => {
@@ -1261,9 +1381,10 @@ test('「ロケーション/場所」の用語を「ロケーション」へ統�
   assert.match(html, /品目・ロケーション・不足・滞留を検索/);
   assert.match(html, /品目、ロケーション、担当者、日付/);
   assert.match(html, /ロケーション明細/);
-  // app.js の可視テキスト・コメントから「場所」は消える。html は狭幅短縮 data-short="場所" だけ意図的に許容。
+  // app.js の可視テキスト・コメントから「場所」は消える。html はステッパー狭幅短縮の
+  // <span class="step-short">場所</span> だけ意図的に許容（INV-038）。
   assert.doesNotMatch(app, /場所/);
-  assert.doesNotMatch(html.replace(/data-short="場所"/g, ''), /場所/);
+  assert.doesNotMatch(html.replace(/<span class="step-short">場所<\/span>/g, ''), /場所/);
 });
 
 test('印刷スタイルで固定クロームを隠し本文を紙幅へ流す（INV-004）', () => {
@@ -1358,16 +1479,21 @@ test('取引監査の登録元ラベルはアプリ共通の解決済みプラ�
   assert.doesNotMatch(app, /source: isMobile\(\)/);
 });
 
-test('マスタ空の入出庫は空状態ガイドで登録先へ導き、aria-busy は読み込み中だけ（INV-020）', () => {
+test('マスタ空の入出庫は空状態ガイドで登録先へ導き、QR無効理由は aria-describedby で添える（INV-020/INV-058）', () => {
   // 行き止まりにせず「履歴・管理」への導線を出す（bootReady で表示トグル・ボタンは switchView('history')）。
   assert.match(html, /<div id="masters-empty-guide" class="empty-guide" role="note" hidden>/);
   assert.match(html, /id="goto-master-register"/);
   assert.match(app, /elements\['goto-master-register'\]\.addEventListener\('click', \(\) => switchView\('history'\)\)/);
   assert.match(app, /elements\['masters-empty-guide'\]\.hidden = state\.bootReady;/);
   assert.match(css, /\.empty-guide\[hidden\]\s*\{\s*display:\s*none/);  // 作者 display が UA [hidden] を打ち消さない
-  // aria-busy は busy のときだけ付け、不可用（マスタ空・エラー）は disabled のみ＝「読込中」を居座らせない。
+  // 無効理由は aria-describedby で添える（INV-058）。aria-busy はボタンでは誤用ゆえ廃し、常に removeAttribute で掃除。
   assert.match(app, /function setQrControlsReady\(ready, busy = false\)/);
-  assert.match(app, /if \(busy\) button\.setAttribute\('aria-busy', 'true'\);\s*\n\s*else button\.removeAttribute\('aria-busy'\);/);
+  assert.match(app, /const reason = ready \? '' : \(busy\s*\n?\s*\? '在庫マスタを読み込み中です。'\s*\n?\s*: '有効な品目またはロケーションがありません。/s);
+  assert.match(app, /button\.removeAttribute\('aria-busy'\);/);
+  assert.match(app, /if \(reason && reasonNode\) button\.setAttribute\('aria-describedby', 'scan-disabled-reason'\);\s*\n\s*else button\.removeAttribute\('aria-describedby'\);/);
+  assert.match(html, /<span id="scan-disabled-reason" class="sr-only"><\/span>/);
+  // scan ボタンは初期マークアップから aria-busy を外す（誤用の再混入防止）。
+  assert.doesNotMatch(html, /class="scan-button"[^>]*aria-busy/);
   assert.match(app, /setQrControlsReady\(false, true\)/);   // 読み込み中は busy=true
   assert.match(app, /setQrControlsReady\(state\.bootReady\)/); // 読込後は busy 既定 false
 });

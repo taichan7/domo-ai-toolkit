@@ -20,6 +20,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
 source "$SCRIPT_DIR/lib/common.sh"
 domo_load_auth
+domo_require curl
 
 DATASET_ID="${1:-}"
 SQL="${2:-SELECT * FROM table LIMIT 10}"
@@ -35,12 +36,12 @@ PYTHON_BIN="$(domo_find_python)"
 # JSON-escape the SQL safely
 ESCAPED_SQL=$("$PYTHON_BIN" -c "import json,sys; print(json.dumps(sys.argv[1]))" "$SQL")
 
-curl -s -X POST \
+RESPONSE=$(curl -sS --max-time 30 -X POST \
   "${DOMO_CURL_AUTH_ARGS[@]}" \
   -H "Content-Type: application/json" \
   -d "{\"sql\": $ESCAPED_SQL}" \
-  "https://$INSTANCE/api/query/v1/execute/$DATASET_ID" \
-  | "$PYTHON_BIN" -c "
+  "https://$INSTANCE/api/query/v1/execute/$DATASET_ID") || domo_neterr
+echo "$RESPONSE" | "$PYTHON_BIN" -c "
 import json, sys
 
 resp = json.load(sys.stdin)

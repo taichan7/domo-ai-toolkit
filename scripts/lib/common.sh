@@ -17,6 +17,23 @@ domo_find_python() {
   return 1
 }
 
+# 必須コマンドの存在チェック（TK-027）。curl はデータ/MCP スクリプトの前提だが未確認だった。
+# 例: domo_require curl
+domo_require() {
+  command -v "$1" >/dev/null 2>&1 || {
+    echo "ERROR: required command '$1' not found on PATH. Install it and retry." >&2
+    exit 1
+  }
+}
+
+# ネットワーク到達失敗（DNS 不能 / 接続拒否 / タイムアウト）時の共通メッセージ（TK-005）。
+# curl が非0終了したとき `|| domo_neterr` で呼ぶ。空の stdout が Python へ渡り JSONDecodeError
+# トレースバックになる／set -e で無言終了する、を actionable な1行に置き換える。
+domo_neterr() {
+  echo "ERROR: could not reach https://${INSTANCE:-<instance>} — network error or wrong instance. Re-run authenticate.sh or check connectivity." >&2
+  exit 1
+}
+
 domo_validate_instance() {
   if [[ ! "${1:-}" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?\.domo\.com$ ]]; then
     echo "ERROR: specify a Domo instance hostname (example.domo.com), without a URL or path." >&2

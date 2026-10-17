@@ -5,6 +5,17 @@
 Domo の Pro Code、AppDB、Magic ETL、Code Engine、Workflows、App Studio を組み合わせた
 ハンズオン用リファレンスです。架空ブランド「シンプルスタイル」の合成損益データを使います。
 
+## 主な機能
+
+業務担当者が 1 画面で店舗別・全社の損益を把握するためのダッシュボードです。
+
+- **全社／店舗の切替** — 全店舗合算と個店を同じ画面で切り替える。
+- **損益サマリー（概要）** — 売上・費用・純利益・利益率の KPI と黒字店舗数。純利益＝売上−営業費用（税金・営業外は含まない）。
+- **可視化** — 売上・純利益の 24 ヶ月トレンド（折れ線）、費用内訳（ドーナツ）、店舗別 純利益ランキング（横棒）。
+- **事業部別損益**（全社ビュー限定） — 売上・粗利益の積み上げ、売上構成比、月次トレンド、予算達成状況。
+- **ドリルダウン** — チャートから月次詳細・費用内訳・店舗内訳へ、各カード内で深掘りする。
+- **AI 経営インサイト** — 損益データから長文レポートを**手動**生成（全社／店舗別）。定期実行はしない。
+
 ## 配布とセットアップ
 
 複数顧客への配布は、公開 `domo-ai-toolkit` の `reference-architectures/pl-summary-app/` のソースを使います。
@@ -44,6 +55,22 @@ AppDB seed → 標準同期 DataSet → Magic ETL → summary / detail / trend /
 | データ生成 | `dataflow/pl_data_generator.py`。合成損益データ。実顧客データを含まない |
 | プロンプト | `prompts/prompt_shared_conventions.md` と各 `prompt_*.md` |
 | 教材 | `dev-guide-app/`。App Studioページ2へ同梱ランタイムで公開 |
+
+このアプリが作る Domo アセットの ID 非依存な台帳（名称・alias・個数の契約）は
+[Domoアセット台帳](docs/domo-assets.md)にあります（配備後の個数照合に使う）。
+
+## ドキュメント
+
+| 文書 | 役割 |
+|---|---|
+| [配布品質と適用範囲](docs/distribution-readiness.ja.md) | 配布前チェックと適用範囲（English: [distribution-readiness.md](docs/distribution-readiness.md)） |
+| [セットアップガイド](docs/setup-guide.md) | ゼロから自分の Domo へ配備・検証する単一の手順書（着手前の「AIが陥りやすい誤り」を先頭に）|
+| [設計原則](docs/design-principles.md) | 優先順位・レイヤー・公開関数を1つにした理由・UI設計・採用しなかった設計 |
+| [アーキテクチャと設計判断](docs/architecture.md) | 出力ハブ型2経路・レイヤー境界・単一ディスパッチャCE・保存順・AI HTML 許可リスト |
+| [データモデル](docs/data-model.md) | 出力DataSet列・勘定科目レベル・状態ラベル5値・AppDBレポート文書 |
+| [Domoアセット台帳](docs/domo-assets.md) | 名称・alias・個数の ID 非依存な契約（配備後の個数照合） |
+| [AGENT.md](AGENT.md) | 変更を加える AI が守る不変契約 |
+| [prompts/](prompts/) | AI への入口プロンプトと共通規約の正本 |
 
 店舗・全社レポートは親Workflowから生成します。画面の更新ボタンは確認後に**全店舗＋全社**を
 開始し、店舗セレクターは閲覧対象だけを切り替えます。定期実行スケジュールは作成しません。

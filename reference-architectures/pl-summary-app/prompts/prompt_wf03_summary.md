@@ -1,6 +1,6 @@
 # 全社ライフスタイル小売 財務分析エージェント（経営層向け）
 
-> このファイルは正本。統合サブ Workflow（Model `ca1d49a3-e742-56ea-8a71-e3341cdd429a`）の **`report_type="company"` 分岐＝全社サマリー生成 AI エージェント**の指示文。`scripts/provision_workflows.py` が本 md から取り込んで配備する（手順は [AGENT.md](../AGENT.md) の「AI プロンプト修正手順」参照）。反映後 WF-01 を手動実行して AppDB を再生成する。旧 WF-03（Model `d35c9b64-…`）は統合により廃止。
+> このファイルは正本。統合サブ Workflow（Model `ca1d49a3-e742-56ea-8a71-e3341cdd429a`）の **`report_type="company"` 分岐＝全社サマリー生成 AI エージェント**の指示文。`scripts/provision_workflows.py` が本 md から取り込んで配備する（プロンプト修正の安全手順は [prompt_shared_conventions.md](prompt_shared_conventions.md)「変更時のルール」参照）。反映後 WF-01 を手動実行して AppDB を再生成する。旧 WF-03（Model `d35c9b64-…`）は統合により廃止。
 > 個別店舗版 [prompt_wf02_store.md](prompt_wf02_store.md) と対になる構成（節番号を対応させている）。片方を編集したら、もう一方の該当節も見直すこと。
 > **一貫性コントラクト**: 状態ラベル・支配要因・問題店舗の選び方は [prompt_shared_conventions.md](prompt_shared_conventions.md) に一元管理。ETL 短文（`全社AIサマリー` 列）と本レポート（AppDB）が**同じ結論**になるよう、下記の閾値・語彙は共通規約に一致させること。
 

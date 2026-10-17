@@ -111,6 +111,9 @@ set -a; . config/secrets.env; set +a
 1. `AGENT.md`（プロジェクト内）と `README.md` を読み、全体像（データフロー出力ハブ・4面の AI サマリー・
    ワークフロー2本＋保存CE）を把握する。
 2. `docs/setup-guide.md` を開き、**STEP 0 → 7 を上から順に**実行する:
+   - **STEP 0.5** プリフライト（配備前の無停止検証）— `python3 -m unittest discover -s tests` ／
+     `node --test tests/test_*.js` ／ `node dev-guide-app/tests/check.mjs` を実行し、**すべて緑を確認してから STEP 1 へ**。
+     配布キットの編集が壊れていないかを、実インスタンスに触れてクレジットを使う前に捕まえる。
    - **STEP 1** `python3 scripts/provision_domo.py apply` — データ層（seed DataSet／Code Engine／AppDB／DataFlow）を
      構築。ダミーの P/L データと ETL 短文 AI サマリーを自動生成。
    - **STEP 2** `python3 scripts/provision_domo.py sync-manifest` — 対象インスタンスの DataSet／コレクション ID を

@@ -137,7 +137,7 @@ python3 scripts/provision_workflows.py sync-manifest   # plReportApiを対象イ
 cd pro-code && domo publish && cd -                   # Pro-Code 公開（§5(3) と同じ・id は外してある）
 python3 scripts/provision_domo.py app-studio          # 自分専用 DataApp にカード埋め込み
 python3 scripts/provision_domo.py verify              # ok: true
-# AI 長文レポートを出すには WF-01 を手動実行（手順は AGENT.md「ワークフロー操作」）→ 約25分で AppDB に生成
+# AI 長文レポートを出すには WF-01 を手動実行（手順は [docs/setup-guide.md](../docs/setup-guide.md) の STEP 6「ワークフロー層の配備・実行」）→ 約25分で AppDB に生成
 ```
 
 > 開発ガイドのタブ（App Studio ページ2）まで自分の DataApp に足すなら:

@@ -44,7 +44,7 @@ domo dev
 
 正常なモバイル対応designと同じ1×1既定カードにするため、Manifestの`fullpage`／`allowFullPage`は省略する。データ、AppDB、Code Engineはそれぞれ `inventoryDashboard`, `inventory_management_records`, `inventoryApi` のエイリアスで参照する。Code Engineの物理関数名は `inventory_api`、物理入力名は `request_json` だが、Pro Code Editor向けエイリアスは記号を含まない `inventoryApi`／`requestJson` とする。ブラウザJavaScriptへ物理IDを書かない。
 
-Code Engineはreleased version（実値は `manifest.json` が正）をManifestへ明示する。通知Workflowは物理model ID（`modelId`・同じく `manifest.json` が正）をManifestへ固定し、版はインスタンス依存で動くため固定しない（`verify` の `ok` は `modelId` 一致とCEソースへの起動先焼き込み `codeEngineWorkflowModelEmbedded` で判定）。Workflowの起動はフロントではなくCode Engineが行い、起動のたびにモデルの有効な最新版を実行時に解決する（Workflowを改版してもカードの再埋め込みは不要）。
+Code Engineはreleased version（実値は `manifest.json` が正）をManifestへ明示する。通知Workflowは物理model ID（`modelId`・同じく `manifest.json` が正）をManifestへ固定し、版はインスタンス依存で固定しない（起動はフロントではなくCode Engineがサーバー側で最新の有効版を実行時に解決する）。仕組みと `verify` 条件（`codeEngineWorkflowModelEmbedded` ほか）・改版時に再埋め込みが不要な理由の詳細は [test-results.md](test-results.md) の「Workflow版解決」が正。
 
 Domoの外では `domo` がないため、同梱したローカルデモデータでUIを表示する。このモードはUI開発用であり、Domoの権限やデータ保存の代替ではない。
 

@@ -15,6 +15,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
 source "$SCRIPT_DIR/lib/common.sh"
 domo_load_auth
+domo_require curl
 
 PYTHON_BIN="$(domo_find_python)"
 
@@ -22,9 +23,9 @@ FLOW_ID="${1:-}"
 
 if [[ -z "$FLOW_ID" ]]; then
   # Summary mode
-  curl -s "${DOMO_CURL_AUTH_ARGS[@]}" \
-    "https://$INSTANCE/api/dataprocessing/v1/dataflows" \
-    | "$PYTHON_BIN" -c "
+  RESPONSE=$(curl -sS --max-time 30 "${DOMO_CURL_AUTH_ARGS[@]}" \
+    "https://$INSTANCE/api/dataprocessing/v1/dataflows") || domo_neterr
+  echo "$RESPONSE" | "$PYTHON_BIN" -c "
 import json, sys
 from collections import Counter
 
@@ -78,9 +79,9 @@ print('Drill into a specific flow:  bash scripts/diagnose-etls.sh <ID>')
 fi
 
 # Drill-down mode
-curl -s "${DOMO_CURL_AUTH_ARGS[@]}" \
-  "https://$INSTANCE/api/dataprocessing/v1/dataflows/$FLOW_ID" \
-  | "$PYTHON_BIN" -c "
+RESPONSE=$(curl -sS --max-time 30 "${DOMO_CURL_AUTH_ARGS[@]}" \
+  "https://$INSTANCE/api/dataprocessing/v1/dataflows/$FLOW_ID") || domo_neterr
+echo "$RESPONSE" | "$PYTHON_BIN" -c "
 import json, sys
 
 df = json.load(sys.stdin)

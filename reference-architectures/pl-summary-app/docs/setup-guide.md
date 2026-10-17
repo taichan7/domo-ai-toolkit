@@ -30,6 +30,35 @@
 
 ---
 
+## AIが陥りやすい誤り（着手前に必ず読む）
+
+このリファレンスは AI エージェントが配備を支援できるように作ってある。不要な手作業や対象の取り違え、
+課金ジョブの誤操作を防ぐため、着手前に次を確認する（姉妹アプリ在庫管理の「0.5」と同じ趣旨）。
+
+1. **「App／AppDB／保存CE／Workflow を画面で手作りして ID を渡して」と言わない**（最頻の誤り）。
+   AppDB コレクション「店舗別損益AI要約」・保存 CE（`pl_report_api`）・DataFlow・統合サブWF／WF-01・
+   App Studio アプリ＋カードは、すべて `apply`／`provision_workflows.py provision`／`app-studio` が
+   Domo API で**名称から発見または作成**する。通常の配備で UI からの手作りは不要。保守用 ID のコピーも要らない。
+2. **`domo publish` は必ず対象ディレクトリの直下から実行する**。Pro Code は `cd pro-code && domo publish`、
+   開発ガイドは `cd dev-guide-app && …`。**親フォルダから publish すると全ツリーがプレフィックス付きで
+   出版されアプリが壊れる**（`findManifest` の罠）。公開後は `pro-code/manifest.json` の `version` を上げる。
+3. **ワークフロー層は `provision_workflows.py` を使う**（レガシーの `deploy_dataflow_prompt.py` 等ではない）。
+   保存CE・統合サブWF・WF-01 は `provision_workflows.py provision --apply --release` が発見/作成する。
+   **いきなり `--apply` しない**——まず引数なしの dry-run（ネットワーク読み取りのみ・`/tmp/plwf` へ書き出し）で
+   組み立て結果を確認してから適用する。
+4. **AI レポートは手動更新のみ。親 Workflow の TIMER トリガーを復元しない**。定期実行は行わない設計で、
+   更新はアプリの「AIレポートを更新」→確認→実行で 1 回だけ起こす。
+5. **〜25 分規模の WF／DataFlow 実行をキャンセル・二重起動しない**。AI 長文生成は店舗数とインスタンス負荷に
+   比例して伸びる。`RUNNING` のまま返っても失敗ではない（サーバ側で継続）。数分おいて `verify` で終端状態
+   （`SUCCESS`／`FAILED` 等）を確認する。**取消だけでは CE／Workflow を呼ばない**ので、確認ダイアログの
+   「実行」以外で AI クレジットは走らない。
+6. **対象インスタンスと名札を明示する**。`DOMO_INSTANCE`／`domo login -i <instance>` で対象を固定し、
+   ハンズオン・検証は `PL_SANDBOX_SUFFIX`（名札）を付けて本番や他参加者と別名にする。`provision_*` は冪等で
+   同名資産を**再利用**するので、既存の同名コレクション／モデル／アプリを**削除・再作成しない**
+   （他者のデータと履歴を壊す）。
+
+---
+
 ## STEP 0 — 前提・インスタンス指定・認証
 
 ### 前提
@@ -79,11 +108,23 @@ domo login -i "$DOMO_INSTANCE"
   ```
 
   provisioner は `DOMO_DEVELOPER_TOKEN` があれば `X-DOMO-Developer-Token` ヘッダで直接認証し、
-  SSO ログインより優先する。**ワークフロー層（STEP 6・`provision_workflows.py`）はこの開発者トークン、
+  SSO ログインより優先する。**ワークフロー層（STEP 3 で初めて使う・`provision_workflows.py`）はこの開発者トークン、
   または別途セットした `SID` 環境変数が必要**で、`domo login` の configstore は読まない点に注意。
 
 > すべてのコマンドは `pl-summary-app/` の直下で実行する（スクリプトは自身の親フォルダを
 > プロジェクトルートとして解決する）。
+
+---
+
+## STEP 0.5 — プリフライト（配備前の無停止検証）
+
+ライブ変更の前に、ネットワークを使わない同梱テストを**緑**にする。配布キットは顧客 SE / AI がコピーして編集することが多く、壊れた編集は実インスタンスに触れてクレジットを使う**前に**ここで捕まえる（**STEP 1 の前にすべて緑であること**）。
+
+```bash
+python3 -m unittest discover -s tests
+node --test tests/test_*.js
+node dev-guide-app/tests/check.mjs
+```
 
 ---
 
@@ -107,7 +148,7 @@ python3 scripts/provision_domo.py apply
    タイルが**店舗／全社の短文 AI サマリー**を出力する。これが Pro-Code の KPI・チャート・短文の供給源。
 
 - **ゲート**: 出力の `ASSET_RESULT` に seed DataSet / AppDB コレクション / DataFlow の
-  各 ID が並ぶこと。DataFlow 実行が長引く場合でも、サーバ側で継続するので**キャンセル・再トリガーしない**。
+  各 ID が並ぶこと。DataFlow 実行は**数分程度**が目安。長引く場合でも、サーバ側で継続するので**キャンセル・再トリガーしない**（WF-01 の AI 長文生成〔約25分・STEP 6〕とは別物）。
 - 配線だけ更新して DataFlow 実行を省きたいときは `--skip-dataflow-run` を付ける。
 - DataSet API へ直接書き込まない。AppDB のデータ移送は Domo 標準同期だけが担当する。
 
@@ -133,6 +174,8 @@ STEP 1 で確定した対象インスタンスの ID へ書き込む。名称で
 
 ## STEP 3 — Workflow・CEの配線とPro Codeの公開
 
+> **前提（Workflow層をこのSTEPで初めて起動する）**: `provision_workflows.py` は `domo login` の configstore を読まない。実行前に `DOMO_DEVELOPER_TOKEN`（または `SID`）を環境へ設定すること（例: `set -a; . config/secrets.env; set +a`）。未設定だと最初のコマンドで止まる（失敗時対処表の「認証情報がありません」行）。あわせて、全社ブランチの `Send Email` 宛先は **`--release` の前に** `export PL_EMAIL_PERSON_RECIPIENTS=<person ID・カンマ区切り>` を設定する。未設定だと WF は完走しても宛先ゼロで送られない（実行者本人には届く場合あり）。詳細・再配備・手動実行は STEP 6。
+
 ```bash
 python3 scripts/provision_workflows.py provision --apply --release
 python3 scripts/provision_workflows.py sync-manifest
@@ -140,7 +183,7 @@ cd pro-code && domo publish && cd ..
 ```
 
 手動実行ボタンが参照する`plReportApi`を、**先に対象インスタンスへ配備・配線**する。
-Workflow層の認証とメール宛先はSTEP 6を読む。`provision`は親/子のモデルを先に確保してから
+Workflow層の詳細・再配備・手動実行は STEP 6。`provision`は親/子のモデルを先に確保してから
 CEソースへ両IDを焼き込み、保存・手動起動・実行状況の1公開関数をreleaseする。
 親のTIMERは作成せず、既存の定期TIMERがあれば対象モデルだけ削除する。
 これにより配布元のCE GUIDを別インスタンスへ持ち込まない。
@@ -203,6 +246,23 @@ python3 scripts/provision_domo.py verify
 ここまでで**データ層＋ Pro-Code ＋ ETL 短文 AI サマリー**が動く状態になる。概要／事業部別タブの
 KPI・チャート・短文サマリーが表示される。AI 長文レポート（サマリータブ）は STEP 6 で生成する。
 
+### 検証記録（配布先ごとに残す）
+
+AGENT.md は配備ごとに「**実際に何を検証したか**を正確に記録する」ことを義務づける。過去の版番号や
+別インスタンスの実行ログは現在の証拠にならない（`verify` の `ok:true` だけでは宛先権限・メール到達・
+AI 長文の全店舗生成までは保証しない）。下のテンプレを埋め、日付入りのハンズオン／引き継ぎノートへ残す。
+
+```text
+- インスタンス:            （例 <your-company>.domo.com）
+- 日付:
+- 名札 / 本番:             PL_SANDBOX_SUFFIX の値、または本番メンテナ（PL_ALLOW_PRODUCTION=1）
+- provision_domo verify:   ok:true（summaryRowCount / detailRowCount を併記）
+- workflow verify:         ok（scheduleCount: 0）
+- analysis_html:           全店舗＋全社で生成を確認（STEP 6 実行後・サマリータブで目視）
+- メール宛先:              意図した宛先 vs 実際に送られた宛先（PL_EMAIL_PERSON_RECIPIENTS）
+- ローカルテスト:          STEP 0.5 の3コマンドが緑
+```
+
 ---
 
 ## STEP 6 — Workflow層の詳細・再配備・手動実行（初回配備はSTEP 3）
@@ -241,6 +301,7 @@ python3 scripts/provision_workflows.py verify                      # scheduleCou
 # 実行はアプリの「AIレポートを更新」→確認→実行。取消だけではCE/Workflowを呼ばない
 ```
 
+- **所要と課金（WF-01 実行）**: AI 長文レポート生成は **約25分**かかり、Domo の **AI クレジットを消費**する課金オペレーションです。実行後に `analysis_html` が数十分出なくても**正常動作**なので、**キャンセル・再実行しない**（重複レポートとクレジット浪費の原因・後片付けはベストエフォート）。進行は `provision_workflows.py verify` と子WF（統合サブWF）の実行状況で確認する。
 - **前提**: STEP 1〜2（データ層・`sync-manifest`）を先に済ませること。`provision --apply` は AppDB
   コレクションと `summary` データセットが見つからなければ**明示的に失敗**する（保守用 GUID を顧客環境へ
   焼き込まないための門番）。
@@ -374,6 +435,7 @@ python3 scripts/provision_domo.py verify            # ok: true
 | 初回 publish が design 不在で失敗 | `manifest.json` の `id` が保守用インスタンスの design ID のまま | `id` を空にして publish → 払い出された design ID を `id` に反映 |
 | `app-studio` が「Registered App ... is missing / refusing to create a duplicate」で停止 | `domo-assets.json` に別インスタンスの App/Card ID が残っている | `domo-assets.json` の `appStudio` を対象の実 ID へ上書き、または `appStudio` を空にして発見/作成させる（新規配布では通常 `domo-assets.json` が無いので起きない） |
 | サマリータブが常に「準備中」 | ワークフロー層（STEP 6）未配備で `analysis_html` が未生成 | STEP 6 を実施。概要／事業部別タブはデータ層だけで動くので、長文が不要ならそのままでも可 |
+| WF-01 実行後、数十分 `analysis_html` が出ない／止まって見える | AI 長文生成は**約25分かかる正常動作**（課金オペレーション） | **キャンセル・再実行しない**（重複レポート＋クレジット浪費）。`provision_workflows.py verify` と統合サブWFの実行状況で進行を確認する |
 | トレンドが空表示・事業部タブが出ない | 埋込カードの context mapping が未同期（`trend`/`dept` alias が proxy で解決不可） | `python3 scripts/provision_domo.py app-studio` で context mapping を同期 |
 | `provision_workflows.py` が「認証情報がありません」で停止 | ワークフロー層は configstore を読まない | `config/secrets.env` に `DOMO_DEVELOPER_TOKEN` を置いて `set -a; . config/secrets.env; set +a`、または `SID` を環境変数で設定 |
 | `embed-guide` が「開発ガイド design … 未公開」で停止 | 開発ガイド design が未 publish、または manifest の `id` が未反映 | `cd dev-guide-app && domo publish` → 払い出された id を `dev-guide-app/manifest.json` に反映 → 再実行 |

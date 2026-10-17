@@ -46,6 +46,8 @@
     masterTab: 'item',
     masterEditKey: null,
     masterEditLabel: null,
+    // マスタ編集フォームに未保存の入力があるか（INV-018）。行切替・タブ切替・新規で破棄する前に確認する。
+    masterDirty: false,
     // 実行対象とフォーカス返却先を保持し、close リスナが一度だけ消費する。
     pendingConfirm: null
   };
@@ -126,7 +128,7 @@
       'quantity', 'reason', 'stock-preview', 'review-list', 'submit-button', 'recent-operations', 'kpi-grid', 'item-chart', 'location-chart',
       'trend-chart', 'shortage-list', 'dormant-list', 'ai-note-list', 'dashboard-search', 'history-search', 'history-type', 'history-head', 'history-body',
       'history-result-count', 'history-type-filter', 'masters-empty-guide', 'goto-master-register', 'history-pager', 'master-pager', 'item-pager', 'location-pager', 'shortage-pager', 'dormant-pager', 'loading-overlay', 'toast-region', 'confirm-dialog', 'confirm-title', 'confirm-message', 'confirm-details', 'confirm-action', 'confirm-cancel',
-      'detail-pane', 'detail-eyebrow', 'detail-title', 'detail-subtitle', 'detail-content', 'chart-tooltip',
+      'detail-pane', 'detail-eyebrow', 'detail-title', 'detail-subtitle', 'detail-content', 'detail-close', 'chart-tooltip',
       'context-detail', 'context-detail-backdrop', 'context-detail-eyebrow', 'context-detail-title', 'context-detail-subtitle', 'context-detail-content', 'context-detail-more', 'context-detail-close',
       'step-count', 'step-action', 'selected-location-card', 'selected-item-card', 'run-notification',
       'master-form', 'master-item-code', 'master-item-name', 'master-item-category', 'master-item-unit',
@@ -147,7 +149,8 @@
     document.querySelectorAll('.scan-button').forEach((button) => button.addEventListener('click', () => scan(button.dataset.scan)));
     // 履歴（取引・通知）とマスタ（品目・ロケーション・基準在庫）を単一のタブ列に統合した。
     document.querySelectorAll('.record-tab').forEach((button) => {
-      button.addEventListener('click', () => setRecordTab(button.dataset.record));
+      // INV-018: マスタ編集に未保存入力があるタブ離脱は破棄確認を挟む（他タブは masterDirty=false で素通り）。
+      button.addEventListener('click', () => guardMasterDirty(() => setRecordTab(button.dataset.record), button));
       button.addEventListener('keydown', handleRecordTabKey);
     });
 
@@ -187,6 +190,7 @@
     byId('view-dashboard').addEventListener('focusin', handleChartFocus);
     byId('view-dashboard').addEventListener('focusout', hideChartTooltip);
     elements['history-body'].addEventListener('click', handleHistoryDrilldown);
+    if (elements['detail-close']) elements['detail-close'].addEventListener('click', closeHistoryDetail);
     // ページ送りは安定した外枠コンテナへ委譲する（中身は再描画で作り替えるため個別バインド不可）。
     if (elements['history-pager']) elements['history-pager'].addEventListener('click', handlePagerClick);
     if (elements['master-pager']) elements['master-pager'].addEventListener('click', handlePagerClick);
@@ -211,10 +215,16 @@
     byId('history-refresh').addEventListener('click', () => refreshAll());
     byId('history-clear').addEventListener('click', clearHistoryFilters);
     if (elements['run-notification']) elements['run-notification'].addEventListener('click', confirmShortageNotification);
-    if (elements['master-form']) elements['master-form'].addEventListener('submit', submitMaster);
+    if (elements['master-form']) {
+      elements['master-form'].addEventListener('submit', submitMaster);
+      // INV-018: ユーザー入力があったらフォームを dirty と記録する（.value の機械的代入では発火しないので
+      // editMaster/resetMasterForm 側で false に戻す）。input（テキスト）と change（select/checkbox）を拾う。
+      elements['master-form'].addEventListener('input', () => { state.masterDirty = true; });
+      elements['master-form'].addEventListener('change', () => { state.masterDirty = true; });
+    }
     // 新規登録は右ペインを空の入力状態へ戻す入口。一覧行のクリック／キー操作は委譲で受け、
     // 選択行を右ペインの編集フォームへ読み込む（履歴のドリルダウンと同じ操作感に揃える）。
-    if (elements['master-new']) elements['master-new'].addEventListener('click', newMaster);
+    if (elements['master-new']) elements['master-new'].addEventListener('click', () => guardMasterDirty(newMaster, elements['master-new']));
     if (elements['master-delete']) elements['master-delete'].addEventListener('click', () => confirmMasterDelete(state.masterTab, state.masterEditKey, state.masterEditLabel));
     if (elements['confirm-dialog']) {
       elements['confirm-dialog'].addEventListener('close', handleConfirmClose);
@@ -392,15 +402,26 @@
     node.className = 'sync-status';
     if (mode === 'connected') {
       node.hidden = true;
+      announce('');  // 接続中＝通知クリア（INV-035）
       return;
     }
     node.hidden = false;
     if (mode === 'demo') {
       if (label) label.textContent = 'ローカルデモ';
+      announce('ローカルデモデータで表示しています。');
     } else {
       node.classList.add('error');
       if (label) label.textContent = '接続エラー';
+      announce('サーバーに接続できません。接続エラーです。');
     }
+  }
+
+  // INV-035: 常設の sr-only ライブ領域(#a11y-status)へ状態文を書き、支援技術へ確実に読み上げる。
+  // 可視チップ/オーバーレイ(hidden トグル)は純視覚で role=status を持たない＝二重読み上げを避ける。
+  // キャッシュ前にも呼ばれ得るので byId で引く。
+  function announce(message) {
+    const node = byId('a11y-status');
+    if (node) node.textContent = message || '';
   }
 
   function updateUser() {
@@ -592,12 +613,20 @@
   }
 
   function setQrControlsReady(ready, busy = false) {
+    // 無効理由を aria-describedby で短く添える（INV-058）＝読込中は「マスタを読み込み中」、使えない状態は
+    // 「有効な品目/ロケーションが無い」。aria-busy はライブ領域/更新中コンテナ向けで、ボタンに付けるのは
+    // 誤用（INV-020 で読込中のみに絞ったが、INV-058 で廃し describedby に置き換える）。理由ノードは
+    // キャッシュ前にも呼ばれ得るので byId で引く。
+    const reason = ready ? '' : (busy
+      ? '在庫マスタを読み込み中です。'
+      : '有効な品目またはロケーションがありません。「履歴・管理」から登録してください。');
+    const reasonNode = byId('scan-disabled-reason');
+    if (reasonNode) reasonNode.textContent = reason;
     document.querySelectorAll('.scan-button').forEach((button) => {
       button.disabled = !ready;
-      // aria-busy は「読み込み中」のときだけ true。マスタ空やエラーで使えない状態は disabled だけで表し、
-      // 「読込中」を意味する aria-busy を居座らせない（INV-020）。
-      if (busy) button.setAttribute('aria-busy', 'true');
-      else button.removeAttribute('aria-busy');
+      button.removeAttribute('aria-busy');  // 誤用の除去（過去版の残留も掃除する）
+      if (reason && reasonNode) button.setAttribute('aria-describedby', 'scan-disabled-reason');
+      else button.removeAttribute('aria-describedby');
     });
   }
 
@@ -719,14 +748,13 @@
     const operation = state.transactionType === 'OUT' ? '出庫' : '入庫';
     const unit = state.item.unit || '';
     showActionConfirmation({
-      title: `${operation}を登録しますか？`,
-      message: '確定後は履歴に記録されます。登録直前にサーバーで最新の在庫を確認し、基準在庫の状態が変わった場合はAI通知も開始します。',
+      // INV-016: STEP4『登録内容の確認』が既にロケーション/品目/数量/理由を全掲するため、最頻路（入出庫）の
+      // モーダルでは同じ5項目を再掲しない。最終コミットの判断に効く「純増減（before→after）」だけに絞り、
+      // サーバ再確認はメッセージで伝える＝読み負荷を減らしつつ最終ゲート・二重送信防止・サーバ在庫再チェックは温存。
+      title: `${operation} ${number.format(payload.quantity)} ${unit} を登録しますか？`,
+      message: '直前の確認内容で登録します。登録直前にサーバーで最新の在庫を再確認し、基準在庫の状態が変わった場合はAI通知も開始します。確定後は履歴に記録されます。',
       details: [
-        ['ロケーション', `${state.location.location_name}（${payload.location_code}）`],
-        ['品目', `${state.item.item_name}（${payload.item_code}）`],
-        ['数量', `${operation} ${number.format(payload.quantity)} ${unit}`],
-        ['登録後の見込み在庫', `${number.format(Number(currentBalance()?.quantity || 0))} → ${number.format(projectedQuantity())} ${unit}`],
-        ['理由・メモ', payload.reason || '—']
+        ['登録後の見込み在庫', `${number.format(Number(currentBalance()?.quantity || 0))} → ${number.format(projectedQuantity())} ${unit}`]
       ],
       actionLabel: 'はい、登録する',
       trigger: elements['submit-button'],
@@ -769,7 +797,7 @@
         if (result.notification.workflow_started) {
           notificationText = '。AI在庫通知を開始しました';
         } else {
-          notificationError = result.notification.workflow_error || '通知Workflowを開始できませんでした。';
+          notificationError = result.notification.workflow_error || '通知フローを開始できませんでした。';
         }
       }
       toast(result.duplicate
@@ -806,7 +834,7 @@
     const recipient = {operator_email: state.user.email || '', operator_display_name: state.user.name || ''};
     showActionConfirmation({
       title: 'AI在庫通知を実行しますか？',
-      message: '実行時点の在庫不足をCode Engineで確認し、AIが通知文を作成して実行ユーザー宛てにメールを送信します。不足がない場合は通知しません。',
+      message: '実行時点の在庫不足をサーバーで確認し、AIが通知文を作成して実行ユーザー宛てにメールを送信します。不足がない場合は通知しません。',
       details: [['通知先', recipient.operator_email || '実行時にDomoユーザーのメールアドレスを確認します']],
       actionLabel: 'はい、通知を実行する',
       trigger: elements['run-notification'],
@@ -925,6 +953,26 @@
 
   function renderDashboard() {
     const rows = state.dashboardRows || [];
+    // INV-022: ダッシュボードの裸の数値に品目マスタの単位を付記する。品目別棒・不足/滞留の「現在」は
+    // item_code で単位を引いて併記し、総在庫数(TOTAL_QUANTITY=数量の合計)は全有効品目が単一単位なら
+    // その単位を付し、複数単位（個/kg/L 等）にまたがるなら合算の意味が薄いので「単位混在」と明示する
+    // （異種単位の単純合算をそのままの見出し数字として配布先へ継承させない）。付記は純FEで、合算ロジック
+    // (DataFlow)の値は変えない。
+    const unitByItemCode = new Map((state.data?.items || []).map((i) => [i.item_code, (i.unit || '').trim()]));
+    const unitFor = (code) => unitByItemCode.get(code) || '';
+    const distinctUnits = new Set((state.data?.items || []).filter(isActive).map((i) => (i.unit || '').trim()).filter(Boolean));
+    const totalUnitSuffix = distinctUnits.size === 1 ? ' ' + [...distinctUnits][0] : '';
+    const totalUnitsMixed = distinctUnits.size > 1;
+    // INV-025: 在庫棒（品目別/ロケーション別）は数量だけを符号化し「要対応」を示さない。SHORTAGE 行
+    // （品目×拠点粒度）を品目別・拠点別に数えておき、棒行へ「不足Nか所／N品目」のテキスト+アイコンチップを
+    // 添える＝棒は再着色せず（ハウス規約）、粒度も再定義せず「どこかで不足あり」を主ビューで可視化する。
+    const shortageByItem = new Map();
+    const shortageByLocation = new Map();
+    for (const r of rows) {
+      if (r.record_type !== 'SHORTAGE') continue;
+      if (r.item_code) shortageByItem.set(r.item_code, (shortageByItem.get(r.item_code) || 0) + 1);
+      if (r.location_code) shortageByLocation.set(r.location_code, (shortageByLocation.get(r.location_code) || 0) + 1);
+    }
     const kpis = rows.filter((row) => row.record_type === 'KPI');
     const kpiOrder = ['TOTAL_QUANTITY', 'ITEM_COUNT', 'SHORTAGE_COUNT', 'TODAY_IN_COUNT', 'TODAY_OUT_COUNT'];
     const fallbackLabels = {TOTAL_QUANTITY: '総在庫数', ITEM_COUNT: '在庫品目', SHORTAGE_COUNT: '在庫不足', TODAY_IN_COUNT: '本日の入庫', TODAY_OUT_COUNT: '本日の出庫'};
@@ -935,14 +983,18 @@
     state.dashboardDrilldowns.kpi = kpiRows;
     elements['kpi-grid'].innerHTML = kpiRows.map((row, index) => {
       const isShortage = row.metric_key === 'SHORTAGE_COUNT';
+      const isTotalQty = row.metric_key === 'TOTAL_QUANTITY';
       const value = Number(row.metric_value || 0);
       const isAlert = isShortage && value > 0;
+      // 総在庫数は数量の合計。単一単位ならその単位を付し、複数単位にまたがるなら合算が無意味なので
+      // 値は裸のまま「単位混在の合計」と注記する（INV-022）。他KPIは件数なので単位を付けない。
+      const valueText = `${number.format(value)}${isTotalQty ? totalUnitSuffix : ''}`;
       // 状態を色だけに頼らせない: 不足>0は「要補充 N件」＋警告アイコン、0は「基準内」、他KPIは「最新集計」。
       // これでアクセシブル名が状態ごとに別語になり（例「在庫不足 3 要補充 3件」/「在庫不足 0 基準内」）、
       // 色覚・AT 利用者にも不足の有無が文言で伝わる。
-      const note = isShortage ? (isAlert ? `要補充 ${number.format(value)}件` : '基準内') : '最新集計';
+      const note = isShortage ? (isAlert ? `要補充 ${number.format(value)}件` : '基準内') : (isTotalQty && totalUnitsMixed ? '単位混在の合計' : '最新集計');
       const alertIcon = isAlert ? '<svg class="kpi-alert-icon" aria-hidden="true"><use href="#icon-bell"></use></svg>' : '';
-      return `<button type="button" class="kpi-card ${isAlert ? 'alert' : ''}" data-drill-kind="kpi" data-drill-index="${index}" data-tooltip-title="${escapeAttribute(row.label)}" data-tooltip-detail="${escapeAttribute(`${number.format(value)} / クリックして内訳を表示`)}"><span class="kpi-label">${escapeHtml(row.label)}</span><strong>${number.format(value)}</strong><span class="kpi-footer"><small>${alertIcon}${escapeHtml(note)}</small><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></span></button>`;
+      return `<button type="button" class="kpi-card ${isAlert ? 'alert' : ''}" data-drill-kind="kpi" data-drill-index="${index}" aria-label="${escapeAttribute(`${row.label} ${valueText} ${note} クリックして内訳を表示`)}" data-tooltip-title="${escapeAttribute(row.label)}" data-tooltip-detail="${escapeAttribute(`${valueText} / クリックして内訳を表示`)}"><span class="kpi-label">${escapeHtml(row.label)}</span><strong>${number.format(value)}${isTotalQty && totalUnitSuffix ? escapeHtml(totalUnitSuffix) : ''}</strong><span class="kpi-footer"><small>${alertIcon}${escapeHtml(note)}</small><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></span></button>`;
     }).join('');
 
     const itemStocks = filterDashboardRows(rows.filter((row) => row.record_type === 'ITEM_STOCK').sort((a, b) => Number(b.metric_value) - Number(a.metric_value)));
@@ -976,7 +1028,16 @@
         // ツールチップの比率は棒の内容（value/最大値）と同じ分母にする。合計基準の「構成比」を最大値
         // 正規化の棒に添えると、ほぼ満杯の棒に小さな％が並び絵と数字が食い違う（INV-021）。棒長＝最大比％。
         const maxShare = maximum > 0 ? value / maximum * 100 : 0;
-        return `<button type="button" class="bar-row chart-hit" data-drill-kind="${kind}" data-drill-index="${index}" data-tooltip-title="${escapeAttribute(row.label)}" data-tooltip-detail="${escapeAttribute(`現在庫 ${number.format(value)} / 最大比 ${number.format(maxShare)}%`)}"><span class="bar-label">${escapeHtml(row.label)}</span><span class="bar-track"><span style="width:${barPct(value, maximum)}%"></span></span><b>${number.format(value)}</b><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button>`;
+        // 品目別棒だけ単位を付記する（ロケーション別は品目横断の合計なので単位を持たない）。
+        const unit = kind === 'item' ? unitFor(row.item_code) : '';
+        const unitSuffix = unit ? ' ' + unit : '';
+        // 不足チップ（INV-025）: 品目別棒は「この品目が不足している拠点数」、ロケーション別棒は
+        // 「この拠点で不足している品目数」。棒は再着色せず赤テキスト＋ベルアイコンのチップで添える。
+        const shortCount = kind === 'item' ? (shortageByItem.get(row.item_code) || 0) : (shortageByLocation.get(row.location_code) || 0);
+        const shortText = shortCount > 0 ? (kind === 'item' ? `不足${number.format(shortCount)}か所` : `不足${number.format(shortCount)}品目`) : '';
+        const flag = shortText ? `<span class="bar-flag"><svg class="ui-icon" aria-hidden="true"><use href="#icon-bell"></use></svg>${shortText}</span>` : '';
+        const ariaShort = shortText ? ` ${shortText}` : '';
+        return `<button type="button" class="bar-row chart-hit" data-drill-kind="${kind}" data-drill-index="${index}" aria-label="${escapeAttribute(`${row.label} 現在庫 ${number.format(value)}${unitSuffix} 最大比 ${number.format(maxShare)}%${ariaShort}`)}" data-tooltip-title="${escapeAttribute(row.label)}" data-tooltip-detail="${escapeAttribute(`現在庫 ${number.format(value)}${unitSuffix} / 最大比 ${number.format(maxShare)}%${ariaShort ? ' /' + ariaShort : ''}`)}"><span class="bar-label"><span class="bar-name">${escapeHtml(row.label)}</span>${flag}</span><span class="bar-track"><span style="width:${barPct(value, maximum)}%"></span></span><b>${number.format(value)}${unit ? ' ' + escapeHtml(unit) : ''}</b><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button>`;
       };
     }
 
@@ -990,13 +1051,26 @@
 
     const shortages = filterDashboardRows(rows.filter((row) => row.record_type === 'SHORTAGE').sort((a, b) => Number(b.shortage_quantity || 0) - Number(a.shortage_quantity || 0)));
     state.dashboardDrilldowns.shortage = shortages;
-    renderDashboardPanel('shortage', shortages, 'shortage-list', 'shortage-pager', dashboardEmpty('<div class="empty-state">在庫不足はありません。</div>'), (row, index) =>
-      `<button type="button" class="shortage-row" data-drill-kind="shortage" data-drill-index="${index}" data-tooltip-title="${escapeAttribute(row.item_name || row.item_code)}" data-tooltip-detail="${escapeAttribute(`${row.location_name || row.location_code} / 現在 ${number.format(Number(row.quantity || row.current_quantity || 0))} / 基準 ${number.format(Number(row.minimum_quantity || 0))}`)}"><span><strong>${escapeHtml(row.item_name || row.item_code)}</strong><small>${escapeHtml(row.location_name || row.location_code)} / 現在 ${number.format(Number(row.quantity || row.current_quantity || 0))}</small></span><span class="shortage-qty">-${number.format(Number(row.shortage_quantity || 0))}<small>不足</small></span><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button>`);
+    renderDashboardPanel('shortage', shortages, 'shortage-list', 'shortage-pager', dashboardEmpty('<div class="empty-state">在庫不足はありません。</div>'), (row, index) => {
+      const unit = unitFor(row.item_code);
+      const u = unit ? ' ' + unit : '';
+      const ue = unit ? ' ' + escapeHtml(unit) : '';
+      const cur = number.format(Number(row.quantity || row.current_quantity || 0));
+      const min = number.format(Number(row.minimum_quantity || 0));
+      const short = number.format(Number(row.shortage_quantity || 0));
+      return `<button type="button" class="shortage-row" data-drill-kind="shortage" data-drill-index="${index}" aria-label="${escapeAttribute(`${row.item_name || row.item_code} ${row.location_name || row.location_code} 現在 ${cur}${u} 基準 ${min}${u} 不足 ${short}${u}`)}" data-tooltip-title="${escapeAttribute(row.item_name || row.item_code)}" data-tooltip-detail="${escapeAttribute(`${row.location_name || row.location_code} / 現在 ${cur}${u} / 基準 ${min}${u}`)}"><span><strong>${escapeHtml(row.item_name || row.item_code)}</strong><small>${escapeHtml(row.location_name || row.location_code)} / 現在 ${cur}${ue}</small></span><span class="shortage-qty">-${short}${ue}<small>不足</small></span><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button>`;
+    });
 
     const dormant = filterDashboardRows(rows.filter((row) => row.record_type === 'DORMANT').sort((a, b) => Number(b.age_days || 0) - Number(a.age_days || 0)));
     state.dashboardDrilldowns.dormant = dormant;
-    renderDashboardPanel('dormant', dormant, 'dormant-list', 'dormant-pager', dashboardEmpty(`<div class="empty-state">${config.analytics.dormantThresholdDays}日超の滞留在庫はありません。</div>`), (row, index) =>
-      `<button type="button" class="dormant-row" data-drill-kind="dormant" data-drill-index="${index}" data-tooltip-title="${escapeAttribute(row.item_name || row.item_code)}" data-tooltip-detail="${escapeAttribute(`${row.location_name || row.location_code} / 現在庫 ${number.format(Number(row.quantity || 0))} / ${number.format(Number(row.age_days || 0))}日取引なし`)}"><span><strong>${escapeHtml(row.item_name || row.item_code)}</strong><small>${escapeHtml(row.location_name || row.location_code)} / ${number.format(Number(row.quantity || 0))}</small></span><span><strong>${number.format(Number(row.age_days || 0))}日</strong><small>取引なし</small></span><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button>`);
+    renderDashboardPanel('dormant', dormant, 'dormant-list', 'dormant-pager', dashboardEmpty(`<div class="empty-state">${config.analytics.dormantThresholdDays}日超の滞留在庫はありません。</div>`), (row, index) => {
+      const unit = unitFor(row.item_code);
+      const u = unit ? ' ' + unit : '';
+      const ue = unit ? ' ' + escapeHtml(unit) : '';
+      const qty = number.format(Number(row.quantity || 0));
+      const age = number.format(Number(row.age_days || 0));
+      return `<button type="button" class="dormant-row" data-drill-kind="dormant" data-drill-index="${index}" aria-label="${escapeAttribute(`${row.item_name || row.item_code} ${row.location_name || row.location_code} 現在庫 ${qty}${u} ${age}日取引なし`)}" data-tooltip-title="${escapeAttribute(row.item_name || row.item_code)}" data-tooltip-detail="${escapeAttribute(`${row.location_name || row.location_code} / 現在庫 ${qty}${u} / ${age}日取引なし`)}"><span><strong>${escapeHtml(row.item_name || row.item_code)}</strong><small>${escapeHtml(row.location_name || row.location_code)} / ${qty}${ue}</small></span><span><strong>${age}日</strong><small>取引なし</small></span><svg class="drill-icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg></button>`;
+    });
 
     renderAiNotes(rows);
     // 描画直後にカード高さを揃える（レイアウト確定後の1フレームで計測するためスケジュールする）。
@@ -1099,7 +1173,7 @@
     notes.forEach((row) => { map[aiNoteKey(row.item_code, row.location_code)] = row; });
     state.aiNotes = map;
     if (!notes.length) {
-      elements['ai-note-list'].innerHTML = '<div class="empty-state">AIコメントは分析DataSetの更新後に表示されます。</div>';
+      elements['ai-note-list'].innerHTML = '<div class="empty-state">AIコメントは分析データの更新後に表示されます。</div>';
       return;
     }
     // 品目コード（無ければ品目名）でグルーピングし、要約の重複を品目単位で解消する。
@@ -1207,8 +1281,8 @@
     else if (key === 'Home') next = 0;
     else if (key === 'End') next = tabs.length - 1;
     const target = tabs[next];
-    setRecordTab(target.dataset.record);
-    target.focus();
+    // INV-018: 矢印キーでのタブ移動も、マスタ編集の未保存入力があれば破棄確認を挟む。
+    guardMasterDirty(() => { setRecordTab(target.dataset.record); target.focus(); }, target);
   }
 
   // 履歴／マスタの2つのタブパネルは「現在のタブ」だけが表示管理者。
@@ -1548,7 +1622,7 @@
     openDetail({
       eyebrow: '品目ドリルダウン',
       title: label || itemCode || '品目明細',
-      subtitle: itemCode || '分析DataSetの集計名で照合',
+      subtitle: itemCode || '分析データの集計名で照合',
       content: detailStats([['現在庫', total], ['ロケーション数', balances.length], ['取引件数', transactions.length]]) + aiNoteSection(balances) + detailSection('ロケーション別現在庫', renderBalanceDetails(balances)) + detailSection('直近の取引', renderDetailTransactions(transactions.slice(0, config.ui.detailTransactionLimit))),
       historyFilter: {mode: 'transactions', query: itemCode || label, type: ''}
     });
@@ -1567,7 +1641,7 @@
     openDetail({
       eyebrow: 'ロケーションドリルダウン',
       title: label || locationCode || 'ロケーション明細',
-      subtitle: locationCode || '分析DataSetの集計名で照合',
+      subtitle: locationCode || '分析データの集計名で照合',
       content: detailStats([['現在庫', total], ['品目数', balances.length], ['取引件数', transactions.length]]) + aiNoteSection(balances) + detailSection('品目別現在庫', renderBalanceDetails(balances)) + detailSection('直近の取引', renderDetailTransactions(transactions.slice(0, config.ui.detailTransactionLimit))),
       historyFilter: {mode: 'transactions', query: locationCode || label, type: ''}
     });
@@ -1695,6 +1769,28 @@
     elements['detail-subtitle'].textContent = '一覧から選択';
     elements['detail-content'].innerHTML = '<div class="detail-placeholder">左の一覧から行を選ぶと、ここに明細が表示されます。</div>';
     elements['detail-pane'].classList.remove('has-detail');
+  }
+
+  /**
+   * 履歴の明細を閉じて一覧へ戻る（INV-066）。狭幅（縦積み）では明細が一覧の下に開き、
+   * 閉じる手段が無いと見終わった後に手動上スクロールするしかないため、ヘッダの「一覧へ戻る」で
+   * 選択を解除し、直前の行（無ければ一覧先頭）までスクロールしてフォーカスを一覧側へ戻す。
+   */
+  function closeHistoryDetail() {
+    const previous = state.selectedHistoryIndex;
+    resetDetailPane();              // selectedHistoryIndex=null＋プレースホルダ＋has-detail 解除
+    highlightSelectedHistoryRow();  // index が null になったので全行から選択強調を外す
+    const row = (previous != null && elements['history-body'])
+      ? elements['history-body'].querySelector('[data-history-index="' + previous + '"]')
+      : null;
+    // 狭幅では明細が一覧の下に開くので、直前の行（無ければ一覧の先頭）まで戻す。
+    if (global.matchMedia && global.matchMedia('(max-width: 980px)').matches) {
+      const anchor = row || elements['history-body'];
+      if (anchor && anchor.scrollIntoView) anchor.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    }
+    // キーボード操作者のフォーカスを一覧側へ戻す（直前行のドリルボタン優先）。
+    const focusTarget = row ? row.querySelector('.drill-btn') : null;
+    if (focusTarget) focusTarget.focus({preventScroll: true});
   }
 
   /**
@@ -1937,10 +2033,32 @@
     renderMasters();
   }
 
+  /**
+   * マスタ編集フォームに未保存の入力があるとき、破棄を伴う遷移（行切替・タブ切替・新規）の前に
+   * 確認を挟む（INV-018）。dirty でなければ即 proceed。確認は既存の showActionConfirmation を再利用し、
+   * 「破棄して移動」を選んだときだけ proceed を実行する。キャンセルはフォームと入力をそのまま残す。
+   * ※ ユーザー起点の入口でのみ呼ぶ（保存成功後の reset など機械的遷移は無条件 proceed）。
+   * @param {function():void} proceed 破棄を確定したときに実行する遷移処理
+   * @param {Element} [trigger] フォーカス返却先
+   */
+  function guardMasterDirty(proceed, trigger) {
+    if (!state.masterDirty) { proceed(); return; }
+    showActionConfirmation({
+      title: '未保存の変更があります',
+      message: '保存していない変更があります。破棄して移動しますか？',
+      details: [],
+      actionLabel: '破棄して移動',
+      danger: true,
+      trigger: trigger || null,
+      onConfirm: () => { state.masterDirty = false; proceed(); },
+    });
+  }
+
   // 右ペインを「新規登録」の空状態へ戻す。入力値・見出し・操作ボタンをすべて初期化し、
   // 編集途中のキー選択も解除する（callMaster 成功後や種別タブ切替から呼ばれる）。
   function resetMasterForm() {
     cancelConfirmation();
+    state.masterDirty = false;  // INV-018: フォームを初期化＝未保存状態を解消。
     state.masterEditKey = null;
     state.masterEditLabel = null;
     ['master-item-code', 'master-item-name', 'master-item-category', 'master-item-unit', 'master-location-code', 'master-location-name', 'master-location-zone', 'master-rule-minimum'].forEach((id) => { if (elements[id]) elements[id].value = ''; });
@@ -2173,6 +2291,7 @@
     }
     state.masterEditKey = code;
     state.masterEditLabel = label;
+    state.masterDirty = false;  // INV-018: 行を読み込んだ直後は未保存ではない（代入は input を発火しない）。
     applyMasterEditorMode(tab, label, active);
     updateMasterSelection();
   }
@@ -2205,7 +2324,8 @@
   function handleMasterRowActivate(event) {
     const row = event.target.closest('[data-master-edit]');
     if (!row) return;
-    editMaster(state.masterTab, row.dataset.masterEdit);
+    // INV-018: 編集途中なら、別行を読み込んで入力を破棄する前に確認する。
+    guardMasterDirty(() => editMaster(state.masterTab, row.dataset.masterEdit), row.querySelector('.drill-btn') || row);
   }
 
   // 物理削除の確認ダイアログ。不可逆であること・関連データも連鎖削除されること・
@@ -2232,7 +2352,7 @@
     if (impact) details.push(['影響範囲', impact]);  // 不可逆操作の影響範囲を定量で見せる
     showActionConfirmation({
       title: `${typeLabel}を完全に削除しますか？`,
-      message: 'この項目をAppDBから完全に削除します。この操作は取り消せません。関連する基準在庫や現在庫も一緒に削除されますが、入出庫・通知の履歴は監査証跡として残ります。一時的に止めたいだけなら、削除せずチェックボックス「入出庫で選択できるようにする」をオフにしてください（停止中・元に戻せます）。',
+      message: 'この項目のデータを完全に削除します。この操作は取り消せません。関連する基準在庫や現在庫も一緒に削除されますが、入出庫・通知の履歴は監査証跡として残ります。一時的に止めたいだけなら、削除せずチェックボックス「入出庫で選択できるようにする」をオフにしてください（停止中・元に戻せます）。',
       details,
       actionLabel: 'はい、完全に削除する',
       danger: true,
@@ -2329,6 +2449,8 @@
     elements['loading-overlay'].hidden = !active;
     const text = elements['loading-overlay'].querySelector('p');
     if (message && text) text.textContent = message;
+    // 処理中は常設ライブ領域へ読み上げ、終了でクリア（INV-035）。オーバーレイ自体は視覚のみ。
+    announce(active ? (message || (text ? text.textContent : '処理しています')) : '');
   }
 
   function toast(message, type, duration) {

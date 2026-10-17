@@ -57,7 +57,8 @@ function extractFunction(name) {
 const PURE_FNS = [
   'shiftPeriod', 'num', 'byProfitDesc', 'costField', 'pctChange',
   'buildStorePeriodRows', 'pickTopBottom', 'buildMonthDetail',
-  'buildStoreCostTable', 'buildDeptMonthDetail', 'chartWidth'
+  'buildStoreCostTable', 'buildDeptMonthDetail', 'chartWidth', 'pctDisplay',
+  'trimZero', 'axisFmt', 'reportFreshness'
 ];
 const pureCtx = vm.createContext({});
 vm.runInContext(PURE_FNS.map(extractFunction).join('\n'), pureCtx);
@@ -76,6 +77,9 @@ const buildMonthDetail = pure('buildMonthDetail');
 const buildStoreCostTable = pure('buildStoreCostTable');
 const buildDeptMonthDetail = pure('buildDeptMonthDetail');
 const chartWidth = pure('chartWidth');
+const pctDisplay = pure('pctDisplay');
+const axisFmt = pure('axisFmt');
+const reportFreshness = pure('reportFreshness');
 
 // ---- drillFrom のロード（モジュール状態はコンテキスト注入で差し替え）----
 const DRILL_SRC = ['topFrame', 'monthDetailFrame', 'deptByCode', 'drillFrom'].map(extractFunction).join('\n');
@@ -324,6 +328,144 @@ test('各 draw 関数は data-drill マーカーを出力する（クリック�
   assert.match(extractFunction('drawDivergingBars'), /data-drill=/, '店舗別横棒');
   assert.match(extractFunction('drawHBars'), /data-drill=/, 'カテゴリ/事業部の横棒');
   assert.match(extractFunction('drawDeptBar'), /data-drill="dept"/, '事業部積み上げ棒');
+});
+
+test('PL-030: 事業部積み上げ棒は粗利マイナス（原価>売上）で壊れない（防御的ガード）', () => {
+  // 同梱デモは健全4事業部なので発火しないが、顧客の実データで赤字/売上0事業部が来ても
+  // 棒が無言で消えない・軸クリップしない・ゼロ割率を出さないことを source-text で固定する。
+  const src = extractFunction('drawDeptBar');
+  assert.match(src, /yMax[\s\S]{0,80}Math\.max\(d\.rev, d\.cogs\)/, 'yMax が max(rev,cogs) でない＝原価超過で軸クリップ');
+  assert.match(src, /Math\.max\(0, yCogs - yRev\)/, '粗利セグメント高さが負でクランプされていない');
+  assert.match(src, /d\.rev > 0 && d\.gross > 0/, '粗利率がゼロ割/負率ガードを持たない');
+  assert.match(src, /粗利マイナス/, '原価>売上の明示ラベルが無い');
+});
+
+test('PL-037: レポート鮮度補足＝相対経過＋データ時点より古い注意（表示専用）', () => {
+  const now = Date.UTC(2025, 9, 20); // 2025-10-20
+  // 3ヶ月前・データ時点(2025-10)より古い → 両方。
+  assert.equal(reportFreshness('2025-07-15', '2025-10', now), '（約3ヶ月前・最新データより古い可能性）');
+  // データ時点と同月に生成（約5日前）→ 古い注意は出さない。
+  assert.equal(reportFreshness('2025-10-15', '2025-10', now), '（約5日前）');
+  // 当日生成（経過0日）かつ同月 → 補足なし。
+  assert.equal(reportFreshness('2025-10-20', '2025-10', now), '');
+  // 不正な日付は空。
+  assert.equal(reportFreshness('', '2025-10', now), '');
+});
+
+test('PL-023/056: KPI は静的（ホバー浮上なし）＋ツールチップ影をカードと統一', () => {
+  // PL-023: .kpi:hover の transform/影スワップを残さない（クリック可能に見せない）。
+  assert.ok(!/\.kpi:hover\s*\{/.test(CSS), '.kpi:hover が残っている（非クリック要素を浮かせている）');
+  // PL-056: ツールチップは重い生の影でなくカードと同じ --shadow-md を使う。
+  assert.match(CSS, /\.chart-tip\{[^}]*box-shadow:\s*var\(--shadow-md\)/, 'ツールチップ影が --shadow-md でない');
+  assert.ok(!/box-shadow:\s*0 8px 22px/.test(CSS), '重い 0 8px 22px のツールチップ影が残る');
+});
+
+test('PL-020: パレットをトークン化し CSS 本文に生の中間色/白を撒かない（明色専用を明示）', () => {
+  assert.match(CSS, /--on-accent:\s*#fff/, '--on-accent トークンが無い');
+  assert.match(CSS, /--warn:\s*#8A6D3B/i, '--warn トークンが無い');
+  assert.match(CSS, /--line-faint:\s*#C9C3BA/i, '--line-faint トークンが無い');
+  assert.match(CSS, /--dept-cogs:\s*#C97B84/i, '--dept-cogs トークンが無い');
+  // :root 以降（本文）に生の中間色/白が残っていない。
+  const body = CSS.slice(CSS.indexOf('\n}\n') + 3);
+  assert.ok(!/#8A6D3B|#C9C3BA|#C97B84|#FBF3F4|#FAF9F7|#FCFBFA|#F5F2ED/i.test(body), 'CSS 本文に生の中間色が残る');
+  assert.ok(!/: ?#fff\b/.test(body), 'CSS 本文に生の #fff が残る');
+  assert.match(CSS, /light-only/, '明色専用（light-only）の宣言コメントが無い');
+});
+
+test('PL-024/025/026/057: タイポグラフィ整頓（小数px排除・見出し階層・モバイル上書き削除・CJK字送り）', () => {
+  // PL-024: font-size に小数px（11.5/12.5/14.5）を残さない。
+  assert.ok(!/font-size: ?\d+\.5px/.test(CSS), '小数px の font-size が残っている');
+  // PL-025: AI インサイト見出し専用クラスが注入 h2(16px) より大きい。
+  assert.match(CSS, /\.insight-heading\{[^}]*font-size:\s*19px/, 'insight-heading が 19px でない');
+  // PL-026: 768px の死んだ h1 上書き・boxed な h2 上書き（単一行形）を残さない。
+  assert.ok(!/#analysis-container h1\{ font-size: 24px/.test(CSS), 'モバイルの死んだ h1 上書きが残る');
+  assert.ok(!/#analysis-container h2\{ font-size: 18px/.test(CSS), 'モバイルの過大 h2 上書きが残る');
+  // PL-057: body に正の letter-spacing を置かない（CJK 本文は normal）。
+  assert.ok(!/\nbody\s*\{[^}]*letter-spacing/.test(CSS), 'body に letter-spacing が残る');
+});
+
+test('PL-063: ツールチップ見出しは max-width 内で折り返す（長名が背景外へ溢れない）', () => {
+  // tip-head は折り返し可、tip-row は数値整列のため nowrap を維持。
+  assert.match(CSS, /\.chart-tip \.tip-head\{[^}]*white-space:\s*normal[^}]*overflow-wrap:\s*anywhere/, 'tip-head が折り返し設定でない');
+  assert.match(CSS, /\.chart-tip \.tip-row\{[^}]*white-space:\s*nowrap/, 'tip-row の nowrap が無い');
+});
+
+test('PL-064: ランキング名の文字数予算が順位番号幅を差し引く（下位で棒域へはみ出さない）', () => {
+  assert.match(extractFunction('drawDivergingBars'), /nameChars - rankStr\.length/, '順位番号幅を差し引いていない');
+});
+
+test('PL-028: 軸目盛りは最大値から単位を1つに固定し万↔億をまたがない', () => {
+  const big = 150000000;  // 1.5億
+  assert.ok(axisFmt(37500000, big).endsWith('億'), '億帯で万が混ざる: ' + axisFmt(37500000, big));
+  assert.ok(axisFmt(big, big).endsWith('億'));
+  const mid = 90000000;   // 9000万（<1億）
+  assert.ok(axisFmt(mid, mid).endsWith('万') && !axisFmt(mid, mid).includes('億'), '万帯で億が出る: ' + axisFmt(mid, mid));
+  assert.ok(axisFmt(4500000, mid).endsWith('万'));
+  assert.ok(axisFmt(-50000000, big).startsWith('-'), '負値の符号が無い');
+});
+
+test('PL-027: ドーナツ構成比は最大剰余法で合計100%・正値1%未満は <1 表記', () => {
+  // 各自四捨五入だと 42+28+15+9+5=99 のように和がズレ、極小スライスが「0」になる不信を防ぐ。
+  const sumInts = (arr) => arr.reduce((a, s) => a + (s === '<1' ? 0 : Number(s)), 0);
+  // 個別 round なら 42+28+15+9+5=99 になる分布でも、表示整数の和は 100。
+  const a = pctDisplay([4210, 2780, 1540, 920, 550]);
+  assert.equal(sumInts(a), 100, '表示整数の和が100%でない: ' + JSON.stringify(a));
+  // 正値だが1%未満のスライスは "0" でなく "<1"（可視スライスが「0%」にならない）。
+  const b = pctDisplay([9970, 20, 10]);  // 2つ目/3つ目は ~0.2% / ~0.1%
+  assert.ok(b.slice(1).every((s) => s === '<1' || Number(s) >= 1), '1%未満の正値が 0 表記: ' + JSON.stringify(b));
+  assert.ok(!b.includes('0'), '正値スライスに 0 表記が残る: ' + JSON.stringify(b));
+  // 大スライス側（1つ目）は整数、全体和は 100。
+  assert.equal(sumInts(b), 100, 'and 和が100%でない: ' + JSON.stringify(b));
+  // 合計0は全て "0"（ゼロ割なし）。
+  assert.deepEqual(pctDisplay([0, 0]), ['0', '0']);
+  // きれいに割れる分布はそのまま。
+  assert.deepEqual(pctDisplay([50, 50]), ['50', '50']);
+});
+
+test('PL-021: ブランド色は単一の真実源 BRAND に集約し、生hexを撒かない', () => {
+  // 色相変更が1箇所で済むよう、COST_KEYS/DEPT_COLORS/PALETTE/BAR_COGS は BRAND を参照する。
+  assert.match(SOURCE, /var BRAND = \{/, 'BRAND SSOT が無い');
+  assert.match(SOURCE, /color: BRAND\.enji/, 'COST_KEYS が BRAND を参照していない');
+  assert.match(SOURCE, /DEPT_COLORS = \{ APPA: BRAND\.enji/, 'DEPT_COLORS が BRAND を参照していない');
+  assert.match(SOURCE, /rev: BRAND\.enji/, 'PALETTE.rev が BRAND を参照していない');
+  assert.match(SOURCE, /var BAR_COGS = BRAND\.rose/, 'BAR_COGS が BRAND を参照していない');
+  // 各ブランド hex は BRAND 定義内の1回のみ（他所に生hexが散っていない）。
+  ['#7F1D2D', '#B23A48', '#C97B84', '#4C6552', '#5A0F1C', '#B8863B', '#5F7A64'].forEach((hex) => {
+    const n = (SOURCE.match(new RegExp(hex, 'g')) || []).length;
+    assert.equal(n, 1, `${hex} が ${n} 回出現（BRAND 1箇所に集約されていない）`);
+  });
+});
+
+test('PL-065: ドット凡例は dotLegend ヘルパで単一定義（インライン重複を排除）', () => {
+  assert.match(SOURCE, /function dotLegend\(items\)/, 'dotLegend ヘルパが無い');
+  // 旧インライン重複（sw-dot を直書きする凡例文字列）が残っていない。
+  assert.doesNotMatch(SOURCE, /'<span class="lg"><i class="sw sw-dot" style="background:'/, 'インライン重複の凡例が残存');
+  assert.match(extractFunction('drawDeptBar'), /dotLegend\(\[/, '事業部棒の凡例が dotLegend でない');
+});
+
+test('PL-039: AI-HTML サニタイザは <a> を許可タグに含めない（信頼面を広げない）', () => {
+  const san = extractFunction('sanitizeReportHtml');
+  // allowlist 文字列に独立した "a" トークンが無いこと（details/summary 等の部分一致を避け、空白境界で判定）。
+  const allowLine = san.match(/var allowed = new Set\("([^"]*)"\.split\(" "\)\)/);
+  assert.ok(allowLine, 'allowed 定義が見つからない');
+  assert.ok(!allowLine[1].split(' ').includes('a'), 'allowed タグに a が含まれている');
+  // ブロックリストは維持（退行防止）。
+  assert.match(san, /var blocked = new Set\("[^"]*script[^"]*iframe[^"]*"/, 'blocked が弱体化');
+});
+
+test('PL-013: 折れ線は色だけに頼らず破線＋終端マーカーで系列を区別する（WCAG 1.4.1）', () => {
+  // 近接2赤（APPA/LIFE）や色覚特性・白黒印刷でも線を追えるよう、第2チャネルを固定する。
+  const dept = extractFunction('drawDeptTrend');
+  assert.match(dept, /stroke-dasharray/, '事業部トレンドの線に破線パターンがない');
+  assert.match(dept, /endMarker\(/, '事業部トレンドに終端マーカーがない');
+  assert.match(dept, /lineKey\(/, '事業部トレンドの凡例が線キー（破線/形状）でない');
+  // 第2チャネルのパターン表は4系列ぶん用意し、実線/破線/点線/一点鎖線＋4形状を持つ。
+  assert.match(SOURCE, /var SERIES_DASH = \[[^\]]*"7 4"[^\]]*\]/, 'SERIES_DASH の破線定義がない');
+  assert.match(SOURCE, /var SERIES_MARK = \[[^\]]*"square"[^\]]*"triangle"[^\]]*"diamond"[^\]]*\]/, 'SERIES_MARK の形状定義がない');
+  // endMarker は形状ごとに異なる SVG 要素を返す（円/四角/三角/菱形）。
+  assert.match(extractFunction('endMarker'), /rect[\s\S]*polygon/, 'endMarker が形状を出し分けていない');
+  // 概要トレンドも凡例を線キー化し、純利益線は破線（CSS 側でも stroke-dasharray）。
+  assert.match(extractFunction('drawTrend'), /lineKey\(PALETTE\.profit, "7 4"/, '概要トレンド凡例が破線キーでない');
 });
 
 test('PL-001: ドリル帯の aria-label に数値を畳み込み、フォーカスでもツールチップを出す', () => {

@@ -9,8 +9,9 @@ The data layer this script stands up, in dependency order:
                        ignores the input rows, so any readable DataSet serves;
                        a dedicated seed keeps the stack self-contained and
                        reproducible on a fresh instance.
-  Runtime Code Engine is provisioned with the Workflow layer. The legacy dedupe
-  utility remains for compatibility but is not automatically created here.
+  2. Code Engine    -- provisioned by the Workflow layer (scripts/provision_workflows.py),
+                       not here. The legacy dedupe utility remains for compatibility but is
+                       not automatically created here.
   3. AppDB collection -- 店舗別損益AI要約 (syncEnabled:false). The long-form
                        analysis_html reports are written here by the WF-01 + consolidated sub-WF
                        workflow layer (provisioned by scripts/provision_workflows.py).

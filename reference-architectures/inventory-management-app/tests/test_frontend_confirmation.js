@@ -74,15 +74,20 @@ test('registration and notification clicks open confirmation without making API 
   }
 });
 
-test('registration shows the reviewed target, quantity, stock and memo; yes executes exactly once', async () => {
+test('取引モーダルは最終ゲートとして純増減だけに絞り（INV-016）、はいで1回だけ実行する', async () => {
   const h = harness();
   h.app.state.reason = '<img src=x onerror=alert(1)>';
   h.app.confirmTransaction();
-  assert.match(h.get('confirm-details').innerHTML, /第1倉庫（LOC-01）/);
-  assert.match(h.get('confirm-details').innerHTML, /入庫 2 双/);
+  // INV-016: STEP4 が全掲するロケーション/品目/数量/理由はモーダルで再掲しない。純増減だけ残す。
   assert.match(h.get('confirm-details').innerHTML, /10 → 12 双/);
-  assert.match(h.get('confirm-details').innerHTML, /&lt;img/);
+  assert.doesNotMatch(h.get('confirm-details').innerHTML, /第1倉庫（LOC-01）/);
+  assert.doesNotMatch(h.get('confirm-details').innerHTML, /理由・メモ/);
+  // 理由（自由入力）はモーダルに再掲しないため、ここに未エスケープの生タグも持ち込まれない
+  //（STEP4 review-list 側の escape は test_frontend_guards の reviewTransaction テストで担保）。
   assert.doesNotMatch(h.get('confirm-details').innerHTML, /<img/);
+  // 操作と数量はタイトルに出す（最終ゲートとして何を確定するか明示）。
+  assert.match(h.get('confirm-title').textContent, /入庫 2 双 を登録しますか？/);
+  // 二重送信防止・サーバ在庫再チェックは温存＝確定で register_transaction を request_id 付きで1回だけ。
   h.get('confirm-dialog').close('default');
   await settle();
   h.app.handleConfirmClose();
@@ -260,4 +265,29 @@ test('マスタ物理削除の確認に影響範囲（連鎖削除の現在庫�
   const h2 = harness();
   h2.app.confirmMasterDelete('rule', 'LOC-01|ITEM-01', 'LOC-01 / ITEM-01');
   assert.doesNotMatch(h2.get('confirm-details').innerHTML, /影響範囲/);
+});
+
+test('マスタ編集に未保存入力があると新規ボタンは破棄確認を挟み、確定で初めて初期化する（INV-018）', async () => {
+  const h = harness();
+  h.app.state.masterTab = 'item';
+  // 編集途中（dirty）を再現：フォームに入力があったことにする（input で masterDirty=true）。
+  h.get('master-form').dispatch('input', {});
+  assert.equal(h.app.state.masterDirty, true);
+  // 新規ボタン：dirty なので即初期化せず破棄確認を出す（まだ破棄していない）。
+  h.get('master-new').dispatch('click');
+  assert.equal(h.get('confirm-dialog').open, true);
+  assert.equal(h.app.state.masterDirty, true);
+  assert.equal(h.calls.length, 0);
+  // 「破棄して移動」確定で初めて dirty 解消＋新規初期化（通信はしない）。
+  h.get('confirm-dialog').close('default');
+  await settle();
+  assert.equal(h.app.state.masterDirty, false);
+  assert.equal(h.calls.length, 0);
+});
+
+test('未保存入力が無ければ新規ボタンは確認を挟まず直接初期化する（INV-018 の無退行）', () => {
+  const h = harness();
+  h.app.state.masterDirty = false;
+  h.get('master-new').dispatch('click');
+  assert.equal(h.get('confirm-dialog').open, false);
 });
