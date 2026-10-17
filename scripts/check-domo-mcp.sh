@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
 source "$SCRIPT_DIR/lib/common.sh"
 
-DEFAULT_ENDPOINT="https://maintenance-instance.domo.com/api/ai/v1/assistant/mcp/toolkits/domo_basic_mcp"
+domo_require curl
 SHOW_SCHEMAS=false
 if [[ "${1:-}" == "--show-schemas" ]]; then
   SHOW_SCHEMAS=true
@@ -18,7 +18,19 @@ if [[ $# -gt 1 ]]; then
   exit 2
 fi
 
-ENDPOINT="${1:-${DOMO_MCP_ENDPOINT:-$DEFAULT_ENDPOINT}}"
+# エンドポイント決定（TK-008）: 明示引数 > $DOMO_MCP_ENDPOINT > $INSTANCE から組み立て。
+# 死んだ固定ホストの既定は持たない（どの顧客でも到達不能で opaque な HTTP 000 を招くため）。
+MCP_TOOLKIT="${DOMO_MCP_TOOLKIT:-domo_basic_mcp}"
+if [[ -n "${1:-}" ]]; then
+  ENDPOINT="$1"
+elif [[ -n "${DOMO_MCP_ENDPOINT:-}" ]]; then
+  ENDPOINT="$DOMO_MCP_ENDPOINT"
+elif [[ -n "${INSTANCE:-}" ]]; then
+  ENDPOINT="https://$INSTANCE/api/ai/v1/assistant/mcp/toolkits/$MCP_TOOLKIT"
+else
+  echo "ERROR: set DOMO_MCP_ENDPOINT, pass an endpoint, or export INSTANCE=<your>.domo.com (see docs/domo-mcp.md)." >&2
+  exit 2
+fi
 PYTHON_BIN="$(domo_find_python)"
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/domo-mcp-check.XXXXXX")"
 trap 'rm -rf "$TMP_DIR"' EXIT

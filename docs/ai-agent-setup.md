@@ -53,7 +53,7 @@ For any agent that can read files and run shell commands, make these files autho
 - `api-reference.md`
 - `quickstart.md` for first-run flow
 - `../templates/pro-code-app/README.md` for Pro Code app work
-- `autonomous-loop.md` when the user wants an improvement cycle that runs until they say stop
+- For an improvement cycle that runs until the user says stop, ask the agent to repeat a review → fix → commit loop on a named target (no separate doc required)
 
 ## Useful Prompts
 

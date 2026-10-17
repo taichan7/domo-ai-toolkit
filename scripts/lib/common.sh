@@ -120,7 +120,7 @@ domo_load_auth() {
   unset DOMO_CACHED_INSTANCE DOMO_CACHED_SID
   if [[ -z "$INSTANCE" || -z "$SID" ]]; then
     echo "ERROR: no Domo auth found." >&2
-    echo "Run 'bash scripts/authenticate.sh <instance>' from the repo root, or set INSTANCE and DOMO_TOKEN." >&2
+    echo "Run 'bash $DOMO_SCRIPT_DIR/authenticate.sh <instance>', or set INSTANCE and DOMO_TOKEN." >&2
     return 1
   fi
 

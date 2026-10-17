@@ -20,8 +20,20 @@ fi
 
 TOOL_NAME="$1"
 TOOL_ARGS_JSON="${2:-{\}}"
-DEFAULT_ENDPOINT="https://maintenance-instance.domo.com/api/ai/v1/assistant/mcp/toolkits/domo_basic_mcp"
-ENDPOINT="${3:-${DOMO_MCP_ENDPOINT:-$DEFAULT_ENDPOINT}}"
+# エンドポイント決定（TK-008）: 明示引数($3) > $DOMO_MCP_ENDPOINT > $INSTANCE から組み立て。
+# 死んだ固定ホストの既定は持たない（どの顧客でも到達不能になるため）。
+MCP_TOOLKIT="${DOMO_MCP_TOOLKIT:-domo_basic_mcp}"
+if [[ -n "${3:-}" ]]; then
+  ENDPOINT="$3"
+elif [[ -n "${DOMO_MCP_ENDPOINT:-}" ]]; then
+  ENDPOINT="$DOMO_MCP_ENDPOINT"
+elif [[ -n "${INSTANCE:-}" ]]; then
+  ENDPOINT="https://$INSTANCE/api/ai/v1/assistant/mcp/toolkits/$MCP_TOOLKIT"
+else
+  echo "ERROR: set DOMO_MCP_ENDPOINT, pass an endpoint, or export INSTANCE=<your>.domo.com (see docs/domo-mcp.md)." >&2
+  exit 2
+fi
+domo_require curl
 PYTHON_BIN="$(domo_find_python)"
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/domo-mcp-call.XXXXXX")"
 trap 'rm -rf "$TMP_DIR"' EXIT

@@ -42,18 +42,18 @@ CLI の設定ファイルは以下に保存されます:
 INSTANCE="your-company.domo.com"
 
 # リフレッシュトークンを読み込み (Windows は $USERPROFILE、macOS/Linux は $HOME を使用)
-REFRESH_TOKEN=$(python -c "import json,os; print(json.load(open(os.path.expanduser('~/.config/configstore/ryuu/$INSTANCE.json')))['refreshToken'])")
+REFRESH_TOKEN=$(python3 -c "import json,os; print(json.load(open(os.path.expanduser('~/.config/configstore/ryuu/$INSTANCE.json')))['refreshToken'])")
 
 # アクセストークンと交換
 ACCESS_TOKEN=$(curl -s -X POST "https://$INSTANCE/api/oauth2/token" \
   -H "content-type: application/x-www-form-urlencoded;charset=utf-8" \
   -d "client_id=domo:internal:devstudio&grant_type=refresh_token&refresh_token=$REFRESH_TOKEN" \
-  | python -c "import json,sys; print(json.load(sys.stdin)['access_token'])")
+  | python3 -c "import json,sys; print(json.load(sys.stdin)['access_token'])")
 
 # SID と交換
 SID=$(curl -s "https://$INSTANCE/api/oauth2/sid" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
-  | python -c "import json,sys; print(json.load(sys.stdin)['sid'])")
+  | python3 -c "import json,sys; print(json.load(sys.stdin)['sid'])")
 
 echo "Authenticated to $INSTANCE （SID 取得済み — 画面には表示しません。コピー・共有しないでください）"
 ```
@@ -72,7 +72,7 @@ curl -s -H "X-Domo-Authentication: $SID" \
 ```bash
 ACCESS_TOKEN=$(curl -s -u "$CLIENT_ID:$CLIENT_SECRET" \
   "https://api.domo.com/oauth/token?grant_type=client_credentials&scope=data" \
-  | python -c "import json,sys; print(json.load(sys.stdin)['access_token'])")
+  | python3 -c "import json,sys; print(json.load(sys.stdin)['access_token'])")
 
 curl -H "Authorization: Bearer $ACCESS_TOKEN" \
   "https://api.domo.com/v1/datasets?limit=10"
@@ -285,7 +285,7 @@ Custom App (Pro Code アプリ) は Domo 上の iframe 内で実行されます�
 
 ```bash
 curl -s -H "X-Domo-Authentication: $SID" "https://$INSTANCE/api/dataprocessing/v1/dataflows" \
-  | python -c "
+  | python3 -c "
 import json, sys
 flows = json.load(sys.stdin)
 for f in flows:

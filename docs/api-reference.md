@@ -40,18 +40,18 @@ The CLI config file lives at `~/.config/configstore/ryuu/<instance>.domo.com.jso
 INSTANCE="your-company.domo.com"
 
 # Read the refresh token (Windows uses $USERPROFILE; macOS/Linux use $HOME)
-REFRESH_TOKEN=$(python -c "import json,os; print(json.load(open(os.path.expanduser('~/.config/configstore/ryuu/$INSTANCE.json')))['refreshToken'])")
+REFRESH_TOKEN=$(python3 -c "import json,os; print(json.load(open(os.path.expanduser('~/.config/configstore/ryuu/$INSTANCE.json')))['refreshToken'])")
 
 # Exchange for an access token
 ACCESS_TOKEN=$(curl -s -X POST "https://$INSTANCE/api/oauth2/token" \
   -H "content-type: application/x-www-form-urlencoded;charset=utf-8" \
   -d "client_id=domo:internal:devstudio&grant_type=refresh_token&refresh_token=$REFRESH_TOKEN" \
-  | python -c "import json,sys; print(json.load(sys.stdin)['access_token'])")
+  | python3 -c "import json,sys; print(json.load(sys.stdin)['access_token'])")
 
 # Exchange for a SID
 SID=$(curl -s "https://$INSTANCE/api/oauth2/sid" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
-  | python -c "import json,sys; print(json.load(sys.stdin)['sid'])")
+  | python3 -c "import json,sys; print(json.load(sys.stdin)['sid'])")
 
 echo "Authenticated to $INSTANCE (SID acquired — not printed; do not copy or share it)"
 ```
@@ -70,7 +70,7 @@ For `api.domo.com` endpoints. Get a client ID + secret from `developer.domo.com 
 ```bash
 ACCESS_TOKEN=$(curl -s -u "$CLIENT_ID:$CLIENT_SECRET" \
   "https://api.domo.com/oauth/token?grant_type=client_credentials&scope=data" \
-  | python -c "import json,sys; print(json.load(sys.stdin)['access_token'])")
+  | python3 -c "import json,sys; print(json.load(sys.stdin)['access_token'])")
 
 curl -H "Authorization: Bearer $ACCESS_TOKEN" \
   "https://api.domo.com/v1/datasets?limit=10"
@@ -283,7 +283,7 @@ The common pattern is: fetch all dataflows → filter to failed → drill into t
 
 ```bash
 curl -s -H "X-Domo-Authentication: $SID" "https://$INSTANCE/api/dataprocessing/v1/dataflows" \
-  | python -c "
+  | python3 -c "
 import json, sys
 flows = json.load(sys.stdin)
 for f in flows:

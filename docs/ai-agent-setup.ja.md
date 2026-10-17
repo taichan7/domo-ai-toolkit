@@ -14,7 +14,7 @@
 | Claude Code cloud/web | `CLAUDE.md` → `AGENTS.md`、`.claude/settings.json` の SessionStart hook が bootstrap を実行 |
 | Cursor | `AGENTS.md` を添付・メンションするか、codebase を index します |
 | Cline / Continue | `AGENTS.md` を project context として添付します |
-| Aider | `aider AGENTS.md api-reference.md` |
+| Aider | `aider AGENTS.md api-reference.ja.md` |
 | 一般的な Web LLM | `AGENTS.md` と `api-reference.ja.md` の必要箇所を貼り付けます |
 
 確認済みDomo MCP serverとclient別設定は [domo-mcp.ja.md](domo-mcp.ja.md) を参照してください。
@@ -47,7 +47,7 @@ bash ../scripts/authenticate.sh your-company.domo.com を実行して認証し�
 ファイルを読めて shell command を実行できるエージェントには、以下を authoritative context として渡してください。
 
 - `AGENTS.md`
-- `api-reference.md`
+- `api-reference.ja.md`
 - `quickstart.ja.md`
 - Pro Code アプリ作業では `../templates/pro-code-app/README.md`
 
