@@ -21,6 +21,8 @@ The [offline catalog](reference/domo-card-config-catalog.json) combines two dist
 | `documented_columns` | [DOC], public Phoenix chart documentation | Mapping name, required flag, format support, documented maximum |
 | `property_refs` → `properties` | [DOC], same public documentation snapshot | Key, label, category, type, value list, dependency, feature flag, bounds/default when published |
 | `observed_keys_missing_from_active_docs` | [LIVE] versus [DOC] comparison | Preserve known source values; do not discard them merely because an older public schema omits them |
+| `documentation_ui_hex_picker` | [DOC], PropertyConfig source map | UI transformation for some non-select_list colors; raw valueList remains intact |
+| `live_hex_color_chart_types` | [LIVE], later save/render exercise | Hex acceptance only on the listed chart codes, even when the raw list contains named colors |
 
 The public documentation currently serves build `main.a710eb8e.chunk.js`. Its factual property
 metadata was normalized without tooltip prose. The snapshot covers all 71 observed chart codes,
@@ -228,6 +230,11 @@ aggregations, filters/date grain, formulas and edited overrides. Then verify dat
 using the authorized target workflow (or a browser check when requested). Test the target's actual
 width, date/filter changes, drill, empty results and PDP where relevant. HTTP 200 alone is not visual
 verification. No create/update was executed as part of this read-only dashboard study.
+
+For subsequent live authoring evidence, read [validation and drill paths](domo-cards-validation.md).
+It records 35 final cards / 31 chart codes, exact failed requests and repairs, dimensioned native
+rendering, full-population versus preview checks, drill URNs/ancestor semantics, cumulative filters,
+and App Studio theme/layout experiments. The catalog's original 154-card study remains read-only.
 
 ## Place the result in the app
 

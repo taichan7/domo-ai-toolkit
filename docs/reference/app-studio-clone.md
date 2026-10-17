@@ -30,7 +30,13 @@ All callable with the ryuu refresh token as `X-DOMO-Developer-Token`.
 
 ## Unified dataapp PUT body shape
 
-This is the body the App Studio editor sends on save. It controls views, nav, theme, landing view, view order, and view-add. The GET returns a SUBSET of this — several required-on-PUT fields come back as `null` on read.
+**Later evidence, 2026-10-17:** this section is the older clone capture, not a universal DTO.
+A later live target accepted full GET→mutate→PUT with `type:"app"`, numeric view IDs and
+navigation `entity`, while forcing the older scaffolding below returned 400. Preserve the
+target's representation and verify the result. See [live validation](../domo-cards-validation.md#app-studio-preserve-the-targets-schema)
+for theme collection isolation, polymorphic color types, one-tab consolidation and readback checks.
+
+This is the body captured from the App Studio editor in the older clone. It controls views, nav, theme, landing view, view order, and view-add. In that capture GET returned a SUBSET — several required-on-PUT fields came back as `null` on read.
 
 ```json
 {

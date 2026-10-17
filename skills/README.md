@@ -28,7 +28,7 @@ Each file is a self-contained skill: read the one matching your task before you 
 | Pro Code + standard cards in one app | [domo-procode-embedded-cards.md](domo-procode-embedded-cards.md) |
 | App Broadcasting (cross-app pub/sub) | [domo-app-broadcasting.md](domo-app-broadcasting.md) |
 | App Studio / DataApps | [domo-appstudio.md](domo-appstudio.md) |
-| Standard cards: dashboard analysis, configuration, native authoring and Pro Code selection | [domo-cards.md](domo-cards.md) |
+| Standard cards: native authoring, drill paths, rendering checks, configuration and Pro Code selection | [domo-cards.md](domo-cards.md) |
 | AppDB / DataStore | [domo-appdb.md](domo-appdb.md) |
 | AppDB cleanup / pruning | [appdb-cleanup.md](appdb-cleanup.md) |
 | FileSets / Documents | [domo-filesets.md](domo-filesets.md) |

@@ -5,13 +5,15 @@
     "property_docs": "https://domoapps.github.io/domo-phoenix/#/properties",
     "property_build": "main.a710eb8e.chunk.js",
     "property_build_sha256": "e677e2628977724d35cdbb994633cf49f5fa15498d643a28824ca9e6dd0c64b9",
-    "enum_source": "https://github.com/DomoApps/domo-phoenix/blob/master/src/enums/phoenix-chart-type.ts"
+    "enum_source": "https://github.com/DomoApps/domo-phoenix/blob/master/src/enums/phoenix-chart-type.ts",
+    "property_ui_component": "components/PropertyConfig/PropertyConfig.tsx (same property_build source map)"
   },
   "evidence": {
     "documented_columns_and_properties": "Public Phoenix documentation snapshot; not an Analyzer support guarantee",
     "observed": "Read-only full definitions on five user-selected dashboards; no write or rendering verification",
     "property_values": "valueList is the published snapshot, not a universal cross-version enum; boolean overrides were live strings",
-    "scope": "Only chart codes observed in this study. Missing types are not proof of absence."
+    "scope": "Only chart codes observed in this study. Missing types are not proof of absence.",
+    "hex_colors": "Raw valueList is retained. documentation_ui_hex_picker marks the non-select_list transformation in PropertyConfig. Separately, live_hex_color_chart_types records saved/rendered hex overrides even where raw named-color lists exist; it applies only to the listed chart codes."
   },
   "totals": {
     "cards": 154,
@@ -175,7 +177,12 @@
         "upper_color_theme@0eb07a4c4c",
         "lower_color_theme@893610935e",
         "excel_export_row_limit@51099ca218"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 2,
+        "browser_interaction_verified": false
+      }
     },
     "badge_bubble": {
       "name": "Bubble (legacy)",
@@ -522,7 +529,12 @@
         "sm_hide_in_legend@816f0d327f",
         "sm_hide_title@096a73239e",
         "series_1_color@ce482a48d4"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_calendar": {
       "name": "Calendar",
@@ -659,7 +671,12 @@
         "decimal_separator@5cb4fda820",
         "thousands_separator@1fdd48bf08",
         "color_theme@340b664dc7"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_checkbox_selector": {
       "name": "Checkbox selector",
@@ -715,7 +732,12 @@
         "selected_fill_color@e340f332da",
         "no_data_message@870287bf59",
         "show_hover_label@d87c754384"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_curved_symbolline": {
       "name": "Curved symbol line",
@@ -1362,7 +1384,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_dropdown_selector": {
       "name": "Dropdown selector (code-derived label)",
@@ -1405,7 +1432,12 @@
         "default_font_family@d0f7fdd9e8",
         "default_font_face@f17e4cf4d3",
         "no_data_message@870287bf59"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_facegauge": {
       "name": "Face",
@@ -1583,7 +1615,12 @@
         "currency_sym_position@bd68a49073",
         "decimal_separator@5cb4fda820",
         "thousands_separator@1fdd48bf08"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_funnel": {
       "name": "Funnel",
@@ -1653,7 +1690,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_funnel_bars": {
       "name": "Funnel bars",
@@ -1905,7 +1947,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_gauge": {
       "name": "Radial",
@@ -2011,7 +2058,12 @@
         "range6_min@ffdbea8415",
         "range6_max@752358094b",
         "range6_color@056ae418b7"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_heatmap": {
       "name": "Heat map",
@@ -2192,7 +2244,12 @@
         "range_9_max@483f5d8d47",
         "range_9_color@152fec2cf5",
         "color_theme@a43f3b74c7"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_heatmap_table": {
       "name": "Heatmap table (code-derived label)",
@@ -2400,7 +2457,12 @@
         "sm_abbreviation@9dc20e8bfe",
         "sm_hide_in_legend@816f0d327f",
         "sm_hide_title@096a73239e"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_horiz_100pct": {
       "name": "100% Stacked bar (Horizontal)",
@@ -2849,7 +2911,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_horiz_boxplot": {
       "name": "Box plot (Horizontal)",
@@ -4603,7 +4670,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_line_clusterbar": {
       "name": "Line + grouped and stacked",
@@ -5782,7 +5854,12 @@
         "currency_sym_position@bd68a49073",
         "decimal_separator@5cb4fda820",
         "thousands_separator@1fdd48bf08"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_pareto": {
       "name": "Pareto",
@@ -5866,7 +5943,12 @@
         "reverse_gradient_direction@343f1f5fad",
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_pie": {
       "name": "Pie",
@@ -5977,7 +6059,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_pivot_table": {
       "name": "Pivot table",
@@ -6176,7 +6263,12 @@
         "use_conditional_colors@9934b5cafc",
         "series_1_color@ce482a48d4",
         "excel_export_row_limit@51099ca218"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_radar": {
       "name": "Radar",
@@ -6304,7 +6396,12 @@
         "sm_hide_in_legend@816f0d327f",
         "sm_hide_title@096a73239e",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_rttrendline": {
       "name": "Running total line",
@@ -6534,7 +6631,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_singlevalue": {
       "name": "Single value",
@@ -6622,7 +6724,12 @@
         "decimal_separator@5cb4fda820",
         "thousands_separator@1fdd48bf08",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 4,
+        "browser_interaction_verified": false
+      }
     },
     "badge_slicer": {
       "name": "Slicer",
@@ -6675,7 +6782,12 @@
         "selected_fill_color@e340f332da",
         "no_data_message@870287bf59",
         "show_hover_label@d87c754384"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_stackedtrend": {
       "name": "Stacked area",
@@ -6871,7 +6983,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_stepline": {
       "name": "Step line",
@@ -8087,7 +8204,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_trendline": {
       "name": "Line",
@@ -8339,7 +8461,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_two_trendline": {
       "name": "Multi-line",
@@ -8846,7 +8973,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_vert_bar": {
       "name": "Bar",
@@ -9106,7 +9238,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@ce482a48d4"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_vert_boxplot": {
       "name": "Box plot",
@@ -9257,7 +9394,12 @@
         "sm_abbreviation@9dc20e8bfe",
         "sm_hide_in_legend@816f0d327f",
         "sm_hide_title@096a73239e"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_vert_bullet": {
       "name": "Bullet (Vertical)",
@@ -11073,7 +11215,12 @@
         "gradient_by_value@d8d17eaa31",
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_word_cloud": {
       "name": "Word cloud",
@@ -11136,7 +11283,12 @@
         "use_gradient_colors@58bdbcff2d",
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_world_map": {
       "name": "Map World",
@@ -11745,7 +11897,12 @@
         "gradient_start_fill_color@c270bd9bf0",
         "gradient_end_fill_color@5b635355d8",
         "series_1_color@26a4d6e22d"
-      ]
+      ],
+      "later_authoring_validation": {
+        "date": "2026-10-17",
+        "displayed_cards_saved_and_rendered": 1,
+        "browser_interaction_verified": false
+      }
     },
     "badge_xyscatterplot": {
       "name": "Scatter plot (legacy)",
@@ -11968,7 +12125,8 @@
       "category": "Additional Text Options",
       "type": "string",
       "dependencyOption": "addl_text",
-      "dependencyValue": "<ANY>"
+      "dependencyValue": "<ANY>",
+      "documentation_ui_hex_picker": true
     },
     "addl_text_font_family@163998e3c7": {
       "key": "addl_text_font_family",
@@ -12461,13 +12619,15 @@
       "key": "base_fill_color",
       "label": "Base Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "border_color@2b86200902": {
       "key": "border_color",
       "label": "Border Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "border_thickness@8012cef323": {
       "key": "border_thickness",
@@ -13506,7 +13666,8 @@
       "type": "string",
       "dependencyOption": "datalabel_fill",
       "dependencyValue": "true",
-      "includeTransparencyOption": true
+      "includeTransparencyOption": true,
+      "documentation_ui_hex_picker": true
     },
     "datalabel_fnt_clr@8d72b75956": {
       "key": "datalabel_fnt_clr",
@@ -13542,13 +13703,15 @@
       "category": "Data Label Settings",
       "type": "string",
       "dependencyOption": "datalabel_text",
-      "dependencyValue": "<ANY>"
+      "dependencyValue": "<ANY>",
+      "documentation_ui_hex_picker": true
     },
     "datalabel_font_color@500fd9be41": {
       "key": "datalabel_font_color",
       "label": "Text Color",
       "category": "Data Label Settings",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "datalabel_font_face@258c7a88b6": {
       "key": "datalabel_font_face",
@@ -14084,7 +14247,8 @@
       "type": "string",
       "dependencyOption": "show_data_table",
       "dependencyValue": "true",
-      "includeTransparencyOption": true
+      "includeTransparencyOption": true,
+      "documentation_ui_hex_picker": true
     },
     "datatable_show_rotated@1f4f4ca439": {
       "key": "datatable_show_rotated",
@@ -14100,7 +14264,8 @@
       "category": "Date Grain Options",
       "type": "string",
       "dependencyOption": "show_date_grain",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "date_grain_style@c06810ac69": {
       "key": "date_grain_style",
@@ -14419,7 +14584,8 @@
       "key": "default_font_color",
       "label": "Default Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "default_font_face@13a1b67ee4": {
       "key": "default_font_face",
@@ -14909,7 +15075,8 @@
       "category": "Change Value Options",
       "type": "string",
       "dependencyOption": "hide_change_value",
-      "dependencyValue": "false"
+      "dependencyValue": "false",
+      "documentation_ui_hex_picker": true
     },
     "dropdown_label_pos@8224b6d253": {
       "key": "dropdown_label_pos",
@@ -14983,7 +15150,8 @@
       "key": "fill_color",
       "label": "Fill Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "fill_color@e9d3cc6888": {
       "key": "fill_color",
@@ -14998,7 +15166,8 @@
         "Purple",
         "Teal",
         "Pink"
-      ]
+      ],
+      "documentation_ui_hex_picker": true
     },
     "fill_empty_end_dates@ecda2c0cc5": {
       "key": "fill_empty_end_dates",
@@ -15137,7 +15306,8 @@
         "Purple",
         "Teal",
         "Pink"
-      ]
+      ],
+      "documentation_ui_hex_picker": true
     },
     "font_size@16e98dc2c7": {
       "key": "font_size",
@@ -15317,7 +15487,8 @@
       "category": "Gradient Colors",
       "type": "string",
       "dependencyOption": "use_gradient_colors",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "gradient_end_fill_color@c58f5f6f4c": {
       "key": "gradient_end_fill_color",
@@ -15325,7 +15496,8 @@
       "category": "Theme",
       "type": "string",
       "dependencyOption": "use_custom_gradient_colors",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "gradient_start_fill_color@73fd65f8a2": {
       "key": "gradient_start_fill_color",
@@ -15333,7 +15505,8 @@
       "category": "Theme",
       "type": "string",
       "dependencyOption": "use_custom_gradient_colors",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "gradient_start_fill_color@c270bd9bf0": {
       "key": "gradient_start_fill_color",
@@ -15341,7 +15514,8 @@
       "category": "Gradient Colors",
       "type": "string",
       "dependencyOption": "use_gradient_colors",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "green_range_max@5d4deb47c0": {
       "key": "green_range_max",
@@ -15361,7 +15535,8 @@
       "category": "Grid Lines",
       "type": "string",
       "dependencyOption": "hide_value_gridlines",
-      "dependencyValue": "false"
+      "dependencyValue": "false",
+      "documentation_ui_hex_picker": true
     },
     "grp_legend_text@c9a99697dd": {
       "key": "grp_legend_text",
@@ -16179,7 +16354,8 @@
       "key": "item_fill_color",
       "label": "Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "item_padding@e393a20a05": {
       "key": "item_padding",
@@ -16927,7 +17103,8 @@
         "Purple",
         "Teal",
         "Pink"
-      ]
+      ],
+      "documentation_ui_hex_picker": true
     },
     "line_color@eb5b4a4b4a": {
       "key": "line_color",
@@ -16944,7 +17121,8 @@
         "Pink"
       ],
       "dependencyOption": "show_linear_regression",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "line_limit_method@a995099e9b": {
       "key": "line_limit_method",
@@ -17156,7 +17334,8 @@
       "category": "Heatmap Options",
       "type": "string",
       "dependencyOption": "show_midpoint",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "midpoint_fill_color@f605b6e50b": {
       "key": "midpoint_fill_color",
@@ -17164,7 +17343,8 @@
       "category": "Diverging",
       "type": "string",
       "dependencyOption": "show_midpoint",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "midpoint_value@a391a85a3f": {
       "key": "midpoint_value",
@@ -17218,7 +17398,8 @@
       "category": "General",
       "type": "string",
       "dependencyOption": "show_milestones",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "milestone_fill_color@de7d27eb4b": {
       "key": "milestone_fill_color",
@@ -17226,7 +17407,8 @@
       "category": "General",
       "type": "string",
       "dependencyOption": "show_milestones",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "min_bubble_value@e48ed15429": {
       "key": "min_bubble_value",
@@ -17238,7 +17420,8 @@
       "key": "min_max_font_color",
       "label": "Text Color",
       "category": "Min Max",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "min_max_font_face@00621ea05e": {
       "key": "min_max_font_face",
@@ -17343,7 +17526,8 @@
       "key": "negative_fill_color",
       "label": "Negative Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "negative_numbers@17b7c39453": {
       "key": "negative_numbers",
@@ -17569,13 +17753,15 @@
       "key": "no_data_fill_color",
       "label": "No Data Color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "no_data_fill_color@4dfe5a02e9": {
       "key": "no_data_fill_color",
       "label": "No Data Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "no_data_handling@86485ba3ac": {
       "key": "no_data_handling",
@@ -17760,7 +17946,8 @@
       "category": "General",
       "type": "string",
       "dependencyOption": "display_limit",
-      "dependencyValue": "<ANY>"
+      "dependencyValue": "<ANY>",
+      "documentation_ui_hex_picker": true
     },
     "other_fill_color@b96b9d163c": {
       "key": "other_fill_color",
@@ -17768,7 +17955,8 @@
       "category": "General",
       "type": "string",
       "dependencyOption": "max_before_other",
-      "dependencyValue": "<ANY>"
+      "dependencyValue": "<ANY>",
+      "documentation_ui_hex_picker": true
     },
     "outliers_above@8a5d750396": {
       "key": "outliers_above",
@@ -17898,7 +18086,8 @@
       "key": "positive_fill_color",
       "label": "Positive Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "primary_x_scale_pos@ec4117e9d4": {
       "key": "primary_x_scale_pos",
@@ -18018,7 +18207,8 @@
       "category": "General",
       "type": "string",
       "dependencyOption": "radial_style",
-      "dependencyValue": "Half|Three-quarter"
+      "dependencyValue": "Half|Three-quarter",
+      "documentation_ui_hex_picker": true
     },
     "radial_label_location@8410473ff5": {
       "key": "radial_label_location",
@@ -18037,7 +18227,8 @@
       "key": "radial_labels_font_color",
       "label": "Text Color",
       "category": "Radial Labels",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "radial_major_segments@f83ac3027e": {
       "key": "radial_major_segments",
@@ -18109,7 +18300,8 @@
       "category": "General",
       "type": "string",
       "dependencyOption": "radial_style",
-      "dependencyValue": "Half|Three-quarter"
+      "dependencyValue": "Half|Three-quarter",
+      "documentation_ui_hex_picker": true
     },
     "radial_tick_pct@701ef9108f": {
       "key": "radial_tick_pct",
@@ -18153,6 +18345,9 @@
         "Purple",
         "Pink",
         "Teal"
+      ],
+      "live_hex_color_chart_types": [
+        "badge_gauge"
       ]
     },
     "range1_max@86b211638d": {
@@ -18181,6 +18376,9 @@
         "Purple",
         "Pink",
         "Teal"
+      ],
+      "live_hex_color_chart_types": [
+        "badge_gauge"
       ]
     },
     "range2_max@46ec9f1290": {
@@ -18209,6 +18407,9 @@
         "Purple",
         "Pink",
         "Teal"
+      ],
+      "live_hex_color_chart_types": [
+        "badge_gauge"
       ]
     },
     "range3_max@e0c3f93211": {
@@ -18311,7 +18512,8 @@
       "key": "range_10_color",
       "label": "range_10_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_10_max@72a9ecc4fd": {
       "key": "range_10_max",
@@ -18335,7 +18537,8 @@
       "key": "range_11_color",
       "label": "range_11_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_11_max@8e829d0e13": {
       "key": "range_11_max",
@@ -18359,7 +18562,8 @@
       "key": "range_12_color",
       "label": "range_12_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_12_max@5be7266e16": {
       "key": "range_12_max",
@@ -18383,7 +18587,8 @@
       "key": "range_13_color",
       "label": "range_13_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_13_max@52a65a6ff8": {
       "key": "range_13_max",
@@ -18407,7 +18612,8 @@
       "key": "range_14_color",
       "label": "range_14_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_14_max@8669561dc7": {
       "key": "range_14_max",
@@ -18431,7 +18637,8 @@
       "key": "range_15_color",
       "label": "range_15_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_15_max@6b49725607": {
       "key": "range_15_max",
@@ -18455,13 +18662,15 @@
       "key": "range_1_color",
       "label": "range_1_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_1_color@ff9f1aca91": {
       "key": "range_1_color",
       "label": "range_1_color",
       "category": "Color Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_1_max@2f31da0009": {
       "key": "range_1_max",
@@ -18497,13 +18706,15 @@
       "key": "range_2_color",
       "label": "range_2_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_2_color@c56d20cdf9": {
       "key": "range_2_color",
       "label": "range_2_color",
       "category": "Color Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_2_max@3ab4b30af9": {
       "key": "range_2_max",
@@ -18539,13 +18750,15 @@
       "key": "range_3_color",
       "label": "range_3_color",
       "category": "Color Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_3_color@eca27859ec": {
       "key": "range_3_color",
       "label": "range_3_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_3_max@25af5cecf2": {
       "key": "range_3_max",
@@ -18581,13 +18794,15 @@
       "key": "range_4_color",
       "label": "range_4_color",
       "category": "Color Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_4_color@f20b7ece62": {
       "key": "range_4_color",
       "label": "range_4_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_4_max@0b9cb997cc": {
       "key": "range_4_max",
@@ -18623,13 +18838,15 @@
       "key": "range_5_color",
       "label": "range_5_color",
       "category": "Color Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_5_color@d2f24c0389": {
       "key": "range_5_color",
       "label": "range_5_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_5_max@c654cbde32": {
       "key": "range_5_max",
@@ -18665,13 +18882,15 @@
       "key": "range_6_color",
       "label": "range_6_color",
       "category": "Color Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_6_color@f71670c499": {
       "key": "range_6_color",
       "label": "range_6_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_6_max@2957136197": {
       "key": "range_6_max",
@@ -18707,13 +18926,15 @@
       "key": "range_7_color",
       "label": "range_7_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_7_color@af94d94f32": {
       "key": "range_7_color",
       "label": "range_7_color",
       "category": "Color Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_7_max@1081978634": {
       "key": "range_7_max",
@@ -18749,13 +18970,15 @@
       "key": "range_8_color",
       "label": "range_8_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_8_color@9b0903d267": {
       "key": "range_8_color",
       "label": "range_8_color",
       "category": "Color Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_8_max@1811626d25": {
       "key": "range_8_max",
@@ -18791,13 +19014,15 @@
       "key": "range_9_color",
       "label": "range_9_color",
       "category": "Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_9_color@918a305a53": {
       "key": "range_9_color",
       "label": "range_9_color",
       "category": "Color Ranges",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "range_9_max@483f5d8d47": {
       "key": "range_9_max",
@@ -18866,7 +19091,8 @@
       "label": "Region Border Color",
       "category": "General",
       "type": "string",
-      "includeTransparencyOption": true
+      "includeTransparencyOption": true,
+      "documentation_ui_hex_picker": true
     },
     "regression_hover_text@11ff5d9759": {
       "key": "regression_hover_text",
@@ -18934,7 +19160,8 @@
       "category": "Regression Lines",
       "type": "string",
       "dependencyOption": "show_regression_lines",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "regression_line_last_point@e220f625fd": {
       "key": "regression_line_last_point",
@@ -19231,7 +19458,8 @@
       "key": "selected_fill_color",
       "label": "Selected Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "selected_year@253b816df0": {
       "key": "selected_year",
@@ -19256,14 +19484,16 @@
       "key": "series_1_color",
       "label": "series_1_color",
       "category": "Colors",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "series_1_color@ce482a48d4": {
       "key": "series_1_color",
       "label": "series_1_color",
       "category": "Colors",
       "type": "string",
-      "includeTransparencyOption": true
+      "includeTransparencyOption": true,
+      "documentation_ui_hex_picker": true
     },
     "series_height@d0e106a7f4": {
       "key": "series_height",
@@ -19702,7 +19932,8 @@
       "category": "Scale Marker",
       "type": "string",
       "dependencyOption": "sm_type",
-      "dependencyValue": "Range"
+      "dependencyValue": "Range",
+      "documentation_ui_hex_picker": true
     },
     "sm_border_style@125ec27b67": {
       "key": "sm_border_style",
@@ -19739,7 +19970,8 @@
       "type": "string",
       "dependencyOption": "sm_type",
       "dependencyValue": "Range",
-      "includeTransparencyOption": true
+      "includeTransparencyOption": true,
+      "documentation_ui_hex_picker": true
     },
     "sm_fill_color@ecf8c5c8b8": {
       "key": "sm_fill_color",
@@ -19747,7 +19979,8 @@
       "category": "Scale Marker",
       "type": "string",
       "dependencyOption": "sm_type",
-      "dependencyValue": "Range"
+      "dependencyValue": "Range",
+      "documentation_ui_hex_picker": true
     },
     "sm_fill_outliers@559f82ef9b": {
       "key": "sm_fill_outliers",
@@ -19775,7 +20008,8 @@
       "category": "Scale Marker",
       "type": "string",
       "dependencyOption": "sm_type",
-      "dependencyValue": "Line"
+      "dependencyValue": "Line",
+      "documentation_ui_hex_picker": true
     },
     "sm_line_style@0cd54fc743": {
       "key": "sm_line_style",
@@ -19933,7 +20167,8 @@
       "category": "Scale Marker",
       "type": "string",
       "dependencyOption": "sm_type",
-      "dependencyValue": "Range"
+      "dependencyValue": "Range",
+      "documentation_ui_hex_picker": true
     },
     "sm_percentage_of@89ed3dba42": {
       "key": "sm_percentage_of",
@@ -19976,7 +20211,8 @@
       "category": "Scale Marker",
       "type": "string",
       "dependencyOption": "sm_type",
-      "dependencyValue": "Quantiles"
+      "dependencyValue": "Quantiles",
+      "documentation_ui_hex_picker": true
     },
     "sm_quant_border_style@6d594ec178": {
       "key": "sm_quant_border_style",
@@ -19997,7 +20233,8 @@
       "category": "Scale Marker",
       "type": "string",
       "dependencyOption": "sm_type",
-      "dependencyValue": "Quantiles"
+      "dependencyValue": "Quantiles",
+      "documentation_ui_hex_picker": true
     },
     "sm_quant_fill_trans_pct@b859603d5a": {
       "key": "sm_quant_fill_trans_pct",
@@ -21058,7 +21295,8 @@
       "key": "target_font_color",
       "label": "Text Color",
       "category": "Target",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "target_font_face@4812327484": {
       "key": "target_font_face",
@@ -21103,7 +21341,8 @@
       "key": "target_line_color",
       "label": "Line Color",
       "category": "Target",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "target_value@a0458c11ae": {
       "key": "target_value",
@@ -21138,7 +21377,8 @@
       "key": "tier1_font_color",
       "label": "Tier 1 Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "tier1_item_count@1e4e65b248": {
       "key": "tier1_item_count",
@@ -21150,7 +21390,8 @@
       "key": "tier2_font_color",
       "label": "Tier 2 Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "tier2_item_count@37eaca075e": {
       "key": "tier2_item_count",
@@ -21162,7 +21403,8 @@
       "key": "tier3_font_color",
       "label": "Tier 3 Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "tier3_item_count@4726422ffe": {
       "key": "tier3_item_count",
@@ -21174,7 +21416,8 @@
       "key": "tier4_font_color",
       "label": "Tier 4 Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "tier4_item_count@996cf96b74": {
       "key": "tier4_item_count",
@@ -21186,7 +21429,8 @@
       "key": "tier5_font_color",
       "label": "Tier 5 Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "tier5_item_count@d66df6147e": {
       "key": "tier5_item_count",
@@ -21206,7 +21450,8 @@
       "category": "Title Options",
       "type": "string",
       "dependencyOption": "title_text",
-      "dependencyValue": "<ANY>"
+      "dependencyValue": "<ANY>",
+      "documentation_ui_hex_picker": true
     },
     "title_font_family@b46de77fd7": {
       "key": "title_font_family",
@@ -21481,7 +21726,8 @@
       "category": "General",
       "type": "string",
       "dependencyOption": "show_today_marker",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "tooltip1_value_type@1b99c4a039": {
       "key": "tooltip1_value_type",
@@ -21638,7 +21884,8 @@
       "key": "total_bar_fill_color",
       "label": "Total Bar Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "total_col@f6fee8d0a0": {
       "key": "total_col",
@@ -21733,7 +21980,8 @@
       "key": "total_fill_color",
       "label": "Total Fill Color",
       "category": "Total Row/Col",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "total_horz_bottom_border@10ee9ea529": {
       "key": "total_horz_bottom_border",
@@ -21854,7 +22102,8 @@
         "Pink"
       ],
       "dependencyOption": "show_total_line",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "total_line_label@6432d16ca5": {
       "key": "total_line_label",
@@ -22240,7 +22489,8 @@
       "type": "string",
       "dependencyOption": "show_as_trellis",
       "dependencyValue": "Trellis Categories|Tiered Dates",
-      "includeTransparencyOption": true
+      "includeTransparencyOption": true,
+      "documentation_ui_hex_picker": true
     },
     "trellis_mid_word_wrap@b4ceb2849c": {
       "key": "trellis_mid_word_wrap",
@@ -22262,7 +22512,8 @@
       "category": "Change Value Options",
       "type": "string",
       "dependencyOption": "hide_change_value",
-      "dependencyValue": "false"
+      "dependencyValue": "false",
+      "documentation_ui_hex_picker": true
     },
     "upper_color_theme@0eb07a4c4c": {
       "key": "upper_color_theme",
@@ -22650,7 +22901,8 @@
       "key": "value_font_color",
       "label": "Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "value_font_color@c6988cf672": {
       "key": "value_font_color",
@@ -22658,7 +22910,8 @@
       "category": "Value Options",
       "type": "string",
       "dependencyOption": "hide_single_value",
-      "dependencyValue": "false"
+      "dependencyValue": "false",
+      "documentation_ui_hex_picker": true
     },
     "value_font_face@05f98949ca": {
       "key": "value_font_face",
@@ -22765,7 +23018,8 @@
       "category": "Value Label",
       "type": "string",
       "dependencyOption": "show_value_label",
-      "dependencyValue": "true"
+      "dependencyValue": "true",
+      "documentation_ui_hex_picker": true
     },
     "value_label_location@d909c7d7bc": {
       "key": "value_label_location",
@@ -23149,7 +23403,8 @@
       "key": "xy_symbol_border_line_color",
       "label": "Symbol Border Color",
       "category": "General",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "xy_symbol_size@90b2bc1e2e": {
       "key": "xy_symbol_size",
@@ -23219,7 +23474,8 @@
       "category": "Change Value Options",
       "type": "string",
       "dependencyOption": "hide_change_value",
-      "dependencyValue": "false"
+      "dependencyValue": "false",
+      "documentation_ui_hex_picker": true
     },
     "zero_like_no_data@05a8c084e2": {
       "key": "zero_like_no_data",
@@ -23231,7 +23487,8 @@
       "key": "zero_line_color",
       "label": "Zero Line Color",
       "category": "Grid Lines",
-      "type": "string"
+      "type": "string",
+      "documentation_ui_hex_picker": true
     },
     "zero_line_color_x@409ec4cc89": {
       "key": "zero_line_color_x",
@@ -23269,5 +23526,12 @@
       "min": "1",
       "max": "5"
     }
+  },
+  "authoring_validation": {
+    "date": "2026-10-17",
+    "displayed_cards": 35,
+    "final_chart_types": 31,
+    "additional_drill_views": 2,
+    "scope": "Separate from original 154-card read-only observation totals. Native PNG/query results and app layout verified; browser interaction not verified. See domo-cards-validation.md."
   }
 }

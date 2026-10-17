@@ -139,6 +139,7 @@ tier hedges. All instance-host, `X-DOMO-Developer-Token` (or SID).
 | Create dataapp shell | `POST /api/content/v1/dataapps` | `[REPO]` |
 | **Add a view (shipping path)** | `POST /api/content/v1/dataapps/{id}/views` | `[REPO]` — what the provisioner uses per-view |
 | **Unified save (clone path)** | `PUT /api/content/v1/dataapps/{id}?includeHiddenViews=true` | `[REPO]` — single-instance editor capture |
+| Remove a tab/view | `DELETE /api/content/v1/dataapps/{id}/views/{viewId}` | `[LIVE 2026-10-17]` three authorized tabs removed after content consolidation |
 | Rename a view | `PUT /api/content/v1/pages/{viewId}` body `{"title": "<new>"}` | `[REPO]` |
 | Read layout (to mutate) | `GET /api/content/v4/pages/{viewId}/layouts` | `[REPO]` |
 | Acquire layout writelock | `PUT /api/content/v4/pages/layouts/{layoutId}/writelock` body `{}` | `[REPO]` — instance-dependent |
@@ -159,6 +160,15 @@ tier hedges. All instance-host, `X-DOMO-Developer-Token` (or SID).
   **required-on-PUT fields that come back `null` on GET** (`viewIds` parallel to `views[]`,
   `pageDrillParentStates:[]`, `conversationalAgentContextRequest`, `viewId`/`landingViewId` as **strings**,
   `parentViewId:"0"`). Missing any of them → new views silently dropped or a bare 400. `[REPO]`
+
+**Later live target differs (2026-10-17):** full GET→mutate→PUT worked with `type:"app"`, numeric
+view IDs and navigation `entity`. Forcing the older clone scaffolding returned 400. Preserve the
+target's representation; do not merge these captures into a guessed universal DTO. Theme collections
+were tested separately. Replacing an AUTOMATIC_COLOR with RGB_HEX failed; preserving its light/dark
+references and editing only existing RGB_HEX entries worked. Read back normalization and actual
+membership. Layout omission alone can restore old card memberships as virtual appendix entries.
+See [live recipes and drill interactions](../docs/domo-cards-validation.md) for failure/repair evidence,
+one-tab consolidation, style sourceIds, static desktop/compact layout checks and verification limits.
 
 **Layout PUT is surgical — but not strictly "in-place only" (hedge c):**
 

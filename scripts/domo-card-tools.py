@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Query the offline chart catalog or inspect explicitly selected cards/pages.
+"""Query the catalog, inspect definitions, or verify native card rendering.
 
 Inspection reads definitions, despite the retrieval endpoint using PUT. It never
-calls card save/copy/delete or queries dataset rows. Reports omit source text.
+calls card save/copy/delete. Rendering reads query results; reports omit row values.
 """
 from __future__ import annotations
 
 import argparse
+import base64
+import binascii
 from collections import Counter
 import json
 import os
@@ -19,6 +21,7 @@ from urllib.request import Request, urlopen
 
 CATALOG = Path(__file__).resolve().parents[1] / "docs/reference/domo-card-config-catalog.json"
 HOST = re.compile(r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.domo\.com")
+CARD_URN = re.compile(r"(?:[0-9]+|dr:[0-9]+:[0-9]+)")
 
 
 def page_id(value: str, instance: str) -> str:
@@ -93,7 +96,42 @@ def summarize_definition(raw: dict) -> dict:
     result["annotation_count"] = count_list(definition.get("annotations"))
     result["control_count"] = count_list(definition.get("controls"))
     result["formula_definition_count"] = count_list(definition.get("formulas"))
+    # The outer drillpath lists ancestors, not descendants of the requested card.
+    result["drill_ancestor_count"] = count_list(raw.get("drillpath"))
     return result
+
+
+def summarize_render(raw: dict, expected_dataset: str | None = None) -> dict:
+    """Validate the observed named-parts response without exposing any data values."""
+    if not isinstance(raw, dict):
+        raise ValueError("Expected named render parts")
+    image_part = raw.get("image")
+    img = image_part.get("data") if isinstance(image_part, dict) else None
+    if not isinstance(img, str):
+        raise ValueError("Missing native image")
+    try:
+        decoded = base64.b64decode(img.split(",", 1)[-1], validate=True)
+    except (ValueError, binascii.Error):
+        raise ValueError("Invalid image encoding") from None
+    if not decoded.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise ValueError("Expected a native PNG image")
+    qr = raw.get("queryResult")
+    data = qr.get("data") if isinstance(qr, dict) else None
+    if not isinstance(data, dict) or not isinstance(data.get("rows"), list):
+        raise ValueError("Missing structured query result")
+    rows = data["rows"]
+    if data.get("numRows") != len(rows):
+        raise ValueError("Inconsistent query row count")
+    if expected_dataset and data.get("datasource") != expected_dataset:
+        raise ValueError("Rendered query uses an unexpected dataset")
+    known_types = {"STRING", "LONG", "DOUBLE", "DECIMAL", "DATE", "DATETIME", "BOOLEAN"}
+    return {"png_bytes": len(decoded), "returned_rows": len(rows),
+            "column_types": [m.get("type") if m.get("type") in known_types else "OTHER"
+                             for m in data.get("metadata", [])],
+            "limited": raw.get("limited"), "query_limited": qr.get("limited"),
+            "not_all_data_shown": raw.get("notAllDataShown"),
+            "image_not_all_data_shown": raw.get("image", {}).get("notAllDataShown"),
+            "expected_dataset_checked": bool(expected_dataset)}
 
 
 class Client:
@@ -111,18 +149,24 @@ class Client:
                         else {"X-Domo-Authentication": sid})
 
     def request(self, path: str, body=None):
-        # Restrict this client to two retrieval operations. PUT here is a read.
+        # Allowlist retrieval/rendering only. No save, copy, or delete operations.
         if body is None:
             if not re.fullmatch(r"/api/content/v1/pages/[0-9]+/cards", path):
                 raise ValueError("Unsupported retrieval path")
             method, data = "GET", None
         else:
-            if path != "/api/content/v3/cards/kpi/definition":
-                raise ValueError("Unsupported definition retrieval path")
-            if (set(body) != {"dynamicText", "variables", "urn"}
+            if path == "/api/content/v3/cards/kpi/definition":
+                if (set(body) != {"dynamicText", "variables", "urn"}
                     or body["dynamicText"] is not True or body["variables"] is not True
-                    or not re.fullmatch(r"[0-9]+", str(body["urn"]))):
-                raise ValueError("Invalid definition read request")
+                    or not CARD_URN.fullmatch(str(body["urn"]))):
+                    raise ValueError("Invalid definition read request")
+            elif re.fullmatch(r"/api/content/v1/cards/kpi/(?:[0-9]+|dr:[0-9]+:[0-9]+)/render\?parts=image,queryResult", path):
+                if (set(body) != {"width", "height"}
+                        or any(type(body[k]) is not int or not 1 <= body[k] <= 8192
+                               for k in ("width", "height"))):
+                    raise ValueError("Rendering requires bounded integer width and height")
+            else:
+                raise ValueError("Unsupported retrieval path")
             method, data = "PUT", json.dumps(body).encode()
         req = Request(self.base + path, data=data, method=method,
                       headers={**self.headers, "Content-Type": "application/json"})
@@ -154,7 +198,7 @@ def inspect(client, pages: list[str], cards: list[str]) -> dict:
                              "standard": len(kpis), "other": len(entries) - len(kpis),
                              "card_ids": kpis})
     results, failures = [], []
-    for cid in sorted(selected, key=int):
+    for cid in sorted(selected, key=lambda s: [int(p) for p in s.replace("dr:", "").split(":")]):
         try:
             raw = client.request("/api/content/v3/cards/kpi/definition",
                                  {"dynamicText": True, "variables": True, "urn": cid})
@@ -190,10 +234,16 @@ def main(argv=None) -> int:
     cat.add_argument("chart", nargs="?")
     cat.add_argument("--search", default="")
     cat.add_argument("--property", default="")
-    live = sub.add_parser("inspect", help="Read only the selected pages/cards")
-    live.add_argument("--instance", default=os.environ.get("INSTANCE"))
-    live.add_argument("--page", action="append", default=[])
-    live.add_argument("--card", action="append", default=[])
+    for command, help_text in [("inspect", "Read selected definitions"),
+                               ("verify", "Read definitions and render native PNG/query results")]:
+        live = sub.add_parser(command, help=help_text)
+        live.add_argument("--instance", default=os.environ.get("INSTANCE"))
+        live.add_argument("--page", action="append", default=[])
+        live.add_argument("--card", action="append", default=[])
+        if command == "verify":
+            live.add_argument("--width", type=int, default=900)
+            live.add_argument("--height", type=int, default=600)
+            live.add_argument("--expected-dataset")
     args = parser.parse_args(argv)
     try:
         if args.command == "catalog":
@@ -204,10 +254,19 @@ def main(argv=None) -> int:
         else:
             if not args.page and not args.card:
                 raise ValueError("Specify at least one --page or --card")
-            if any(not re.fullmatch(r"[0-9]+", cid) for cid in args.card):
-                raise ValueError("Card identifiers must be numeric")
+            if any(not CARD_URN.fullmatch(cid) for cid in args.card):
+                raise ValueError("Use numeric card IDs or dr:<viewId>:<rootCardId> URNs")
             client = Client(args.instance or "")
             report = inspect(client, [page_id(p, args.instance) for p in args.page], args.card)
+            if args.command == "verify":
+                for card in report["cards"]:
+                    cid = card["card_id"]
+                    try:
+                        raw = client.request(f"/api/content/v1/cards/kpi/{cid}/render?parts=image,queryResult",
+                                             {"width": args.width, "height": args.height})
+                        card["render"] = summarize_render(raw, args.expected_dataset)
+                    except (RuntimeError, ValueError, KeyError, TypeError):
+                        report["failures"].append({"card_id": cid, "error": "Native render verification failed"})
             status = 1 if report["failures"] else 0
         print(json.dumps(report, ensure_ascii=False, indent=2))
         return status

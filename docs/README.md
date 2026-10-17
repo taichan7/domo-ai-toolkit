@@ -20,6 +20,7 @@ Guides and references. Most guides have a Japanese twin (`*.ja.md`).
 | [domo-workflow-reference.md](domo-workflow-reference.md) | Per-shape / per-action Domo Workflows reference |
 | [domo-cards-reference.md](domo-cards-reference.md) | Standard card / chart types |
 | [domo-cards-configuration.md](domo-cards-configuration.md) / [ja](domo-cards-configuration.ja.md) | Native-card bindings, properties, definition authoring and app placement |
+| [domo-cards-validation.md](domo-cards-validation.md) / [ja](domo-cards-validation.ja.md) | Live authoring failures/repairs, drill paths, native image/data checks and one-tab App Studio configuration |
 | [domo-card-config-catalog.json](reference/domo-card-config-catalog.json) | Searchable role/property metadata for 71 observed chart codes; query with `scripts/domo-card-tools.py` |
 
 ## Deep references (clone & migration work)

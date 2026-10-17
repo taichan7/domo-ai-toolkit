@@ -655,7 +655,7 @@ The shape the App Studio editor sends on save (capture verified 2026-05-12 again
 PUT /api/content/v1/dataapps/<dataappId>?includeHiddenViews=true
 ```
 
-The body must include **fields that come back as null on GET** — they're required on PUT or new views[] entries are silently dropped:
+For this older clone capture, the body needed **fields that come back as null on GET** or new views[] entries were silently dropped:
 
 | Field | Type | Notes |
 |---|---|---|
@@ -671,7 +671,12 @@ The body must include **fields that come back as null on GET** — they're requi
 | `views[].children` | `[]` | |
 | `navigations[]` | object[] | One VIEW entry per viewId + standard HOME/AI_ASSISTANT/CONTROLS/DISTRIBUTE/MORE system entries. |
 
-The full body shape is captured in [docs/reference/app-studio-clone.md](../docs/reference/app-studio-clone.md). Use a captured-pattern template and substitute source values; do NOT round-trip a GET response without filling in the null-on-read scaffolding fields.
+The full body shape is captured in [docs/reference/app-studio-clone.md](../docs/reference/app-studio-clone.md).
+**A later target (2026-10-17) accepted the full GET object and rejected the older scaffolding.**
+It kept `type:"app"`, numeric view IDs and navigation `entity` fields. Preserve the target's
+representation for theme/nav edits; use the older scaffolding only where verified, particularly
+when adding views. See [live app/card validation](../docs/domo-cards-validation.md) for the
+field-by-field experiments and automatic-color preservation rule.
 
 ### Step 10e — Nav icon `phosphor` field is stripped on PUT (OPEN gap)
 
@@ -798,6 +803,12 @@ See [docs/reference/app-studio-clone.md](../docs/reference/app-studio-clone.md) 
 
 Two paths: **CREATE on page** (`PUT /api/content/v3/cards/kpi?pageId=<viewId>`) for new cards, or **UPDATE by urn** (`PUT /api/content/v3/cards/kpi/<urn>`) when overlaying source style onto an existing target card.
 
+For authoring/validation rather than ID-only cloning, read
+[native-card validation and drill paths](../docs/domo-cards-validation.md) / [日本語](../docs/domo-cards-validation.ja.md).
+The later live exercise validated 35 final displayed cards across 31 codes, two drill views,
+native image/query results, and one-tab App Studio placement. Card save, data correctness,
+rendering and browser interaction are separate checks.
+
 ### Definition-driven id-swap (CANONICAL)
 
 This is the ID-only-swap principle applied to cards. Verified 2026-05-14 on 6 Exec Summary cards (3 filters + 3 hero pop_multi_value) with full source overrides landing on target.
@@ -820,7 +831,9 @@ This is the ID-only-swap principle applied to cards. Verified 2026-05-14 on 6 Ex
    - `definition.subscriptions.main.dataSourceId` (strip — moves to top-level `dataProvider`)
    - `definition.formulas[].formulaId` references (via formula map if remapping)
    - `definition.charts.main.overrides` formula refs (e.g. `DOMO_BEAST_MODE(<src_templateId>)` → `DOMO_BEAST_MODE(<tgt_templateId>)`)
-   - `definition.drillpath[].pageId` (via view map — or strip if drill targets aren't being cloned)
+   - If a definition contains page-drill destinations such as `definition.drillpath[].pageId`,
+     map those through the view map. This is distinct from native-card drill URNs and the outer
+     definition response's `drillpath` (ancestor list).
    - `dynamicTitle` variable refs (e.g. `<VARIABLE 752>` → `<VARIABLE 118280>`)
    - Everything else preserved verbatim.
 
@@ -832,7 +845,8 @@ This is the ID-only-swap principle applied to cards. Verified 2026-05-14 on 6 Ex
 
 5. **Strip read-only fields**:
    - `urn`, `id`, `embedded`, `dataSourceWrite`, `columns` (top-level)
-   - Drop `definition.drillpath` if drill targets aren't being cloned
+   - Handle unmapped page-drill destinations deliberately. Do not assume dropping one field
+     clones or removes native-card drill children: inspect root metadata `drillPathURNs`.
    - **KEEP `definition.modified` and `definition.allowTableDrill`** — prior skill guidance said remove these, but empirically removing them breaks the UPDATE. The card-creation skill's gotcha #14 is wrong on this point.
 
 6. **Top-level body**:
@@ -848,6 +862,25 @@ This is the ID-only-swap principle applied to cards. Verified 2026-05-14 on 6 Ex
 7. **PUT**:
    - CREATE on page: `PUT /api/content/v3/cards/kpi?pageId=<tgt_viewId>` → returns new card body with new urn.
    - UPDATE by urn: `PUT /api/content/v3/cards/kpi/<tgt_urn>` → overlays style onto existing card.
+
+### Native drill views and actual render validation
+
+Create a child with the usual write envelope at
+`PUT /api/content/v3/cards/kpi?parentUrn=<root-id>` (no pageId). The returned identity is
+`dr:<view-id>:<root-id>`; use the full URN for definition reads, updates and rendering.
+Sequential creates on the same root produced a sequential path in the live target; re-read
+`drillPathURNs`, `drillPath` and `drillParents` metadata to confirm order. Root definition
+`drillpath:[]` is an empty **ancestor** list, not proof that the root has no children.
+
+App Studio's root content needs `interaction:{type:"DRILL",config:{}}` for in-place drill.
+Child drill views are not app navigation tabs. Test cumulative category filters against SQL,
+then exercise clicks/back/reset when browser verification is authorized and available.
+
+`PUT /api/content/v1/cards/kpi/<urn>/render?parts=image,queryResult` with
+`{width:900,height:600}` worked with SID and returned named image/queryResult parts. Both
+dimensions were required in this target. Inspect images and limit flags; legacy data GET was
+capped at 500, whereas the renderer returned all 9,006 distribution observations. Read the
+linked validation guide for the complete failure/repair table and verification limits.
 
 ### Subscriptions: omit big_number when source doesn't have it
 

@@ -20,6 +20,7 @@ inside a Pro Code `manifest.json`; a Phoenix chart drawn by custom JavaScript is
 | Place native cards and Pro Code together; filters, SDK and embedding | [Native cards plus Pro Code](domo-procode-embedded-cards.md) and [App Studio](domo-appstudio.md) |
 | Cross-instance creation/migration | [Native KPI clone recipe](domo-cross-instance-clone.md#section-11--native-kpi-cards) |
 | Calculated fields or host Variables/filters | [Beast Modes](domo-beast-mode.md) / [Variables and filters](domo-variables-filters.md) |
+| Live authoring failures, native render validation, click-to-drill, one-tab app configuration | [Verified recipes and trial-and-error findings](../docs/domo-cards-validation.md) / [日本語](../docs/domo-cards-validation.ja.md) |
 
 ## Requirement to working card
 
@@ -48,6 +49,7 @@ python3 scripts/domo-card-tools.py catalog badge_pivot_table --property subtotal
 # Authenticated read-only inspection; INSTANCE and DOMO_TOKEN or SID must be exported.
 python3 scripts/domo-card-tools.py inspect --page https://example.domo.com/page/123
 python3 scripts/domo-card-tools.py inspect --card 456
+python3 scripts/domo-card-tools.py verify --card 456 --width 900 --height 600
 ```
 
 Repeat `--page` / `--card` for a supplied set. The tool skips non-KPI cards, deduplicates IDs and
@@ -58,6 +60,9 @@ The 2026-10-17 study read **154 cards / 71 chart codes / 110 configured property
 also contains public Phoenix mapping/property metadata: **820 distinct property keys**, including
 types, value lists, prerequisites, feature flags and per-chart variations. Distinguish [LIVE] stored
 settings from [DOC] possibilities. No save/render test was performed in that study.
+The separate authoring exercise verified **35 final displayed cards / 31 chart codes**, plus two
+drill views, using native images and query results. Its repairs and verification limits are in
+the linked validation guide. Keep these denominators separate from the read-only catalog study.
 
 ## The configuration traps that matter
 
@@ -83,6 +88,16 @@ settings from [DOC] possibilities. No save/render test was performed in that stu
   and transitive Beast Mode dependencies. Never leave a reference without a definition/resolution.
 - Do not invent a summary subscription: preserve a template with `main` only when it has no
   `big_number`. Where present, the summary query can differ from the plotted query.
+- Validate grain and measure semantics: repeated event quantities cannot be summed as entity
+  totals. A string timestamp needs a typed formula; a stored MONTH dateGrain alone did not produce
+  monthly query rows in the live exercise. A data preview capped at 500 is not a full box-plot sample.
+- Use native render with **both width and height**. Inspect named `image`/`queryResult` parts and
+  compare values to independent SQL; a successful save, query or PNG is not proof of a correct chart.
+- For drill-down, create child views with `?parentUrn=<root-id>` and verify root metadata
+  `drillPathURNs`. The definition's outer `drillpath` lists **ancestors**, so a root `[]` says
+  nothing about its children. Pass the full `dr:<view-id>:<root-id>` URN to child reads/updates.
+  Configure App Studio `interaction.type:"DRILL"`; test cumulative filters at every level.
+  Drill views are distinct from App Studio navigation tabs and page-drill destinations.
 
 ## Instance API operations
 
@@ -99,6 +114,8 @@ writes; endpoint existence does not authorize changing a supplied source dashboa
 | Simple metadata update | `PUT /api/content/v1/cards/{id}` | [REPO] title partial-merge verified; not proof of arbitrary graph retargeting |
 | New native KPI on a page | `PUT /api/content/v3/cards/kpi?pageId={pageId}` | [REPO] full transformed definition, not the raw read response |
 | Update a native KPI | `PUT /api/content/v3/cards/kpi/{urn}` | [REPO] read target first; preserve modification/identity fields |
+| New drill view | `PUT /api/content/v3/cards/kpi?parentUrn={rootId}` | [LIVE] normal write envelope, no pageId; ordered ancestry verified |
+| Native image and data verification | `PUT /api/content/v1/cards/kpi/{urn}/render?parts=image,queryResult` | [LIVE] body `{width:900,height:600}`; SID and drill URNs worked |
 | Delete a disposable copy | `DELETE /api/content/v1/cards/{id}` | [REPO] source selection/authorization must be explicit |
 
 The [authoring guide](../docs/domo-cards-configuration.md#authoring-reuse-a-graph-then-verify-the-saved-result)
